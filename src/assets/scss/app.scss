@@ -9,13 +9,13 @@
     font-family: $primary_font;
 }
 .home__header {
-    display: flex;
     background-color: #c4dad2;
-    align-items: center;
 }
-
+.home__header > div {
+    max-height: 64px;
+}
 .home__menu {
-    min-width: 65%;
+    min-width: 85%;
     background-color: #c4dad2;
 }
 
@@ -26,19 +26,11 @@
     font-weight: 700;
 }
 
-.home__header_logo {
-    min-width: 15%;
+.home__header__logo {
+    max-width: 15%;
     text-align: center;
 }
 
-.home__header__input {
-    min-width: 15%;
-    display: flex;
-    align-items: center;
-}
-
-.home__header__input .input__search {
-    padding: 5px 10px;
-    width: 70%;
-    color: #ccc;
+.home__header__logo .header__logo__text {
+    cursor: pointer;
 }

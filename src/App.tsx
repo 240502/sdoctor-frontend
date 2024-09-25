@@ -1,13 +1,6 @@
-import { useState } from 'react';
-import { Button } from 'antd';
-import type { MenuProps } from 'antd';
-import { Menu } from 'antd';
 import { publicRoutes } from './routes';
-import { AppLayout } from './modules/app';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 function App() {
-    const [count, setCount] = useState(0);
-
     return (
         <div className="App">
             <Router>
