@@ -1,0 +1,29 @@
+.home__content {
+    .block__for__you {
+        .block__list_item {
+            cursor: pointer;
+        }
+        .block__title {
+        }
+
+        .block__heading:hover {
+            opacity: 0.5;
+        }
+        .block__heading {
+            color: #000;
+        }
+    }
+    .block__services {
+        .block__group {
+            .block__list__item {
+                .item__heading {
+                    color: #000;
+                    transition: all 0.1s linear;
+                }
+                .item__heading:hover {
+                    opacity: 0.5;
+                }
+            }
+        }
+    }
+}
