@@ -9,14 +9,14 @@
     font-family: $primary_font;
 }
 .home__header {
-    background-color: #c4dad2;
+    background-color: #fff;
 }
-.home__header > div {
-    max-height: 64px;
+.home__header {
+    height: 78px;
 }
 .home__menu {
     min-width: 85%;
-    background-color: #c4dad2;
+    background-color: #fff;
 }
 
 .home__menu__item {

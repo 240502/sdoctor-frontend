@@ -8,7 +8,10 @@ const { Header, Content, Footer } = Layout;
 export const AppLayout = ({ children }: any) => {
     return (
         <Layout>
-            <Header className="home__header">
+            <Header
+                className="home__header position-fixed top-0 start-0 end-0"
+                style={{ zIndex: '99' }}
+            >
                 <div className="container d-flex justify-content-between">
                     <div className="home__header__logo">
                         <Link
@@ -28,7 +31,9 @@ export const AppLayout = ({ children }: any) => {
                 </div>
             </Header>
 
-            <Content className="content mt-3">{children}</Content>
+            <Content style={{ background: '#fff' }} className="content">
+                {children}
+            </Content>
             <Footer>
                 <HomeFooter />
             </Footer>

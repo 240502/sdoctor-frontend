@@ -21,11 +21,11 @@ export const HomeMenu = () => {
 
     return (
         <Menu
-            className="home__menu"
+            className="home__menu "
             mode="horizontal"
             onClick={handleChangeMenu}
             selectedKeys={[current]}
-            style={{ maxHeight: '700px' }}
+            style={{ maxHeight: '700px', zIndex: '99' }}
         >
             <Menu.Item
                 key="home"
