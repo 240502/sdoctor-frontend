@@ -27,15 +27,9 @@
         }
     }
     .block__specialization {
-        .btn__more {
-            height: 38px;
-        }
-        .block__list__item {
-            display: flex;
-            justify-content: space-between;
-        }
-        .block__list__item .item {
-            max-width: 390px !important ;
+        .item {
+            max-width: 400px;
+            margin-left: 10px;
         }
     }
     .item .item__text {
@@ -75,10 +69,10 @@
     }
 
     .left-arrow {
-        left: 5px;
+        left: -5px;
     }
 
     .right-arrow {
-        right: 5px;
+        right: 10px;
     }
 }

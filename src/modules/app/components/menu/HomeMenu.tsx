@@ -1,19 +1,32 @@
 import React, { useEffect, useState } from 'react';
 import { Menu } from 'antd';
 import { Link } from 'react-router-dom';
+import { HomeMenuService } from '../../../../services/home_menuService';
+import { HomeMenuModel } from '../../../../models/home_menu';
 
 export const HomeMenu = () => {
-    const [current, setCurrent] = useState('');
-    const currentMenuLocal = JSON.parse(
-        localStorage.getItem('currentMenu') || ''
-    );
+    const [current, setCurrent] = useState('1');
+    const [homeMenus, setHomeMenus] = useState<HomeMenuModel[]>();
+
+    const loadData = async () => {
+        try {
+            const data = await HomeMenuService.getHomeMenu();
+            setHomeMenus(data);
+        } catch (err: any) {
+            console.log(err.message);
+        }
+    };
+    const getCurrentMenuLocal = async (currentMenuLocal: any) => {
+        setCurrent(currentMenuLocal);
+    };
     useEffect(() => {
-        const getCurrentMenuLocal = async () => {
-            if (currentMenuLocal === '') setCurrent('home');
-            setCurrent(currentMenuLocal);
-        };
-        getCurrentMenuLocal();
-    }, [currentMenuLocal]);
+        const currentMenuLocal = JSON.parse(
+            localStorage.getItem('currentMenu') || '1'
+        );
+        getCurrentMenuLocal(currentMenuLocal);
+        loadData();
+    }, []);
+
     const handleChangeMenu = (e: any) => {
         setCurrent(e.key);
         localStorage.setItem('currentMenu', JSON.stringify(e.key));
@@ -27,58 +40,21 @@ export const HomeMenu = () => {
             selectedKeys={[current]}
             style={{ maxHeight: '700px', zIndex: '99' }}
         >
-            <Menu.Item
-                key="home"
-                className="home__menu__item text-decoration-none"
-            >
-                <Link to="/" className="text-decoration-none menu__item__text">
-                    Trang chủ
-                </Link>
-            </Menu.Item>
-            <Menu.Item
-                key="doctor"
-                className="home__menu__item text-decoration-none"
-            >
-                <Link
-                    to="/doctor"
-                    className="text-decoration-none  menu__item__text"
-                >
-                    Bác sĩ
-                </Link>
-            </Menu.Item>
-            <Menu.Item
-                key="clinic"
-                className="home__menu__item text-decoration-none"
-            >
-                <Link
-                    to="clinic"
-                    className="text-decoration-none  menu__item__text"
-                >
-                    {' '}
-                    Cơ sở y tế
-                </Link>
-            </Menu.Item>
-            <Menu.Item key="service" className="home__menu__item ">
-                {' '}
-                <Link
-                    to="service"
-                    className="text-decoration-none  menu__item__text"
-                >
-                    Dịch vụ
-                </Link>
-            </Menu.Item>
-            <Menu.Item
-                key="news"
-                className="home__menu__item text-decoration-none"
-            >
-                <Link
-                    to="news"
-                    className=" menu__item__text text-decoration-none"
-                >
-                    {' '}
-                    Sống khỏe
-                </Link>
-            </Menu.Item>
+            {homeMenus?.map((homeMenu: HomeMenuModel) => {
+                return (
+                    <Menu.Item
+                        key={Number(homeMenu.id)}
+                        className="home__menu__item text-decoration-none"
+                    >
+                        <Link
+                            to={homeMenu.url}
+                            className="text-decoration-none menu__item__text"
+                        >
+                            {homeMenu.name}
+                        </Link>
+                    </Menu.Item>
+                );
+            })}
         </Menu>
     );
 };

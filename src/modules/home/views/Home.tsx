@@ -6,6 +6,7 @@ import { BlockSpecialization } from '../components/BlockSpecialization';
 import { BlockForYou } from '../components/BlockForYou';
 import { BlockClinic } from '../components/BlockClinic';
 import { BlockHotDoctor } from '../components/BlockHotDoctor';
+
 export const Home = () => {
     return (
         <div className="container home__content mt-4">

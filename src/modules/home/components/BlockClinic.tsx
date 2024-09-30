@@ -1,17 +1,43 @@
-import { useRef } from 'react';
-import { Image, Button, Carousel } from 'antd';
+import { useEffect, useState } from 'react';
+import { Image, Button } from 'antd';
 import { Link } from 'react-router-dom';
-import { LeftOutlined, RightOutlined } from '@ant-design/icons';
+import 'slick-carousel/slick/slick.css';
+import 'slick-carousel/slick/slick-theme.css';
+import NextArrow from './NextArrow';
+import PrevArrow from './PrevArrow';
+import Slider from 'react-slick';
+import { Clinic } from '../../../models/clinic';
+import { ClinicService } from '../../../services/clinicService';
+import { apiClient, baseURL } from '../../../constants/api';
 export const BlockClinic = (): JSX.Element => {
-    const carouselRef = useRef<any>(null);
-
-    const next = () => {
-        carouselRef.current.next();
+    var settings = {
+        dots: false,
+        infinite: true,
+        slidesToShow: 3,
+        slidesToScroll: 3,
+        autoplay: true,
+        speed: 2000,
+        autoplaySpeed: 2000,
+        cssEase: 'ease-in-out',
+        arrow: true,
+        nextArrow: <NextArrow />,
+        prevArrow: <PrevArrow />,
+    };
+    const [clinics, setClinics] = useState<Clinic[]>();
+    const loadData = async () => {
+        try {
+            const data = await ClinicService.getPopularClinic();
+            console.log(data);
+            setClinics(data);
+        } catch (err: any) {
+            console.log(err.message);
+        }
     };
 
-    const prev = () => {
-        carouselRef.current.prev();
-    };
+    useEffect(() => {
+        loadData();
+    }, []);
+
     return (
         <div className="block__specialization row mt-5">
             <div className="block__header d-flex justify-content-between align-items-center">
@@ -19,96 +45,25 @@ export const BlockClinic = (): JSX.Element => {
                 <Button className="btn__more pt-3 pb-3 fs-5">Xem thêm</Button>
             </div>
             <div className="block__list mt-4 position-relative">
-                <Carousel ref={carouselRef} autoplay autoplaySpeed={3000}>
-                    <div className="slide__container">
-                        <div className="block__list__item row justify-content-between ">
-                            <div className="item border m-3 border-1 rounded p-3  ">
+                <Slider {...settings}>
+                    {clinics?.map((clinic: Clinic) => {
+                        return (
+                            <div className="item  border border-1 rounded p-3  ">
                                 <Link to="" className=" text-decoration-none">
                                     <Image
+                                        height={157}
+                                        width={330}
                                         preview={false}
-                                        src="https://cdn.bookingcare.vn/fo/w640/2023/12/26/101627-co-xuong-khop.png"
+                                        src={baseURL + clinic.avatar}
                                     ></Image>
                                     <p className="item__text mt-3 text-center text-decoration-none fs-5 text-capitalize">
-                                        Cơ xương khớp
+                                        {clinic.name}
                                     </p>
                                 </Link>
                             </div>
-                            <div className="item border m-3 border-1 rounded p-3">
-                                <Link to="" className=" text-decoration-none">
-                                    <Image
-                                        preview={false}
-                                        src="https://cdn.bookingcare.vn/fo/w640/2023/12/26/101627-co-xuong-khop.png"
-                                    ></Image>
-                                    <p className="item__text mt-3 text-center text-decoration-none fs-5 text-capitalize">
-                                        Cơ xương khớp
-                                    </p>
-                                </Link>
-                            </div>
-                            <div className="item border m-3 border-1 rounded p-3">
-                                <Link to="" className=" text-decoration-none">
-                                    <Image
-                                        preview={false}
-                                        src="https://cdn.bookingcare.vn/fo/w640/2023/12/26/101627-co-xuong-khop.png"
-                                    ></Image>
-                                    <p className="item__text mt-3 text-center text-decoration-none fs-5 text-capitalize">
-                                        Cơ xương khớp
-                                    </p>
-                                </Link>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="slide__container">
-                        <div className="block__list__item row justify-content-between overflow-hidden">
-                            <div className="item border m-3 border-1 rounded p-3 ">
-                                <Link to="" className=" text-decoration-none">
-                                    <Image
-                                        preview={false}
-                                        src="https://cdn.bookingcare.vn/fo/w640/2023/12/26/101627-co-xuong-khop.png"
-                                    ></Image>
-                                    <p className="item__text mt-3 text-center text-decoration-none fs-5 text-capitalize">
-                                        Cơ xương khớp
-                                    </p>
-                                </Link>
-                            </div>
-                            <div className="item border m-3 border-1 rounded p-3">
-                                <Link to="" className=" text-decoration-none">
-                                    <Image
-                                        preview={false}
-                                        src="https://cdn.bookingcare.vn/fo/w640/2023/12/26/101627-co-xuong-khop.png"
-                                    ></Image>
-                                    <p className="item__text mt-3 text-center text-decoration-none fs-5 text-capitalize">
-                                        Cơ xương khớp
-                                    </p>
-                                </Link>
-                            </div>
-                            <div className="item border m-3 border-1 rounded p-3 overflow-hidden">
-                                <Link to="" className=" text-decoration-none">
-                                    <Image
-                                        preview={false}
-                                        src="https://cdn.bookingcare.vn/fo/w640/2023/12/26/101627-co-xuong-khop.png"
-                                    ></Image>
-                                    <p className="item__text mt-3 text-center text-decoration-none fs-5 text-capitalize">
-                                        Cơ xương khớp
-                                    </p>
-                                </Link>
-                            </div>
-                        </div>
-                    </div>
-                </Carousel>
-                <Button
-                    icon={<LeftOutlined />}
-                    onClick={prev}
-                    variant="outlined"
-                    className="carousel-arrow left-arrow"
-                />
-
-                {/* Nút mũi tên phải */}
-                <Button
-                    icon={<RightOutlined />}
-                    onClick={next}
-                    variant="outlined"
-                    className="carousel-arrow right-arrow"
-                />
+                        );
+                    })}
+                </Slider>
             </div>
         </div>
     );

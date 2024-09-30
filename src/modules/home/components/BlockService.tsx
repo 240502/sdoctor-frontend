@@ -1,168 +1,56 @@
-import React from 'react';
 import { Link } from 'react-router-dom';
 import { Image } from 'antd';
+import { useEffect, useState } from 'react';
 
+import { HomeDirectoryService } from '../../../services/home_directoryService';
+import { HomeDirectory } from '../../../models/home_directory';
+import { baseURL } from '../../../constants/api';
 export const BlockService = () => {
+    const [homeDirectories, setHomeDirectories] = useState<HomeDirectory[]>();
+    const loadData = async () => {
+        try {
+            const data = await HomeDirectoryService.getHomeDirectory();
+            console.log(data);
+            setHomeDirectories(data);
+        } catch (err: any) {
+            console.error(err);
+        }
+    };
+    useEffect(() => {
+        loadData();
+    }, []);
     return (
         <div className="row block__services mt-5">
             <h3 className="block__title fs-4 fw-bold mb-4">
                 Dịch vụ toàn diện
             </h3>
             <div className="block__list row">
-                <div className="block__group d-flex justify-content-between mb-5 ">
-                    <Link to="" className="text-decoration-none col-5">
-                        <div className="block__list__item  align-items-center border rounded-pill d-flex p-4  ">
-                            <Image
-                                className=""
-                                preview={false}
-                                src="https://bookingcare.vn/_next/image?url=https%3A%2F%2Fcdn.bookingcare.vn%2Ffo%2F2023%2F06%2F07%2F161905-iconkham-chuyen-khoa.png&w=128&q=75"
-                                style={{ width: '40%' }}
-                            ></Image>
+                {homeDirectories?.map((item: HomeDirectory) => {
+                    return (
+                        <div
+                            className="block__group col-6  mb-5 "
+                            key={Number(item.id)}
+                        >
+                            <Link
+                                to={item.url}
+                                className="text-decoration-none col-5"
+                            >
+                                <div className="block__list__item  align-items-center border rounded-pill d-flex p-4  ">
+                                    <Image
+                                        className=""
+                                        preview={false}
+                                        src={baseURL + item.image}
+                                        style={{ width: '40%' }}
+                                    ></Image>
 
-                            <h3 className="ms-5 fs-4 item__heading">
-                                Khám chuyên khoa
-                            </h3>
+                                    <h3 className="ms-5 mb-0 fs-4 item__heading text-center">
+                                        {item.name}
+                                    </h3>
+                                </div>
+                            </Link>
                         </div>
-                    </Link>
-                    <Link to="" className="text-decoration-none col-5">
-                        <div className="block__list__item  align-items-center d-flex  p-4  border rounded-pill">
-                            <Image
-                                preview={false}
-                                className=""
-                                src="https://bookingcare.vn/_next/image?url=https%3A%2F%2Fcdn.bookingcare.vn%2Ffo%2F2023%2F06%2F07%2F161905-iconkham-chuyen-khoa.png&w=128&q=75"
-                                style={{ width: '40%' }}
-                            ></Image>
-
-                            <h3 className="ms-5 fs-4 item__heading">
-                                Khám từ xa
-                            </h3>
-                        </div>
-                    </Link>
-                </div>
-
-                <div className="block__group d-flex justify-content-between mb-5">
-                    <Link to="" className="text-decoration-none col-5">
-                        <div className="block__list__item  align-items-center border rounded-pill d-flex p-4 ">
-                            <Image
-                                className=""
-                                preview={false}
-                                src="https://bookingcare.vn/_next/image?url=https%3A%2F%2Fcdn.bookingcare.vn%2Ffo%2F2023%2F06%2F07%2F161905-iconkham-chuyen-khoa.png&w=128&q=75"
-                                style={{ width: '40%' }}
-                            ></Image>
-
-                            <h3 className="ms-5 fs-4 item__heading">
-                                Khám tổng quát
-                            </h3>
-                        </div>
-                    </Link>
-                    <Link to="" className="text-decoration-none col-5">
-                        <div className="block__list__item  align-items-center d-flex  p-4  border rounded-pill">
-                            <Image
-                                preview={false}
-                                className=""
-                                src="https://bookingcare.vn/_next/image?url=https%3A%2F%2Fcdn.bookingcare.vn%2Ffo%2F2023%2F06%2F07%2F161905-iconkham-chuyen-khoa.png&w=128&q=75"
-                                style={{ width: '40%' }}
-                            ></Image>
-
-                            <h3 className="ms-5 fs-4 item__heading">
-                                Xét nghiệm y học
-                            </h3>
-                        </div>
-                    </Link>
-                </div>
-
-                <div className="block__group d-flex justify-content-between mb-5">
-                    <Link to="" className="text-decoration-none col-5">
-                        <div className="block__list__item  align-items-center border rounded-pill d-flex p-4 ">
-                            <Image
-                                className=""
-                                preview={false}
-                                src="https://bookingcare.vn/_next/image?url=https%3A%2F%2Fcdn.bookingcare.vn%2Ffo%2F2023%2F06%2F07%2F161905-iconkham-chuyen-khoa.png&w=128&q=75"
-                                style={{ width: '40%' }}
-                            ></Image>
-
-                            <h3 className="ms-5 fs-4 item__heading">
-                                Sức khỏe tinh thần
-                            </h3>
-                        </div>
-                    </Link>
-                    <Link to="" className="text-decoration-none col-5">
-                        {' '}
-                        <div className="block__list__item  align-items-center d-flex  p-4  border rounded-pill">
-                            <Image
-                                preview={false}
-                                className=""
-                                src="https://bookingcare.vn/_next/image?url=https%3A%2F%2Fcdn.bookingcare.vn%2Ffo%2F2023%2F06%2F07%2F161905-iconkham-chuyen-khoa.png&w=128&q=75"
-                                style={{ width: '40%' }}
-                            ></Image>
-
-                            <h3 className="ms-5 fs-4 item__heading">
-                                Khám nha khoa
-                            </h3>
-                        </div>
-                    </Link>
-                </div>
-                <div className="block__group d-flex justify-content-between mb-5">
-                    <Link to="" className="text-decoration-none col-5">
-                        <div className="block__list__item  align-items-center border rounded-pill d-flex p-4 ">
-                            <Image
-                                className=""
-                                preview={false}
-                                src="https://bookingcare.vn/_next/image?url=https%3A%2F%2Fcdn.bookingcare.vn%2Ffo%2F2023%2F06%2F07%2F161905-iconkham-chuyen-khoa.png&w=128&q=75"
-                                style={{ width: '40%' }}
-                            ></Image>
-
-                            <h3 className="ms-5 fs-4 item__heading">
-                                Gói phẫu thuật
-                            </h3>
-                        </div>
-                    </Link>
-                    <Link to="" className="text-decoration-none col-5">
-                        <div className="block__list__item  align-items-center d-flex  p-4  border rounded-pill">
-                            <Image
-                                preview={false}
-                                className=""
-                                src="https://bookingcare.vn/_next/image?url=https%3A%2F%2Fcdn.bookingcare.vn%2Ffo%2F2023%2F06%2F07%2F161905-iconkham-chuyen-khoa.png&w=128&q=75"
-                                style={{ width: '40%' }}
-                            ></Image>
-
-                            <h3 className="ms-5 fs-4 item__heading">
-                                Sống khỏe Tiểu đường
-                            </h3>
-                        </div>
-                    </Link>
-                </div>
-                <div className="block__group d-flex justify-content-between mb-5">
-                    <Link to="" className="text-decoration-none col-5">
-                        <div className="block__list__item  align-items-center border rounded-pill d-flex p-4 ">
-                            <Image
-                                className=""
-                                preview={false}
-                                src="https://bookingcare.vn/_next/image?url=https%3A%2F%2Fcdn.bookingcare.vn%2Ffo%2F2023%2F06%2F07%2F161905-iconkham-chuyen-khoa.png&w=128&q=75"
-                                style={{ width: '40%' }}
-                            ></Image>
-
-                            <h3 className="ms-5 fs-4 item__heading">
-                                Bài Test Sức khỏe
-                            </h3>
-                        </div>
-                    </Link>
-
-                    <Link to="" className="text-decoration-none col-5">
-                        <div className="block__list__item  align-items-center border rounded-pill d-flex p-4 ">
-                            <Image
-                                preview={false}
-                                className=""
-                                src="https://bookingcare.vn/_next/image?url=https%3A%2F%2Fcdn.bookingcare.vn%2Ffo%2F2023%2F06%2F07%2F161905-iconkham-chuyen-khoa.png&w=128&q=75"
-                                style={{ width: '40%' }}
-                            ></Image>
-
-                            <h3 className="ms-5 fs-4 item__heading">
-                                Y tế gần bạn
-                            </h3>
-                        </div>
-                    </Link>
-                </div>
+                    );
+                })}
             </div>
         </div>
     );
