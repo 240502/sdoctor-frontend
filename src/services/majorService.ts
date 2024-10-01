@@ -1,8 +1,8 @@
 import { apiClient } from '../constants/api';
 
 export const MajorService = {
-    async getPopularMajor(): Promise<any> {
-        const res: any = await apiClient.get('/api/major/get-popular-major');
+    async getCommonMajor(): Promise<any> {
+        const res: any = await apiClient.get('/api/major/get-common-major');
         return res?.data;
     },
 };

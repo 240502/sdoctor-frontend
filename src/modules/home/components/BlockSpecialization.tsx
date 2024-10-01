@@ -27,7 +27,7 @@ export const BlockSpecialization = (): JSX.Element => {
     const [majors, setMajors] = useState<Major[]>();
     const loadData = async () => {
         try {
-            const data = await MajorService.getPopularMajor();
+            const data = await MajorService.getCommonMajor();
             console.log(data);
             setMajors(data);
         } catch (err: any) {

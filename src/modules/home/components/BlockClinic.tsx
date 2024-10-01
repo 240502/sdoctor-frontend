@@ -8,7 +8,7 @@ import PrevArrow from './PrevArrow';
 import Slider from 'react-slick';
 import { Clinic } from '../../../models/clinic';
 import { ClinicService } from '../../../services/clinicService';
-import { apiClient, baseURL } from '../../../constants/api';
+import { baseURL } from '../../../constants/api';
 export const BlockClinic = (): JSX.Element => {
     var settings = {
         dots: false,
@@ -26,7 +26,7 @@ export const BlockClinic = (): JSX.Element => {
     const [clinics, setClinics] = useState<Clinic[]>();
     const loadData = async () => {
         try {
-            const data = await ClinicService.getPopularClinic();
+            const data = await ClinicService.getCommonClinic();
             console.log(data);
             setClinics(data);
         } catch (err: any) {
