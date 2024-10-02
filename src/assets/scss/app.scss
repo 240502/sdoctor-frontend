@@ -8,8 +8,12 @@
 .App {
     font-family: $primary_font;
 }
+main {
+    margin-top: 78px;
+}
 .home__header {
     background-color: #fff;
+    box-shadow: 0 10px 10px rgba(0, 0, 0, 0.1);
 }
 .home__header {
     height: 78px;

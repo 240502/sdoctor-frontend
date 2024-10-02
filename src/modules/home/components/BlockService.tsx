@@ -10,7 +10,6 @@ export const BlockService = () => {
     const loadData = async () => {
         try {
             const data = await HomeDirectoryService.getHomeDirectory();
-            console.log(data);
             setHomeDirectories(data);
         } catch (err: any) {
             console.error(err);

@@ -1,7 +1,13 @@
 import { AppLayout } from '../modules/app';
 import { ViewDoctor } from '../modules/doctor';
 import { Home } from '../modules/home';
-import { HOME_PATH, DOCTOR_PATH } from './path';
+import { ViewSpecialization } from '../modules/specialization';
+import {
+    HOME_PATH,
+    VIEW_CLINIC_PATH,
+    VIEW_DOCTOR_PATH,
+    VIEW_SPECIALIZATION_PATH,
+} from './path';
 export const publicRoutes = [
     {
         path: HOME_PATH,
@@ -9,8 +15,13 @@ export const publicRoutes = [
         layout: AppLayout,
     },
     {
-        path: DOCTOR_PATH,
+        path: VIEW_DOCTOR_PATH,
         component: ViewDoctor,
+        layout: AppLayout,
+    },
+    {
+        path: VIEW_SPECIALIZATION_PATH,
+        component: ViewSpecialization,
         layout: AppLayout,
     },
 ];

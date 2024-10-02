@@ -27,7 +27,6 @@ export const BlockHotDoctor = (): JSX.Element => {
     const loadData = async () => {
         try {
             const data = await doctorService.getCommonDoctor();
-            console.log(data);
             setDoctors(data);
         } catch (err: any) {
             console.log(err.message);
@@ -47,7 +46,7 @@ export const BlockHotDoctor = (): JSX.Element => {
                     {doctors?.map((doctor: Doctor) => {
                         return (
                             <div className="slide__container">
-                                <div className="item  m-3  p-3 d-flex  ">
+                                <div className="item   p-3 ">
                                     <Link
                                         to=""
                                         className="text-decoration-none text-center"

@@ -15,7 +15,7 @@ export const BlockClinic = (): JSX.Element => {
         infinite: true,
         slidesToShow: 3,
         slidesToScroll: 3,
-        autoplay: true,
+        autoplay: false,
         speed: 2000,
         autoplaySpeed: 2000,
         cssEase: 'ease-in-out',
@@ -27,7 +27,6 @@ export const BlockClinic = (): JSX.Element => {
     const loadData = async () => {
         try {
             const data = await ClinicService.getCommonClinic();
-            console.log(data);
             setClinics(data);
         } catch (err: any) {
             console.log(err.message);
@@ -39,7 +38,7 @@ export const BlockClinic = (): JSX.Element => {
     }, []);
 
     return (
-        <div className="block__specialization row mt-5">
+        <div className="block__clinic row mt-5">
             <div className="block__header d-flex justify-content-between align-items-center">
                 <h3 className="block__title fs-4 fw-bold">Cơ sở y tế</h3>
                 <Button className="btn__more pt-3 pb-3 fs-5">Xem thêm</Button>
@@ -48,18 +47,22 @@ export const BlockClinic = (): JSX.Element => {
                 <Slider {...settings}>
                     {clinics?.map((clinic: Clinic) => {
                         return (
-                            <div className="item  border border-1 rounded p-3  ">
-                                <Link to="" className=" text-decoration-none">
-                                    <Image
-                                        height={157}
-                                        width={330}
-                                        preview={false}
-                                        src={baseURL + clinic.avatar}
-                                    ></Image>
-                                    <p className="item__text mt-3 text-center text-decoration-none fs-5 text-capitalize">
-                                        {clinic.name}
-                                    </p>
-                                </Link>
+                            <div className="slide__container">
+                                <div className="item border border-1 rounded p-3 text-center  ">
+                                    <Link
+                                        to=""
+                                        className=" text-decoration-none"
+                                    >
+                                        <Image
+                                            className="item__image"
+                                            preview={false}
+                                            src={baseURL + clinic.avatar}
+                                        ></Image>
+                                        <p className="item__text mt-3 text-center text-decoration-none fs-5 text-capitalize">
+                                            {clinic.name}
+                                        </p>
+                                    </Link>
+                                </div>
                             </div>
                         );
                     })}

@@ -16,7 +16,7 @@ export const BlockSpecialization = (): JSX.Element => {
         infinite: true,
         slidesToShow: 3,
         slidesToScroll: 3,
-        autoplay: true,
+        autoplay: false,
         speed: 2000,
         autoplaySpeed: 2000,
         cssEase: 'ease-in-out',
@@ -28,7 +28,6 @@ export const BlockSpecialization = (): JSX.Element => {
     const loadData = async () => {
         try {
             const data = await MajorService.getCommonMajor();
-            console.log(data);
             setMajors(data);
         } catch (err: any) {
             console.log(err.message);
@@ -47,20 +46,25 @@ export const BlockSpecialization = (): JSX.Element => {
                 </h3>
                 <Button className="btn__more pt-3 pb-3 fs-5">Xem thêm</Button>
             </div>
-            <div className="block__list mt-4 position-relative">
+            <div className="block__list mt-4 position-relative p-0 text-center">
                 <Slider {...settings}>
                     {majors?.map((major: Major) => {
                         return (
-                            <div className="item  border border-1 rounded p-3  ">
-                                <Link to="" className=" text-decoration-none">
-                                    <Image
-                                        preview={false}
-                                        src={baseURL + major.image}
-                                    ></Image>
-                                    <p className="item__text mt-3 text-center text-decoration-none fs-5 text-capitalize">
-                                        {major.name}
-                                    </p>
-                                </Link>
+                            <div className="slide__container">
+                                <div className="item  border border-1 rounded p-3  ">
+                                    <Link
+                                        to=""
+                                        className=" text-decoration-none"
+                                    >
+                                        <Image
+                                            preview={false}
+                                            src={baseURL + major.image}
+                                        ></Image>
+                                        <p className="item__text mt-3 text-center text-decoration-none fs-5 text-capitalize">
+                                            {major.name}
+                                        </p>
+                                    </Link>
+                                </div>
                             </div>
                         );
                     })}

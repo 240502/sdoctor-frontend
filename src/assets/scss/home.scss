@@ -28,8 +28,19 @@
     }
     .block__specialization {
         .item {
-            max-width: 400px;
-            margin-left: 10px;
+            width: 90%;
+            margin-left: 5%;
+            margin-right: 5%;
+        }
+    }
+    .block__clinic {
+        .item {
+            width: 90%;
+            margin-left: 5%;
+            margin-right: 5%;
+        }
+        .item__image {
+            height: 157px;
         }
     }
     .item .item__text {
@@ -37,11 +48,9 @@
         font-weight: 600;
     }
     .block__hot__doctor {
-        .block__list__item {
-        }
-        .block__list__item .item {
-            max-width: 390px !important ;
-            width: calc((100% / 4) - 3%);
+        .item {
+            width: 100%;
+            text-align: center;
         }
 
         .item__text div {
@@ -69,10 +78,10 @@
     }
 
     .left-arrow {
-        left: -5px;
+        left: 0px;
     }
 
     .right-arrow {
-        right: 10px;
+        right: 0px;
     }
 }

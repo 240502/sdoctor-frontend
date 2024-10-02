@@ -30,8 +30,7 @@ export const AppLayout = ({ children }: any) => {
                     <HomeMenu></HomeMenu>
                 </div>
             </Header>
-
-            <Content style={{ background: '#fff' }} className="content">
+            <Content style={{ background: '#fff', marginTop: '78px' }}>
                 {children}
             </Content>
             <Footer>
