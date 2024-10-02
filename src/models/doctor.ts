@@ -16,4 +16,5 @@ export interface Doctor {
     fee: Number;
     examination_object: String;
     views: number;
+    time: string[];
 }

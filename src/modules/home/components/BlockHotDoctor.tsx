@@ -23,10 +23,18 @@ export const BlockHotDoctor = (): JSX.Element => {
         nextArrow: <NextArrow />,
         prevArrow: <PrevArrow />,
     };
+    const today = new Date();
+
     const [doctors, setDoctors] = useState<Doctor[]>();
     const loadData = async () => {
         try {
-            const data = await doctorService.getCommonDoctor();
+            const data = await doctorService.getCommonDoctor({
+                date: `${today.getFullYear()}/${today.getMonth() + 1}/${
+                    today.getDate().toString().length === 1
+                        ? '0' + today.getDate()
+                        : today.getDate()
+                }`,
+            });
             setDoctors(data);
         } catch (err: any) {
             console.log(err.message);
