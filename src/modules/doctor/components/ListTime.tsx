@@ -1,31 +1,26 @@
-import React, { useState, useEffect } from 'react';
-import { Time } from '../../../models/time';
-import { TimeService } from '../../../services/timeService';
+import { useState, useEffect } from 'react';
 import { Button } from 'antd';
-export const ListTime = ({
-    id,
-    setIsModalOpen,
-    setDoctor,
-}: any): JSX.Element => {
+import { TimeService } from '../../../services/timeService';
+import { Time } from '../../../models/time';
+export const ListTime = ({ handleOnClickBtnTime, timeId }: any) => {
     const [time, setTime] = useState<Time>();
+    const getTimeById = async (timeId: string) => {
+        try {
+            const result = await TimeService.getTimeById(timeId);
+            setTime(result);
+        } catch (err: any) {
+            console.log(err.message);
+        }
+    };
     useEffect(() => {
-        const getTimeById = async (id: any) => {
-            try {
-                const data: Time = await TimeService.getTimeById(id);
-                setTime(data);
-            } catch (err: any) {
-                console.log(err.message);
-            }
-        };
-
-        getTimeById(id);
-    }, [id]);
+        getTimeById(timeId);
+    }, []);
     return (
         <Button
             key={Number(time?.id)}
             className="me-3 mb-3"
             onClick={() => {
-                setIsModalOpen(true);
+                handleOnClickBtnTime(time);
             }}
         >
             {time?.value}

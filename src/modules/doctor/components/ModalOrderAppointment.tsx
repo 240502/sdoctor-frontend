@@ -1,15 +1,61 @@
-import { useState, useEffect } from 'react';
-import { Button, Modal, Form, Image, Input, Radio, Select } from 'antd';
+import { useState, useEffect, useRef } from 'react';
+import {
+    Button,
+    Modal,
+    Form,
+    Image,
+    Input,
+    Radio,
+    Select,
+    InputRef,
+    SelectProps,
+    RadioProps,
+    RadioChangeEvent,
+} from 'antd';
 import { baseURL } from '../../../constants/api';
-import { EnvironmentOutlined } from '@ant-design/icons';
+import axios from 'axios';
+
 const { TextArea } = Input;
 export const ModalOrderAppointment = ({
     isModalOpen,
     doctor,
     setIsModalOpen,
+    time,
+    date,
 }: any): JSX.Element => {
+    const [provinces, setProvinces] = useState([
+        { province_id: 0, province_name: '' },
+    ]);
+
+    const [districts, setDistricts] = useState([
+        { district_id: 0, district_name: '' },
+    ]);
+    const [district, setDistrict] = useState({
+        district_id: 0,
+        district_name: '',
+    });
+    const [province, setProvince] = useState({
+        province_id: 0,
+        province_name: '',
+    });
+    const [wards, setWards] = useState([{ ward_id: 0, ward_name: '' }]);
+    const [ward, setWard] = useState({ ward_id: 0, ward_name: '' });
+    const inputPatientNameRef = useRef<InputRef>(null);
+    const inputPatientPhoneRef = useRef<InputRef>(null);
+    const inputPatientEmailRef = useRef<InputRef>(null);
+    const inputPatientBirthDateRef = useRef<InputRef>(null);
+    const inputExaminationRef = useRef<InputRef>(null);
+    const inputVillageRef = useRef<InputRef>(null);
+    const radioGenderRef = useRef<string | undefined>(undefined);
+
     const handleOk = () => {
-        console.log(doctor);
+        console.log('Ten' + inputPatientNameRef.current?.input?.value);
+        console.log('phone' + inputPatientPhoneRef.current?.input?.value);
+        console.log('mail' + inputPatientEmailRef.current?.input?.value);
+        console.log('day' + inputPatientBirthDateRef.current?.input?.value);
+        console.log('Ten' + inputPatientNameRef.current?.input?.value);
+
+        console.log('gt' + radioGenderRef.current);
     };
     const [paymentMethod, setPaymentMethod] = useState(1);
 
@@ -19,6 +65,57 @@ export const ModalOrderAppointment = ({
     const handleCancel = () => {
         setIsModalOpen(false);
     };
+    const handleChange = (e: RadioChangeEvent) => {
+        radioGenderRef.current = e.target.value;
+        console.log('Giá trị được chọn:', radioGenderRef.current);
+    };
+    const getListDistrict = async (provinceId: any) => {
+        try {
+            const res = await axios.get(
+                `https://vapi.vnappmob.com//api/province/district/${provinceId}`
+            );
+            setDistricts(res.data.results);
+        } catch (err) {
+            console.log(err);
+        }
+    };
+    const getWards = async (districtId: any) => {
+        try {
+            const res = await axios.get(
+                `https://vapi.vnappmob.com//api/province/ward/${districtId}`
+            );
+            setWards(res.data.results);
+        } catch (err) {
+            console.log(err);
+        }
+    };
+
+    useEffect(() => {
+        const getProvinces = async () => {
+            try {
+                const res = await axios.get(
+                    'https://vapi.vnappmob.com/api/province'
+                );
+                setProvinces(res.data.results);
+            } catch (err) {
+                console.log(err);
+            }
+        };
+        getProvinces();
+    }, []);
+    useEffect(() => {
+        if (province.province_id !== 0) {
+            getListDistrict(province.province_id);
+        }
+    }, [province.province_id]);
+    useEffect(() => {
+        if (districts.length > 0) {
+            if (district !== undefined) {
+                getWards(district.district_id);
+            }
+        }
+    }, [district.district_id]);
+
     return (
         <Modal
             onCancel={handleCancel}
@@ -54,21 +151,22 @@ export const ModalOrderAppointment = ({
                     </div>
                     <div className="appointment__time mt-3">
                         <p className="time">
-                            <strong>Thời gian:</strong> 16:00 - 17:00
+                            <strong>Thời gian:</strong> {time.value}
                         </p>
                         <p className="date">
-                            <strong>Ngày khám:</strong> 2024/10/02
+                            <strong>Ngày khám:</strong> {date}
                         </p>
                     </div>
                     <div className="location mt-3">
                         <span>
                             {' '}
-                            <strong>Địa điểm:</strong> Hà Nội
+                            <strong>Địa điểm:</strong> {doctor.address}
                         </span>
                     </div>
                     <div className="fee mt-3">
                         <span>
-                            <strong>Phí khám:</strong> 900.000 đ
+                            <strong>Phí khám:</strong>{' '}
+                            {doctor.fee.toLocaleString(undefined)} đ
                         </span>
                     </div>
                 </div>
@@ -82,7 +180,8 @@ export const ModalOrderAppointment = ({
                                 Tên bệnh nhân
                             </label>
                             <Input
-                                className="form-control patient_name fw-bold"
+                                ref={inputPatientNameRef}
+                                className="form-control patient_name "
                                 id="patient_name"
                             ></Input>
                         </div>
@@ -90,7 +189,10 @@ export const ModalOrderAppointment = ({
                             <label htmlFor="" className="form-label fw-bold">
                                 Giới tính
                             </label>
-                            <Radio.Group className="d-block">
+                            <Radio.Group
+                                className="d-block"
+                                onChange={handleChange}
+                            >
                                 <Radio value={1}>Nam</Radio>
                                 <Radio value={2}>Nữ</Radio>
                                 <Radio value={3}>Khác</Radio>
@@ -104,6 +206,7 @@ export const ModalOrderAppointment = ({
                                 Số điện thoại
                             </label>
                             <Input
+                                ref={inputPatientPhoneRef}
                                 className="fw-bold form-control patient_phone"
                                 id="patient_phone"
                             ></Input>
@@ -116,6 +219,7 @@ export const ModalOrderAppointment = ({
                                 Email
                             </label>
                             <Input
+                                ref={inputPatientEmailRef}
                                 className="form-control patient_email"
                                 id="patient_email"
                             ></Input>
@@ -125,6 +229,7 @@ export const ModalOrderAppointment = ({
                                 Ngày/ Tháng/ Năm Sinh
                             </label>
                             <Input
+                                ref={inputPatientBirthDateRef}
                                 className=" form-control patient_phone"
                                 id="patient_phone"
                                 type="date"
@@ -137,73 +242,120 @@ export const ModalOrderAppointment = ({
                             <Select
                                 className="d-block"
                                 showSearch
-                                placeholder="Select a person"
+                                onChange={(e) => {
+                                    const province: any = provinces.find(
+                                        (province: any) => {
+                                            return province.province_id === e;
+                                        }
+                                    );
+                                    setProvince(province);
+                                }}
+                                placeholder="Chọn tỉnh/ thành phố"
                                 filterOption={(input, option) =>
-                                    (option?.label ?? '')
+                                    (option?.province_name)
                                         .toLowerCase()
                                         .includes(input.toLowerCase())
                                 }
-                                options={[
-                                    { value: '1', label: 'Jack' },
-                                    { value: '2', label: 'Lucy' },
-                                    { value: '3', label: 'Tom' },
-                                ]}
-                            />
+                            >
+                                {provinces.map((item) => {
+                                    return (
+                                        <Select.Option
+                                            key={item.province_id}
+                                            value={item.province_id}
+                                        >
+                                            {item.province_name}
+                                        </Select.Option>
+                                    );
+                                })}
+                            </Select>
                         </div>
                         <div className="mb-3">
                             <label htmlFor="" className="form-label fw-bold">
                                 Quận/ Huyện
                             </label>
                             <Select
-                                showSearch
                                 className="d-block"
-                                placeholder="Select a person"
+                                showSearch
+                                onChange={(e) => {
+                                    const district: any = districts.find(
+                                        (item: any) => {
+                                            return item.district_id === e;
+                                        }
+                                    );
+                                    setDistrict(district);
+                                }}
+                                placeholder="Chọn quận/ huyện/ thị xã"
                                 filterOption={(input, option) =>
-                                    (option?.label ?? '')
+                                    (option?.district_name)
                                         .toLowerCase()
                                         .includes(input.toLowerCase())
                                 }
-                                options={[
-                                    { value: '1', label: 'Jack' },
-                                    { value: '2', label: 'Lucy' },
-                                    { value: '3', label: 'Tom' },
-                                ]}
-                            />
+                            >
+                                {districts.map((item) => {
+                                    return (
+                                        <Select.Option
+                                            key={item.district_id}
+                                            value={item.district_id}
+                                        >
+                                            {item.district_name}
+                                        </Select.Option>
+                                    );
+                                })}
+                            </Select>
                         </div>
                         <div className="mb-3">
                             <label htmlFor="" className="form-label fw-bold">
                                 Xã/ Phường
                             </label>
                             <Select
-                                showSearch
                                 className="d-block"
-                                placeholder="Select a person"
+                                showSearch
+                                onChange={(e) => {
+                                    const ward: any = wards.find((w: any) => {
+                                        return w.ward_id === e;
+                                    });
+                                    setWard(ward);
+                                }}
+                                placeholder="Chọn xã/ phường"
                                 filterOption={(input, option) =>
-                                    (option?.label ?? '')
+                                    (option?.ward_name)
                                         .toLowerCase()
                                         .includes(input.toLowerCase())
                                 }
-                                options={[
-                                    { value: '1', label: 'Jack' },
-                                    { value: '2', label: 'Lucy' },
-                                    { value: '3', label: 'Tom' },
-                                ]}
-                            />
+                            >
+                                {wards.map((item) => {
+                                    return (
+                                        <Select.Option
+                                            key={item.ward_id}
+                                            value={item.ward_id}
+                                        >
+                                            {item.ward_name}
+                                        </Select.Option>
+                                    );
+                                })}
+                            </Select>
                         </div>
                         <div className="mb-3">
-                            <label htmlFor="" className="form-label fw-bold">
+                            <label
+                                htmlFor="patient_village"
+                                className="form-label fw-bold"
+                            >
                                 Tổ/ Khu/ Thôn/ Xóm
                             </label>
                             <Input
-                                className="form-control patient_email"
-                                id="patient_"
+                                ref={inputVillageRef}
+                                className="form-control patient_village"
+                                id="patient_village"
                             ></Input>
                         </div>
                         <div className="mb-3">
                             <label htmlFor="" className="form-label fw-bold">
                                 Lý do khám
                             </label>
-                            <TextArea className="form-control"></TextArea>
+                            <TextArea
+                                ref={inputExaminationRef}
+                                className="form-control"
+                            ></TextArea>
                         </div>
                         <div className="mb-3">
                             <label htmlFor="" className="form-label fw-bold">
