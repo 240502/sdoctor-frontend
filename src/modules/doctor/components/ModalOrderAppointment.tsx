@@ -8,13 +8,16 @@ import {
     Radio,
     Select,
     InputRef,
-    SelectProps,
-    RadioProps,
     RadioChangeEvent,
 } from 'antd';
 import { baseURL } from '../../../constants/api';
 import axios from 'axios';
-
+import { isEmpty } from '../../../utils/global';
+import { useRecoilState } from 'recoil';
+import socket from '../../../socket';
+import { appointmentListState } from '../../../stores/appointmentAtom';
+import { doctorListState } from '../../../stores/doctorAtom';
+import { Doctor } from '../../../models/doctor';
 const { TextArea } = Input;
 export const ModalOrderAppointment = ({
     isModalOpen,
@@ -38,6 +41,10 @@ export const ModalOrderAppointment = ({
         province_id: 0,
         province_name: '',
     });
+    const [doctors, setDoctors] = useRecoilState(doctorListState);
+    const [errors, setErrors] = useState<any>({});
+    const [appointments, setAppointments] =
+        useRecoilState(appointmentListState);
     const [wards, setWards] = useState([{ ward_id: 0, ward_name: '' }]);
     const [ward, setWard] = useState({ ward_id: 0, ward_name: '' });
     const inputPatientNameRef = useRef<InputRef>(null);
@@ -47,16 +54,54 @@ export const ModalOrderAppointment = ({
     const inputExaminationRef = useRef<InputRef>(null);
     const inputVillageRef = useRef<InputRef>(null);
     const radioGenderRef = useRef<string | undefined>(undefined);
-
+    const [isValid, setIsValid] = useState(false);
     const handleOk = () => {
-        console.log('Ten' + inputPatientNameRef.current?.input?.value);
-        console.log('phone' + inputPatientPhoneRef.current?.input?.value);
-        console.log('mail' + inputPatientEmailRef.current?.input?.value);
-        console.log('day' + inputPatientBirthDateRef.current?.input?.value);
-        console.log('Ten' + inputPatientNameRef.current?.input?.value);
-
-        console.log('gt' + radioGenderRef.current);
+        const isEmptyPatientName = isEmpty(inputPatientNameRef.current?.input);
+        const isEmptyPatientPhone = isEmpty(
+            inputPatientPhoneRef.current?.input
+        );
+        const isEmptyPatientEmail = isEmpty(
+            inputPatientEmailRef.current?.input
+        );
+        const isEmptyPatientBirthday = isEmpty(
+            inputPatientBirthDateRef.current?.input
+        );
+        // if (
+        //     !isEmptyPatientBirthday &&
+        //     !isEmptyPatientName &&
+        //     !isEmptyPatientPhone &&
+        //     !isEmptyPatientEmail
+        // ) {
+        const newAppointment = {
+            doctor_id: doctor.id,
+            appointment_date: date,
+            patient_name: inputPatientNameRef.current?.input?.value,
+            patient_phone: inputPatientPhoneRef.current?.input?.value,
+            patient_email: inputPatientEmailRef.current?.input?.value,
+            birthday: inputPatientBirthDateRef.current?.input?.value,
+            province: province.province_name,
+            district: district.district_name,
+            commune: ward.ward_name,
+            examination_reason: inputExaminationRef.current?.input?.value,
+            time_id: time.id,
+            gender: radioGenderRef.current,
+        };
+        CreateAppointment(newAppointment);
+        // }
     };
+    const CreateAppointment = async (data: any) => {
+        try {
+            const res: any = await axios.post(
+                baseURL + 'api/appointment/create',
+                data
+            );
+            setDoctors([doctor]);
+            socket.emit('addApp', data);
+        } catch (err: any) {
+            console.log(err.message);
+        }
+    };
+
     const [paymentMethod, setPaymentMethod] = useState(1);
 
     const handleOnChangeRadioPaymentMethod = (e: any) => {
@@ -67,7 +112,6 @@ export const ModalOrderAppointment = ({
     };
     const handleChange = (e: RadioChangeEvent) => {
         radioGenderRef.current = e.target.value;
-        console.log('Giá trị được chọn:', radioGenderRef.current);
     };
     const getListDistrict = async (provinceId: any) => {
         try {
@@ -103,6 +147,7 @@ export const ModalOrderAppointment = ({
         };
         getProvinces();
     }, []);
+
     useEffect(() => {
         if (province.province_id !== 0) {
             getListDistrict(province.province_id);
@@ -125,6 +170,7 @@ export const ModalOrderAppointment = ({
                 </h3>
             }
             width={800}
+            maskClosable={false}
             open={isModalOpen}
             footer={[
                 <Button key="submit" type="primary" onClick={handleOk}>
@@ -184,6 +230,10 @@ export const ModalOrderAppointment = ({
                                 className="form-control patient_name "
                                 id="patient_name"
                             ></Input>
+
+                            <div className="error_message">
+                                {errors.patientName}
+                            </div>
                         </div>
                         <div className="mb-3">
                             <label htmlFor="" className="form-label fw-bold">
@@ -197,6 +247,9 @@ export const ModalOrderAppointment = ({
                                 <Radio value={2}>Nữ</Radio>
                                 <Radio value={3}>Khác</Radio>
                             </Radio.Group>
+                            <div className="error_message">
+                                {errors.patientName}
+                            </div>
                         </div>
                         <div className="mb-3">
                             <label
@@ -207,9 +260,12 @@ export const ModalOrderAppointment = ({
                             </label>
                             <Input
                                 ref={inputPatientPhoneRef}
-                                className="fw-bold form-control patient_phone"
+                                className=" form-control patient_phone"
                                 id="patient_phone"
                             ></Input>
+                            <div className="error_message">
+                                {errors.patientName}
+                            </div>
                         </div>
                         <div className="mb-3">
                             <label
@@ -223,6 +279,9 @@ export const ModalOrderAppointment = ({
                                 className="form-control patient_email"
                                 id="patient_email"
                             ></Input>
+                            <div className="error_message">
+                                {errors.patientName}
+                            </div>
                         </div>
                         <div className="mb-3">
                             <label htmlFor="" className="form-label fw-bold">
@@ -234,6 +293,9 @@ export const ModalOrderAppointment = ({
                                 id="patient_phone"
                                 type="date"
                             ></Input>
+                            <div className="error_message">
+                                {errors.patientName}
+                            </div>
                         </div>
                         <div className="mb-3">
                             <label htmlFor="" className="form-label fw-bold">
@@ -268,6 +330,9 @@ export const ModalOrderAppointment = ({
                                     );
                                 })}
                             </Select>
+                            <div className="error_message">
+                                {errors.patientName}
+                            </div>
                         </div>
                         <div className="mb-3">
                             <label htmlFor="" className="form-label fw-bold">
@@ -302,6 +367,9 @@ export const ModalOrderAppointment = ({
                                     );
                                 })}
                             </Select>
+                            <div className="error_message">
+                                {errors.patientName}
+                            </div>
                         </div>
                         <div className="mb-3">
                             <label htmlFor="" className="form-label fw-bold">
@@ -334,6 +402,9 @@ export const ModalOrderAppointment = ({
                                     );
                                 })}
                             </Select>
+                            <div className="error_message">
+                                {errors.patientName}
+                            </div>
                         </div>
                         <div className="mb-3">
                             <label
@@ -347,6 +418,9 @@ export const ModalOrderAppointment = ({
                                 className="form-control patient_village"
                                 id="patient_village"
                             ></Input>
+                            <div className="error_message">
+                                {errors.patientName}
+                            </div>
                         </div>
                         <div className="mb-3">
                             <label htmlFor="" className="form-label fw-bold">
@@ -356,6 +430,9 @@ export const ModalOrderAppointment = ({
                                 ref={inputExaminationRef}
                                 className="form-control"
                             ></TextArea>
+                            <div className="error_message">
+                                {errors.patientName}
+                            </div>
                         </div>
                         <div className="mb-3">
                             <label htmlFor="" className="form-label fw-bold">
@@ -370,6 +447,9 @@ export const ModalOrderAppointment = ({
                                     Thanh toán sau tại cơ sở y tế
                                 </Radio>
                             </Radio.Group>
+                            <div className="error_message">
+                                {errors.patientName}
+                            </div>
                         </div>
                     </Form>
                 </div>

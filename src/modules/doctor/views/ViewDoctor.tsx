@@ -1,24 +1,20 @@
 import { useState, useEffect } from 'react';
-import {
-    HomeOutlined,
-    EnvironmentOutlined,
-    CalendarOutlined,
-} from '@ant-design/icons';
-import { Breadcrumb, Button, Image, DatePicker, Modal } from 'antd';
+import { HomeOutlined, EnvironmentOutlined } from '@ant-design/icons';
+import { Breadcrumb, Image } from 'antd';
 import { Link } from 'react-router-dom';
-import dayjs from 'dayjs';
 import '@/assets/scss/doctor.scss';
 import { doctorService } from '../../../services/doctorService';
 import { Doctor } from '../../../models/doctor';
 import { baseURL } from '../../../constants/api';
 import parse from 'html-react-parser';
 import { ModalOrderAppointment } from '../components/ModalOrderAppointment';
-import { ListTime } from '../components/ListTime';
-import type { DatePickerProps } from 'antd';
 import { BlockSchedule } from '../components/BlockSchedule';
 import { Time } from '../../../models/time';
+import { useRecoilState } from 'recoil';
+import { doctorListState } from '../../../stores/doctorAtom';
+import socket from '../../../socket';
 const ViewDoctor = () => {
-    const [doctors, setDoctors] = useState<Doctor[]>();
+    const [doctors, setDoctors] = useRecoilState(doctorListState);
     const [doctor, setDoctor] = useState<Doctor>();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [time, setTime] = useState<Time>();
@@ -31,8 +27,22 @@ const ViewDoctor = () => {
             console.log(err.message);
         }
     };
+    useEffect(() => {
+        // Lắng nghe sự kiện newAppointment
+        socket.on('newAppointment', (newAppointment) => {
+            console.log('New appointment received:', newAppointment);
+        });
+
+        // Cleanup listener khi component unmount
+        return () => {
+            socket.off('newAppointment');
+        };
+    }, [doctors]);
 
     useEffect(() => {
+        socket.on('connected', (data) => {
+            console.log(data);
+        });
         loadData();
     }, []);
 
@@ -128,14 +138,10 @@ const ViewDoctor = () => {
                                                       Địa chỉ phòng khám
                                                   </h6>
                                                   <h6 className="clinic__name">
-                                                      Phòng khám đa khoa
-                                                      Mediplus
+                                                      {doctor.clinic_name}
                                                   </h6>
                                                   <p className="clinic__location fs-6">
-                                                      Tầng 2, Trung tâm thương
-                                                      mại Mandarin Garden 2, 99
-                                                      phố Tân Mai, Tân Mai,
-                                                      Hoàng Mai, Hà Nội
+                                                      {doctor.location}
                                                   </p>
                                               </div>
                                               <div className="fee mt-3">
@@ -143,7 +149,10 @@ const ViewDoctor = () => {
                                                       Giá khám:
                                                   </span>
                                                   <span className="price fs-6 ms-2">
-                                                      999.000 đ
+                                                      {doctor.fee.toLocaleString(
+                                                          undefined
+                                                      )}
+                                                      đ
                                                   </span>
                                               </div>
                                           </div>
