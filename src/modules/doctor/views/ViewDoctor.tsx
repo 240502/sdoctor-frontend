@@ -12,13 +12,14 @@ import { BlockSchedule } from '../components/BlockSchedule';
 import { Time } from '../../../models/time';
 import { useRecoilState } from 'recoil';
 import { doctorListState } from '../../../stores/doctorAtom';
-import socket from '../../../socket';
+import { Schedule } from '../../../models/schdule';
 const ViewDoctor = () => {
     const [doctors, setDoctors] = useRecoilState(doctorListState);
     const [doctor, setDoctor] = useState<Doctor>();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [time, setTime] = useState<Time>();
     const [appointmentDate, setAppointmentDate] = useState<string>();
+
     const loadData = async () => {
         try {
             const data = await doctorService.getCommonDoctor();
@@ -27,22 +28,8 @@ const ViewDoctor = () => {
             console.log(err.message);
         }
     };
-    useEffect(() => {
-        // Lắng nghe sự kiện newAppointment
-        socket.on('newAppointment', (newAppointment) => {
-            console.log('New appointment received:', newAppointment);
-        });
-
-        // Cleanup listener khi component unmount
-        return () => {
-            socket.off('newAppointment');
-        };
-    }, [doctors]);
 
     useEffect(() => {
-        socket.on('connected', (data) => {
-            console.log(data);
-        });
         loadData();
     }, []);
 

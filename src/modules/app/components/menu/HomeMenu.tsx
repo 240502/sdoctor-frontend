@@ -40,13 +40,14 @@ export const HomeMenu = () => {
             selectedKeys={[current]}
             style={{ maxHeight: '700px', zIndex: '99' }}
         >
-            {homeMenus?.map((homeMenu: HomeMenuModel) => {
+            {homeMenus?.map((homeMenu: HomeMenuModel, index: number) => {
                 return (
                     <Menu.Item
                         key={Number(homeMenu.id)}
                         className="home__menu__item text-decoration-none"
                     >
                         <Link
+                            key={index}
                             to={homeMenu.url}
                             className="text-decoration-none menu__item__text"
                         >

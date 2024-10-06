@@ -1,3 +1,5 @@
+import { Schedule } from './schdule';
+
 export interface Doctor {
     id: Number;
     full_name: String;
@@ -16,7 +18,8 @@ export interface Doctor {
     fee: Number;
     examination_object: String;
     views: number;
-    time: string[];
     clinic_name: String;
     location: string;
+    major_name: String;
+    schedule: Schedule;
 }
