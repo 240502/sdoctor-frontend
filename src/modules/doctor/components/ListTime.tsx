@@ -10,25 +10,25 @@ export const ListTime = ({
     scheduleDetailId,
 }: any) => {
     const [time, setTime] = useState<Time>();
-    const handleTimeOverRealTime = (startHour: number, startMinute: number) => {
-        const intervalId = setInterval(() => {
-            console.log('chay');
-            const now = new Date();
-            const hours = String(now.getHours()).padStart(2, '0');
-            const minutes = String(now.getMinutes()).padStart(2, '0');
-            if (Number(startHour) === Number(hours)) {
-                if (Number(startMinute) <= Number(minutes)) {
-                    console.log('update');
-                    updateAvailableScheduleDetail(scheduleDetailId);
-                }
-            }
-            if (Number(startHour) < Number(hours)) {
-                console.log('update');
-                updateAvailableScheduleDetail(scheduleDetailId);
-            }
-        }, 1000);
-        return intervalId;
-    };
+    // const handleTimeOverRealTime = (startHour: number, startMinute: number) => {
+    //     const intervalId = setInterval(() => {
+    //         console.log('chay');
+    //         const now = new Date();
+    //         const hours = String(now.getHours()).padStart(2, '0');
+    //         const minutes = String(now.getMinutes()).padStart(2, '0');
+    //         if (Number(startHour) === Number(hours)) {
+    //             if (Number(startMinute) <= Number(minutes)) {
+    //                 console.log('update');
+    //                 updateAvailableScheduleDetail(scheduleDetailId);
+    //             }
+    //         }
+    //         if (Number(startHour) < Number(hours)) {
+    //             console.log('update');
+    //             updateAvailableScheduleDetail(scheduleDetailId);
+    //         }
+    //     }, 1000);
+    //     return intervalId;
+    // };
     const getTimeById = async (timeId: string) => {
         try {
             const result = await TimeService.getTimeById(timeId);
@@ -40,7 +40,6 @@ export const ListTime = ({
 
     useEffect(() => {
         getTimeById(timeId);
-        console.log(timeId);
     }, [timeId]);
     useEffect(() => {
         let intervalId: number;
@@ -48,7 +47,7 @@ export const ListTime = ({
             const listTime: any = time?.value.split('-');
             const startMinute = listTime[0].split('.')[1];
             const startHour = listTime[0].split('.')[0];
-            intervalId = handleTimeOverRealTime(startHour, startMinute);
+            // intervalId = handleTimeOverRealTime(startHour, startMinute);
         }
 
         return () => {

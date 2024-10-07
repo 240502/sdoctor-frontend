@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { HomeOutlined, EnvironmentOutlined } from '@ant-design/icons';
-import { Breadcrumb, Image } from 'antd';
+import { Breadcrumb, Image, notification } from 'antd';
 import { Link } from 'react-router-dom';
 import '@/assets/scss/doctor.scss';
 import { doctorService } from '../../../services/doctorService';
@@ -10,23 +10,37 @@ import parse from 'html-react-parser';
 import { ModalOrderAppointment } from '../components/ModalOrderAppointment';
 import { BlockSchedule } from '../components/BlockSchedule';
 import { Time } from '../../../models/time';
-import { useRecoilState } from 'recoil';
-import { doctorListState } from '../../../stores/doctorAtom';
-import { Schedule } from '../../../models/schdule';
+import { useRecoilValue, useSetRecoilState } from 'recoil';
+import { doctorListState, doctorListValue } from '../../../stores/doctorAtom';
+type NotificationType = 'success' | 'error';
 const ViewDoctor = () => {
-    const [doctors, setDoctors] = useRecoilState(doctorListState);
     const [doctor, setDoctor] = useState<Doctor>();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [time, setTime] = useState<Time>();
     const [appointmentDate, setAppointmentDate] = useState<string>();
-
+    const [api, contextHolder] = notification.useNotification();
+    const doctors = useRecoilValue(doctorListValue);
+    const setDoctors = useSetRecoilState(doctorListState);
     const loadData = async () => {
-        try {
-            const data = await doctorService.getCommonDoctor();
-            setDoctors(data);
-        } catch (err: any) {
-            console.log(err.message);
+        if (doctors?.length === 0) {
+            try {
+                console.log('call api');
+                const data = await doctorService.getCommonDoctor();
+                setDoctors(data);
+            } catch (err: any) {
+                console.log(err.message);
+            }
         }
+    };
+    const openNotificationWithIcon = (
+        type: NotificationType,
+        title: string,
+        des: string
+    ) => {
+        api[type]({
+            message: title,
+            description: des,
+        });
     };
 
     useEffect(() => {
@@ -35,6 +49,7 @@ const ViewDoctor = () => {
 
     return (
         <div className="container home__content mt-4 mb-4">
+            {contextHolder}
             <Breadcrumb
                 items={[
                     {
@@ -157,6 +172,7 @@ const ViewDoctor = () => {
                     setIsModalOpen={setIsModalOpen}
                     time={time}
                     date={appointmentDate}
+                    openNotificationWithIcon={openNotificationWithIcon}
                 />
             )}
         </div>

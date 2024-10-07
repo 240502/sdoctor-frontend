@@ -9,6 +9,8 @@ import Slider from 'react-slick';
 import { doctorService } from '../../../services/doctorService';
 import { Doctor } from '../../../models/doctor';
 import { baseURL } from '../../../constants/api';
+import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
+import { doctorListState, doctorListValue } from '../../../stores/doctorAtom';
 export const BlockHotDoctor = (): JSX.Element => {
     var settings = {
         dots: false,
@@ -24,13 +26,18 @@ export const BlockHotDoctor = (): JSX.Element => {
         prevArrow: <PrevArrow />,
     };
 
-    const [doctors, setDoctors] = useState<Doctor[]>();
+    const setDoctors = useSetRecoilState(doctorListState);
+    const doctors = useRecoilValue(doctorListValue);
+
     const loadData = async () => {
-        try {
-            const data = await doctorService.getCommonDoctor();
-            setDoctors(data);
-        } catch (err: any) {
-            console.log(err.message);
+        if (doctors?.length === 0) {
+            console.log('call api');
+            try {
+                const data = await doctorService.getCommonDoctor();
+                setDoctors(data);
+            } catch (err: any) {
+                console.log(err.message);
+            }
         }
     };
     useEffect(() => {

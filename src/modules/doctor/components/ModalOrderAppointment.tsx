@@ -10,10 +10,30 @@ import {
     InputRef,
     RadioChangeEvent,
 } from 'antd';
+
 import { baseURL } from '../../../constants/api';
 import axios from 'axios';
-import { isEmpty } from '../../../utils/global';
+import {
+    handleFocusInput,
+    handleFocusSelect,
+    isEmpty,
+    isEmptyRadio,
+    isEmptySelect,
+    showSuccess,
+} from '../../../utils/global';
 import socket from '../../../socket';
+import {
+    validatePatientBirthDay,
+    validatePatientEmail,
+    validatePatientName,
+    validatePatientPhone,
+} from '../../../utils/appointment';
+import { useRecoilValue, useSetRecoilState } from 'recoil';
+import {
+    scheduleListState,
+    scheduleListValue,
+} from '../../../stores/scheduleAtom';
+import { Schedule } from '../../../models/schdule';
 import { ScheduleDetails } from '../../../models/schedule_details';
 const { TextArea } = Input;
 export const ModalOrderAppointment = ({
@@ -22,6 +42,7 @@ export const ModalOrderAppointment = ({
     setIsModalOpen,
     time,
     date,
+    openNotificationWithIcon,
 }: any): JSX.Element => {
     const [provinces, setProvinces] = useState([
         { province_id: 0, province_name: '' },
@@ -47,51 +68,113 @@ export const ModalOrderAppointment = ({
     const inputPatientBirthDateRef = useRef<InputRef>(null);
     const inputExaminationRef = useRef<InputRef>(null);
     const inputVillageRef = useRef<InputRef>(null);
-    const radioGenderRef = useRef<string | undefined>(undefined);
+    const radioGenderRef = useRef<any>(undefined);
+    const radioGenderValue = useRef<string | undefined>(undefined);
+    const selectProvinceRef = useRef<any>(null);
+    const selectDistrictRef = useRef<any>(null);
+    const selectWardRef = useRef<any>(null);
     const handleOk = () => {
-        // const isEmptyPatientName = isEmpty(inputPatientNameRef.current?.input);
-        // const isEmptyPatientPhone = isEmpty(
-        //     inputPatientPhoneRef.current?.input
-        // );
-        // const isEmptyPatientEmail = isEmpty(
-        //     inputPatientEmailRef.current?.input
-        // );
-        // const isEmptyPatientBirthday = isEmpty(
-        //     inputPatientBirthDateRef.current?.input
-        // );
-        // if (
-        //     !isEmptyPatientBirthday &&
-        //     !isEmptyPatientName &&
-        //     !isEmptyPatientPhone &&
-        //     !isEmptyPatientEmail
-        // ) {
-        const newAppointment = {
-            doctor_id: doctor.id,
-            appointment_date: date,
-            patient_name: inputPatientNameRef.current?.input?.value,
-            patient_phone: inputPatientPhoneRef.current?.input?.value,
-            patient_email: inputPatientEmailRef.current?.input?.value,
-            birthday: inputPatientBirthDateRef.current?.input?.value,
-            province: province.province_name,
-            district: district.district_name,
-            commune: ward.ward_name,
-            examination_reason: inputExaminationRef.current?.input?.value,
-            time_id: time.id,
-            gender: radioGenderRef.current,
-        };
+        const isEmptyPatientName = isEmpty(inputPatientNameRef.current?.input);
+        const isEmptyPatientPhone = isEmpty(
+            inputPatientPhoneRef.current?.input
+        );
+        const isEmptyPatientEmail = isEmpty(
+            inputPatientEmailRef.current?.input
+        );
+        const isEmptyPatientBirthday = isEmpty(
+            inputPatientBirthDateRef.current?.input
+        );
+        const isEmptyRadioGender = isEmptyRadio(
+            radioGenderRef.current,
+            radioGenderValue.current
+        );
+        const provinceId = province.province_id;
+        const districtId = district.district_id;
+        const wardId = ward.ward_id;
+        const isEmptySelectProvince = isEmptySelect(
+            selectProvinceRef.current,
+            provinceId
+        );
+        const isEmptySelectDistrict = isEmptySelect(
+            selectDistrictRef.current,
+            districtId
+        );
+        const isEmptySelectWard = isEmptySelect(selectWardRef.current, wardId);
+        if (
+            !isEmptyPatientBirthday &&
+            !isEmptyPatientName &&
+            !isEmptyPatientPhone &&
+            !isEmptyPatientEmail &&
+            !isEmptyRadioGender &&
+            !isEmptySelectProvince &&
+            !isEmptySelectDistrict &&
+            !isEmptySelectWard
+        ) {
+            const isErrorPatientName = validatePatientName(
+                inputPatientNameRef.current?.input
+            );
+            const isErrorPatientEmail = validatePatientEmail(
+                inputPatientEmailRef.current?.input
+            );
+            const isErrorPatientPhone = validatePatientPhone(
+                inputPatientPhoneRef.current?.input
+            );
+            const isErrorPatientBirthday = validatePatientBirthDay(
+                inputPatientBirthDateRef.current?.input
+            );
 
-        CreateAppointment(newAppointment);
-        // }
+            if (
+                !isErrorPatientName &&
+                !isErrorPatientEmail &&
+                !isErrorPatientPhone &&
+                !isErrorPatientBirthday
+            ) {
+                const newAppointment = {
+                    doctor_id: doctor.id,
+                    appointment_date: date,
+                    patient_name: inputPatientNameRef.current?.input?.value,
+                    patient_phone: inputPatientPhoneRef.current?.input?.value,
+                    patient_email: inputPatientEmailRef.current?.input?.value,
+                    birthday: inputPatientBirthDateRef.current?.input?.value,
+                    province: province.province_name,
+                    district: district.district_name,
+                    commune: ward.ward_name,
+                    examination_reason:
+                        inputExaminationRef.current?.input?.value,
+                    time_id: time.id,
+                    gender: radioGenderValue.current,
+                    doctor_name: doctor.full_name,
+                    time_value: time.value,
+                    fee: doctor.fee,
+                };
+                console.log(date);
+
+                CreateAppointment(newAppointment);
+            }
+        }
     };
+
     const CreateAppointment = async (data: any) => {
         try {
-            // const res: any = await axios.post(
-            //     baseURL + 'api/appointment/create',
-            //     data
-            // );
+            const res: any = await axios.post(
+                baseURL + 'api/appointment/create',
+                data
+            );
+            openNotificationWithIcon(
+                'success',
+                'Thông báo',
+                'Đặt lịch hẹn thành công!'
+            );
+            setIsModalOpen(false);
+
             socket.emit('addApp', data);
         } catch (err: any) {
             console.log(err.message);
+            openNotificationWithIcon(
+                'error',
+                'Thông báo',
+                'Đặt lịch hẹn không thành công!'
+            );
         }
     };
 
@@ -104,7 +187,7 @@ export const ModalOrderAppointment = ({
         setIsModalOpen(false);
     };
     const handleChange = (e: RadioChangeEvent) => {
-        radioGenderRef.current = e.target.value;
+        radioGenderValue.current = e.target.value;
     };
     const getListDistrict = async (provinceId: any) => {
         try {
@@ -219,26 +302,39 @@ export const ModalOrderAppointment = ({
                                 Tên bệnh nhân
                             </label>
                             <Input
+                                onFocus={(e: any) => {
+                                    handleFocusInput(e.target);
+                                }}
                                 ref={inputPatientNameRef}
                                 className="form-control patient_name "
                                 id="patient_name"
                             ></Input>
 
-                            <div className="error_message"></div>
+                            <div
+                                className="error_message mt-3"
+                                style={{ color: 'red' }}
+                            ></div>
                         </div>
                         <div className="mb-3">
                             <label htmlFor="" className="form-label fw-bold">
                                 Giới tính
                             </label>
                             <Radio.Group
+                                onFocus={() => {
+                                    showSuccess(radioGenderRef.current);
+                                }}
                                 className="d-block"
+                                ref={radioGenderRef}
                                 onChange={handleChange}
                             >
                                 <Radio value={1}>Nam</Radio>
                                 <Radio value={2}>Nữ</Radio>
                                 <Radio value={3}>Khác</Radio>
                             </Radio.Group>
-                            <div className="error_message"></div>
+                            <div
+                                className="error_message mt-3"
+                                style={{ color: 'red' }}
+                            ></div>
                         </div>
                         <div className="mb-3">
                             <label
@@ -248,11 +344,17 @@ export const ModalOrderAppointment = ({
                                 Số điện thoại
                             </label>
                             <Input
+                                onFocus={(e: any) => {
+                                    handleFocusInput(e.target);
+                                }}
                                 ref={inputPatientPhoneRef}
                                 className=" form-control patient_phone"
                                 id="patient_phone"
                             ></Input>
-                            <div className="error_message"></div>
+                            <div
+                                className="error_message mt-3"
+                                style={{ color: 'red' }}
+                            ></div>
                         </div>
                         <div className="mb-3">
                             <label
@@ -262,31 +364,47 @@ export const ModalOrderAppointment = ({
                                 Email
                             </label>
                             <Input
+                                onFocus={(e: any) => {
+                                    handleFocusInput(e.target);
+                                }}
                                 ref={inputPatientEmailRef}
                                 className="form-control patient_email"
                                 id="patient_email"
                             ></Input>
-                            <div className="error_message"></div>
+                            <div
+                                className="error_message mt-3"
+                                style={{ color: 'red' }}
+                            ></div>
                         </div>
                         <div className="mb-3">
                             <label htmlFor="" className="form-label fw-bold">
                                 Ngày/ Tháng/ Năm Sinh
                             </label>
                             <Input
+                                onFocus={(e: any) => {
+                                    handleFocusInput(e.target);
+                                }}
                                 ref={inputPatientBirthDateRef}
                                 className=" form-control patient_phone"
                                 id="patient_phone"
                                 type="date"
                             ></Input>
-                            <div className="error_message"></div>
+                            <div
+                                className="error_message mt-3"
+                                style={{ color: 'red' }}
+                            ></div>
                         </div>
                         <div className="mb-3">
                             <label htmlFor="" className="form-label fw-bold">
                                 Tỉnh/ Thành phố
                             </label>
                             <Select
+                                ref={selectProvinceRef}
                                 className="d-block"
                                 showSearch
+                                onFocus={(e) =>
+                                    handleFocusSelect(selectProvinceRef.current)
+                                }
                                 onChange={(e) => {
                                     const province: any = provinces.find(
                                         (province: any) => {
@@ -313,14 +431,21 @@ export const ModalOrderAppointment = ({
                                     );
                                 })}
                             </Select>
-                            <div className="error_message"></div>
+                            <div
+                                className="error_message mt-3"
+                                style={{ color: 'red' }}
+                            ></div>
                         </div>
                         <div className="mb-3">
                             <label htmlFor="" className="form-label fw-bold">
                                 Quận/ Huyện
                             </label>
                             <Select
+                                ref={selectDistrictRef}
                                 className="d-block"
+                                onFocus={(e) =>
+                                    handleFocusSelect(selectDistrictRef.current)
+                                }
                                 showSearch
                                 onChange={(e) => {
                                     const district: any = districts.find(
@@ -348,13 +473,20 @@ export const ModalOrderAppointment = ({
                                     );
                                 })}
                             </Select>
-                            <div className="error_message"></div>
+                            <div
+                                className="error_message mt-3"
+                                style={{ color: 'red' }}
+                            ></div>
                         </div>
                         <div className="mb-3">
                             <label htmlFor="" className="form-label fw-bold">
                                 Xã/ Phường
                             </label>
                             <Select
+                                ref={selectWardRef}
+                                onFocus={(e) =>
+                                    handleFocusSelect(selectWardRef.current)
+                                }
                                 className="d-block"
                                 showSearch
                                 onChange={(e) => {
@@ -381,7 +513,10 @@ export const ModalOrderAppointment = ({
                                     );
                                 })}
                             </Select>
-                            <div className="error_message"></div>
+                            <div
+                                className="error_message mt-3"
+                                style={{ color: 'red' }}
+                            ></div>
                         </div>
                         <div className="mb-3">
                             <label
@@ -391,11 +526,17 @@ export const ModalOrderAppointment = ({
                                 Tổ/ Khu/ Thôn/ Xóm
                             </label>
                             <Input
+                                onFocus={(e: any) => {
+                                    handleFocusInput(e.target);
+                                }}
                                 ref={inputVillageRef}
                                 className="form-control patient_village"
                                 id="patient_village"
                             ></Input>
-                            <div className="error_message"></div>
+                            <div
+                                className="error_message mt-3"
+                                style={{ color: 'red' }}
+                            ></div>
                         </div>
                         <div className="mb-3">
                             <label htmlFor="" className="form-label fw-bold">
@@ -405,7 +546,10 @@ export const ModalOrderAppointment = ({
                                 ref={inputExaminationRef}
                                 className="form-control"
                             ></TextArea>
-                            <div className="error_message"></div>
+                            <div
+                                className="error_message mt-3"
+                                style={{ color: 'red' }}
+                            ></div>
                         </div>
                         <div className="mb-3">
                             <label htmlFor="" className="form-label fw-bold">
@@ -420,7 +564,10 @@ export const ModalOrderAppointment = ({
                                     Thanh toán sau tại cơ sở y tế
                                 </Radio>
                             </Radio.Group>
-                            <div className="error_message"></div>
+                            <div
+                                className="error_message mt-3"
+                                style={{ color: 'red' }}
+                            ></div>
                         </div>
                     </Form>
                 </div>

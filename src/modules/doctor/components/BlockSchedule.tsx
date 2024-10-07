@@ -5,16 +5,18 @@ import { CalendarOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import type { DatePickerProps } from 'antd';
 import { scheduleService } from '../../../services/scheduleService';
-import { doctorListState } from '../../../stores/doctorAtom';
-import { useRecoilState } from 'recoil';
 import socket from '../../../socket';
-import { Appointment } from '../../../models/appointment';
 import { ScheduleDetails } from '../../../models/schedule_details';
-import { ListTime } from './ListTime';
 import { schedule_detailsService } from '../../../services/schedule_detailsService';
 import { Doctor } from '../../../models/doctor';
 import { Schedule } from '../../../models/schdule';
-
+import { useRecoilValue, useSetRecoilState } from 'recoil';
+import { doctorListValue } from '../../../stores/doctorAtom';
+import { ListTime } from './ListTime';
+import {
+    scheduleListState,
+    scheduleListValue,
+} from '../../../stores/scheduleAtom';
 export const BlockSchedule = ({
     subscriberId,
     setIsModalOpen,
@@ -31,11 +33,10 @@ export const BlockSchedule = ({
             : today.getDate()
     }`;
     const [date, setDate] = useState<string>();
+    const setSchedules = useSetRecoilState(scheduleListState);
+    const schedules = useRecoilValue(scheduleListValue);
     const [schedule, setSchedule] = useState<Schedule>();
-
-    const [doctors, setDoctors] = useRecoilState(doctorListState);
-    const [newAppointment, setNewAppointment] = useState<Appointment>();
-
+    const doctors = useRecoilValue(doctorListValue);
     const onChange: DatePickerProps['onChange'] = (date, dateString) => {
         setDate(String(dateString));
     };
@@ -57,60 +58,24 @@ export const BlockSchedule = ({
             };
             const result = await scheduleService.getBySubscriberIdAndDate(data);
             setSchedule(result.data);
-            const newDoctors = doctors.map((doctor: Doctor) => {
-                if (doctor.id === subscriberId) {
-                    return { ...doctor, schedule: result.data };
-                } else return doctor;
+
+            setSchedules((prev: Schedule[]) => {
+                const existingSchedule = prev.find(
+                    (schedule: Schedule) =>
+                        schedule.subscriber_id === subscriberId
+                );
+                if (existingSchedule) {
+                    return prev;
+                } else {
+                    return [...prev, result.data];
+                }
             });
-            setDoctors(newDoctors);
         } catch (err: any) {
             console.log(err.message);
             setSchedule(undefined);
         }
     };
-    // // const handleSetAvailableTime = (scheduleDetailId: number) => {
-    // //     const newDoctors = doctors.map((doctor: Doctor) => {
-    // //         if (doctor?.schedule) {
-    // //             const newScheduleDetails =
-    // //                 doctor.schedule.listScheduleDetails.map(
-    // //                     (scheduleDetails: ScheduleDetails) => {
-    // //                         if (scheduleDetails.id === scheduleDetailId) {
-    // //                             return { ...scheduleDetails, available: 0 };
-    // //                         } else return scheduleDetails;
-    // //                     }
-    // //                 );
-    // //             const newSchedule = {
-    // //                 ...doctor.schedule,
-    // //                 listScheduleDetails: newScheduleDetails,
-    // //             };
-    // //             const newDoctor = {
-    // //                 ...doctor,
-    // //                 schedule: { ...newSchedule },
-    // //             };
-    // //             return newDoctor;
-    // //         } else return doctor;
-    // //     });
-    //     const doctor: Doctor | undefined = doctors.find(
-    //         (doctor: Doctor): Doctor | any => {
-    //             if (doctor?.schedule) {
-    //                 doctor.schedule.listScheduleDetails.find(
-    //                     (scheduleDetails: ScheduleDetails) => {
-    //                         return scheduleDetails.id === scheduleDetailId;
-    //                     }
-    //                 );
-    //             }
-    //         }
-    //     );
-    //     console.log(doctor);
-    //     setDoctors(newDoctors);
-    // };
-    const getDoctorById = (doctorId: number) => {
-        const doctor = doctors.find((doctor: Doctor) => {
-            return doctor.id === doctorId;
-        });
 
-        return doctor;
-    };
     const updateAvailableScheduleDetail = async (scheduleDetailId: number) => {
         try {
             const res =
@@ -127,32 +92,48 @@ export const BlockSchedule = ({
         }
     };
     useEffect(() => {
+        console.log('Current myArray:', schedules);
+    }, [schedules]);
+    useEffect(() => {
+        let isDifferentDate = false;
+        schedules.forEach((schedule: Schedule) => {
+            if (String(schedule.date) !== date) {
+                isDifferentDate = true;
+                const newSchedules = schedules.filter((schedule: Schedule) => {
+                    return schedule.subscriber_id !== subscriberId;
+                });
+                setSchedules(newSchedules);
+            }
+        });
         getScheduleBySubscriberIdAndDate(
             String(date ?? stringDay),
             subscriberId
         );
-    }, [date]);
+    }, [date, subscriberId]);
 
     useEffect(() => {
         socket.on('newAppointment', (newAppointment) => {
-            setNewAppointment(newAppointment);
-            const doctor: Doctor | undefined = getDoctorById(
-                Number(newAppointment.doctor_id)
+            // setNewAppointment(newAppointment);
+            console.log(schedules);
+
+            const schedule = schedules?.find(
+                (schedule: Schedule, i: number) => {
+                    return schedule.subscriber_id === newAppointment.doctor_id;
+                }
             );
-            console.log(doctor);
-            const scheduleDetail = doctor?.schedule?.listScheduleDetails.find(
+            const scheduleDetail = schedule?.listScheduleDetails.find(
                 (scheduleDetail: ScheduleDetails) => {
                     return scheduleDetail.time_id === newAppointment.time_id;
                 }
             );
 
-            updateAvailableScheduleDetail(Number(scheduleDetail?.id));
+            // updateAvailableScheduleDetail(Number(scheduleDetail?.id));
         });
 
         return () => {
             socket.off('newAppointment');
         };
-    }, [doctors]);
+    }, [schedules]);
     return (
         <div className="block__schedule border border-end-0 border-start-0 border-top-0">
             <DatePicker
@@ -168,8 +149,7 @@ export const BlockSchedule = ({
                 {schedule ? (
                     schedule.listScheduleDetails?.map(
                         (scheduleDetail: ScheduleDetails) => {
-                            return Number(scheduleDetail.time_id) !==
-                                newAppointment?.time_id ? (
+                            return (
                                 <ListTime
                                     handleOnClickBtnTime={handleOnClickBtnTime}
                                     timeId={scheduleDetail.time_id}
@@ -178,8 +158,6 @@ export const BlockSchedule = ({
                                     }
                                     scheduleDetailId={scheduleDetail.id}
                                 />
-                            ) : (
-                                <></>
                             );
                         }
                     )

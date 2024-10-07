@@ -4,8 +4,7 @@ import { Link } from 'react-router-dom';
 import { HomeMenuService } from '../../../../services/home_menuService';
 import { HomeMenuModel } from '../../../../models/home_menu';
 
-export const HomeMenu = () => {
-    const [current, setCurrent] = useState('1');
+export const HomeMenu = ({ current, setCurrent }: any) => {
     const [homeMenus, setHomeMenus] = useState<HomeMenuModel[]>();
 
     const loadData = async () => {

@@ -3,9 +3,12 @@ import { HomeFooter } from './footer/HomeFooter';
 import { Layout } from 'antd';
 import { Link } from 'react-router-dom';
 import '@/assets/scss/app.scss';
+import { useState } from 'react';
 
 const { Header, Content, Footer } = Layout;
 export const AppLayout = ({ children }: any) => {
+    const [current, setCurrent] = useState('1');
+
     return (
         <Layout>
             <Header
@@ -18,8 +21,9 @@ export const AppLayout = ({ children }: any) => {
                             onClick={(e) => {
                                 localStorage.setItem(
                                     'currentMenu',
-                                    JSON.stringify('home')
+                                    JSON.stringify('1')
                                 );
+                                setCurrent('1');
                             }}
                             className="header__logo__text fs-2 fw-bold text-decoration-none"
                             to="/"
@@ -27,7 +31,10 @@ export const AppLayout = ({ children }: any) => {
                             SDOCTOR
                         </Link>
                     </div>
-                    <HomeMenu></HomeMenu>
+                    <HomeMenu
+                        current={current}
+                        setCurrent={setCurrent}
+                    ></HomeMenu>
                 </div>
             </Header>
             <Content style={{ background: '#fff', marginTop: '78px' }}>
