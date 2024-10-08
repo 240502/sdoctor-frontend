@@ -30,14 +30,14 @@ export const BlockHotDoctor = (): JSX.Element => {
     const doctors = useRecoilValue(doctorListValue);
 
     const loadData = async () => {
-        if (doctors?.length === 0) {
-            console.log('call api');
-            try {
-                const data = await doctorService.getCommonDoctor();
-                setDoctors(data);
-            } catch (err: any) {
-                console.log(err.message);
-            }
+        console.log('call api');
+        try {
+            const data = await doctorService.getCommonDoctor();
+            setDoctors(data);
+            console.log(data);
+        } catch (err: any) {
+            console.log(err.message);
+            setDoctors([]);
         }
     };
     useEffect(() => {
@@ -51,31 +51,35 @@ export const BlockHotDoctor = (): JSX.Element => {
             </div>
             <div className="block__list mt-4 position-relative">
                 <Slider {...settings}>
-                    {doctors?.map((doctor: Doctor) => {
-                        return (
-                            <div className="slide__container">
-                                <div className="item   p-3 ">
-                                    <Link
-                                        to=""
-                                        className="text-decoration-none text-center"
-                                    >
-                                        <Image
-                                            preview={false}
-                                            width={222}
-                                            className="rounded-circle text-center"
-                                            src={baseURL + doctor.image}
-                                        ></Image>
-                                        <p className="item__text mt-3 text-center text-decoration-none fs-5 text-capitalize">
-                                            {doctor.full_name}
-                                            <div className="specialization fs-6 mt-1">
-                                                {doctor.major_name}
-                                            </div>
-                                        </p>
-                                    </Link>
+                    {doctors.length > 0 ? (
+                        doctors?.map((doctor: Doctor) => {
+                            return (
+                                <div className="slide__container">
+                                    <div className="item   p-3 ">
+                                        <Link
+                                            to=""
+                                            className="text-decoration-none text-center"
+                                        >
+                                            <Image
+                                                preview={false}
+                                                width={222}
+                                                className="rounded-circle text-center"
+                                                src={baseURL + doctor.image}
+                                            ></Image>
+                                            <p className="item__text mt-3 text-center text-decoration-none fs-5 text-capitalize">
+                                                {doctor.full_name}
+                                                <div className="specialization fs-6 mt-1">
+                                                    {doctor.major_name}
+                                                </div>
+                                            </p>
+                                        </Link>
+                                    </div>
                                 </div>
-                            </div>
-                        );
-                    })}
+                            );
+                        })
+                    ) : (
+                        <p>Có bác sĩ nào !</p>
+                    )}
                 </Slider>
             </div>
         </div>

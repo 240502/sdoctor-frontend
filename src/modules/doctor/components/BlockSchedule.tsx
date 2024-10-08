@@ -8,7 +8,6 @@ import { scheduleService } from '../../../services/scheduleService';
 import socket from '../../../socket';
 import { ScheduleDetails } from '../../../models/schedule_details';
 import { schedule_detailsService } from '../../../services/schedule_detailsService';
-import { Doctor } from '../../../models/doctor';
 import { Schedule } from '../../../models/schdule';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { doctorListValue } from '../../../stores/doctorAtom';
@@ -36,7 +35,6 @@ export const BlockSchedule = ({
     const setSchedules = useSetRecoilState(scheduleListState);
     const schedules = useRecoilValue(scheduleListValue);
     const [schedule, setSchedule] = useState<Schedule>();
-    const doctors = useRecoilValue(doctorListValue);
     const onChange: DatePickerProps['onChange'] = (date, dateString) => {
         setDate(String(dateString));
     };
@@ -127,7 +125,7 @@ export const BlockSchedule = ({
                 }
             );
 
-            // updateAvailableScheduleDetail(Number(scheduleDetail?.id));
+            updateAvailableScheduleDetail(Number(scheduleDetail?.id));
         });
 
         return () => {
@@ -135,7 +133,7 @@ export const BlockSchedule = ({
         };
     }, [schedules]);
     return (
-        <div className="block__schedule border border-end-0 border-start-0 border-top-0">
+        <div className="block__schedule">
             <DatePicker
                 className="mb-3"
                 defaultValue={dayjs(stringDay, dateFormat)}

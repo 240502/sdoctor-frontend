@@ -28,13 +28,7 @@ import {
     validatePatientName,
     validatePatientPhone,
 } from '../../../utils/appointment';
-import { useRecoilValue, useSetRecoilState } from 'recoil';
-import {
-    scheduleListState,
-    scheduleListValue,
-} from '../../../stores/scheduleAtom';
-import { Schedule } from '../../../models/schdule';
-import { ScheduleDetails } from '../../../models/schedule_details';
+
 const { TextArea } = Input;
 export const ModalOrderAppointment = ({
     isModalOpen,
@@ -147,7 +141,7 @@ export const ModalOrderAppointment = ({
                     time_value: time.value,
                     fee: doctor.fee,
                 };
-                console.log(date);
+                console.log(newAppointment);
 
                 CreateAppointment(newAppointment);
             }

@@ -1,10 +1,11 @@
 import { AppLayout } from '../modules/app';
-import { ViewDoctor } from '../modules/doctor';
+import { ViewDetailDoctor, ViewDoctor } from '../modules/doctor';
 import { Home } from '../modules/home';
 import { ViewSpecialization } from '../modules/specialization';
 import {
     HOME_PATH,
     VIEW_CLINIC_PATH,
+    VIEW_DETAIL_DOCTOR_PATH,
     VIEW_DOCTOR_PATH,
     VIEW_SPECIALIZATION_PATH,
 } from './path';
@@ -22,6 +23,11 @@ export const publicRoutes = [
     {
         path: VIEW_SPECIALIZATION_PATH,
         component: ViewSpecialization,
+        layout: AppLayout,
+    },
+    {
+        path: VIEW_DETAIL_DOCTOR_PATH,
+        component: ViewDetailDoctor,
         layout: AppLayout,
     },
 ];
