@@ -1,31 +1,70 @@
 import { CheckCircleOutlined } from '@ant-design/icons';
-import { Button } from 'antd';
-import React from 'react';
-
-export const BlockComment = ({ setIsModalCommentOpen }: any) => {
+import { Button, notification } from 'antd';
+import { useState, useEffect } from 'react';
+import { CommentService } from '../../../services/commentService';
+import { Comment } from '../../../models/comment';
+import socket from '../../../socket';
+type NotificationType = 'success' | 'error';
+export const BlockComment = ({ userId, setIsModalCommentOpen }: any) => {
+    const [comments, setComments] = useState<Comment[]>();
+    const [pageIndex, setPageIndex] = useState(1);
+    const [pageSize, setPageSize] = useState(10);
+    const [api, contextHolder] = notification.useNotification();
+    const getCommentByUserId = async (userID: number) => {
+        try {
+            const data = {
+                pageIndex: pageIndex,
+                pageSize: pageSize,
+                userId: Number(userID),
+            };
+            const comments = await CommentService.getCommentByUserId(data);
+            console.log(comments.data);
+            setComments(comments.data);
+        } catch (err: any) {
+            console.log(err);
+        }
+    };
+    const handleOnNewComment = () => {
+        socket.on('newComment', (newComment: Comment) => {
+            getCommentByUserId(Number(newComment.user_id));
+        });
+    };
+    useEffect(() => {
+        handleOnNewComment();
+    });
+    useEffect(() => {
+        getCommentByUserId(userId);
+    }, [userId, pageIndex, pageSize]);
     return (
         <>
             <h3 className="fs-4">Phản hồi của người khám</h3>
             <div className="list__comment">
-                <div className="comment mt-4 border border-start-0 border-end-0 border-top-0">
-                    <div className="d-flex">
-                        <h6 className="patient__name">Nguyễn Hữu Thế Phong </h6>
-                        <span className="appointment__date  ms-2 text-primary">
-                            <CheckCircleOutlined />
-                            <span className="ms-1">
-                                đã khám ngày 30/07/2024
-                            </span>
-                        </span>
-                    </div>
+                {comments ? (
+                    comments.map((comment: Comment) => {
+                        return (
+                            <div className="comment mt-4 border border-start-0 border-end-0 border-top-0">
+                                <div className="d-flex">
+                                    <h6 className="patient__name">
+                                        {comment.full_name}
+                                    </h6>
+                                    <span className="appointment__date  ms-2 text-primary">
+                                        <CheckCircleOutlined />
+                                        <span className="ms-1">
+                                            đã khám ngày{' '}
+                                            {comment.date_booking.slice(0, 10)}
+                                        </span>
+                                    </span>
+                                </div>
 
-                    <p className="comment__content mt-2">
-                        Cảm nhận App BookingCare tuyệt vời. Tôi thường xuyên sử
-                        dụng BookingCare tham khảo và đặt lịch. Bác sĩ khám tốt,
-                        thông tin có trước giảm thiểu việc kê khai lại thông
-                        tin. Tuy nhiên, do bác sĩ đông bệnh nhân nên việc chờ
-                        đợi lâu.
-                    </p>
-                </div>
+                                <p className="comment__content mt-2">
+                                    {comment.content}
+                                </p>
+                            </div>
+                        );
+                    })
+                ) : (
+                    <p className="fs-6 fw-bold">Không có phản hồi nào!</p>
+                )}
             </div>
             <div className="group__button text-center mt-3">
                 <Button
@@ -34,7 +73,7 @@ export const BlockComment = ({ setIsModalCommentOpen }: any) => {
                     }}
                     className="pt-3 pb-3"
                 >
-                    Thêm bình luận
+                    Thêm phản hồi
                 </Button>
             </div>
         </>

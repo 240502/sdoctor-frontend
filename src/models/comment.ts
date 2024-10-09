@@ -1,8 +1,8 @@
 export interface Comment {
-    id: Number;
-    content: Number;
-    date_booking: Date;
-    user_id: Number;
+    id: number;
+    content: number;
+    date_booking: string;
+    user_id: number;
     phone: string;
     full_name: string;
 }

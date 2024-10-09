@@ -23,7 +23,6 @@ export const isNumber = (char: any) => {
 
 export const isEmpty = (element: any) => {
     let isEmpty = false;
-
     if (!element.value) {
         showError(element, 'Không được để trống ô này');
         isEmpty = true;
@@ -53,4 +52,50 @@ export const isEmptySelect = (element: any, value: any): boolean => {
 
 export const handleFocusSelect = (element: any) => {
     showSuccess(element.nativeElement);
+};
+
+export const validateName = (element: any) => {
+    let isError = false;
+    for (let i = 0; i < element.value.length; i++) {
+        if (isNumber(element.value[i])) {
+            showError(element, 'Tên bệnh nhân không bao gồm số');
+            isError = true;
+        }
+    }
+    return isError;
+};
+
+export const validateEmail = (element: any): boolean => {
+    const emailRegex =
+        /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    let isError = false;
+    if (!emailRegex.test(element.value)) {
+        showError(element, 'Email không hợp lệ');
+        isError = true;
+    }
+    return isError;
+};
+
+export const validatePhone = (element: any): boolean => {
+    let isError = false;
+    for (let i = 0; i < element.value.length; i++) {
+        if (!isNumber(element.value[i])) {
+            showError(
+                element,
+                'Số điện thoại không bao gồm kí tự đặt biệt hay kí tự chữ'
+            );
+            isError = true;
+        }
+    }
+
+    return isError;
+};
+export const validatePhoneLength = (element: any): boolean => {
+    let isError = false;
+
+    if (element.value.length < 10 || element.value.length > 10) {
+        isError = true;
+        showError(element, 'Số điện thoại không hợp lệ');
+    }
+    return isError;
 };

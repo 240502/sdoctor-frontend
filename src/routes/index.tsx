@@ -1,4 +1,5 @@
 import { AppLayout } from '../modules/app';
+import { ViewClinic } from '../modules/clinic';
 import { ViewDetailDoctor, ViewDoctor } from '../modules/doctor';
 import { Home } from '../modules/home';
 import { ViewSpecialization } from '../modules/specialization';
@@ -28,6 +29,11 @@ export const publicRoutes = [
     {
         path: VIEW_DETAIL_DOCTOR_PATH,
         component: ViewDetailDoctor,
+        layout: AppLayout,
+    },
+    {
+        path: VIEW_CLINIC_PATH,
+        component: ViewClinic,
         layout: AppLayout,
     },
 ];

@@ -69,9 +69,6 @@ const ViewDoctor = () => {
         console.log(`selected ${value}`);
         setMajorId(value);
     };
-    const onSearchMajor = (value: string) => {
-        console.log('search:', value);
-    };
 
     useEffect(() => {
         loadData();
@@ -101,7 +98,6 @@ const ViewDoctor = () => {
                     <Select
                         style={{ width: '20%' }}
                         onChange={handleChangeMajor}
-                        onSearch={onSearchMajor}
                         showSearch
                         placeholder="Chọn chuyên ngành"
                         optionFilterProp="children"

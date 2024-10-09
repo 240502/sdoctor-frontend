@@ -19,10 +19,10 @@ export const Home = () => {
                 </Carousel>
             </div>
             <BlockForYou />
+            <BlockHotDoctor />
             <BlockService />
             <BlockSpecialization />
             <BlockClinic />
-            <BlockHotDoctor />
         </div>
     );
 };

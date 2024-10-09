@@ -20,14 +20,13 @@ import {
     isEmptyRadio,
     isEmptySelect,
     showSuccess,
+    validateEmail,
+    validateName,
+    validatePhone,
+    validatePhoneLength,
 } from '../../../utils/global';
 import socket from '../../../socket';
-import {
-    validatePatientBirthDay,
-    validatePatientEmail,
-    validatePatientName,
-    validatePatientPhone,
-} from '../../../utils/appointment';
+import { validatePatientBirthDay } from '../../../utils/appointment';
 
 const { TextArea } = Input;
 export const ModalOrderAppointment = ({
@@ -104,24 +103,28 @@ export const ModalOrderAppointment = ({
             !isEmptySelectDistrict &&
             !isEmptySelectWard
         ) {
-            const isErrorPatientName = validatePatientName(
+            const isErrorPatientName = validateName(
                 inputPatientNameRef.current?.input
             );
-            const isErrorPatientEmail = validatePatientEmail(
+            const isErrorPatientEmail = validateEmail(
                 inputPatientEmailRef.current?.input
             );
-            const isErrorPatientPhone = validatePatientPhone(
+            const isErrorPatientPhone = validatePhone(
                 inputPatientPhoneRef.current?.input
             );
             const isErrorPatientBirthday = validatePatientBirthDay(
                 inputPatientBirthDateRef.current?.input
+            );
+            const isErrorPhoneLength = validatePhoneLength(
+                inputPatientPhoneRef.current?.input
             );
 
             if (
                 !isErrorPatientName &&
                 !isErrorPatientEmail &&
                 !isErrorPatientPhone &&
-                !isErrorPatientBirthday
+                !isErrorPatientBirthday &&
+                !isErrorPhoneLength
             ) {
                 const newAppointment = {
                     doctor_id: doctor.id,

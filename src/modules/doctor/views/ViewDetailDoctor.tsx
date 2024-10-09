@@ -15,6 +15,8 @@ import { apiClient, baseURL } from '../../../constants/api';
 import parse from 'html-react-parser';
 import { BlockComment } from '../components/BlockComment';
 import { ModalComment } from '../components/ModalComment';
+import { useRecoilValue } from 'recoil';
+import { doctorListValue } from '../../../stores/doctorAtom';
 
 type NotificationType = 'success' | 'error';
 
@@ -22,6 +24,7 @@ type DataParams = {
     id: string;
 };
 const ViewDetailDoctor = () => {
+    const doctors = useRecoilValue(doctorListValue);
     const [isModalAppointmentOpen, setIsModalAppointmentOpen] = useState(false);
     const [isModalCommentOpen, setIsModalCommentOpen] = useState(false);
 
@@ -44,7 +47,10 @@ const ViewDetailDoctor = () => {
     };
     const getDoctorById = async (id: number) => {
         try {
-            const res = await doctorService.getDoctorById(id);
+            const res = doctors.find(
+                (doctor: Doctor) => doctor.id === Number(id)
+            );
+            console.log(res);
             setDoctor(res);
         } catch (err: any) {
             console.log(err.message);
@@ -98,7 +104,7 @@ const ViewDetailDoctor = () => {
                         <h6 className="opacity-75">Địa chỉ phòng khám</h6>
                         <h6 className="clinic__name">{doctor?.clinic_name}</h6>
                         <p className="clinic__location fs-6 opacity-75">
-                            {doctor?.clinic_location}
+                            {doctor?.location}
                         </p>
                     </div>
                     <div className="fee mt-3">
@@ -111,46 +117,16 @@ const ViewDetailDoctor = () => {
                     </div>
                 </div>
             </div>
-            <div className="doctor__introduction border border-start-0 border-bottom-0 border-end-0 pt-4 pb-4">
-                <div>
-                    <h3 className="fs-5 mb-2">
-                        Phó Giáo sư, Tiến sĩ, Bác sĩ Nguyễn Thị Hoài An
-                    </h3>
-                    <ul>
-                        <li className="mb-2 fs-6">
-                            Phó Giáo sư, Tiến sĩ chuyên ngành Tai Mũi Họng
-                        </li>
-                        <li className="mb-2 fs-6">
-                            Nguyên Trưởng khoa Tai Mũi Họng trẻ em, Bệnh viện
-                            Tai Mũi Họng Trung ương
-                        </li>
-                        <li className="mb-2 fs-6">
-                            Trên 25 năm công tác tại Bệnh viện Tai Mũi Họng
-                            Trung ương
-                        </li>
-                    </ul>
+            {doctor?.introduction && (
+                <div className="doctor__introduction border border-start-0 border-bottom-0 border-end-0 pt-4 pb-4">
+                    {parse(String(doctor?.introduction))}
                 </div>
-
-                <div>
-                    <h3 className="fs-5 mb-2">Khám và điều trị</h3>
-                    <ul>
-                        <li className="mb-2 fs-6">
-                            Chuyên khám và điều trị các bệnh lý Tai Mũi Họng
-                            người lớn
-                        </li>
-                        <li className="mb-2 fs-6">
-                            Chuyên khám và điều trị các bệnh lý Tai Mũi Họng trẻ
-                            em
-                        </li>
-                        <li className="mb-2 fs-6">Nội soi Tai Mũi Họng</li>
-                        <li className="mb-2 fs-6">
-                            Thực hiện các qui trình kỹ thuật Tai Mũi Họng
-                        </li>
-                    </ul>
-                </div>
-            </div>
+            )}
             <div className="block__comment border border-start-0 border-bottom-0 border-end-0 pt-4 pb-4">
-                <BlockComment setIsModalCommentOpen={setIsModalCommentOpen} />
+                <BlockComment
+                    userId={id}
+                    setIsModalCommentOpen={setIsModalCommentOpen}
+                />
             </div>
 
             {isModalAppointmentOpen && (
@@ -165,6 +141,8 @@ const ViewDetailDoctor = () => {
             )}
             {isModalCommentOpen && (
                 <ModalComment
+                    openNotificationWithIcon={openNotificationWithIcon}
+                    doctorId={id}
                     isModalCommentOpen={isModalCommentOpen}
                     setIsModalCommentOpen={setIsModalCommentOpen}
                 />
