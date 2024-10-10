@@ -9,4 +9,8 @@ export const MajorService = {
         const res: any = await apiClient.get('/api/major/get-all-major');
         return res?.data;
     },
+    async getMajorById(id: number): Promise<any> {
+        const res: any = await apiClient.get('/api/major/get-by-id/' + id);
+        return res?.data;
+    },
 };

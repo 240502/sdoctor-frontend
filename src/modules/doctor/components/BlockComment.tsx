@@ -51,7 +51,10 @@ export const BlockComment = ({ userId, setIsModalCommentOpen }: any) => {
                                         <CheckCircleOutlined />
                                         <span className="ms-1">
                                             đã khám ngày{' '}
-                                            {comment.date_booking.slice(0, 10)}
+                                            {comment?.date_booking?.slice(
+                                                0,
+                                                10
+                                            )}
                                         </span>
                                     </span>
                                 </div>

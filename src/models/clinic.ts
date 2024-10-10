@@ -7,4 +7,5 @@ export interface Clinic {
     cover_image: String;
     created_at: Date;
     updated_at: Date;
+    major_list: number[];
 }

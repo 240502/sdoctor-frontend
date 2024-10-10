@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import {
     HomeOutlined,
     EnvironmentOutlined,
@@ -12,8 +12,8 @@ import { doctorService } from '../../../services/doctorService';
 import { Doctor } from '../../../models/doctor';
 import { baseURL } from '../../../constants/api';
 import parse from 'html-react-parser';
-import { ModalOrderAppointment } from '../components/ModalOrderAppointment';
-import { BlockSchedule } from '../components/BlockSchedule';
+import { ModalOrderAppointment } from '../../doctor/components/ModalOrderAppointment';
+import { BlockSchedule } from '../../doctor/components/BlockSchedule';
 import { Time } from '../../../models/time';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { doctorListState, doctorListValue } from '../../../stores/doctorAtom';
@@ -21,13 +21,13 @@ import { MajorService } from '../../../services/majorService';
 import { Major } from '../../../models/major';
 import ReactPaginate from 'react-paginate';
 type NotificationType = 'success' | 'error';
-const ViewDoctor = () => {
+const BlockDoctor = ({ clinicId, clinic }: any) => {
     const [doctor, setDoctor] = useState<Doctor>();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [time, setTime] = useState<Time>();
     const [appointmentDate, setAppointmentDate] = useState<string>();
     const [api, contextHolder] = notification.useNotification();
-    const [majorList, setMajorList] = useState<Major[]>();
+    const [majors, setMajors] = useState<Major[]>([]);
     const [pageIndex, setPageIndex] = useState<number>(1);
     const [pageSize, setPageSize] = useState<number>(10);
     const [pageCount, setPageCount] = useState<number>(0);
@@ -35,20 +35,16 @@ const ViewDoctor = () => {
     const [majorId, setMajorId] = useState<number | null>(0);
     const doctors = useRecoilValue(doctorListValue);
     const setDoctors = useSetRecoilState(doctorListState);
-    const sectionTopRef = useRef<HTMLDivElement>(null);
-    const scrollToSection = (sectionRef: any) => {
-        sectionRef?.current?.scrollIntoView({ behavior: 'smooth' });
-    };
     const loadData = async () => {
         try {
             console.log('call api');
             const data = {
                 pageIndex: pageIndex,
                 pageSize: pageSize,
-                majorId: majorId != 0 ? majorId : null,
+                clinicId: Number(clinicId),
+                majorId: majorId === 0 ? null : Number(majorId),
             };
             const res = await doctorService.viewDoctor(data);
-            console.log(res.data);
             setDoctors(res.data);
             setPageCount(res.pageCount);
         } catch (err: any) {
@@ -56,14 +52,32 @@ const ViewDoctor = () => {
             setDoctors([]);
         }
     };
-    const getAllMajor = async () => {
+    const handleGetMajorById = async (id: number) => {
         try {
-            const majorList = await MajorService.getAllMajor();
-            setMajorList(majorList);
+            const major = await MajorService.getMajorById(id);
+            setMajors((prevMajors: Major[]) => {
+                const existingMajor = prevMajors.find(
+                    (item: Major) => item.id === major.id
+                );
+                if (existingMajor) {
+                    return prevMajors;
+                } else return [...prevMajors, major];
+            });
         } catch (err: any) {
             console.log(err.message);
         }
     };
+    useEffect(() => {
+        console.log(majors);
+    }, [majors]);
+    useEffect(() => {
+        if (clinic?.major_list) {
+            for (let i = 0; i < clinic?.major_list.length; i++) {
+                handleGetMajorById(clinic?.major_list[i]);
+            }
+        }
+    }, [clinic]);
+
     const openNotificationWithIcon = (
         type: NotificationType,
         title: string,
@@ -89,27 +103,14 @@ const ViewDoctor = () => {
 
     useEffect(() => {
         loadData();
-        getAllMajor();
-        scrollToSection(sectionTopRef);
-    }, [majorId, pageIndex, pageSize]);
+    }, [majorId, clinicId, pageIndex, pageSize]);
 
     return (
-        <div className="container home__content mt-4 mb-4" ref={sectionTopRef}>
+        <div className="container home__content mt-4 mb-4">
             {contextHolder}
-            <Breadcrumb
-                items={[
-                    {
-                        href: '',
-                        title: <HomeOutlined />,
-                    },
 
-                    {
-                        title: `Danh sách bác sĩ`,
-                    },
-                ]}
-            />
             <h3 className="block__heading fs-5 fw-bold mt-4 mb-4">
-                Bác sĩ nổi bật
+                Danh sách bác sĩ
             </h3>
             <div className="block__list__doctor">
                 <div className="group__filter mb-3">
@@ -124,7 +125,7 @@ const ViewDoctor = () => {
                         <Select.Option value={0}>
                             Chọn chuyên ngành
                         </Select.Option>
-                        {majorList?.map((major: Major) => {
+                        {majors?.map((major: Major) => {
                             return (
                                 <Select.Option
                                     key={Number(major.id)}
@@ -136,7 +137,7 @@ const ViewDoctor = () => {
                         })}
                     </Select>
                 </div>
-                {doctors?.length ? (
+                {doctors.length > 0 ? (
                     <div className="list__doctor m-0 p-0 ">
                         {doctors?.map((doctor: Doctor) => {
                             return (
@@ -291,4 +292,4 @@ const ViewDoctor = () => {
         </div>
     );
 };
-export default ViewDoctor;
+export default BlockDoctor;

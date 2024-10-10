@@ -8,8 +8,10 @@ import {
     Radio,
     Select,
     InputRef,
+    DatePicker,
     RadioChangeEvent,
 } from 'antd';
+import type { DatePickerProps } from 'antd';
 
 import { baseURL } from '../../../constants/api';
 import axios from 'axios';
@@ -58,7 +60,6 @@ export const ModalOrderAppointment = ({
     const inputPatientNameRef = useRef<InputRef>(null);
     const inputPatientPhoneRef = useRef<InputRef>(null);
     const inputPatientEmailRef = useRef<InputRef>(null);
-    const inputPatientBirthDateRef = useRef<InputRef>(null);
     const inputExaminationRef = useRef<InputRef>(null);
     const inputVillageRef = useRef<InputRef>(null);
     const radioGenderRef = useRef<any>(undefined);
@@ -66,6 +67,11 @@ export const ModalOrderAppointment = ({
     const selectProvinceRef = useRef<any>(null);
     const selectDistrictRef = useRef<any>(null);
     const selectWardRef = useRef<any>(null);
+    const [birthday, setBirthday] = useState<string>();
+
+    const onChange: DatePickerProps['onChange'] = (date, dateString) => {
+        setBirthday(String(dateString));
+    };
     const handleOk = () => {
         const isEmptyPatientName = isEmpty(inputPatientNameRef.current?.input);
         const isEmptyPatientPhone = isEmpty(
@@ -74,9 +80,9 @@ export const ModalOrderAppointment = ({
         const isEmptyPatientEmail = isEmpty(
             inputPatientEmailRef.current?.input
         );
-        const isEmptyPatientBirthday = isEmpty(
-            inputPatientBirthDateRef.current?.input
-        );
+        // const isEmptyPatientBirthday = isEmpty(
+        //     inputPatientBirthDateRef.current?.input
+        // );
         const isEmptyRadioGender = isEmptyRadio(
             radioGenderRef.current,
             radioGenderValue.current
@@ -94,7 +100,7 @@ export const ModalOrderAppointment = ({
         );
         const isEmptySelectWard = isEmptySelect(selectWardRef.current, wardId);
         if (
-            !isEmptyPatientBirthday &&
+            // !isEmptyPatientBirthday &&
             !isEmptyPatientName &&
             !isEmptyPatientPhone &&
             !isEmptyPatientEmail &&
@@ -112,9 +118,9 @@ export const ModalOrderAppointment = ({
             const isErrorPatientPhone = validatePhone(
                 inputPatientPhoneRef.current?.input
             );
-            const isErrorPatientBirthday = validatePatientBirthDay(
-                inputPatientBirthDateRef.current?.input
-            );
+            // const isErrorPatientBirthday = validatePatientBirthDay(
+            //     inputPatientBirthDateRef.current?.input
+            // );
             const isErrorPhoneLength = validatePhoneLength(
                 inputPatientPhoneRef.current?.input
             );
@@ -123,7 +129,7 @@ export const ModalOrderAppointment = ({
                 !isErrorPatientName &&
                 !isErrorPatientEmail &&
                 !isErrorPatientPhone &&
-                !isErrorPatientBirthday &&
+                // !isErrorPatientBirthday &&
                 !isErrorPhoneLength
             ) {
                 const newAppointment = {
@@ -132,7 +138,7 @@ export const ModalOrderAppointment = ({
                     patient_name: inputPatientNameRef.current?.input?.value,
                     patient_phone: inputPatientPhoneRef.current?.input?.value,
                     patient_email: inputPatientEmailRef.current?.input?.value,
-                    birthday: inputPatientBirthDateRef.current?.input?.value,
+                    birthday: birthday,
                     province: province.province_name,
                     district: district.district_name,
                     commune: ward.ward_name,
@@ -377,15 +383,11 @@ export const ModalOrderAppointment = ({
                             <label htmlFor="" className="form-label fw-bold">
                                 Ngày/ Tháng/ Năm Sinh
                             </label>
-                            <Input
-                                onFocus={(e: any) => {
-                                    handleFocusInput(e.target);
-                                }}
-                                ref={inputPatientBirthDateRef}
-                                className=" form-control patient_phone"
-                                id="patient_phone"
-                                type="date"
-                            ></Input>
+                            <DatePicker
+                                className="mb-3 d-block"
+                                defaultChecked={true}
+                                onChange={onChange}
+                            ></DatePicker>
                             <div
                                 className="error_message mt-3"
                                 style={{ color: 'red' }}

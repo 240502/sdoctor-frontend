@@ -10,7 +10,6 @@ import { ScheduleDetails } from '../../../models/schedule_details';
 import { schedule_detailsService } from '../../../services/schedule_detailsService';
 import { Schedule } from '../../../models/schdule';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
-import { doctorListValue } from '../../../stores/doctorAtom';
 import { ListTime } from './ListTime';
 import {
     scheduleListState,

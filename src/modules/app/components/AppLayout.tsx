@@ -7,8 +7,6 @@ import { useState } from 'react';
 
 const { Header, Content, Footer } = Layout;
 export const AppLayout = ({ children }: any) => {
-    const [current, setCurrent] = useState('1');
-
     return (
         <Layout>
             <Header
@@ -18,23 +16,13 @@ export const AppLayout = ({ children }: any) => {
                 <div className="container d-flex justify-content-between">
                     <div className="home__header__logo">
                         <Link
-                            onClick={(e) => {
-                                localStorage.setItem(
-                                    'currentMenu',
-                                    JSON.stringify('1')
-                                );
-                                setCurrent('1');
-                            }}
                             className="header__logo__text fs-2 fw-bold text-decoration-none"
                             to="/"
                         >
                             SDOCTOR
                         </Link>
                     </div>
-                    <HomeMenu
-                        current={current}
-                        setCurrent={setCurrent}
-                    ></HomeMenu>
+                    <HomeMenu></HomeMenu>
                 </div>
             </Header>
             <Content style={{ background: '#fff', marginTop: '78px' }}>

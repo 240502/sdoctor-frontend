@@ -1,16 +1,18 @@
-import { Button, Input, InputRef, Modal } from 'antd';
-import { useRef } from 'react';
+import { Button, Input, InputRef, Modal, DatePicker } from 'antd';
+import type { DatePickerProps } from 'antd';
+
+import { useRef, useState } from 'react';
 import {
     handleFocusInput,
+    handleFocusSelect,
     isEmpty,
     validateName,
     validatePhone,
     validatePhoneLength,
 } from '../../../utils/global';
-import { validateDateBooking } from '../../../utils/comment';
+import { isEmptyDatePicker, validateDateBooking } from '../../../utils/comment';
 import { CommentService } from '../../../services/commentService';
 import { Comment } from '../../../models/comment';
-import socket from '../../../socket';
 const { TextArea } = Input;
 
 export const ModalComment = ({
@@ -23,8 +25,16 @@ export const ModalComment = ({
     const inputPatientPhoneRef = useRef<InputRef>(null);
     const inputDateBookingRef = useRef<InputRef>(null);
     const inputContentRef = useRef<any>(null);
+    const datePickerRef = useRef<any>(null);
+
+    const [date, setDate] = useState<string>();
+
     const handleCancel = () => {
         setIsModalCommentOpen(false);
+    };
+    const onChange: DatePickerProps['onChange'] = (date, dateString) => {
+        setDate(String(dateString));
+        console.log(datePickerRef.current.nativeElement);
     };
     const handleOk = () => {
         const isEmptyName = isEmpty(inputPatientNameRef?.current?.input);
@@ -32,7 +42,10 @@ export const ModalComment = ({
         const isEmptyContent = isEmpty(
             inputContentRef?.current?.resizableTextArea?.textArea
         );
-        const isEmptyDateBooking = isEmpty(inputDateBookingRef?.current?.input);
+        const isEmptyDateBooking = isEmptyDatePicker(
+            datePickerRef.current.nativeElement,
+            date
+        );
         if (
             !isEmptyPhone &&
             !isEmptyContent &&
@@ -46,7 +59,8 @@ export const ModalComment = ({
                 inputPatientPhoneRef.current?.input
             );
             const isErrorDateBooking = validateDateBooking(
-                inputDateBookingRef.current?.input
+                datePickerRef.current.nativeElement,
+                date
             );
             const isErrorPhoneLength = validatePhoneLength(
                 inputPatientPhoneRef.current?.input
@@ -57,17 +71,11 @@ export const ModalComment = ({
                 !isErrorDateBooking &&
                 !isErrorPhoneLength
             ) {
-                const date = new Date(
-                    inputDateBookingRef?.current?.input?.value ?? ''
-                );
-
                 const data: Comment = {
                     id: 0,
                     full_name: inputPatientNameRef?.current?.input?.value ?? '',
                     phone: inputPatientPhoneRef?.current?.input?.value ?? '',
-                    date_booking: `${date.getFullYear()}/${
-                        date.getMonth() + 1
-                    }/${date.getDate()}`,
+                    date_booking: date,
                     content:
                         inputContentRef?.current?.resizableTextArea?.textArea
                             .value ?? '',
@@ -145,14 +153,13 @@ export const ModalComment = ({
                 <label htmlFor="" className="form-label">
                     Ngày khám:
                 </label>
-                <Input
-                    onFocus={() =>
-                        handleFocusInput(inputDateBookingRef.current?.input)
-                    }
-                    ref={inputDateBookingRef}
-                    type="date"
-                    className="patient__name p-2"
-                />
+                <DatePicker
+                    onFocus={() => handleFocusSelect(datePickerRef.current)}
+                    ref={datePickerRef}
+                    className="mb-3 d-block"
+                    defaultChecked={true}
+                    onChange={onChange}
+                ></DatePicker>
                 <div
                     className="error_message mt-3"
                     style={{ color: 'red' }}

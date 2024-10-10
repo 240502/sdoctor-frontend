@@ -4,7 +4,7 @@ import {
     HomeOutlined,
 } from '@ant-design/icons';
 import { Breadcrumb, Button, Image, notification } from 'antd';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { BlockSchedule } from '../components/BlockSchedule';
 import { Doctor } from '../../../models/doctor';
@@ -17,6 +17,7 @@ import { BlockComment } from '../components/BlockComment';
 import { ModalComment } from '../components/ModalComment';
 import { useRecoilValue } from 'recoil';
 import { doctorListValue } from '../../../stores/doctorAtom';
+import { NULL } from 'sass';
 
 type NotificationType = 'success' | 'error';
 
@@ -27,7 +28,7 @@ const ViewDetailDoctor = () => {
     const doctors = useRecoilValue(doctorListValue);
     const [isModalAppointmentOpen, setIsModalAppointmentOpen] = useState(false);
     const [isModalCommentOpen, setIsModalCommentOpen] = useState(false);
-
+    const sectionTopRef = useRef<HTMLDivElement>(null);
     const [time, setTime] = useState<Time>();
     const [appointmentDate, setAppointmentDate] = useState<string>();
 
@@ -45,6 +46,9 @@ const ViewDetailDoctor = () => {
             description: des,
         });
     };
+    const scrollToSection = (sectionRef: any) => {
+        sectionRef?.current?.scrollIntoView({ behavior: 'smooth' });
+    };
     const getDoctorById = async (id: number) => {
         try {
             const res = doctors.find(
@@ -58,10 +62,11 @@ const ViewDetailDoctor = () => {
     };
     useEffect(() => {
         getDoctorById(Number(id));
+        scrollToSection(sectionTopRef);
     }, [id]);
     console.log(id);
     return (
-        <div className="container mt-4 mb-4">
+        <div className="container mt-4 mb-4" ref={sectionTopRef}>
             {contextHolder}
             <Breadcrumb
                 items={[

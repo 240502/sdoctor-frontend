@@ -38,3 +38,8 @@ main {
 .home__header__logo .header__logo__text {
     cursor: pointer;
 }
+
+.custom-menu .ant-menu-item-active,
+.custom-menu .ant-menu-item-selected {
+    background-color: transparent !important;
+}

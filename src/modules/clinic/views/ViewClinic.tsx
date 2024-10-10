@@ -10,19 +10,31 @@ import { Link } from 'react-router-dom';
 import { ClinicService } from '../../../services/clinicService';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { clinicListState, clinicListValue } from '../../../stores/clinicAtom';
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { SearchProps } from 'antd/es/input';
 import { Clinic } from '../../../models/clinic';
 import { baseURL } from '../../../constants/api';
 import ReactPaginate from 'react-paginate';
+import axios from 'axios';
 const { Search } = Input;
 const ViewClinic = () => {
+    const [optionsFilter, setOptionsFilter] = useState<any>({
+        location: null,
+        name: null,
+    });
     const [pageIndex, setPageIndex] = useState<number>(1);
     const [pageSize, setPageSize] = useState<number>(10);
-    const [location, setLocation] = useState<string>();
+    const [provinces, setProvinces] = useState([
+        { province_id: 0, province_name: '' },
+    ]);
+
     const [pageCount, setPageCount] = useState<number>(0);
     const setClinics = useSetRecoilState(clinicListState);
     const clinics = useRecoilValue(clinicListValue);
+    const sectionTopRef = useRef<HTMLDivElement>(null);
+    const scrollToSection = (sectionRef: any) => {
+        sectionRef?.current?.scrollIntoView({ behavior: 'smooth' });
+    };
     const viewClinic = async (data: any) => {
         try {
             const res = await ClinicService.viewClinic(data);
@@ -35,15 +47,26 @@ const ViewClinic = () => {
         }
     };
     const onSearch: SearchProps['onSearch'] = (value, _e, info) => {
-        const data = { pageIndex, pageSize, name: value };
-        console.log(data);
-        viewClinic(data);
+        const newOptions = { ...optionsFilter, name: value };
+        setOptionsFilter(newOptions);
     };
     const handleChangeLocation = (value: string) => {
-        console.log(`selected ${value}`);
-        setLocation(value);
+        let province: string = '';
+        const cityStr = 'thành phố';
+        const provinceStr = 'tỉnh';
+        if (value.toLowerCase().includes('thành phố')) {
+            province = value.slice(cityStr.length, value.length);
+        }
+        if (value.toLowerCase().includes('tỉnh')) {
+            province = value.slice(provinceStr.length, value.length);
+        }
+        console.log(`selected ${province}`);
+        const newOptions = { ...optionsFilter, location: province };
+        setOptionsFilter(newOptions);
     };
     const changePageSize = (value: any) => {
+        setPageIndex(1);
+
         setPageSize(Number(value));
     };
     const handlePageClick = (event: any) => {
@@ -51,18 +74,32 @@ const ViewClinic = () => {
         setPageIndex(event.selected + 1);
     };
     useEffect(() => {
+        const getProvinces = async () => {
+            try {
+                const res = await axios.get(
+                    'https://vapi.vnappmob.com/api/province'
+                );
+                setProvinces(res.data.results);
+            } catch (err) {
+                console.log(err);
+            }
+        };
+        getProvinces();
         const data = {
             pageIndex: pageIndex,
             pageSize: pageSize,
+            ...optionsFilter,
         };
+        console.log(data);
         viewClinic(data);
-    }, [pageIndex, pageSize]);
+        scrollToSection(sectionTopRef);
+    }, [pageIndex, pageSize, optionsFilter]);
     return (
-        <div className="container mt-5 mb-5">
+        <div className="container mt-5 mb-5" ref={sectionTopRef}>
             <Breadcrumb
                 items={[
                     {
-                        href: '',
+                        href: '/',
                         title: <HomeOutlined />,
                     },
 
@@ -80,23 +117,23 @@ const ViewClinic = () => {
                         onChange={handleChangeLocation}
                         // onSearch={onSearchMajor}
                         showSearch
-                        placeholder="Chọn chuyên ngành"
+                        placeholder="Chọn tỉnh"
                         optionFilterProp="children"
                         defaultValue={'0'}
                     >
                         <Select.Option value={'0'}>
                             Chọn tỉnh thành
                         </Select.Option>
-                        {/* {?.map((major: Major) => {
+                        {provinces?.map((province: any) => {
                             return (
                                 <Select.Option
-                                    key={Number(major.id)}
-                                    value={major.id}
+                                    key={Number(province.province_id)}
+                                    value={province.province_name}
                                 >
-                                    {major.name}
+                                    {province.province_name}
                                 </Select.Option>
                             );
-                        })} */}
+                        })}
                     </Select>
                     <Search
                         onSearch={onSearch}
@@ -116,7 +153,7 @@ const ViewClinic = () => {
                                 return (
                                     <div className="col-3 clinic ps-3 pe-3 mt-3 mb-3 text-center">
                                         <Link
-                                            to=""
+                                            to={'/clinic/detail/' + clinic.id}
                                             className="d-inline-block"
                                             style={{ width: '100%' }}
                                         >
@@ -132,7 +169,7 @@ const ViewClinic = () => {
                                             ></Image>
                                         </Link>
                                         <Link
-                                            to="/"
+                                            to={'/clinic/detail/' + clinic.id}
                                             className="text-decoration-none text-reset"
                                         >
                                             <h6 className="mt-3 fs-5">
@@ -184,7 +221,9 @@ const ViewClinic = () => {
                     </section>
                 </>
             ) : (
-                <p>Không tồn tại cơ sở y tế nào</p>
+                <p className="text-center fs-6 fw-bold">
+                    Không tồn tại cơ sở y tế nào
+                </p>
             )}
         </div>
     );

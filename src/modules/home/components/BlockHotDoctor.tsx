@@ -57,7 +57,7 @@ export const BlockHotDoctor = (): JSX.Element => {
                                 <div className="slide__container">
                                     <div className="item   p-3 ">
                                         <Link
-                                            to=""
+                                            to={`/doctor/detail/${doctor.id}`}
                                             className="text-decoration-none text-center"
                                         >
                                             <Image
