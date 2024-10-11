@@ -18,8 +18,8 @@ import {
 export const BlockSchedule = ({
     subscriberId,
     setIsModalOpen,
-    doctor,
-    setDoctor,
+    service,
+    setService,
     setTime,
     setAppointmentDate,
 }: any): JSX.Element => {
@@ -39,8 +39,9 @@ export const BlockSchedule = ({
     };
 
     const handleOnClickBtnTime = (time: Time) => {
+        console.log('oge');
         setIsModalOpen(true);
-        setDoctor(doctor);
+        setService(service);
         setTime(time);
         setAppointmentDate(date ?? stringDay);
     };
@@ -52,7 +53,7 @@ export const BlockSchedule = ({
             const data = {
                 date: date ?? stringDay,
                 subscriberId: subscriberId,
-                type: 'Bác sĩ',
+                type: 'Dịch vụ',
             };
             const result = await scheduleService.getBySubscriberIdAndDate(data);
             setSchedule(result.data);

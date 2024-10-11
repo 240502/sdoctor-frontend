@@ -3,6 +3,7 @@ import { ViewClinic } from '../modules/clinic';
 import { ViewClinicDetail } from '../modules/clinic/views/ViewClinicDetail';
 import { ViewDetailDoctor, ViewDoctor } from '../modules/doctor';
 import { Home } from '../modules/home';
+import { ViewService } from '../modules/service';
 import { ViewSpecialization } from '../modules/specialization';
 import {
     HOME_PATH,
@@ -10,6 +11,7 @@ import {
     VIEW_CLINIC_PATH,
     VIEW_DETAIL_DOCTOR_PATH,
     VIEW_DOCTOR_PATH,
+    VIEW_SERVICE_PATH,
     VIEW_SPECIALIZATION_PATH,
 } from './path';
 export const publicRoutes = [
@@ -41,6 +43,11 @@ export const publicRoutes = [
     {
         path: VIEW_CLINIC_DETAIL_PATH,
         component: ViewClinicDetail,
+        layout: AppLayout,
+    },
+    {
+        path: VIEW_SERVICE_PATH,
+        component: ViewService,
         layout: AppLayout,
     },
 ];
