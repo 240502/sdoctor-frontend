@@ -60,7 +60,8 @@ export const ModalOrderAppointment = ({
     const inputPatientNameRef = useRef<InputRef>(null);
     const inputPatientPhoneRef = useRef<InputRef>(null);
     const inputPatientEmailRef = useRef<InputRef>(null);
-    const inputExaminationRef = useRef<InputRef>(null);
+    const [examinationReason, setExaminationReason] = useState<string>();
+
     const inputVillageRef = useRef<InputRef>(null);
     const radioGenderRef = useRef<any>(undefined);
     const radioGenderValue = useRef<string | undefined>(undefined);
@@ -142,14 +143,14 @@ export const ModalOrderAppointment = ({
                     province: province.province_name,
                     district: district.district_name,
                     commune: ward.ward_name,
-                    examination_reason:
-                        inputExaminationRef.current?.input?.value,
+                    examination_reason: examinationReason,
                     time_id: time.id,
                     gender: radioGenderValue.current,
                     doctor_name: service.name,
                     time_value: time.value,
-                    fee: service.price,
+                    price: service.price,
                     location: service.location,
+                    type: 'Gói khám',
                 };
                 console.log(newAppointment);
 
@@ -541,7 +542,9 @@ export const ModalOrderAppointment = ({
                                 Lý do khám
                             </label>
                             <TextArea
-                                ref={inputExaminationRef}
+                                onChange={(e) => {
+                                    setExaminationReason(e.target.value);
+                                }}
                                 className="form-control"
                             ></TextArea>
                             <div

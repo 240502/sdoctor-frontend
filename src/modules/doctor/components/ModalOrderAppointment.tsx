@@ -29,6 +29,7 @@ import {
 } from '../../../utils/global';
 import socket from '../../../socket';
 import { validatePatientBirthDay } from '../../../utils/appointment';
+import { Appointment } from '../../../models/appointment';
 
 const { TextArea } = Input;
 export const ModalOrderAppointment = ({
@@ -60,7 +61,6 @@ export const ModalOrderAppointment = ({
     const inputPatientNameRef = useRef<InputRef>(null);
     const inputPatientPhoneRef = useRef<InputRef>(null);
     const inputPatientEmailRef = useRef<InputRef>(null);
-    const inputExaminationRef = useRef<InputRef>(null);
     const inputVillageRef = useRef<InputRef>(null);
     const radioGenderRef = useRef<any>(undefined);
     const radioGenderValue = useRef<string | undefined>(undefined);
@@ -68,7 +68,7 @@ export const ModalOrderAppointment = ({
     const selectDistrictRef = useRef<any>(null);
     const selectWardRef = useRef<any>(null);
     const [birthday, setBirthday] = useState<string>();
-
+    const [examinationReason, setExaminationReason] = useState<string>();
     const onChange: DatePickerProps['onChange'] = (date, dateString) => {
         setBirthday(String(dateString));
     };
@@ -142,13 +142,14 @@ export const ModalOrderAppointment = ({
                     province: province.province_name,
                     district: district.district_name,
                     commune: ward.ward_name,
-                    examination_reason:
-                        inputExaminationRef.current?.input?.value,
+                    examination_reason: examinationReason,
                     time_id: time.id,
                     gender: radioGenderValue.current,
                     doctor_name: doctor.full_name,
                     time_value: time.value,
-                    fee: doctor.fee,
+                    price: doctor.fee,
+                    location: doctor.location,
+                    type: 'Bác sĩ',
                 };
                 console.log(newAppointment);
 
@@ -542,8 +543,10 @@ export const ModalOrderAppointment = ({
                                 Lý do khám
                             </label>
                             <TextArea
-                                ref={inputExaminationRef}
                                 className="form-control"
+                                onChange={(e) => {
+                                    setExaminationReason(e.target.value);
+                                }}
                             ></TextArea>
                             <div
                                 className="error_message mt-3"

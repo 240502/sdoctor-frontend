@@ -22,6 +22,5 @@ export interface Doctor {
     location: string;
     major_name: String;
     schedule: Schedule;
-    clinic_location: string;
     introduction: string;
 }

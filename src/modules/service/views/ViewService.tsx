@@ -85,6 +85,7 @@ const ViewService = () => {
             description: des,
         });
     };
+
     const [provinces, setProvinces] = useState([
         { province_id: 0, province_name: '' },
     ]);
@@ -207,6 +208,7 @@ const ViewService = () => {
     }, [optionsFilter]);
     return (
         <>
+            {contextHolder}
             <div className="position-relative ">
                 <div className="banner">
                     <Image
@@ -424,7 +426,12 @@ const ViewService = () => {
                                     <div className="item_container d-flex pt-1">
                                         <div className="item__left col-6 d-flex border border-start-0 border-bottom-0 border-top-0 pe-3">
                                             <div className="col-3 text-center">
-                                                <Link to={`/doctor/detail/1`}>
+                                                <Link
+                                                    to={
+                                                        `/service/detail/` +
+                                                        service.id
+                                                    }
+                                                >
                                                     <Image
                                                         preview={false}
                                                         style={{
@@ -439,7 +446,10 @@ const ViewService = () => {
                                                 </Link>
 
                                                 <Link
-                                                    to={`/doctor/detail/1`}
+                                                    to={
+                                                        `/service/detail/` +
+                                                        service.id
+                                                    }
                                                     className="btn__more text-decoration-none mt-3"
                                                 >
                                                     Xem thêm
@@ -448,7 +458,10 @@ const ViewService = () => {
                                             <div className="col-9 doctor_info">
                                                 <h3 className="doctor__name fs-5">
                                                     <Link
-                                                        to={`/doctor/detail/1`}
+                                                        to={
+                                                            `/service/detail/` +
+                                                            service.id
+                                                        }
                                                         className="text-decoration-none"
                                                     >
                                                         {service.name}
@@ -521,7 +534,7 @@ const ViewService = () => {
                     service={service}
                     setIsModalOpen={setIsModalOpen}
                     time={time}
-                    data={appointmentDate}
+                    date={appointmentDate}
                     openNotificationWithIcon={openNotificationWithIcon}
                 />
             )}

@@ -1,2 +1,3 @@
 import ViewService from './views/ViewService';
-export { ViewService };
+import ViewDetailService from './views/ViewDetailService';
+export { ViewService, ViewDetailService };

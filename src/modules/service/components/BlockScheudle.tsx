@@ -39,7 +39,6 @@ export const BlockSchedule = ({
     };
 
     const handleOnClickBtnTime = (time: Time) => {
-        console.log('oge');
         setIsModalOpen(true);
         setService(service);
         setTime(time);

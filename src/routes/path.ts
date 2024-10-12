@@ -5,6 +5,8 @@ const VIEW_SPECIALIZATION_PATH = '/list/specification';
 const VIEW_DETAIL_DOCTOR_PATH = '/doctor/detail/:id';
 const VIEW_CLINIC_DETAIL_PATH = '/clinic/detail/:id';
 const VIEW_SERVICE_PATH = '/list/service';
+const VIEW_SERVICE_DETAIL_PATH = '/service/detail/:id';
+const VIEW_NEWS_PATH = '/list/news';
 export {
     HOME_PATH,
     VIEW_CLINIC_PATH,
@@ -13,4 +15,6 @@ export {
     VIEW_DETAIL_DOCTOR_PATH,
     VIEW_CLINIC_DETAIL_PATH,
     VIEW_SERVICE_PATH,
+    VIEW_SERVICE_DETAIL_PATH,
+    VIEW_NEWS_PATH,
 };

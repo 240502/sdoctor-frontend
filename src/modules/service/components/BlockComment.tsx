@@ -16,7 +16,7 @@ export const BlockComment = ({ userId, setIsModalCommentOpen }: any) => {
                 pageIndex: pageIndex,
                 pageSize: pageSize,
                 userId: Number(userID),
-                type: 'Bác sĩ',
+                type: 'Dịch vụ',
             };
             const comments = await CommentService.getCommentByUserId(data);
             console.log(comments.data);

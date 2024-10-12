@@ -17,7 +17,7 @@ const { TextArea } = Input;
 
 export const ModalComment = ({
     openNotificationWithIcon,
-    doctorId,
+    serviceId,
     isModalCommentOpen,
     setIsModalCommentOpen,
 }: any): JSX.Element => {
@@ -79,8 +79,8 @@ export const ModalComment = ({
                     content:
                         inputContentRef?.current?.resizableTextArea?.textArea
                             .value ?? '',
-                    user_id: Number(doctorId),
-                    type: 'Bác sĩ',
+                    user_id: Number(serviceId),
+                    type: 'Dịch vụ',
                 };
                 createCommentForPatient(data);
             }

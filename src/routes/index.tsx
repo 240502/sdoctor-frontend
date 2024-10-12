@@ -3,8 +3,8 @@ import { ViewClinic } from '../modules/clinic';
 import { ViewClinicDetail } from '../modules/clinic/views/ViewClinicDetail';
 import { ViewDetailDoctor, ViewDoctor } from '../modules/doctor';
 import { Home } from '../modules/home';
-import { ViewService } from '../modules/service';
-import { ViewSpecialization } from '../modules/specialization';
+import { ViewNews } from '../modules/news';
+import { ViewService, ViewDetailService } from '../modules/service';
 import {
     HOME_PATH,
     VIEW_CLINIC_DETAIL_PATH,
@@ -12,7 +12,8 @@ import {
     VIEW_DETAIL_DOCTOR_PATH,
     VIEW_DOCTOR_PATH,
     VIEW_SERVICE_PATH,
-    VIEW_SPECIALIZATION_PATH,
+    VIEW_SERVICE_DETAIL_PATH,
+    VIEW_NEWS_PATH,
 } from './path';
 export const publicRoutes = [
     {
@@ -25,11 +26,7 @@ export const publicRoutes = [
         component: ViewDoctor,
         layout: AppLayout,
     },
-    {
-        path: VIEW_SPECIALIZATION_PATH,
-        component: ViewSpecialization,
-        layout: AppLayout,
-    },
+
     {
         path: VIEW_DETAIL_DOCTOR_PATH,
         component: ViewDetailDoctor,
@@ -48,6 +45,16 @@ export const publicRoutes = [
     {
         path: VIEW_SERVICE_PATH,
         component: ViewService,
+        layout: AppLayout,
+    },
+    {
+        path: VIEW_SERVICE_DETAIL_PATH,
+        component: ViewDetailService,
+        layout: AppLayout,
+    },
+    {
+        path: VIEW_NEWS_PATH,
+        component: ViewNews,
         layout: AppLayout,
     },
 ];
