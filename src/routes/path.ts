@@ -7,6 +7,9 @@ const VIEW_CLINIC_DETAIL_PATH = '/clinic/detail/:id';
 const VIEW_SERVICE_PATH = '/list/service';
 const VIEW_SERVICE_DETAIL_PATH = '/service/detail/:id';
 const VIEW_NEWS_PATH = '/list/news';
+const LOGIN_PATH = '/login';
+const ADMIN_PATH = '/admin';
+const DASHBOARD_PATH = '/admin/dashboard';
 export {
     HOME_PATH,
     VIEW_CLINIC_PATH,
@@ -17,4 +20,7 @@ export {
     VIEW_SERVICE_PATH,
     VIEW_SERVICE_DETAIL_PATH,
     VIEW_NEWS_PATH,
+    LOGIN_PATH,
+    ADMIN_PATH,
+    DASHBOARD_PATH,
 };

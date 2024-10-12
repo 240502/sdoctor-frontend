@@ -1,10 +1,13 @@
-import { AppLayout } from '../modules/app';
-import { ViewClinic } from '../modules/clinic';
-import { ViewClinicDetail } from '../modules/clinic/views/ViewClinicDetail';
-import { ViewDetailDoctor, ViewDoctor } from '../modules/doctor';
-import { Home } from '../modules/home';
-import { ViewNews } from '../modules/news';
-import { ViewService, ViewDetailService } from '../modules/service';
+import { AppLayout } from '../modules/account/app';
+import { ViewClinic } from '../modules/account/clinic';
+import { ViewClinicDetail } from '../modules/account/clinic/views/ViewClinicDetail';
+import { ViewDetailDoctor, ViewDoctor } from '../modules/account/doctor';
+import { Home } from '../modules/account/home';
+import { Login } from '../modules/account/login/login';
+import { ViewNews } from '../modules/account/news';
+import { ViewService, ViewDetailService } from '../modules/account/service';
+import { DashBoard } from '../modules/auth/dashboard';
+import { AdminLayout } from '../modules/auth/layout';
 import {
     HOME_PATH,
     VIEW_CLINIC_DETAIL_PATH,
@@ -14,6 +17,9 @@ import {
     VIEW_SERVICE_PATH,
     VIEW_SERVICE_DETAIL_PATH,
     VIEW_NEWS_PATH,
+    ADMIN_PATH,
+    LOGIN_PATH,
+    DASHBOARD_PATH,
 } from './path';
 export const publicRoutes = [
     {
@@ -56,5 +62,18 @@ export const publicRoutes = [
         path: VIEW_NEWS_PATH,
         component: ViewNews,
         layout: AppLayout,
+    },
+    {
+        path: LOGIN_PATH,
+        component: Login,
+        layout: null,
+    },
+];
+
+export const privateRoutes = [
+    {
+        path: DASHBOARD_PATH,
+        component: DashBoard,
+        layout: AdminLayout,
     },
 ];
