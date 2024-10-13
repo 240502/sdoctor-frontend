@@ -2,10 +2,10 @@ import { Image } from 'antd';
 import { Carousel } from 'antd';
 import '@/assets/scss/home.scss';
 import { BlockService } from '../components/BlockService';
-import { BlockSpecialization } from '../components/BlockSpecialization';
 import { BlockForYou } from '../components/BlockForYou';
 import { BlockClinic } from '../components/BlockClinic';
 import { BlockHotDoctor } from '../components/BlockHotDoctor';
+import { BlockCommonNews } from '../components/BlockCommonNews';
 
 export const Home = () => {
     return (
@@ -21,8 +21,8 @@ export const Home = () => {
             <BlockForYou />
             <BlockHotDoctor />
             <BlockService />
-            <BlockSpecialization />
             <BlockClinic />
+            <BlockCommonNews />
         </div>
     );
 };

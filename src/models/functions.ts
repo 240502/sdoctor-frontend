@@ -4,4 +4,5 @@ export interface Functions {
     created_at: Date | null;
     updated_at: Date | null;
     parent_id: number | null;
+    icon: string;
 }

@@ -5,4 +5,8 @@ export const ServicesService = {
         const res = await apiClient.post('/api/service/view', data);
         return res?.data;
     },
+    async getCommonService(): Promise<any> {
+        const res = await apiClient.get('/api/service/get-common-service');
+        return res?.data;
+    },
 };

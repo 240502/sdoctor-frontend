@@ -1,16 +1,32 @@
 import { Link } from 'react-router-dom';
-import { Image } from 'antd';
+import { Button, Image } from 'antd';
 import { useEffect, useState } from 'react';
-
-import { HomeDirectoryService } from '../../../../services/home_directoryService';
-import { HomeDirectory } from '../../../../models/home_directory';
+import Slider from 'react-slick';
+import NextArrow from './NextArrow';
+import PrevArrow from './PrevArrow';
+import { Services } from '../../../../models/services';
+import { ServicesService } from '../../../../services/servicesService';
 import { baseURL } from '../../../../constants/api';
 export const BlockService = () => {
-    const [homeDirectories, setHomeDirectories] = useState<HomeDirectory[]>();
+    var settings = {
+        dots: false,
+        infinite: true,
+        slidesToShow: 4,
+        slidesToScroll: 4,
+        autoplay: false,
+        speed: 2000,
+        autoplaySpeed: 2000,
+        cssEase: 'ease-in-out',
+        arrow: true,
+        nextArrow: <NextArrow />,
+        prevArrow: <PrevArrow />,
+    };
+    const [commonServices, setCommonServices] = useState<Services[]>();
     const loadData = async () => {
         try {
-            const data = await HomeDirectoryService.getHomeDirectory();
-            setHomeDirectories(data);
+            const data = await ServicesService.getCommonService();
+            console.log(data);
+            setCommonServices(data);
         } catch (err: any) {
             console.error(err);
         }
@@ -19,37 +35,36 @@ export const BlockService = () => {
         loadData();
     }, []);
     return (
-        <div className="row block__services mt-5">
-            <h3 className="block__title fs-4 fw-bold mb-4">
-                Dịch vụ toàn diện
-            </h3>
-            <div className="block__list row">
-                {homeDirectories?.map((item: HomeDirectory) => {
-                    return (
-                        <div
-                            className="block__group col-6  mb-5 "
-                            key={Number(item.id)}
-                        >
-                            <Link
-                                to={item.url}
-                                className="text-decoration-none col-5"
-                            >
-                                <div className="block__list__item  align-items-center border rounded-pill d-flex p-4  ">
-                                    <Image
-                                        className=""
-                                        preview={false}
-                                        src={baseURL + item.image}
-                                        style={{ width: '40%' }}
-                                    ></Image>
-
-                                    <h3 className="ms-5 mb-0 fs-4 item__heading text-center">
-                                        {item.name}
-                                    </h3>
+        <div className="row block__service mt-5 mb-5">
+            <div className="block__header d-flex justify-content-between align-items-center">
+                <h3 className="block__title fs-4 fw-bold">Dịch vụ nổi bật</h3>
+                <Button className="btn__more pt-3 pb-3 fs-5">Xem thêm</Button>
+            </div>
+            <div className="block__list mt-4 position-relative">
+                <Slider {...settings}>
+                    {commonServices?.map((service: Services) => {
+                        return (
+                            <div className="slide__container col-3 ps-3 pe-3">
+                                <div className="item border border-1 rounded p-3 text-center  ">
+                                    <Link
+                                        to={'/service/detail' + service.id}
+                                        className=" text-decoration-none"
+                                    >
+                                        <Image
+                                            className="item__image"
+                                            preview={false}
+                                            style={{ width: '157px' }}
+                                            src={baseURL + service.image}
+                                        ></Image>
+                                        <p className="item__text mt-3 text-center text-dark fw-bold fs-6 text-capitalize">
+                                            {service.name}
+                                        </p>
+                                    </Link>
                                 </div>
-                            </Link>
-                        </div>
-                    );
-                })}
+                            </div>
+                        );
+                    })}
+                </Slider>
             </div>
         </div>
     );

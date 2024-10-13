@@ -4,7 +4,7 @@ import PrivateRoutes from './routes/private_router';
 import { Fragment, useEffect } from 'react';
 import { useSetRecoilState } from 'recoil';
 import { userState } from './stores/userAtom';
-
+import './assets/fontawesome/css/all.min.css';
 function App() {
     const setUser = useSetRecoilState(userState);
     const getUser = async () => {

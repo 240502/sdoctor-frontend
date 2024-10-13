@@ -7,16 +7,7 @@ export const BlockForYou = (): JSX.Element => {
             <h3 className="fs-4 fw-bold block__title ">Dành cho bạn</h3>
             <div className="block__list row mt-4">
                 <div className="block__list_item col-3 d-flex">
-                    <Link
-                        to=""
-                        className="text-decoration-none"
-                        onClick={() => {
-                            localStorage.setItem(
-                                'currentMenu',
-                                JSON.stringify('3')
-                            );
-                        }}
-                    >
+                    <Link to="/list/clinics" className="text-decoration-none">
                         <Image
                             style={{ width: '90%' }}
                             preview={false}
@@ -29,16 +20,7 @@ export const BlockForYou = (): JSX.Element => {
                     </Link>
                 </div>
                 <div className="block__list_item col-3 d-flex">
-                    <Link
-                        to="/list/doctor/for-you"
-                        className="text-decoration-none"
-                        onClick={() => {
-                            localStorage.setItem(
-                                'currentMenu',
-                                JSON.stringify('2')
-                            );
-                        }}
-                    >
+                    <Link to="/list/doctor" className="text-decoration-none">
                         <Image
                             style={{ width: '90%' }}
                             preview={false}
@@ -51,16 +33,7 @@ export const BlockForYou = (): JSX.Element => {
                     </Link>
                 </div>
                 <div className="block__list_item col-3 d-flex">
-                    <Link
-                        to=""
-                        className="text-decoration-none"
-                        onClick={() => {
-                            localStorage.setItem(
-                                'currentMenu',
-                                JSON.stringify('6')
-                            );
-                        }}
-                    >
+                    <Link to="/list/service" className="text-decoration-none">
                         <Image
                             style={{ width: '90%' }}
                             preview={false}
@@ -68,21 +41,12 @@ export const BlockForYou = (): JSX.Element => {
                             src={baseURL + '/img/140537-chuyen-khoa.png'}
                         ></Image>
                         <h5 className="fs-5 text-center block__heading mt-4">
-                            Chuyên khoa
+                            Dịch vụ
                         </h5>
                     </Link>
                 </div>
                 <div className="block__list_item col-3 d-flex">
-                    <Link
-                        to=""
-                        className="text-decoration-none"
-                        onClick={() => {
-                            localStorage.setItem(
-                                'currentMenu',
-                                JSON.stringify('5')
-                            );
-                        }}
-                    >
+                    <Link to="/list/news" className="text-decoration-none">
                         <Image
                             style={{ width: '90%' }}
                             preview={false}

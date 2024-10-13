@@ -1,2 +1,2 @@
-import AdminLayout from './components/AdminLayout';
+import AdminLayout from './AdminLayout';
 export { AdminLayout };

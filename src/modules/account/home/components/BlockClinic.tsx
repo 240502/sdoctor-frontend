@@ -13,8 +13,8 @@ export const BlockClinic = (): JSX.Element => {
     var settings = {
         dots: false,
         infinite: true,
-        slidesToShow: 3,
-        slidesToScroll: 3,
+        slidesToShow: 4,
+        slidesToScroll: 4,
         autoplay: false,
         speed: 2000,
         autoplaySpeed: 2000,
