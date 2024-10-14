@@ -16,7 +16,7 @@ import { Sidenav } from './components/Sidenav';
 import { HeaderLayout } from './components/Header';
 const { Header, Sider, Content } = Layout;
 
-const AdminLayout: React.FC = () => {
+const AdminLayout: React.FC = ({ children }: any) => {
     const [collapsed, setCollapsed] = useState(false);
     const [current, setCurrent] = useState('0');
 
@@ -33,7 +33,7 @@ const AdminLayout: React.FC = () => {
         setCurrent(menuKey);
     }, []);
     return (
-        <Layout style={{ height: '100vh' }}>
+        <Layout>
             <Sider trigger={null} collapsible collapsed={collapsed}>
                 <div className="mb-3">
                     <h3 className="fs-3 fw-bold text-white p-3 text-center">
@@ -51,8 +51,11 @@ const AdminLayout: React.FC = () => {
                     user={user}
                 />
             </Sider>
-            <Layout>
-                <HeaderLayout />
+            <Layout style={{ width: '200vh' }}>
+                <HeaderLayout
+                    collapsed={collapsed}
+                    setCollapsed={setCollapsed}
+                />
                 <Content
                     style={{
                         margin: '24px 16px',
@@ -62,7 +65,7 @@ const AdminLayout: React.FC = () => {
                         borderRadius: borderRadiusLG,
                     }}
                 >
-                    Content
+                    {children}
                 </Content>
             </Layout>
         </Layout>

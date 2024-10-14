@@ -6,6 +6,7 @@ import { Home } from '../modules/account/home';
 import { Login } from '../modules/account/login/login';
 import { ViewNews } from '../modules/account/news';
 import { ViewService, ViewDetailService } from '../modules/account/service';
+import { AppointmentManagement } from '../modules/auth/appointment';
 import { DashBoard } from '../modules/auth/dashboard';
 import { AdminLayout } from '../modules/auth/layout';
 import {
@@ -20,6 +21,7 @@ import {
     ADMIN_PATH,
     LOGIN_PATH,
     DASHBOARD_PATH,
+    APPOINTMENT_PATH,
 } from './path';
 export const publicRoutes = [
     {
@@ -74,6 +76,11 @@ export const privateRoutes = [
     {
         path: DASHBOARD_PATH,
         component: DashBoard,
+        layout: AdminLayout,
+    },
+    {
+        path: APPOINTMENT_PATH,
+        component: AppointmentManagement,
         layout: AdminLayout,
     },
 ];
