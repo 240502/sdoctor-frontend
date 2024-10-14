@@ -32,7 +32,12 @@ export const BlockClinic = (): JSX.Element => {
             console.log(err.message);
         }
     };
-
+    const handleUpdateViewsClinic = async (id: number) => {
+        try {
+            const res = await ClinicService.updateViewsClinic(id);
+            console.log(res);
+        } catch (err: any) {}
+    };
     useEffect(() => {
         loadData();
     }, []);
@@ -50,7 +55,12 @@ export const BlockClinic = (): JSX.Element => {
                             <div className="slide__container">
                                 <div className="item border border-1 rounded p-3 text-center  ">
                                     <Link
-                                        to=""
+                                        onClick={() =>
+                                            handleUpdateViewsClinic(
+                                                Number(clinic.id)
+                                            )
+                                        }
+                                        to={'/clinic/detail/' + clinic.id}
                                         className=" text-decoration-none"
                                     >
                                         <Image

@@ -59,6 +59,7 @@ const ViewDetailDoctor = () => {
             console.log(err.message);
         }
     };
+
     useEffect(() => {
         getDoctorById(Number(id));
         scrollToSection(sectionTopRef);

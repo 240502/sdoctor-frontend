@@ -72,6 +72,12 @@ const ViewClinic = () => {
 
         setPageSize(Number(value));
     };
+    const handleUpdateViewsClinic = async (id: number) => {
+        try {
+            const res = await ClinicService.updateViewsClinic(id);
+            console.log(res);
+        } catch (err: any) {}
+    };
     const handlePageClick = (event: any) => {
         console.log(event.selected);
         setPageIndex(event.selected + 1);
@@ -158,6 +164,11 @@ const ViewClinic = () => {
                                         <Link
                                             to={'/clinic/detail/' + clinic.id}
                                             className="d-inline-block"
+                                            onClick={() =>
+                                                handleUpdateViewsClinic(
+                                                    Number(clinic.id)
+                                                )
+                                            }
                                             style={{ width: '100%' }}
                                         >
                                             <Image
@@ -172,6 +183,11 @@ const ViewClinic = () => {
                                             ></Image>
                                         </Link>
                                         <Link
+                                            onClick={() =>
+                                                handleUpdateViewsClinic(
+                                                    Number(clinic.id)
+                                                )
+                                            }
                                             to={'/clinic/detail/' + clinic.id}
                                             className="text-decoration-none text-reset"
                                         >

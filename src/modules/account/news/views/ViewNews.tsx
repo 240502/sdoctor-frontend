@@ -2,7 +2,7 @@ import React from 'react';
 import { Image } from 'antd';
 import { BlockNewNews } from '../components/BlockNewNews';
 import { BlockCommonNews } from '../components/BlockCommonNews';
-import { BlockNewCategories } from '../components/BlockNewCategories';
+import { BlockNewCategories } from '../components/BlockNewsCategories';
 
 const ViewNews = () => {
     return (

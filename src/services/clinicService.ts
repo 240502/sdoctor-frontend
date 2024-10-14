@@ -9,4 +9,14 @@ export const ClinicService = {
         const res: any = await apiClient.post('/api/clinic/view', data);
         return res?.data;
     },
+    async updateViewsClinic(id: number): Promise<any> {
+        const res: any = await apiClient.put(
+            '/api/clinic/update-views-clinic/' + id
+        );
+        return res;
+    },
+    async getClinicById(id: number): Promise<any> {
+        const res = await apiClient.get('/api/clinic//getById/' + id);
+        return res.data;
+    },
 };

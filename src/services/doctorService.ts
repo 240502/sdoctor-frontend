@@ -13,4 +13,10 @@ export const doctorService = {
         const res: any = await apiClient.get('/api/doctor/getById/' + id);
         return res?.data;
     },
+    async updateViewsDoctor(id: number): Promise<any> {
+        const res: any = await apiClient.put(
+            '/api/doctor/update-views-doctor/' + id
+        );
+        return res;
+    },
 };

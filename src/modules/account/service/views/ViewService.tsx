@@ -104,6 +104,14 @@ const ViewService = () => {
 
         setOptionsFilter(newOptions);
     };
+    const handleUpdateViewsService = async (id: number): Promise<any> => {
+        try {
+            const res = await ServicesService.updateViewsService(id);
+            console.log(res);
+        } catch (err: any) {
+            console.log(err.message);
+        }
+    };
     const handleChangeCategory = (value: any) => {
         const newOptions = {
             ...optionsFilter,
@@ -427,6 +435,11 @@ const ViewService = () => {
                                         <div className="item__left col-6 d-flex border border-start-0 border-bottom-0 border-top-0 pe-3">
                                             <div className="col-3 text-center">
                                                 <Link
+                                                    onClick={() =>
+                                                        handleUpdateViewsService(
+                                                            Number(service.id)
+                                                        )
+                                                    }
                                                     to={
                                                         `/service/detail/` +
                                                         service.id
@@ -446,6 +459,11 @@ const ViewService = () => {
                                                 </Link>
 
                                                 <Link
+                                                    onClick={() =>
+                                                        handleUpdateViewsService(
+                                                            Number(service.id)
+                                                        )
+                                                    }
                                                     to={
                                                         `/service/detail/` +
                                                         service.id
@@ -458,6 +476,13 @@ const ViewService = () => {
                                             <div className="col-9 doctor_info">
                                                 <h3 className="doctor__name fs-5">
                                                     <Link
+                                                        onClick={() =>
+                                                            handleUpdateViewsService(
+                                                                Number(
+                                                                    service.id
+                                                                )
+                                                            )
+                                                        }
                                                         to={
                                                             `/service/detail/` +
                                                             service.id

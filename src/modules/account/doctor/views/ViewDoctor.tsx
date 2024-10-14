@@ -59,6 +59,14 @@ const ViewDoctor = () => {
             setDoctors([]);
         }
     };
+    const handleUpdateViewsDoctor = async (id: number) => {
+        try {
+            const res = await doctorService.updateViewsDoctor(id);
+            console.log(res);
+        } catch (err: any) {
+            console.log(err.message);
+        }
+    };
     const getAllMajor = async () => {
         try {
             const majorList = await MajorService.getAllMajor();
@@ -151,6 +159,11 @@ const ViewDoctor = () => {
                                         <div className="item__left col-6 d-flex border border-start-0 border-bottom-0 border-top-0 pe-3">
                                             <div className="col-3 text-center">
                                                 <Link
+                                                    onClick={() =>
+                                                        handleUpdateViewsDoctor(
+                                                            Number(doctor.id)
+                                                        )
+                                                    }
                                                     to={`/doctor/detail/${doctor.id}`}
                                                 >
                                                     <Image
@@ -167,6 +180,11 @@ const ViewDoctor = () => {
                                                 </Link>
 
                                                 <Link
+                                                    onClick={() =>
+                                                        handleUpdateViewsDoctor(
+                                                            Number(doctor.id)
+                                                        )
+                                                    }
                                                     to={`/doctor/detail/${doctor.id}`}
                                                     className="btn__more text-decoration-none mt-3"
                                                 >
@@ -176,6 +194,13 @@ const ViewDoctor = () => {
                                             <div className="col-9 doctor_info">
                                                 <h3 className="doctor__name fs-5">
                                                     <Link
+                                                        onClick={() =>
+                                                            handleUpdateViewsDoctor(
+                                                                Number(
+                                                                    doctor.id
+                                                                )
+                                                            )
+                                                        }
                                                         to={`/doctor/detail/${doctor.id}`}
                                                         className="text-decoration-none"
                                                     >

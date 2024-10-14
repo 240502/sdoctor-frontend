@@ -31,7 +31,14 @@ export const BlockHotDoctor = (): JSX.Element => {
 
     const setDoctors = useSetRecoilState(doctorListState);
     const doctors = useRecoilValue(doctorListValue);
-
+    const handleUpdateViewsDoctor = async (id: number) => {
+        try {
+            const res = await doctorService.updateViewsDoctor(id);
+            console.log(res);
+        } catch (err: any) {
+            console.log(err.message);
+        }
+    };
     const loadData = async () => {
         console.log('call api');
         try {
@@ -60,6 +67,11 @@ export const BlockHotDoctor = (): JSX.Element => {
                                 <div className="slide__container">
                                     <div className="item   p-3 ">
                                         <Link
+                                            onClick={() =>
+                                                handleUpdateViewsDoctor(
+                                                    Number(doctor.id)
+                                                )
+                                            }
                                             to={`/doctor/detail/${doctor.id}`}
                                             className="text-decoration-none text-center"
                                         >

@@ -17,6 +17,7 @@ import { ModalComment } from '../components/ModalComment';
 import { useRecoilValue } from 'recoil';
 import { serviceListValue } from '../../../../stores/servicesAtom';
 import { Services } from '../../../../models/services';
+import { ServicesService } from '../../../../services/servicesService';
 
 type NotificationType = 'success' | 'error';
 
@@ -66,6 +67,7 @@ const ViewDetailService = () => {
             console.log(err.message);
         }
     };
+
     useEffect(() => {
         getServiceById(Number(id));
         scrollToSection(sectionTopRef);
@@ -81,7 +83,7 @@ const ViewDetailService = () => {
                         title: <HomeOutlined />,
                     },
                     {
-                        title: 'Chi tiết bác sĩ',
+                        title: 'Chi tiết gói khám',
                     },
                 ]}
             ></Breadcrumb>

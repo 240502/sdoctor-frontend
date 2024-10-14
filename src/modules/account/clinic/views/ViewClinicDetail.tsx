@@ -6,6 +6,7 @@ import { useRecoilValue } from 'recoil';
 import { clinicListValue } from '../../../../stores/clinicAtom';
 import { Clinic } from '../../../../models/clinic';
 import { baseURL } from '../../../../constants/api';
+import { ClinicService } from '../../../../services/clinicService';
 
 export const ViewClinicDetail = () => {
     const { id } = useParams<any>();
@@ -13,14 +14,21 @@ export const ViewClinicDetail = () => {
     const [clinic, setClinic] = useState<Clinic>();
     const [current, setCurrent] = useState<string>('0');
     const sectionDoctorRef = useRef<HTMLDivElement>(null);
+    const sectionTop = useRef<HTMLDivElement>(null);
 
     const scrollToSection = (sectionRef: any) => {
         sectionRef?.current?.scrollIntoView({ behavior: 'smooth' });
     };
-    const handleGetClinicById = (id: number) => {
+    const handleGetClinicById = async (id: number) => {
         try {
             const clinic = clinics.find((item: Clinic) => item.id === id);
-            setClinic(clinic);
+            console.log(clinic);
+            if (clinic) {
+                setClinic(clinic);
+            } else {
+                const res = await ClinicService.getClinicById(id);
+                setClinic(res);
+            }
         } catch (err: any) {
             throw new Error(err.message);
         }
@@ -31,9 +39,11 @@ export const ViewClinicDetail = () => {
     };
     useEffect(() => {
         handleGetClinicById(Number(id));
+        scrollToSection(sectionTop);
     }, [id]);
+
     return (
-        <div className=" block__clinic__detail">
+        <div className=" block__clinic__detail" ref={sectionTop}>
             <div className="position-relative">
                 <div
                     className="block__image_cover position-relative overflow-hidden"

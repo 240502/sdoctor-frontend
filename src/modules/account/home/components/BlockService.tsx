@@ -31,6 +31,14 @@ export const BlockService = () => {
             console.error(err);
         }
     };
+    const handleUpdateViewsService = async (id: number): Promise<any> => {
+        try {
+            const res = await ServicesService.updateViewsService(id);
+            console.log(res);
+        } catch (err: any) {
+            console.log(err.message);
+        }
+    };
     useEffect(() => {
         loadData();
     }, []);
@@ -47,7 +55,12 @@ export const BlockService = () => {
                             <div className="slide__container col-3 ps-3 pe-3">
                                 <div className="item border border-1 rounded p-3 text-center  ">
                                     <Link
-                                        to={'/service/detail' + service.id}
+                                        onClick={() =>
+                                            handleUpdateViewsService(
+                                                Number(service.id)
+                                            )
+                                        }
+                                        to={'/service/detail/' + service.id}
                                         className=" text-decoration-none"
                                     >
                                         <Image
