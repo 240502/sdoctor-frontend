@@ -5,4 +5,6 @@ export interface Functions {
     updated_at: Date | null;
     parent_id: number | null;
     icon: string;
+    link: string | null;
+    sort: string | null;
 }

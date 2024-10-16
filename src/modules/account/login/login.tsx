@@ -53,7 +53,7 @@ export const Login = () => {
     };
     return (
         <div className="" style={{ width: '100%', height: '100vh' }}>
-            <div className="container row pt-5 justify-content-center">
+            <div className="container row pt-5 justify-content-center m-auto">
                 <Flex
                     vertical={true}
                     className="col-5 rounded shadow-lg p-5"

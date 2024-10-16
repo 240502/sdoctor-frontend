@@ -1,4 +1,5 @@
 export function showSuccess(input: any) {
+    console.log(input);
     let parent = input.parentElement;
     let error__message = parent.querySelector('.error_message');
     parent.classList.remove('error');
@@ -50,7 +51,17 @@ export const isEmptySelect = (element: any, value: any): boolean => {
     return isEmpty;
 };
 
+export const isEmptyEditor = (element: any, value: any): boolean => {
+    let isEmpty = false;
+    if (value === '') {
+        showError(element, 'Không được để trống ô này');
+        isEmpty = true;
+    }
+
+    return isEmpty;
+};
 export const handleFocusSelect = (element: any) => {
+    console.log(element);
     showSuccess(element.nativeElement);
 };
 

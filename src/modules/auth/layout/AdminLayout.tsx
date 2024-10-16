@@ -1,17 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import {
-    MenuFoldOutlined,
-    MenuUnfoldOutlined,
-    UploadOutlined,
-    UserOutlined,
-    VideoCameraOutlined,
-} from '@ant-design/icons';
+
 import { Button, Layout, Menu, theme } from 'antd';
 import { Link } from 'react-router-dom';
-import { useRecoilState, useSetRecoilState } from 'recoil';
-import parse from 'html-react-parser';
 
-import { Functions } from '../../../models/functions';
 import { Sidenav } from './components/Sidenav';
 import { HeaderLayout } from './components/Header';
 const { Header, Sider, Content } = Layout;
@@ -33,7 +24,7 @@ const AdminLayout: React.FC = ({ children }: any) => {
         setCurrent(menuKey);
     }, []);
     return (
-        <Layout>
+        <Layout style={{ minHeight: '100vh' }}>
             <Sider trigger={null} collapsible collapsed={collapsed}>
                 <div className="mb-3">
                     <h3 className="fs-3 fw-bold text-white p-3 text-center">

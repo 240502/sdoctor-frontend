@@ -9,6 +9,9 @@ import { ViewService, ViewDetailService } from '../modules/account/service';
 import { AppointmentManagement } from '../modules/auth/appointment';
 import { DashBoard } from '../modules/auth/dashboard';
 import { AdminLayout } from '../modules/auth/layout';
+import { NewsManagement } from '../modules/auth/news';
+import { DoctorManagement } from '../modules/auth/doctor';
+
 import {
     HOME_PATH,
     VIEW_CLINIC_DETAIL_PATH,
@@ -22,6 +25,8 @@ import {
     LOGIN_PATH,
     DASHBOARD_PATH,
     APPOINTMENT_PATH,
+    NEWS_PATH,
+    DOCTOR_MANAGEMENT_PATH,
 } from './path';
 export const publicRoutes = [
     {
@@ -81,6 +86,16 @@ export const privateRoutes = [
     {
         path: APPOINTMENT_PATH,
         component: AppointmentManagement,
+        layout: AdminLayout,
+    },
+    {
+        path: NEWS_PATH,
+        component: NewsManagement,
+        layout: AdminLayout,
+    },
+    {
+        path: DOCTOR_MANAGEMENT_PATH,
+        component: DoctorManagement,
         layout: AdminLayout,
     },
 ];

@@ -11,7 +11,8 @@ const LOGIN_PATH = '/login';
 const ADMIN_PATH = '/admin';
 const DASHBOARD_PATH = '/admin/dashboard';
 const APPOINTMENT_PATH = '/admin/appointment';
-
+const NEWS_PATH = '/admin/news';
+const DOCTOR_MANAGEMENT_PATH = '/admin/doctor';
 export {
     HOME_PATH,
     VIEW_CLINIC_PATH,
@@ -26,4 +27,6 @@ export {
     ADMIN_PATH,
     DASHBOARD_PATH,
     APPOINTMENT_PATH,
+    NEWS_PATH,
+    DOCTOR_MANAGEMENT_PATH,
 };

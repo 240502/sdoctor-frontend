@@ -4,3 +4,7 @@ export const apiClient = axios.create({
     baseURL: baseURL,
     timeout: 1000 * 60 * 30 * 3,
 });
+const user = JSON.parse(sessionStorage.getItem('user') ?? '{}');
+
+export const token = user ? user['token'] : '';
+export const config = { headers: { authorization: 'Bearer ' + token } };
