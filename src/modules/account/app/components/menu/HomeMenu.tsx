@@ -8,9 +8,6 @@ export const HomeMenu = () => {
     const [homeMenus, setHomeMenus] = useState<HomeMenuModel[]>();
     const [selectedKeys, setSelectedKeys] = useState<string[]>([]);
 
-    const handleClick = (key: string) => {
-        setSelectedKeys([]);
-    };
     const loadData = async () => {
         try {
             const data = await HomeMenuService.getHomeMenu();

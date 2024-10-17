@@ -18,7 +18,7 @@ import {
 } from '@ant-design/icons';
 import { News } from '../../../../models/news';
 import { NewsService } from '../../../../services/newsService';
-const TableNews: React.FC = ({
+const TableNews = ({
     setIsUpdate,
     setIsShowModal,
     news,
@@ -26,6 +26,7 @@ const TableNews: React.FC = ({
     setIsView,
     openNotificationWithIcon,
     loadData,
+    config,
 }: any) => {
     const [isShowModalConfirm, setIsShowModalConfirm] =
         useState<boolean>(false);
@@ -36,7 +37,7 @@ const TableNews: React.FC = ({
     const handleOk = async () => {
         console.log(postId);
         try {
-            await NewsService.deleteNews(postId);
+            await NewsService.deleteNews(postId, config);
             openNotificationWithIcon(
                 'success',
                 'Thông báo!',

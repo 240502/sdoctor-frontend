@@ -26,6 +26,7 @@ export const ModalAddNews = ({
     isView,
     setIsView,
     setIsUpdate,
+    config,
 }: any): JSX.Element => {
     const [editorData, setEditorData] = useState('');
     const inputTitleRef = useRef<InputRef>(null);
@@ -90,7 +91,7 @@ export const ModalAddNews = ({
     };
     const CreatePost = async (data: any) => {
         try {
-            const res = await NewsService.createNews(data);
+            const res = await NewsService.createNews(data, config);
             console.log(res);
             openNotificationWithIcon(
                 'success',
@@ -138,7 +139,7 @@ export const ModalAddNews = ({
     const UpdatePost = async (data: any) => {
         try {
             console.log(data);
-            const res = await NewsService.updateNews(data);
+            const res = await NewsService.updateNews(data, config);
             console.log(res);
             openNotificationWithIcon(
                 'success',

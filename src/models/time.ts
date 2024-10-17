@@ -1,5 +1,5 @@
 export interface Time {
-    id: Number;
-    value: String;
-    type_time: String;
+    id: number;
+    value: string;
+    type_time: string;
 }

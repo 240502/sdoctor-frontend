@@ -7,8 +7,12 @@ import { News } from '../../../../models/news';
 import { NewsService } from '../../../../services/newsService';
 type NotificationType = 'success' | 'error';
 import type { PaginationProps } from 'antd';
+import { useRecoilValue } from 'recoil';
+import { userValue } from '../../../../stores/userAtom';
 
 const NewsManagement = () => {
+    const user = useRecoilValue(userValue);
+    const [config, setConfig] = useState<any>();
     const [api, contextHolder] = notification.useNotification();
     const [isShowModal, setIsShowModal] = useState<boolean>(false);
     const [isUpdate, setIsUpdate] = useState<boolean>(false);
@@ -52,13 +56,19 @@ const NewsManagement = () => {
     const loadData = async () => {
         try {
             console.log('api');
+            const header = {
+                headers: { authorization: 'Bearer ' + user.token },
+            };
+            setConfig(header);
+
             const data = {
                 pageIndex: pageIndex,
                 pageSize: pageSize,
                 status: status,
                 categoryId: categoryId,
             };
-            const res = await NewsService.viewNewsAdmin(data);
+            const res = await NewsService.viewNewsAdmin(data, header);
+
             setPageCount(res.pageCount);
             setPosts(res.data);
         } catch (err: any) {
@@ -69,9 +79,7 @@ const NewsManagement = () => {
     useEffect(() => {
         loadData();
     }, []);
-    useEffect(() => {
-        console.log(post);
-    }, [post]);
+
     return (
         <div className="container">
             {contextHolder}
@@ -101,6 +109,7 @@ const NewsManagement = () => {
                     setIsView={setIsView}
                     openNotificationWithIcon={openNotificationWithIcon}
                     loadData={loadData}
+                    config={config}
                 />
                 <Pagination
                     showSizeChanger
@@ -122,6 +131,7 @@ const NewsManagement = () => {
                     isView={isView}
                     setIsView={setIsView}
                     setIsUpdate={setIsUpdate}
+                    config={config}
                 />
             )}
         </div>

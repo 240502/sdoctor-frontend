@@ -3,7 +3,6 @@ import { HomeFooter } from './footer/HomeFooter';
 import { Layout } from 'antd';
 import { Link } from 'react-router-dom';
 import '@/assets/scss/app.scss';
-import { useState } from 'react';
 
 const { Header, Content, Footer } = Layout;
 export const AppLayout = ({ children }: any) => {

@@ -5,24 +5,18 @@ import { Link } from 'react-router-dom';
 
 import { Sidenav } from './components/Sidenav';
 import { HeaderLayout } from './components/Header';
+import { useRecoilValue, useSetRecoilState } from 'recoil';
+import { userState, userValue } from '../../../stores/userAtom';
 const { Header, Sider, Content } = Layout;
 
 const AdminLayout: React.FC = ({ children }: any) => {
     const [collapsed, setCollapsed] = useState(false);
-    const [current, setCurrent] = useState('0');
+    const [current, setCurrent] = useState<string[]>([]);
 
     const {
         token: { colorBgContainer, borderRadiusLG },
     } = theme.useToken();
-    const user = JSON.parse(sessionStorage.getItem('user') || '{}');
-    const onClickMenu = (e: any) => {
-        setCurrent(e.key);
-        localStorage.setItem('menu_key', JSON.stringify(e.key));
-    };
-    useEffect(() => {
-        const menuKey = JSON.parse(localStorage.getItem('menu_key') || '0');
-        setCurrent(menuKey);
-    }, []);
+
     return (
         <Layout style={{ minHeight: '100vh' }}>
             <Sider trigger={null} collapsible collapsed={collapsed}>
@@ -38,8 +32,8 @@ const AdminLayout: React.FC = ({ children }: any) => {
                 </div>
                 <Sidenav
                     current={current}
-                    setCurrent={setCurrent}
-                    user={user}
+                    // setCurrent={setCurrent}
+                    // user={user}
                 />
             </Sider>
             <Layout style={{ width: '200vh' }}>

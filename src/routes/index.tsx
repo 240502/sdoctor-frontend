@@ -21,13 +21,14 @@ import {
     VIEW_SERVICE_PATH,
     VIEW_SERVICE_DETAIL_PATH,
     VIEW_NEWS_PATH,
-    ADMIN_PATH,
+    SCHEDULE_MANAGEMENT_PATH,
     LOGIN_PATH,
     DASHBOARD_PATH,
     APPOINTMENT_PATH,
     NEWS_PATH,
     DOCTOR_MANAGEMENT_PATH,
 } from './path';
+import { ScheduleManagement } from '../modules/auth/schedule';
 export const publicRoutes = [
     {
         path: HOME_PATH,
@@ -96,6 +97,11 @@ export const privateRoutes = [
     {
         path: DOCTOR_MANAGEMENT_PATH,
         component: DoctorManagement,
+        layout: AdminLayout,
+    },
+    {
+        path: SCHEDULE_MANAGEMENT_PATH,
+        component: ScheduleManagement,
         layout: AdminLayout,
     },
 ];

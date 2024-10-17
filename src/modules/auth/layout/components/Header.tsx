@@ -13,41 +13,52 @@ import {
 import '@/assets/scss/animation.scss';
 
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useSetRecoilState } from 'recoil';
+import { userState } from '../../../../stores/userAtom';
+import { User } from '../../../../models/user';
 
-const items: MenuProps['items'] = [
-    {
-        key: '1',
-        label: (
-            <Button style={{ width: '100%' }} className="border-0">
-                Hồ sơ
-            </Button>
-        ),
-    },
-    {
-        type: 'divider',
-    },
-    {
-        key: '2',
-        label: (
-            <Button
-                style={{ width: '100%' }}
-                type="primary"
-                danger
-                className="border-0"
-            >
-                Đăng xuất
-            </Button>
-        ),
-    },
-];
 export const HeaderLayout = ({ collapsed, setCollapsed }: any) => {
+    const navigate = useNavigate();
+    const setUser = useSetRecoilState(userState);
     const [isShowNotifi, setIsShowNotifi] = useState(false);
     const {
         token: { colorBgContainer, borderRadiusLG },
     } = theme.useToken();
+    const items: MenuProps['items'] = [
+        {
+            key: '1',
+            label: (
+                <Button style={{ width: '100%' }} className="border-0">
+                    Hồ sơ
+                </Button>
+            ),
+        },
+        {
+            type: 'divider',
+        },
+        {
+            key: '2',
+            label: (
+                <Button
+                    onClick={() => {
+                        navigate('/');
+                        sessionStorage.setItem('user', '{}');
+                        setUser({} as User);
+                    }}
+                    style={{ width: '100%' }}
+                    type="primary"
+                    danger
+                    className="border-0"
+                >
+                    Đăng xuất
+                </Button>
+            ),
+        },
+    ];
     return (
         <Header style={{ padding: 0, background: colorBgContainer }}>
-            <div className="container">
+            <div className="">
                 {' '}
                 <div className="d-flex align-items-center justify-content-between">
                     <Button

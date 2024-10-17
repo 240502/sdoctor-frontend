@@ -1,5 +1,4 @@
-import { apiClient, config } from '../constants/api';
-
+import { apiClient } from '../constants/api';
 export const NewsService = {
     async getCommonNews(): Promise<any> {
         const res = await apiClient.get('/api/news/get-common-post');
@@ -9,11 +8,11 @@ export const NewsService = {
         const res = await apiClient.put('/api/post/update-views-post/' + id);
         return res;
     },
-    async createNews(data: any): Promise<any> {
+    async createNews(data: any, config: any): Promise<any> {
         const res = await apiClient.post('/api/post/create', data, config);
         return res.data;
     },
-    async viewNewsAdmin(data: any): Promise<any> {
+    async viewNewsAdmin(data: any, config: any): Promise<any> {
         const res = await apiClient.post(
             '/api/post/view-news-admin',
             data,
@@ -21,11 +20,11 @@ export const NewsService = {
         );
         return res.data;
     },
-    async updateNews(data: any): Promise<any> {
+    async updateNews(data: any, config: any): Promise<any> {
         const res = await apiClient.put('/api/post/update', data, config);
         return res;
     },
-    async deleteNews(id: number): Promise<any> {
+    async deleteNews(id: number, config: any): Promise<any> {
         const res = await apiClient.delete('/api/post/delete/' + id, config);
         return res;
     },
