@@ -1,6 +1,6 @@
 export interface ScheduleDetails {
-    id: number;
-    schedule_id: number;
-    time_id: number;
-    available: number;
+    id: number | null;
+    schedule_id: number | null;
+    time_id: number | null;
+    available: number | null;
 }

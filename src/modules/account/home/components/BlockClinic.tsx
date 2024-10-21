@@ -68,7 +68,7 @@ export const BlockClinic = (): JSX.Element => {
                                             preview={false}
                                             src={baseURL + clinic.avatar}
                                         ></Image>
-                                        <p className="item__text mt-3 text-center text-decoration-none fs-5 text-capitalize">
+                                        <p className="item__text mt-3 text-center text-decoration-none fs-6 text-capitalize">
                                             {clinic.name}
                                         </p>
                                     </Link>

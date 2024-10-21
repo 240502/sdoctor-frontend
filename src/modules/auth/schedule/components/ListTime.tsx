@@ -4,16 +4,20 @@ import { Button } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { TimeService } from '../../../../services/timeService';
 
-export const ListTime = ({ timeType, day }: any) => {
-    const [selectedTimes, setSelectedTimes] = useState<Time[]>([]);
-    const [selectedTimeKeys, setSelectedTimeKeys] = useState<number[]>([]);
+export const ListTime = ({
+    timeType,
+    day,
+    selectedTimes,
+    setSelectedTimes,
+    selectedTimeKeys,
+    setSelectedTimeKeys,
+}: any) => {
     const [times, setTimes] = useState<Time[]>([]);
     const [isVisible, setIsVisible] = useState<boolean>(false);
     const getTimeByType = async (type: string) => {
         try {
             const data = { timeType: type };
             const res = await TimeService.getTimeByTimeType(data);
-            console.log(res);
             setTimes(res);
         } catch (err: any) {
             console.log(err);
@@ -30,7 +34,17 @@ export const ListTime = ({ timeType, day }: any) => {
         getTimeByType(timeType);
         handleOverTime(day);
     }, [timeType]);
-
+    useEffect(() => {
+        if (selectedTimeKeys.length > 0) {
+            const newSelectedTimes = times.filter((time: Time) => {
+                const isExist = selectedTimeKeys.includes(time.id);
+                if (isExist) {
+                    return time;
+                }
+            });
+            setSelectedTimes(newSelectedTimes);
+        }
+    }, [selectedTimeKeys]);
     const handleSelectTime = (time: Time) => {
         if (selectedTimes.length > 0) {
             const existsTime = selectedTimes.find(
@@ -74,12 +88,6 @@ export const ListTime = ({ timeType, day }: any) => {
         }
     };
 
-    useEffect(() => {
-        console.log('time', selectedTimes);
-    }, [selectedTimes]);
-    useEffect(() => {
-        console.log('key', selectedTimeKeys);
-    }, [selectedTimeKeys]);
     return (
         <div className="d-flex mt-3 border rounded p-3">
             <div className="block__select__time col-6 border border-top-0 border-start-0 border-bottom-0">
