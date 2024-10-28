@@ -4,6 +4,7 @@ import { TimeService } from '../../../../services/timeService';
 import { Time } from '../../../../models/time';
 
 export const ListTime = ({
+    date,
     handleOnClickBtnTime,
     timeId,
     updateAvailableScheduleDetail,
@@ -42,18 +43,21 @@ export const ListTime = ({
         getTimeById(timeId);
     }, [timeId]);
     useEffect(() => {
-        let intervalId: any;
-        if (time) {
-            const listTime: any = time?.value.split('-');
-            const startMinute = listTime[0].split('.')[1];
-            const startHour = listTime[0].split('.')[0];
-            intervalId = handleTimeOverRealTime(startHour, startMinute);
+        const newDate = new Date(date);
+        const now = new Date();
+        if (newDate.getDate() === now.getDate()) {
+            let intervalId: any;
+            if (time) {
+                const listTime: any = time?.value.split('-');
+                const startMinute = listTime[0].split('.')[1];
+                const startHour = listTime[0].split('.')[0];
+                intervalId = handleTimeOverRealTime(startHour, startMinute);
+            }
+            return () => {
+                clearInterval(intervalId);
+                console.log('clear:' + intervalId);
+            };
         }
-
-        return () => {
-            clearInterval(intervalId);
-            console.log('clear:' + intervalId);
-        };
     }, [time]);
     return (
         <Button

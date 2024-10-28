@@ -149,6 +149,7 @@ export const BlockSchedule = ({
                         (scheduleDetail: ScheduleDetails) => {
                             return (
                                 <ListTime
+                                    date={date}
                                     handleOnClickBtnTime={handleOnClickBtnTime}
                                     timeId={scheduleDetail.time_id}
                                     updateAvailableScheduleDetail={
