@@ -13,31 +13,14 @@ const ScheduleManagement = () => {
     const [config, setConfig] = useState<any>();
 
     const user = useRecoilValue(userValue);
+    const [day, setDay] = useState<number>(1);
     const [timeType, setTimeType] = useState<string>('60 phút');
     const [activeKey, setDefaultActiveKey] = useState<string>('1');
-
     const [selectedTimes, setSelectedTimes] = useState<Time[]>([]);
     const [selectedTimeKeys, setSelectedTimeKeys] = useState<number[]>([]);
     const [schedule, setSchedule] = useState<Schedule>();
     const [isVisibleButtonSave, setIsVisibleButtonSave] =
         useState<boolean>(false);
-    useEffect(() => {
-        handleGetScheduleBySubscriberAndDate();
-        const header = {
-            headers: { authorization: 'Bearer ' + user.token },
-        };
-        setConfig(header);
-        const now = new Date();
-        setDefaultActiveKey(String(now.getDay()));
-    }, []);
-
-    useEffect(() => {
-        if (selectedTimes.length > 0) {
-            setIsVisibleButtonSave(true);
-        } else {
-            setIsVisibleButtonSave(false);
-        }
-    }, [selectedTimes]);
     const handleGetScheduleBySubscriberAndDate = () => {
         const now = new Date();
         let dateOfWeek;
@@ -104,7 +87,7 @@ const ScheduleManagement = () => {
             dateOfWeek = handleGetDate(now, Number(activeKey));
         }
         const schedule = {
-            subscriber_id: user.id,
+            subscriber_id: user.object_id,
             date: dateOfWeek.toISOString().slice(0, 19).replace('T', ' '),
             type: user.role_id === 2 ? 'Bác sĩ' : 'Dịch vụ',
             listScheduleDetails: scheduleDetails,
@@ -199,11 +182,12 @@ const ScheduleManagement = () => {
     const tabs = [
         {
             key: 1,
+
             tab: <h6 className="ps-3 pe-3">Thứ hai</h6>,
             component: (
                 <ListTime
                     timeType={timeType}
-                    day={1}
+                    day={day}
                     selectedTimes={selectedTimes}
                     setSelectedTimes={setSelectedTimes}
                     selectedTimeKeys={selectedTimeKeys}
@@ -218,7 +202,7 @@ const ScheduleManagement = () => {
             component: (
                 <ListTime
                     timeType={timeType}
-                    day={2}
+                    day={day}
                     selectedTimes={selectedTimes}
                     setSelectedTimes={setSelectedTimes}
                     selectedTimeKeys={selectedTimeKeys}
@@ -232,7 +216,7 @@ const ScheduleManagement = () => {
             component: (
                 <ListTime
                     timeType={timeType}
-                    day={3}
+                    day={day}
                     selectedTimes={selectedTimes}
                     setSelectedTimes={setSelectedTimes}
                     selectedTimeKeys={selectedTimeKeys}
@@ -246,7 +230,7 @@ const ScheduleManagement = () => {
             component: (
                 <ListTime
                     timeType={timeType}
-                    day={4}
+                    day={day}
                     selectedTimes={selectedTimes}
                     setSelectedTimes={setSelectedTimes}
                     selectedTimeKeys={selectedTimeKeys}
@@ -260,7 +244,7 @@ const ScheduleManagement = () => {
             component: (
                 <ListTime
                     timeType={timeType}
-                    day={5}
+                    day={day}
                     selectedTimes={selectedTimes}
                     setSelectedTimes={setSelectedTimes}
                     selectedTimeKeys={selectedTimeKeys}
@@ -274,7 +258,7 @@ const ScheduleManagement = () => {
             component: (
                 <ListTime
                     timeType={timeType}
-                    day={6}
+                    day={day}
                     selectedTimes={selectedTimes}
                     setSelectedTimes={setSelectedTimes}
                     selectedTimeKeys={selectedTimeKeys}
@@ -288,7 +272,7 @@ const ScheduleManagement = () => {
             component: (
                 <ListTime
                     timeType={timeType}
-                    day={0}
+                    day={day}
                     selectedTimes={selectedTimes}
                     setSelectedTimes={setSelectedTimes}
                     selectedTimeKeys={selectedTimeKeys}
@@ -297,6 +281,24 @@ const ScheduleManagement = () => {
             ),
         },
     ];
+    useEffect(() => {
+        handleGetScheduleBySubscriberAndDate();
+        const header = {
+            headers: { authorization: 'Bearer ' + user.token },
+        };
+        setConfig(header);
+        const now = new Date();
+        setDefaultActiveKey(String(now.getDay()));
+    }, []);
+
+    useEffect(() => {
+        if (selectedTimes.length > 0) {
+            setIsVisibleButtonSave(true);
+        } else {
+            setIsVisibleButtonSave(false);
+        }
+    }, [selectedTimes]);
+
     return (
         <div className="">
             <div className="">
@@ -311,6 +313,7 @@ const ScheduleManagement = () => {
                 <Tabs
                     activeKey={activeKey !== undefined ? activeKey : '1'}
                     onChange={(key) => setDefaultActiveKey(key)}
+                    onTabClick={(key) => setDay(Number(key))}
                 >
                     {tabs.map((item: any, index: number) => {
                         return (
@@ -341,7 +344,7 @@ const ScheduleManagement = () => {
                                         phút.
                                     </p>
                                 </div>
-                                {item.component}
+                                {item.key === day && item.component}
                             </TabPane>
                         );
                     })}

@@ -14,6 +14,9 @@ export const ListTime = ({
 }: any) => {
     const [times, setTimes] = useState<Time[]>([]);
     const [isVisible, setIsVisible] = useState<boolean>(false);
+    const [disableButton, setDisableButton] = useState<any>([
+        { timeId: 0, disable: true },
+    ]);
     const getTimeByType = async (type: string) => {
         try {
             const data = { timeType: type };
@@ -29,6 +32,45 @@ export const ListTime = ({
             setIsVisible(true);
         }
     };
+    const handleTimeOverRealTime = () => {
+        const now = new Date();
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        let newTimes: any = [];
+        times.forEach((time: Time) => {
+            const listTime: any = time?.value.split('-');
+            const startMinute = listTime[0].split('.')[1];
+
+            const startHour = listTime[0].split('.')[0];
+
+            if (Number(hours) === Number(startHour)) {
+                if (Math.abs(Number(startMinute) - Number(minutes)) <= 15) {
+                    if (newTimes.length === 0) {
+                        newTimes = [{ ...time, disable: true }];
+                    } else {
+                        newTimes = [...newTimes, { ...time, disable: true }];
+                    }
+                }
+            }
+            if (Number(hours) > Number(startHour)) {
+                if (newTimes.length === 0) {
+                    newTimes = [{ ...time, disable: true }];
+                } else {
+                    newTimes = [...newTimes, { ...time, disable: true }];
+                }
+            }
+        });
+        return newTimes;
+    };
+    useEffect(() => {
+        const now = new Date();
+        if (now.getDay() === day) {
+            const newTimes = handleTimeOverRealTime();
+            setTimes(newTimes);
+        }
+        setSelectedTimes([]);
+        setSelectedTimeKeys([]);
+    }, [day, times.length]);
 
     useEffect(() => {
         getTimeByType(timeType);
@@ -96,7 +138,9 @@ export const ListTime = ({
                     {times.map((time: Time) => {
                         return (
                             <Button
-                                disabled={isVisible ? true : false}
+                                disabled={
+                                    isVisible ? true : false || time.disable
+                                }
                                 className={`me-3 mt-3 border border-primary ${
                                     selectedTimeKeys.includes(Number(time.id))
                                         ? 'bg-primary text-white'

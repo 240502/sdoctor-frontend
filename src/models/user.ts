@@ -16,4 +16,5 @@ export interface User {
     birthday: Date;
     token: string;
     functions: Functions[];
+    object_id: number;
 }
