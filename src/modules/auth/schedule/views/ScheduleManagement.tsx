@@ -79,16 +79,18 @@ const ScheduleManagement = () => {
             scheduleDetails.push(schedule);
         });
         const now = new Date();
-        console.log('now', now.getDate());
         let dateOfWeek;
         if (now.getDay() === Number(activeKey)) {
             dateOfWeek = now;
         } else {
             dateOfWeek = handleGetDate(now, Number(activeKey));
         }
+        console.log(dateOfWeek);
         const schedule = {
             subscriber_id: user.object_id,
-            date: dateOfWeek.toISOString().slice(0, 19).replace('T', ' '),
+            date: `${dateOfWeek.getFullYear()}-${
+                dateOfWeek.getMonth() + 1
+            }-${dateOfWeek.getDate()}`,
             type: user.role_id === 2 ? 'Bác sĩ' : 'Dịch vụ',
             listScheduleDetails: scheduleDetails,
         };

@@ -42,7 +42,7 @@ export const ListTime = ({
         getTimeById(timeId);
     }, [timeId]);
     useEffect(() => {
-        let intervalId: number;
+        let intervalId: any;
         if (time) {
             const listTime: any = time?.value.split('-');
             const startMinute = listTime[0].split('.')[1];
