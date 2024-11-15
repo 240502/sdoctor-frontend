@@ -10,6 +10,7 @@ import {
     InputRef,
     DatePicker,
     RadioChangeEvent,
+    Switch,
 } from 'antd';
 import type { DatePickerProps } from 'antd';
 
@@ -28,8 +29,7 @@ import {
     validatePhoneLength,
 } from '../../../../utils/global';
 import socket from '../../../../socket';
-import { validatePatientBirthDay } from '../../../../utils/appointment';
-import { Appointment } from '../../../../models/appointment';
+import { PatientProfileService } from '../../../../services/patient_profileService';
 
 const { TextArea } = Input;
 export const ModalOrderAppointment = ({
@@ -55,6 +55,7 @@ export const ModalOrderAppointment = ({
         province_id: 0,
         province_name: '',
     });
+    const [isSaveProfile, setIsSaveProfile] = useState<boolean>(false);
 
     const [wards, setWards] = useState([{ ward_id: 0, ward_name: '' }]);
     const [ward, setWard] = useState({ ward_id: 0, ward_name: '' });
@@ -71,6 +72,9 @@ export const ModalOrderAppointment = ({
     const [examinationReason, setExaminationReason] = useState<string>();
     const onChange: DatePickerProps['onChange'] = (date, dateString) => {
         setBirthday(String(dateString));
+    };
+    const onSwitchChange = (checked: boolean) => {
+        setIsSaveProfile(checked);
     };
     const handleOk = () => {
         const isEmptyPatientName = isEmpty(inputPatientNameRef.current?.input);
@@ -151,11 +155,32 @@ export const ModalOrderAppointment = ({
                     location: doctor.location,
                     type: 'Bác sĩ',
                 };
-                console.log(newAppointment);
+                //CreateAppointment(newAppointment);
 
-                CreateAppointment(newAppointment);
+                if (isSaveProfile) {
+                    const newProfile = {
+                        patient_name: inputPatientNameRef.current?.input?.value,
+                        patient_phone:
+                            inputPatientPhoneRef.current?.input?.value,
+                        patient_email:
+                            inputPatientEmailRef.current?.input?.value,
+                        birthday: birthday,
+                        province: province.province_name,
+                        district: district.district_name,
+                        commune: ward.ward_name,
+                        gender: radioGenderValue.current,
+                    };
+                    console.log('newProfile', newProfile);
+                    CreatePatientProfile(newProfile);
+                }
             }
         }
+    };
+    const CreatePatientProfile = async (data: any) => {
+        try {
+            const res = await PatientProfileService.createPatientProfile(data);
+            localStorage.setItem('patientProfile', JSON.stringify(data));
+        } catch (err: any) {}
     };
 
     const CreateAppointment = async (data: any) => {
@@ -552,6 +577,15 @@ export const ModalOrderAppointment = ({
                                 className="error_message mt-3"
                                 style={{ color: 'red' }}
                             ></div>
+                        </div>
+                        <div className="mb-3">
+                            <Switch
+                                className=""
+                                onChange={onSwitchChange}
+                            ></Switch>
+                            <label htmlFor="" className="ms-3">
+                                Lưu thông tin hồ sơ
+                            </label>
                         </div>
                         <div className="mb-3">
                             <label htmlFor="" className="form-label fw-bold">

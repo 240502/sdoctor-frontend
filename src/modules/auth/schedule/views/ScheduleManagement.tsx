@@ -1,5 +1,5 @@
 import { HomeOutlined } from '@ant-design/icons';
-import { Breadcrumb, Button, Select, Tabs } from 'antd';
+import { Breadcrumb, Button, Select, Tabs, notification } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { ListTime } from '../components/ListTime';
 import { ScheduleDetails } from '../../../../models/schedule_details';
@@ -9,72 +9,101 @@ import { userValue } from '../../../../stores/userAtom';
 import { scheduleService } from '../../../../services/scheduleService';
 import { Schedule } from '../../../../models/schdule';
 const { TabPane } = Tabs;
+type NotificationType = 'success' | 'error';
 const ScheduleManagement = () => {
     const [config, setConfig] = useState<any>();
-
+    const [api, contextHolder] = notification.useNotification();
     const user = useRecoilValue(userValue);
     const [day, setDay] = useState<number>(1);
     const [timeType, setTimeType] = useState<string>('60 phút');
     const [activeKey, setDefaultActiveKey] = useState<string>('1');
     const [selectedTimes, setSelectedTimes] = useState<Time[]>([]);
     const [selectedTimeKeys, setSelectedTimeKeys] = useState<number[]>([]);
-    const [schedule, setSchedule] = useState<Schedule>();
+
+    const [schedule, setSchedule] = useState<Schedule>({} as Schedule);
     const [isVisibleButtonSave, setIsVisibleButtonSave] =
         useState<boolean>(false);
-    const handleGetScheduleBySubscriberAndDate = () => {
-        const now = new Date();
-        let dateOfWeek;
-        if (now.getDay() === Number(activeKey)) {
-            dateOfWeek = now;
-        } else {
-            dateOfWeek = handleGetDate(now, Number(activeKey));
-        }
-        const data = {
-            subscriberId: user.id,
-            date: dateOfWeek.toISOString().slice(0, 19).replace('T', ' '),
-            type: user.role_id === 2 ? 'Bác sĩ' : 'Gói khám',
-        };
-        GetScheduleBySubscriberIdAndDate(data);
-    };
-    const GetScheduleBySubscriberIdAndDate = async (data: any) => {
-        try {
-            const res = await scheduleService.getBySubscriberIdAndDate(data);
-            setSchedule(res.data);
-            let timeAvailable: any = [];
-            res.data.listScheduleDetails.forEach((item: ScheduleDetails) => {
-                if (timeAvailable.length > 0) {
-                    timeAvailable.push(item.time_id);
-                } else {
-                    timeAvailable = [item.time_id];
-                }
-            });
-            setSelectedTimeKeys(timeAvailable);
-        } catch (err: any) {
-            console.error(err.message);
-        }
+    const openNotification = (
+        type: NotificationType,
+        title: string,
+        des: string
+    ) => {
+        api[type]({
+            message: title,
+            description: des,
+        });
     };
     const handleUpdateSchedule = () => {
-        console.log('update');
-        const newTimes = selectedTimes.filter((time: Time) => {
-            const exists = schedule?.listScheduleDetails.find(
+        let isUpdate: boolean = false;
+        if (selectedTimes.length > schedule.listScheduleDetails.length) {
+            isUpdate = true;
+            console.log('add new time');
+            const newTimes = selectedTimes.filter((time: Time) => {
+                const exist = schedule.listScheduleDetails.find(
+                    (detail: ScheduleDetails) => detail.time_id === time.id
+                );
+                if (!exist) {
+                    return time;
+                }
+            });
+            console.log('newTimes', newTimes);
+        }
+        if (selectedTimes.length <= schedule.listScheduleDetails.length) {
+            console.log('delete time');
+            const deletedDetails = schedule.listScheduleDetails.filter(
                 (detail: ScheduleDetails) => {
-                    return detail.time_id === time.id;
+                    if (!selectedTimeKeys.includes(detail.time_id)) {
+                        return detail;
+                    }
                 }
             );
-            if (!exists) {
-                return time;
-            }
-        });
-        console.log('new', newTimes);
+            const newTimes = selectedTimes.filter((time: Time) => {
+                const exist = schedule.listScheduleDetails.find(
+                    (detail: ScheduleDetails) => detail.time_id === time.id
+                );
+                if (!exist) {
+                    return time;
+                }
+            });
+            console.log(
+                'deletedDetails',
+                deletedDetails.map((detail: ScheduleDetails) => {
+                    return { ...detail, action: 3 };
+                })
+            );
+            console.log('newTimes', newTimes);
+        }
+        // const newTimes = selectedTimes.filter((time: Time) => {
+        //     const exists = schedule?.listScheduleDetails.find(
+        //         (detail: ScheduleDetails) => {
+        //             return detail.time_id === time.id;
+        //         }
+        //     );
+        //     if (!exists) {
+        //         return time;
+        //     }
+        // });
+        // console.log('newTimes', newTimes);
+        if (isUpdate) {
+            updateSchedule();
+        }
+    };
+    const updateSchedule = async () => {
+        try {
+            console.log('update');
+        } catch (err: any) {
+            console.log(err.message);
+        }
     };
     const handleCreateSchedule = () => {
         const scheduleDetails: ScheduleDetails[] = [];
         selectedTimes.forEach((selectedTime: Time) => {
             const schedule: ScheduleDetails = {
-                id: null,
+                id: 0,
                 time_id: selectedTime.id,
                 schedule_id: null,
                 available: 1,
+                action: null,
             };
             scheduleDetails.push(schedule);
         });
@@ -100,7 +129,11 @@ const ScheduleManagement = () => {
     const CreateSchedule = async (data: any) => {
         try {
             const res = await scheduleService.createSchedule(data, config);
-            console.log(res);
+            openNotification(
+                'success',
+                'Thông báo !',
+                'Đăng ký lịch thành công'
+            );
         } catch (err: any) {
             console.log(err.message);
         }
@@ -181,110 +214,76 @@ const ScheduleManagement = () => {
         }
         return dateOfWeek;
     };
+    const handleGetScheduleBySubscriberAndDate = () => {
+        const now = new Date();
+        let dateOfWeek: Date;
+        if (now.getDay() === Number(activeKey)) {
+            dateOfWeek = now;
+        } else {
+            dateOfWeek = handleGetDate(now, Number(activeKey));
+        }
+        const data = {
+            subscriberId: user.object_id,
+            date: `${dateOfWeek.getFullYear()}-${
+                dateOfWeek.getMonth() + 1
+            }-${dateOfWeek.getDate()}`,
+            type: user.role_id === 2 ? 'Bác sĩ' : 'Gói khám',
+        };
+        GetScheduleBySubscriberIdAndDate(data);
+    };
+    const GetScheduleBySubscriberIdAndDate = async (data: any) => {
+        try {
+            const res = await scheduleService.getBySubscriberIdAndDate(data);
+            setSchedule(res.data);
+            let timeAvailable: any = [];
+            res.data.listScheduleDetails.forEach((item: ScheduleDetails) => {
+                if (timeAvailable.length > 0) {
+                    timeAvailable.push(item.time_id);
+                } else {
+                    timeAvailable = [item.time_id];
+                }
+            });
+            setSelectedTimeKeys(timeAvailable);
+        } catch (err: any) {
+            console.error(err.message);
+        }
+    };
+    useEffect(() => handleGetScheduleBySubscriberAndDate(), [day]);
     const tabs = [
         {
             key: 1,
-
             tab: <h6 className="ps-3 pe-3">Thứ hai</h6>,
-            component: (
-                <ListTime
-                    timeType={timeType}
-                    day={day}
-                    selectedTimes={selectedTimes}
-                    setSelectedTimes={setSelectedTimes}
-                    selectedTimeKeys={selectedTimeKeys}
-                    setSelectedTimeKeys={setSelectedTimeKeys}
-                    scheduleDetails={schedule?.listScheduleDetails}
-                />
-            ),
         },
         {
             key: 2,
             tab: <h6 className="ps-3 pe-3">Thứ ba</h6>,
-            component: (
-                <ListTime
-                    timeType={timeType}
-                    day={day}
-                    selectedTimes={selectedTimes}
-                    setSelectedTimes={setSelectedTimes}
-                    selectedTimeKeys={selectedTimeKeys}
-                    setSelectedTimeKeys={setSelectedTimeKeys}
-                />
-            ),
         },
         {
             key: 3,
             tab: <h6 className="ps-3 pe-3">Thứ tư</h6>,
-            component: (
-                <ListTime
-                    timeType={timeType}
-                    day={day}
-                    selectedTimes={selectedTimes}
-                    setSelectedTimes={setSelectedTimes}
-                    selectedTimeKeys={selectedTimeKeys}
-                    setSelectedTimeKeys={setSelectedTimeKeys}
-                />
-            ),
         },
         {
             key: 4,
             tab: <h6 className="ps-3 pe-3">Thứ năm</h6>,
-            component: (
-                <ListTime
-                    timeType={timeType}
-                    day={day}
-                    selectedTimes={selectedTimes}
-                    setSelectedTimes={setSelectedTimes}
-                    selectedTimeKeys={selectedTimeKeys}
-                    setSelectedTimeKeys={setSelectedTimeKeys}
-                />
-            ),
         },
         {
             key: 5,
             tab: <h6 className="ps-3 pe-3">Thứ sáu</h6>,
-            component: (
-                <ListTime
-                    timeType={timeType}
-                    day={day}
-                    selectedTimes={selectedTimes}
-                    setSelectedTimes={setSelectedTimes}
-                    selectedTimeKeys={selectedTimeKeys}
-                    setSelectedTimeKeys={setSelectedTimeKeys}
-                />
-            ),
         },
         {
             key: 6,
             tab: <h6 className="ps-3 pe-3">Thứ bảy</h6>,
-            component: (
-                <ListTime
-                    timeType={timeType}
-                    day={day}
-                    selectedTimes={selectedTimes}
-                    setSelectedTimes={setSelectedTimes}
-                    selectedTimeKeys={selectedTimeKeys}
-                    setSelectedTimeKeys={setSelectedTimeKeys}
-                />
-            ),
         },
         {
             key: 0,
             tab: <h6 className="ps-3 pe-3">Chủ nhật</h6>,
-            component: (
-                <ListTime
-                    timeType={timeType}
-                    day={day}
-                    selectedTimes={selectedTimes}
-                    setSelectedTimes={setSelectedTimes}
-                    selectedTimeKeys={selectedTimeKeys}
-                    setSelectedTimeKeys={setSelectedTimeKeys}
-                />
-            ),
         },
     ];
     useEffect(() => {
-        handleGetScheduleBySubscriberAndDate();
+        const now = new Date();
+        setDay(now.getDay());
+    }, []);
+    useEffect(() => {
         const header = {
             headers: { authorization: 'Bearer ' + user.token },
         };
@@ -303,6 +302,7 @@ const ScheduleManagement = () => {
 
     return (
         <div className="">
+            {contextHolder}
             <div className="">
                 <Breadcrumb
                     items={[
@@ -314,8 +314,11 @@ const ScheduleManagement = () => {
             <div className="mt-3">
                 <Tabs
                     activeKey={activeKey !== undefined ? activeKey : '1'}
-                    onChange={(key) => setDefaultActiveKey(key)}
-                    onTabClick={(key) => setDay(Number(key))}
+                    onChange={(key) => {
+                        setDefaultActiveKey(key);
+                        setDay(Number(key));
+                        //setSchedule(undefined);
+                    }}
                 >
                     {tabs.map((item: any, index: number) => {
                         return (
@@ -346,7 +349,18 @@ const ScheduleManagement = () => {
                                         phút.
                                     </p>
                                 </div>
-                                {item.key === day && item.component}
+                                {item.key === day && (
+                                    <ListTime
+                                        timeType={timeType}
+                                        day={day}
+                                        selectedTimes={selectedTimes}
+                                        setSelectedTimes={setSelectedTimes}
+                                        selectedTimeKeys={selectedTimeKeys}
+                                        setSelectedTimeKeys={
+                                            setSelectedTimeKeys
+                                        }
+                                    />
+                                )}
                             </TabPane>
                         );
                     })}
@@ -355,9 +369,8 @@ const ScheduleManagement = () => {
             <div className="group__btn text-center mt-3">
                 <Button
                     onClick={() => {
-                        schedule !== undefined
-                            ? handleUpdateSchedule()
-                            : handleCreateSchedule();
+                        
+                        handleCreateSchedule();
                     }}
                     disabled={!isVisibleButtonSave}
                     type="primary"

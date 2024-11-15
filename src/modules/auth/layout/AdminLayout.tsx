@@ -5,9 +5,7 @@ import { Link } from 'react-router-dom';
 
 import { Sidenav } from './components/Sidenav';
 import { HeaderLayout } from './components/Header';
-import { useRecoilValue, useSetRecoilState } from 'recoil';
-import { userState, userValue } from '../../../stores/userAtom';
-const { Header, Sider, Content } = Layout;
+const { Sider, Content } = Layout;
 
 const AdminLayout: React.FC = ({ children }: any) => {
     const [collapsed, setCollapsed] = useState(false);

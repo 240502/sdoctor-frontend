@@ -11,7 +11,7 @@ const DashBoard = () => {
     return (
         <div className="container">
             <div className="group__box d-flex  justify-content-between">
-                <div className="box__item col-2 bg-light bg-gradient rounded p-3 shadow-lg">
+                <div className="box__item col-3 bg-light bg-gradient rounded p-3 shadow-lg">
                     <h6 className="box__title d-flex justify-content-between ">
                         <span>
                             Số lượng bệnh nhân
@@ -22,7 +22,7 @@ const DashBoard = () => {
                         </span>
                     </h6>
                 </div>
-                <div className="box__item col-2 bg-light bg-gradient rounded p-3 shadow-lg">
+                <div className="box__item col-3 bg-light bg-gradient rounded p-3 shadow-lg">
                     <h6 className="box__title d-flex justify-content-between ">
                         <span>
                             Số lượng lịch hẹn
@@ -33,7 +33,7 @@ const DashBoard = () => {
                         </span>
                     </h6>
                 </div>
-                <div className="box__item col-2 bg-light bg-gradient rounded p-3 shadow-lg">
+                <div className="box__item col-3 bg-light bg-gradient rounded p-3 shadow-lg">
                     <h6 className="box__title d-flex justify-content-between ">
                         <span>
                             Doanh thu
@@ -44,7 +44,7 @@ const DashBoard = () => {
                         </span>
                     </h6>
                 </div>
-                <div className="box__item col-2 bg-light bg-gradient rounded p-3 shadow-lg">
+                <div className="box__item col-3 bg-light bg-gradient rounded p-3 shadow-lg">
                     <h6 className="box__title d-flex justify-content-between ">
                         <span>
                             Tỷ lệ hủy hẹn

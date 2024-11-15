@@ -1,18 +1,20 @@
 import { HomeMenu } from './menu/HomeMenu';
 import { HomeFooter } from './footer/HomeFooter';
-import { Layout } from 'antd';
-import { Link } from 'react-router-dom';
+import { Button, Layout } from 'antd';
+import { Link, useNavigate } from 'react-router-dom';
+import { UserOutlined, AuditOutlined } from '@ant-design/icons';
 import '@/assets/scss/app.scss';
 
 const { Header, Content, Footer } = Layout;
 export const AppLayout = ({ children }: any) => {
+    const navigate = useNavigate();
     return (
         <Layout>
             <Header
                 className="home__header position-fixed top-0 start-0 end-0"
                 style={{ zIndex: '99' }}
             >
-                <div className="container d-flex justify-content-between">
+                <div className="container d-flex justify-content-between align-items-center">
                     <div className="home__header__logo">
                         <Link
                             className="header__logo__text fs-2 fw-bold text-decoration-none"
@@ -22,6 +24,28 @@ export const AppLayout = ({ children }: any) => {
                         </Link>
                     </div>
                     <HomeMenu></HomeMenu>
+                    <div className="group__button__header d-flex">
+                        <Button
+                            className="border-0"
+                            onClick={() => navigate('/patient/profile')}
+                        >
+                            <UserOutlined />
+                            Hồ sơ
+                        </Button>
+                        <Button
+                            className="border-0"
+                            onClick={() => navigate('/patient/appointment')}
+                        >
+                            <AuditOutlined />
+                            Lịch hẹn
+                        </Button>
+                        <Button
+                            className="border-0"
+                            onClick={() => navigate('/login')}
+                        >
+                            Đăng nhập
+                        </Button>
+                    </div>
                 </div>
             </Header>
             <Content style={{ background: '#fff', marginTop: '78px' }}>

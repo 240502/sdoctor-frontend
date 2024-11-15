@@ -3,7 +3,7 @@ import { ViewClinic } from '../modules/account/clinic';
 import { ViewClinicDetail } from '../modules/account/clinic/views/ViewClinicDetail';
 import { ViewDetailDoctor, ViewDoctor } from '../modules/account/doctor';
 import { Home } from '../modules/account/home';
-import { Login } from '../modules/account/login/login';
+import { LoginLayout } from '../modules/account/login/LoginLayout';
 import { ViewNews } from '../modules/account/news';
 import { ViewService, ViewDetailService } from '../modules/account/service';
 import { AppointmentManagement } from '../modules/auth/appointment';
@@ -73,7 +73,7 @@ export const publicRoutes = [
     },
     {
         path: LOGIN_PATH,
-        component: Login,
+        component: LoginLayout,
         layout: null,
     },
 ];
