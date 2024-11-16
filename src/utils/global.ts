@@ -1,5 +1,4 @@
 export function showSuccess(input: any) {
-    console.log(input);
     let parent = input.parentElement;
     let error__message = parent.querySelector('.error_message');
     parent.classList.remove('error');

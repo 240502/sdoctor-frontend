@@ -89,9 +89,7 @@ export const BlockSchedule = ({
             console.log(err.message);
         }
     };
-    useEffect(() => {
-        console.log('Current myArray:', schedules);
-    }, [schedules]);
+
     useEffect(() => {
         let isDifferentDate = false;
         schedules.forEach((schedule: Schedule) => {
@@ -112,7 +110,6 @@ export const BlockSchedule = ({
     useEffect(() => {
         socket.on('newAppointment', (newAppointment) => {
             // setNewAppointment(newAppointment);
-            console.log(schedules);
 
             const schedule = schedules?.find(
                 (schedule: Schedule, i: number) => {

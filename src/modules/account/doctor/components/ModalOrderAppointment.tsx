@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { v4 as uuidv4 } from 'uuid';
 import {
     Button,
     Modal,
@@ -30,6 +31,8 @@ import {
 } from '../../../../utils/global';
 import socket from '../../../../socket';
 import { PatientProfileService } from '../../../../services/patient_profileService';
+import { useSetRecoilState } from 'recoil';
+import { patientProfileState } from '../../../../stores/patientAtom';
 
 const { TextArea } = Input;
 export const ModalOrderAppointment = ({
@@ -40,6 +43,7 @@ export const ModalOrderAppointment = ({
     date,
     openNotificationWithIcon,
 }: any): JSX.Element => {
+    const setPatientProfile = useSetRecoilState(patientProfileState);
     const [provinces, setProvinces] = useState([
         { province_id: 0, province_name: '' },
     ]);
@@ -158,6 +162,7 @@ export const ModalOrderAppointment = ({
                 //CreateAppointment(newAppointment);
 
                 if (isSaveProfile) {
+                    const uuid = uuidv4();
                     const newProfile = {
                         patient_name: inputPatientNameRef.current?.input?.value,
                         patient_phone:
@@ -169,6 +174,7 @@ export const ModalOrderAppointment = ({
                         district: district.district_name,
                         commune: ward.ward_name,
                         gender: radioGenderValue.current,
+                        uuid: uuid,
                     };
                     console.log('newProfile', newProfile);
                     CreatePatientProfile(newProfile);
@@ -180,6 +186,7 @@ export const ModalOrderAppointment = ({
         try {
             const res = await PatientProfileService.createPatientProfile(data);
             localStorage.setItem('patientProfile', JSON.stringify(data));
+            setPatientProfile(data);
         } catch (err: any) {}
     };
 

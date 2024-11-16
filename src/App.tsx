@@ -5,8 +5,12 @@ import { Fragment, useEffect } from 'react';
 import { useSetRecoilState } from 'recoil';
 import { userState } from './stores/userAtom';
 import './assets/fontawesome/css/all.min.css';
+import { PatientProfile } from './models/patient_profile';
+import { patientProfileState } from './stores/patientAtom';
 function App() {
     const setUser = useSetRecoilState(userState);
+    const setPatientProfile = useSetRecoilState(patientProfileState);
+
     const getUser = async () => {
         try {
             const user = await JSON.parse(
@@ -17,8 +21,22 @@ function App() {
             console.error(e.message);
         }
     };
+    const getPatientProfile = async () => {
+        try {
+            const profile: PatientProfile = await JSON.parse(
+                localStorage.getItem('patientProfile') || 'null'
+            );
+            console.log(profile);
+            if (profile) {
+                setPatientProfile(profile);
+            }
+        } catch (err: any) {
+            console.log(err.message);
+        }
+    };
     useEffect(() => {
         getUser();
+        getPatientProfile();
     }, []);
     return (
         <div className="App">

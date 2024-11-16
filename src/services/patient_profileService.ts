@@ -8,4 +8,17 @@ export const PatientProfileService = {
         );
         return res;
     },
+    async updatePatientProfile(data: any): Promise<any> {
+        const res: any = await apiClient.put(
+            '/api/patient-profile/update',
+            data
+        );
+        return res;
+    },
+    async deletePatientProfile(phone: any): Promise<any> {
+        const res = await apiClient.delete(
+            '/api/patient-profile/delete/' + phone
+        );
+        return res;
+    },
 };

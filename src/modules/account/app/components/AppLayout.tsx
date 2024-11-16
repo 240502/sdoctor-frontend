@@ -32,13 +32,7 @@ export const AppLayout = ({ children }: any) => {
                             <UserOutlined />
                             Hồ sơ
                         </Button>
-                        <Button
-                            className="border-0"
-                            onClick={() => navigate('/patient/appointment')}
-                        >
-                            <AuditOutlined />
-                            Lịch hẹn
-                        </Button>
+
                         <Button
                             className="border-0"
                             onClick={() => navigate('/login')}

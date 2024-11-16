@@ -14,7 +14,7 @@ const APPOINTMENT_PATH = '/admin/appointment';
 const NEWS_PATH = '/admin/news';
 const DOCTOR_MANAGEMENT_PATH = '/admin/doctor';
 const SCHEDULE_MANAGEMENT_PATH = '/admin/schedule';
-
+const VIEW_PATIENT_PROFILE = '/patient/profile';
 export {
     HOME_PATH,
     VIEW_CLINIC_PATH,
@@ -32,4 +32,5 @@ export {
     NEWS_PATH,
     DOCTOR_MANAGEMENT_PATH,
     SCHEDULE_MANAGEMENT_PATH,
+    VIEW_PATIENT_PROFILE,
 };

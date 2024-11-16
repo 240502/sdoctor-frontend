@@ -44,14 +44,12 @@ const ViewDoctor = () => {
     };
     const loadData = async () => {
         try {
-            console.log('call api');
             const data = {
                 pageIndex: pageIndex,
                 pageSize: pageSize,
                 majorId: majorId != 0 ? majorId : null,
             };
             const res = await doctorService.viewDoctor(data);
-            console.log(res.data);
             setDoctors(res.data);
             setPageCount(res.pageCount);
         } catch (err: any) {
@@ -62,7 +60,6 @@ const ViewDoctor = () => {
     const handleUpdateViewsDoctor = async (id: number) => {
         try {
             const res = await doctorService.updateViewsDoctor(id);
-            console.log(res);
         } catch (err: any) {
             console.log(err.message);
         }
@@ -86,7 +83,6 @@ const ViewDoctor = () => {
         });
     };
     const handleChangeMajor = (value: number) => {
-        console.log(`selected ${value}`);
         setMajorId(value);
     };
     const changePageSize = (value: any) => {
@@ -94,7 +90,6 @@ const ViewDoctor = () => {
         setPageSize(Number(value));
     };
     const handlePageClick = (event: any) => {
-        console.log(event.selected);
         setPageIndex(event.selected + 1);
     };
 

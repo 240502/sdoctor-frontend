@@ -6,12 +6,12 @@ import { HomeMenuService } from '../../../../../services/home_menuService';
 import { HomeMenuModel } from '../../../../../models/home_menu';
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import { userState, userValue } from '../../../../../stores/userAtom';
+import { patientProfileState } from '../../../../../stores/patientAtom';
+import { PatientProfile } from '../../../../../models/patient_profile';
 
 export const HomeMenu = () => {
-    const navigate = useNavigate();
     const [homeMenus, setHomeMenus] = useState<HomeMenuModel[]>();
     const [selectedKeys, setSelectedKeys] = useState<string[]>([]);
-    const [user, setUser] = useRecoilState(userState);
     const loadData = async () => {
         try {
             const data = await HomeMenuService.getHomeMenu();
@@ -20,22 +20,9 @@ export const HomeMenu = () => {
             console.log(err.message);
         }
     };
-    const getUser = async () => {
-        try {
-            const user: any = await JSON.parse(
-                sessionStorage.getItem('user') || 'null'
-            );
-            if (user) {
-                setUser(user);
-            }
-        } catch (err: any) {
-            console.log(err.message);
-        }
-    };
+
     useEffect(() => {
         loadData();
-        getUser();
-        console.log(user.id);
     }, []);
 
     return (

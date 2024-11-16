@@ -27,8 +27,10 @@ import {
     APPOINTMENT_PATH,
     NEWS_PATH,
     DOCTOR_MANAGEMENT_PATH,
+    VIEW_PATIENT_PROFILE,
 } from './path';
 import { ScheduleManagement } from '../modules/auth/schedule';
+import { PatientProfile } from '../modules/account/patient_profile';
 export const publicRoutes = [
     {
         path: HOME_PATH,
@@ -75,6 +77,11 @@ export const publicRoutes = [
         path: LOGIN_PATH,
         component: LoginLayout,
         layout: null,
+    },
+    {
+        path: VIEW_PATIENT_PROFILE,
+        component: PatientProfile,
+        layout: AppLayout,
     },
 ];
 
