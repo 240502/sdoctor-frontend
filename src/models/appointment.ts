@@ -5,7 +5,7 @@ export interface Appointment {
     patient_name: string;
     patient_phone: string;
     patient_email: string;
-    birthday: Date;
+    birthday: Date | string;
     province: string;
     district: string;
     commune: string;

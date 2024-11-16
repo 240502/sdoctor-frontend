@@ -79,7 +79,7 @@ const TableNews = ({
                 <>
                     <Tooltip placement="topLeft" title={'Xem chi tiết'}>
                         <Button
-                            className="me-3 border border-info"
+                            className="me-2 border border-info"
                             onClick={() => {
                                 setIsView(true);
                                 setPost(record);
@@ -91,7 +91,7 @@ const TableNews = ({
                     </Tooltip>
                     <Tooltip placement="topLeft" title={'Sửa bài viết'}>
                         <Button
-                            className="me-3 border border-warning"
+                            className="me-2 border border-warning"
                             danger
                             onClick={() => {
                                 setIsUpdate(true);
@@ -104,6 +104,7 @@ const TableNews = ({
                     </Tooltip>
                     <Tooltip placement="topLeft" title={'Xóa bài viết'}>
                         <Button
+                            className="mt-2"
                             danger
                             onClick={() => {
                                 setIsShowModalConfirm(true);

@@ -1,5 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { v4 as uuidv4 } from 'uuid';
+import dayjs from 'dayjs';
+
 import {
     Button,
     Modal,
@@ -31,8 +33,14 @@ import {
 } from '../../../../utils/global';
 import socket from '../../../../socket';
 import { PatientProfileService } from '../../../../services/patient_profileService';
-import { useSetRecoilState } from 'recoil';
-import { patientProfileState } from '../../../../stores/patientAtom';
+import { useRecoilValue, useSetRecoilState } from 'recoil';
+import {
+    patientProfileState,
+    patientProfileValue,
+} from '../../../../stores/patientAtom';
+import { Appointment } from '../../../../models/appointment';
+import { appointmentListState } from '../../../../stores/appointmentAtom';
+import { NewsManagement } from '../../../auth/news';
 
 const { TextArea } = Input;
 export const ModalOrderAppointment = ({
@@ -43,7 +51,9 @@ export const ModalOrderAppointment = ({
     date,
     openNotificationWithIcon,
 }: any): JSX.Element => {
+    const dateFormat = 'YYYY-MM-DD';
     const setPatientProfile = useSetRecoilState(patientProfileState);
+    const patientProfile = useRecoilValue(patientProfileValue);
     const [provinces, setProvinces] = useState([
         { province_id: 0, province_name: '' },
     ]);
@@ -51,16 +61,22 @@ export const ModalOrderAppointment = ({
     const [districts, setDistricts] = useState([
         { district_id: 0, district_name: '' },
     ]);
+
     const [district, setDistrict] = useState({
         district_id: 0,
         district_name: '',
     });
+
     const [province, setProvince] = useState({
         province_id: 0,
         province_name: '',
     });
+
     const [isSaveProfile, setIsSaveProfile] = useState<boolean>(false);
 
+    const [newAppointment, setNewAppointment] = useState<Appointment>(
+        {} as Appointment
+    );
     const [wards, setWards] = useState([{ ward_id: 0, ward_name: '' }]);
     const [ward, setWard] = useState({ ward_id: 0, ward_name: '' });
     const inputPatientNameRef = useRef<InputRef>(null);
@@ -74,12 +90,54 @@ export const ModalOrderAppointment = ({
     const selectWardRef = useRef<any>(null);
     const [birthday, setBirthday] = useState<string>();
     const [examinationReason, setExaminationReason] = useState<string>();
+    const [paymentMethod, setPaymentMethod] = useState(1);
+    const [birthdayError, setBirthDayError] = useState<any>();
+
     const onChange: DatePickerProps['onChange'] = (date, dateString) => {
         setBirthday(String(dateString));
+        setNewAppointment({ ...newAppointment, birthday: String(dateString) });
     };
+
     const onSwitchChange = (checked: boolean) => {
         setIsSaveProfile(checked);
     };
+
+    const validateBirthday = (date: any) => {
+        const now = new Date();
+        let error: boolean = false;
+        if (date.getFullYear() === now.getFullYear()) {
+            if (date.getMonth() === now.getMonth()) {
+                if (date.getDate() === now.getDate()) {
+                    error = true;
+                } else {
+                    error = false;
+                }
+            }
+            if (date.getMonth() > now.getMonth()) {
+                error = true;
+            }
+            if (date.getMonth() < now.getMonth()) {
+                error = false;
+            }
+        }
+        if (date.getFullYear() > now.getFullYear()) {
+            error = true;
+        }
+        if (date.getFullYear() < now.getFullYear()) {
+            error = false;
+        }
+        if (error) {
+            setBirthDayError({ message: 'Ngày/ Tháng/ Năm sinh không hợp lệ' });
+        }
+        return error;
+    };
+    const handleEmptyPatientBirthday = () => {
+        if (newAppointment?.birthday) {
+            return false;
+        }
+        return true;
+    };
+
     const handleOk = () => {
         const isEmptyPatientName = isEmpty(inputPatientNameRef.current?.input);
         const isEmptyPatientPhone = isEmpty(
@@ -88,13 +146,14 @@ export const ModalOrderAppointment = ({
         const isEmptyPatientEmail = isEmpty(
             inputPatientEmailRef.current?.input
         );
-        // const isEmptyPatientBirthday = isEmpty(
-        //     inputPatientBirthDateRef.current?.input
-        // );
-        const isEmptyRadioGender = isEmptyRadio(
-            radioGenderRef.current,
-            radioGenderValue.current
-        );
+
+        const isEmptyRadioGender =
+            patientProfile !== null
+                ? false
+                : isEmptyRadio(
+                      radioGenderRef.current,
+                      radioGenderValue.current
+                  );
         const provinceId = province.province_id;
         const districtId = district.district_id;
         const wardId = ward.ward_id;
@@ -107,8 +166,9 @@ export const ModalOrderAppointment = ({
             districtId
         );
         const isEmptySelectWard = isEmptySelect(selectWardRef.current, wardId);
+
         if (
-            // !isEmptyPatientBirthday &&
+            newAppointment.birthday !== null &&
             !isEmptyPatientName &&
             !isEmptyPatientPhone &&
             !isEmptyPatientEmail &&
@@ -126,27 +186,29 @@ export const ModalOrderAppointment = ({
             const isErrorPatientPhone = validatePhone(
                 inputPatientPhoneRef.current?.input
             );
-            // const isErrorPatientBirthday = validatePatientBirthDay(
-            //     inputPatientBirthDateRef.current?.input
-            // );
+
             const isErrorPhoneLength = validatePhoneLength(
                 inputPatientPhoneRef.current?.input
             );
+            const isErrorBirthday =
+                patientProfile === null
+                    ? false
+                    : validateBirthday(new Date(newAppointment.birthday));
 
             if (
                 !isErrorPatientName &&
                 !isErrorPatientEmail &&
                 !isErrorPatientPhone &&
-                // !isErrorPatientBirthday &&
-                !isErrorPhoneLength
+                !isErrorPhoneLength &&
+                !isErrorBirthday
             ) {
-                const newAppointment = {
+                const appointment = {
                     doctor_id: doctor.id,
                     appointment_date: date,
                     patient_name: inputPatientNameRef.current?.input?.value,
                     patient_phone: inputPatientPhoneRef.current?.input?.value,
                     patient_email: inputPatientEmailRef.current?.input?.value,
-                    birthday: birthday,
+                    birthday: newAppointment.birthday,
                     province: province.province_name,
                     district: district.district_name,
                     commune: ward.ward_name,
@@ -159,7 +221,7 @@ export const ModalOrderAppointment = ({
                     location: doctor.location,
                     type: 'Bác sĩ',
                 };
-                //CreateAppointment(newAppointment);
+                CreateAppointment(appointment);
 
                 if (isSaveProfile) {
                     const uuid = uuidv4();
@@ -176,12 +238,12 @@ export const ModalOrderAppointment = ({
                         gender: radioGenderValue.current,
                         uuid: uuid,
                     };
-                    console.log('newProfile', newProfile);
                     CreatePatientProfile(newProfile);
                 }
             }
         }
     };
+
     const CreatePatientProfile = async (data: any) => {
         try {
             const res = await PatientProfileService.createPatientProfile(data);
@@ -214,8 +276,6 @@ export const ModalOrderAppointment = ({
         }
     };
 
-    const [paymentMethod, setPaymentMethod] = useState(1);
-
     const handleOnChangeRadioPaymentMethod = (e: any) => {
         setPaymentMethod(Number(e.target.value));
     };
@@ -224,16 +284,7 @@ export const ModalOrderAppointment = ({
     };
     const handleChange = (e: RadioChangeEvent) => {
         radioGenderValue.current = e.target.value;
-    };
-    const getListDistrict = async (provinceId: any) => {
-        try {
-            const res = await axios.get(
-                `https://vapi.vnappmob.com//api/province/district/${provinceId}`
-            );
-            setDistricts(res.data.results);
-        } catch (err) {
-            console.log(err);
-        }
+        setNewAppointment({ ...newAppointment, gender: e.target.value });
     };
     const getWards = async (districtId: any) => {
         try {
@@ -245,7 +296,77 @@ export const ModalOrderAppointment = ({
             console.log(err);
         }
     };
+    const getListDistrict = async (provinceId: any) => {
+        try {
+            const res = await axios.get(
+                `https://vapi.vnappmob.com//api/province/district/${provinceId}`
+            );
 
+            setDistricts(res.data.results);
+        } catch (err) {
+            console.log(err);
+        }
+    };
+
+    //find province when patient had a profile
+    useEffect(() => {
+        const getProvince = () => {
+            const province: any = provinces.find(
+                (item) => item?.province_name === patientProfile.province
+            );
+            if (province) {
+                setProvince(province);
+            }
+        };
+        if (provinces.length > 1) {
+            getProvince();
+        }
+    }, [provinces.length]);
+
+    //find district when patient had a profile
+    useEffect(() => {
+        const getDistrict = () => {
+            const district: any = districts.find(
+                (item) => item.district_name === patientProfile.district
+            );
+            if (district) {
+                setDistrict(district);
+            }
+        };
+        if (districts.length > 1) {
+            getDistrict();
+        }
+    }, [districts.length]);
+    //find ward when patient had a profile
+    useEffect(() => {
+        const getWards = () => {
+            const ward = wards.find(
+                (item) => item.ward_name === patientProfile.commune
+            );
+            if (ward) {
+                setWard(ward);
+            }
+        };
+        if (wards.length > 1) {
+            getWards();
+        }
+    }, [wards.length]);
+
+    //get list district of province when change province
+    useEffect(() => {
+        if (province.province_id !== 0) {
+            getListDistrict(province.province_id);
+        }
+    }, [province.province_id]);
+
+    //get list ward of district when change district
+    useEffect(() => {
+        if (districts.length > 1) {
+            if (district !== undefined) {
+                getWards(district.district_id);
+            }
+        }
+    }, [district.district_id]);
     useEffect(() => {
         const getProvinces = async () => {
             try {
@@ -258,20 +379,18 @@ export const ModalOrderAppointment = ({
             }
         };
         getProvinces();
+        setNewAppointment({
+            ...newAppointment,
+            patient_name: patientProfile.patient_name,
+            patient_phone: patientProfile.patient_phone,
+            patient_email: patientProfile.patient_email,
+            birthday: patientProfile.birthday,
+            province: patientProfile.province,
+            district: patientProfile.district,
+            commune: patientProfile.commune,
+            gender: patientProfile.gender,
+        });
     }, []);
-
-    useEffect(() => {
-        if (province.province_id !== 0) {
-            getListDistrict(province.province_id);
-        }
-    }, [province.province_id]);
-    useEffect(() => {
-        if (districts.length > 0) {
-            if (district !== undefined) {
-                getWards(district.district_id);
-            }
-        }
-    }, [district.district_id]);
 
     return (
         <Modal
@@ -344,6 +463,13 @@ export const ModalOrderAppointment = ({
                                 ref={inputPatientNameRef}
                                 className="form-control patient_name "
                                 id="patient_name"
+                                value={newAppointment.patient_name}
+                                onChange={(e) =>
+                                    setNewAppointment({
+                                        ...newAppointment,
+                                        patient_name: e.target.value,
+                                    })
+                                }
                             ></Input>
 
                             <div
@@ -356,6 +482,7 @@ export const ModalOrderAppointment = ({
                                 Giới tính
                             </label>
                             <Radio.Group
+                                value={newAppointment.gender}
                                 onFocus={() => {
                                     showSuccess(radioGenderRef.current);
                                 }}
@@ -384,8 +511,15 @@ export const ModalOrderAppointment = ({
                                     handleFocusInput(e.target);
                                 }}
                                 ref={inputPatientPhoneRef}
+                                value={newAppointment.patient_phone}
                                 className=" form-control patient_phone"
                                 id="patient_phone"
+                                onChange={(e) =>
+                                    setNewAppointment({
+                                        ...newAppointment,
+                                        patient_phone: e.target.value,
+                                    })
+                                }
                             ></Input>
                             <div
                                 className="error_message mt-3"
@@ -404,6 +538,13 @@ export const ModalOrderAppointment = ({
                                     handleFocusInput(e.target);
                                 }}
                                 ref={inputPatientEmailRef}
+                                onChange={(e) =>
+                                    setNewAppointment({
+                                        ...newAppointment,
+                                        patient_email: e.target.value,
+                                    })
+                                }
+                                value={newAppointment.patient_email}
                                 className="form-control patient_email"
                                 id="patient_email"
                             ></Input>
@@ -417,14 +558,26 @@ export const ModalOrderAppointment = ({
                                 Ngày/ Tháng/ Năm Sinh
                             </label>
                             <DatePicker
-                                className="mb-3 d-block"
-                                defaultChecked={true}
+                                onFocus={() => {
+                                    setBirthDayError({});
+                                }}
                                 onChange={onChange}
-                            ></DatePicker>
-                            <div
-                                className="error_message mt-3"
-                                style={{ color: 'red' }}
-                            ></div>
+                                className="d-block mt-2"
+                                type="date"
+                                defaultValue={dayjs(
+                                    patientProfile.birthday,
+                                    dateFormat
+                                )}
+                                format={dateFormat}
+                            />
+                            {birthdayError?.message && (
+                                <div
+                                    className="error_message mt-3"
+                                    style={{ color: 'red' }}
+                                >
+                                    {birthdayError.message}
+                                </div>
+                            )}
                         </div>
                         <div className="mb-3">
                             <label htmlFor="" className="form-label fw-bold">
@@ -434,6 +587,7 @@ export const ModalOrderAppointment = ({
                                 ref={selectProvinceRef}
                                 className="d-block"
                                 showSearch
+                                value={province.province_id}
                                 onFocus={(e) =>
                                     handleFocusSelect(selectProvinceRef.current)
                                 }
@@ -474,6 +628,7 @@ export const ModalOrderAppointment = ({
                             </label>
                             <Select
                                 ref={selectDistrictRef}
+                                value={district.district_id}
                                 className="d-block"
                                 onFocus={(e) =>
                                     handleFocusSelect(selectDistrictRef.current)
@@ -516,6 +671,7 @@ export const ModalOrderAppointment = ({
                             </label>
                             <Select
                                 ref={selectWardRef}
+                                value={ward.ward_id}
                                 onFocus={(e) =>
                                     handleFocusSelect(selectWardRef.current)
                                 }
@@ -585,15 +741,19 @@ export const ModalOrderAppointment = ({
                                 style={{ color: 'red' }}
                             ></div>
                         </div>
-                        <div className="mb-3">
-                            <Switch
-                                className=""
-                                onChange={onSwitchChange}
-                            ></Switch>
-                            <label htmlFor="" className="ms-3">
-                                Lưu thông tin hồ sơ
-                            </label>
-                        </div>
+                        {patientProfile === null ? (
+                            <div className="mb-3">
+                                <Switch
+                                    className=""
+                                    onChange={onSwitchChange}
+                                ></Switch>
+                                <label htmlFor="" className="ms-3">
+                                    Lưu thông tin hồ sơ
+                                </label>
+                            </div>
+                        ) : (
+                            <></>
+                        )}
                         <div className="mb-3">
                             <label htmlFor="" className="form-label fw-bold">
                                 Hình thức thanh toán

@@ -203,7 +203,6 @@ export const ViewProfile = () => {
                 console.log(err);
             }
         };
-        console.log(String(dayjs(patientProfile.birthday, dateFormat)));
         setBirthday(String(dayjs(patientProfile.birthday, dateFormat)));
         getProvinces();
     }, []);
