@@ -21,4 +21,10 @@ export const PatientProfileService = {
         );
         return res;
     },
+    async getPatientProfileByUuid(uuid: string): Promise<any> {
+        const res = await apiClient.get(
+            '/api/patient-profile/get-by-uuid/' + uuid
+        );
+        return res.data;
+    },
 };

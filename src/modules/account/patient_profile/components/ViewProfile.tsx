@@ -144,9 +144,9 @@ export const ViewProfile = () => {
                     commune: ward.ward_name,
                     gender: patientProfile.gender,
                     uuid: patientProfile.uuid,
+                    id: patientProfile.id,
                 };
                 UpdateProfile(newProfile);
-                console.log('newProfile', newProfile);
             }
         }
     };
@@ -161,7 +161,6 @@ export const ViewProfile = () => {
                 'Cập nhật thông tin thành công!'
             );
             setPatientProfile(newProfile);
-            localStorage.setItem('patientProfile', JSON.stringify(newProfile));
         } catch (err: any) {
             console.log(err.message);
             openNotificationWithIcon(

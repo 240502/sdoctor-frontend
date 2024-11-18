@@ -41,6 +41,7 @@ import {
 import { Appointment } from '../../../../models/appointment';
 import { appointmentListState } from '../../../../stores/appointmentAtom';
 import { NewsManagement } from '../../../auth/news';
+import { PatientProfile } from '../../../../models/patient_profile';
 
 const { TextArea } = Input;
 export const ModalOrderAppointment = ({
@@ -54,6 +55,8 @@ export const ModalOrderAppointment = ({
     const dateFormat = 'YYYY-MM-DD';
     const setPatientProfile = useSetRecoilState(patientProfileState);
     const patientProfile = useRecoilValue(patientProfileValue);
+    const [isShowSwitchUpdateProfile, setIsShowSwitchUpdateProfile] =
+        useState<boolean>(false);
     const [provinces, setProvinces] = useState([
         { province_id: 0, province_name: '' },
     ]);
@@ -73,10 +76,9 @@ export const ModalOrderAppointment = ({
     });
 
     const [isSaveProfile, setIsSaveProfile] = useState<boolean>(false);
-
-    const [newAppointment, setNewAppointment] = useState<Appointment>(
-        {} as Appointment
-    );
+    const [isUpdateProfile, setIsUpdateProfile] = useState<boolean>(false);
+    const [patientProfileCopy, setPatientProfileCopy] =
+        useState<PatientProfile>({} as PatientProfile);
     const [wards, setWards] = useState([{ ward_id: 0, ward_name: '' }]);
     const [ward, setWard] = useState({ ward_id: 0, ward_name: '' });
     const inputPatientNameRef = useRef<InputRef>(null);
@@ -95,11 +97,28 @@ export const ModalOrderAppointment = ({
 
     const onChange: DatePickerProps['onChange'] = (date, dateString) => {
         setBirthday(String(dateString));
-        setNewAppointment({ ...newAppointment, birthday: String(dateString) });
+        setPatientProfileCopy({
+            ...patientProfileCopy,
+            birthday: String(dateString),
+        });
+
+        if (
+            JSON.stringify({
+                ...patientProfileCopy,
+                birthday: String(dateString),
+            }) === JSON.stringify(patientProfile)
+        ) {
+            setIsShowSwitchUpdateProfile(false);
+        } else {
+            setIsShowSwitchUpdateProfile(true);
+        }
     };
 
-    const onSwitchChange = (checked: boolean) => {
+    const onSwitchSaveProfileChange = (checked: boolean) => {
         setIsSaveProfile(checked);
+    };
+    const onSwitchUpdateProfileChange = (checked: boolean) => {
+        setIsUpdateProfile(checked);
     };
 
     const validateBirthday = (date: any) => {
@@ -132,7 +151,7 @@ export const ModalOrderAppointment = ({
         return error;
     };
     const handleEmptyPatientBirthday = () => {
-        if (newAppointment?.birthday) {
+        if (patientProfileCopy?.birthday) {
             return false;
         }
         return true;
@@ -168,7 +187,7 @@ export const ModalOrderAppointment = ({
         const isEmptySelectWard = isEmptySelect(selectWardRef.current, wardId);
 
         if (
-            newAppointment.birthday !== null &&
+            patientProfileCopy.birthday !== null &&
             !isEmptyPatientName &&
             !isEmptyPatientPhone &&
             !isEmptyPatientEmail &&
@@ -193,7 +212,7 @@ export const ModalOrderAppointment = ({
             const isErrorBirthday =
                 patientProfile === null
                     ? false
-                    : validateBirthday(new Date(newAppointment.birthday));
+                    : validateBirthday(new Date(patientProfileCopy.birthday));
 
             if (
                 !isErrorPatientName &&
@@ -208,7 +227,7 @@ export const ModalOrderAppointment = ({
                     patient_name: inputPatientNameRef.current?.input?.value,
                     patient_phone: inputPatientPhoneRef.current?.input?.value,
                     patient_email: inputPatientEmailRef.current?.input?.value,
-                    birthday: newAppointment.birthday,
+                    birthday: patientProfileCopy.birthday,
                     province: province.province_name,
                     district: district.district_name,
                     commune: ward.ward_name,
@@ -240,14 +259,34 @@ export const ModalOrderAppointment = ({
                     };
                     CreatePatientProfile(newProfile);
                 }
+                if (isUpdateProfile) {
+                    const newProfile = {
+                        ...patientProfileCopy,
+                        birthday: patientProfileCopy.birthday
+                            .toString()
+                            .slice(0, 10),
+                        province: province.province_name,
+                        district: district.district_name,
+                        commune: ward.ward_name,
+                    };
+
+                    UpdatePatientProfile(newProfile);
+                }
             }
         }
     };
-
+    const UpdatePatientProfile = async (data: any) => {
+        try {
+            setPatientProfile(data);
+            const res = await PatientProfileService.updatePatientProfile(data);
+        } catch (err: any) {
+            console.log(err.message);
+        }
+    };
     const CreatePatientProfile = async (data: any) => {
         try {
             const res = await PatientProfileService.createPatientProfile(data);
-            localStorage.setItem('patientProfile', JSON.stringify(data));
+            localStorage.setItem('uuid', JSON.stringify(data.uuid));
             setPatientProfile(data);
         } catch (err: any) {}
     };
@@ -284,7 +323,21 @@ export const ModalOrderAppointment = ({
     };
     const handleChange = (e: RadioChangeEvent) => {
         radioGenderValue.current = e.target.value;
-        setNewAppointment({ ...newAppointment, gender: e.target.value });
+        setPatientProfileCopy({
+            ...patientProfileCopy,
+            gender: e.target.value,
+        });
+        console.log('change');
+        if (
+            JSON.stringify({
+                ...patientProfileCopy,
+                gender: e.target.value,
+            }) === JSON.stringify(patientProfile)
+        ) {
+            setIsShowSwitchUpdateProfile(false);
+        } else {
+            setIsShowSwitchUpdateProfile(true);
+        }
     };
     const getWards = async (districtId: any) => {
         try {
@@ -379,16 +432,8 @@ export const ModalOrderAppointment = ({
             }
         };
         getProvinces();
-        setNewAppointment({
-            ...newAppointment,
-            patient_name: patientProfile.patient_name,
-            patient_phone: patientProfile.patient_phone,
-            patient_email: patientProfile.patient_email,
-            birthday: patientProfile.birthday,
-            province: patientProfile.province,
-            district: patientProfile.district,
-            commune: patientProfile.commune,
-            gender: patientProfile.gender,
+        setPatientProfileCopy({
+            ...patientProfile,
         });
     }, []);
 
@@ -463,13 +508,23 @@ export const ModalOrderAppointment = ({
                                 ref={inputPatientNameRef}
                                 className="form-control patient_name "
                                 id="patient_name"
-                                value={newAppointment.patient_name}
+                                value={patientProfileCopy.patient_name}
                                 onChange={(e) =>
-                                    setNewAppointment({
-                                        ...newAppointment,
+                                    setPatientProfileCopy({
+                                        ...patientProfileCopy,
                                         patient_name: e.target.value,
                                     })
                                 }
+                                onBlur={() => {
+                                    if (
+                                        JSON.stringify(patientProfileCopy) ===
+                                        JSON.stringify(patientProfile)
+                                    ) {
+                                        setIsShowSwitchUpdateProfile(false);
+                                    } else {
+                                        setIsShowSwitchUpdateProfile(true);
+                                    }
+                                }}
                             ></Input>
 
                             <div
@@ -482,7 +537,7 @@ export const ModalOrderAppointment = ({
                                 Giới tính
                             </label>
                             <Radio.Group
-                                value={newAppointment.gender}
+                                value={patientProfileCopy.gender}
                                 onFocus={() => {
                                     showSuccess(radioGenderRef.current);
                                 }}
@@ -511,15 +566,25 @@ export const ModalOrderAppointment = ({
                                     handleFocusInput(e.target);
                                 }}
                                 ref={inputPatientPhoneRef}
-                                value={newAppointment.patient_phone}
+                                value={patientProfileCopy.patient_phone}
                                 className=" form-control patient_phone"
                                 id="patient_phone"
                                 onChange={(e) =>
-                                    setNewAppointment({
-                                        ...newAppointment,
+                                    setPatientProfileCopy({
+                                        ...patientProfileCopy,
                                         patient_phone: e.target.value,
                                     })
                                 }
+                                onBlur={() => {
+                                    if (
+                                        JSON.stringify(patientProfileCopy) ===
+                                        JSON.stringify(patientProfile)
+                                    ) {
+                                        setIsShowSwitchUpdateProfile(false);
+                                    } else {
+                                        setIsShowSwitchUpdateProfile(true);
+                                    }
+                                }}
                             ></Input>
                             <div
                                 className="error_message mt-3"
@@ -539,12 +604,22 @@ export const ModalOrderAppointment = ({
                                 }}
                                 ref={inputPatientEmailRef}
                                 onChange={(e) =>
-                                    setNewAppointment({
-                                        ...newAppointment,
+                                    setPatientProfileCopy({
+                                        ...patientProfileCopy,
                                         patient_email: e.target.value,
                                     })
                                 }
-                                value={newAppointment.patient_email}
+                                onBlur={() => {
+                                    if (
+                                        JSON.stringify(patientProfileCopy) ===
+                                        JSON.stringify(patientProfile)
+                                    ) {
+                                        setIsShowSwitchUpdateProfile(false);
+                                    } else {
+                                        setIsShowSwitchUpdateProfile(true);
+                                    }
+                                }}
+                                value={patientProfileCopy.patient_email}
                                 className="form-control patient_email"
                                 id="patient_email"
                             ></Input>
@@ -564,10 +639,15 @@ export const ModalOrderAppointment = ({
                                 onChange={onChange}
                                 className="d-block mt-2"
                                 type="date"
-                                defaultValue={dayjs(
-                                    patientProfile.birthday,
-                                    dateFormat
-                                )}
+                                defaultValue={
+                                    patientProfile?.birthday
+                                        ? dayjs(
+                                              patientProfile.birthday,
+                                              dateFormat
+                                          )
+                                        : null
+                                }
+                                onBlur={() => {}}
                                 format={dateFormat}
                             />
                             {birthdayError?.message && (
@@ -592,12 +672,28 @@ export const ModalOrderAppointment = ({
                                     handleFocusSelect(selectProvinceRef.current)
                                 }
                                 onChange={(e) => {
-                                    const province: any = provinces.find(
+                                    const pro: any = provinces.find(
                                         (province: any) => {
                                             return province.province_id === e;
                                         }
                                     );
-                                    setProvince(province);
+                                    if (
+                                        JSON.stringify({
+                                            ...patientProfileCopy,
+                                            province: pro.province_name,
+                                        }) === JSON.stringify(patientProfile)
+                                    ) {
+                                        setIsShowSwitchUpdateProfile(false);
+                                    } else {
+                                        setIsShowSwitchUpdateProfile(true);
+                                    }
+                                    setProvince(pro);
+                                    setDistrict({
+                                        district_id: 0,
+                                        district_name: '',
+                                    });
+
+                                    setWard({ ward_id: 0, ward_name: '' });
                                 }}
                                 placeholder="Chọn tỉnh/ thành phố"
                                 filterOption={(input, option) =>
@@ -606,6 +702,9 @@ export const ModalOrderAppointment = ({
                                         .includes(input.toLowerCase())
                                 }
                             >
+                                <Select.Option key={0} value={0}>
+                                    Chọn tỉnh/ thành phố
+                                </Select.Option>
                                 {provinces.map((item) => {
                                     return (
                                         <Select.Option
@@ -635,12 +734,26 @@ export const ModalOrderAppointment = ({
                                 }
                                 showSearch
                                 onChange={(e) => {
-                                    const district: any = districts.find(
+                                    const dis: any = districts.find(
                                         (item: any) => {
                                             return item.district_id === e;
                                         }
                                     );
-                                    setDistrict(district);
+                                    if (
+                                        JSON.stringify({
+                                            ...patientProfileCopy,
+                                            district: dis.district_name,
+                                        }) === JSON.stringify(patientProfile)
+                                    ) {
+                                        setIsShowSwitchUpdateProfile(false);
+                                    } else {
+                                        setIsShowSwitchUpdateProfile(true);
+                                    }
+
+                                    setDistrict(dis);
+                                    if (ward.ward_id !== 0) {
+                                        setWard({ ward_id: 0, ward_name: '' });
+                                    }
                                 }}
                                 placeholder="Chọn quận/ huyện/ thị xã"
                                 filterOption={(input, option) =>
@@ -649,6 +762,9 @@ export const ModalOrderAppointment = ({
                                         .includes(input.toLowerCase())
                                 }
                             >
+                                <Select.Option key={0} value={0}>
+                                    Chọn quận/ huyện/ thị xã
+                                </Select.Option>
                                 {districts.map((item) => {
                                     return (
                                         <Select.Option
@@ -681,15 +797,27 @@ export const ModalOrderAppointment = ({
                                     const ward: any = wards.find((w: any) => {
                                         return w.ward_id === e;
                                     });
+                                    if (
+                                        JSON.stringify({
+                                            ...patientProfileCopy,
+                                            commune: ward.ward_name,
+                                        }) === JSON.stringify(patientProfile)
+                                    ) {
+                                        setIsShowSwitchUpdateProfile(false);
+                                    } else {
+                                        setIsShowSwitchUpdateProfile(true);
+                                    }
                                     setWard(ward);
                                 }}
-                                placeholder="Chọn xã/ phường"
                                 filterOption={(input, option) =>
                                     (option?.ward_name)
                                         .toLowerCase()
                                         .includes(input.toLowerCase())
                                 }
                             >
+                                <Select.Option key={0} value={0}>
+                                    Chọn xã/ phường
+                                </Select.Option>
                                 {wards.map((item) => {
                                     return (
                                         <Select.Option
@@ -706,26 +834,7 @@ export const ModalOrderAppointment = ({
                                 style={{ color: 'red' }}
                             ></div>
                         </div>
-                        <div className="mb-3">
-                            <label
-                                htmlFor="patient_village"
-                                className="form-label fw-bold"
-                            >
-                                Tổ/ Khu/ Thôn/ Xóm
-                            </label>
-                            <Input
-                                onFocus={(e: any) => {
-                                    handleFocusInput(e.target);
-                                }}
-                                ref={inputVillageRef}
-                                className="form-control patient_village"
-                                id="patient_village"
-                            ></Input>
-                            <div
-                                className="error_message mt-3"
-                                style={{ color: 'red' }}
-                            ></div>
-                        </div>
+
                         <div className="mb-3">
                             <label htmlFor="" className="form-label fw-bold">
                                 Lý do khám
@@ -741,14 +850,24 @@ export const ModalOrderAppointment = ({
                                 style={{ color: 'red' }}
                             ></div>
                         </div>
-                        {patientProfile === null ? (
+                        {patientProfile?.id === undefined ? (
                             <div className="mb-3">
                                 <Switch
                                     className=""
-                                    onChange={onSwitchChange}
+                                    onChange={onSwitchSaveProfileChange}
                                 ></Switch>
                                 <label htmlFor="" className="ms-3">
                                     Lưu thông tin hồ sơ
+                                </label>
+                            </div>
+                        ) : isShowSwitchUpdateProfile ? (
+                            <div className="mb-3">
+                                <Switch
+                                    className=""
+                                    onChange={onSwitchUpdateProfileChange}
+                                ></Switch>
+                                <label htmlFor="" className="ms-3">
+                                    Lưu thông tin thay đổi vào hồ sơ hiện có
                                 </label>
                             </div>
                         ) : (

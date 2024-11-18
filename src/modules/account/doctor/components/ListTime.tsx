@@ -53,6 +53,7 @@ export const ListTime = ({
                 const startHour = listTime[0].split('.')[0];
                 intervalId = handleTimeOverRealTime(startHour, startMinute);
             }
+
             return () => {
                 clearInterval(intervalId);
                 console.log('clear:' + intervalId);

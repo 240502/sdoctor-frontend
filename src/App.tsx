@@ -7,6 +7,7 @@ import { userState } from './stores/userAtom';
 import './assets/fontawesome/css/all.min.css';
 import { PatientProfile } from './models/patient_profile';
 import { patientProfileState } from './stores/patientAtom';
+import { PatientProfileService } from './services/patient_profileService';
 function App() {
     const setUser = useSetRecoilState(userState);
     const setPatientProfile = useSetRecoilState(patientProfileState);
@@ -23,12 +24,13 @@ function App() {
     };
     const getPatientProfile = async () => {
         try {
-            const profile: PatientProfile = await JSON.parse(
-                localStorage.getItem('patientProfile') || 'null'
+            const uuid: string = await JSON.parse(
+                localStorage.getItem('uuid') || 'null'
             );
-            console.log(profile);
-            if (profile) {
-                setPatientProfile(profile);
+            if (uuid) {
+                const patientProfile =
+                    await PatientProfileService.getPatientProfileByUuid(uuid);
+                setPatientProfile(patientProfile);
             }
         } catch (err: any) {
             console.log(err.message);
