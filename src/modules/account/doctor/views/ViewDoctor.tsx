@@ -23,6 +23,7 @@ import {
 import { MajorService } from '../../../../services/majorService';
 import { Major } from '../../../../models/major';
 import ReactPaginate from 'react-paginate';
+import { addWatchedDoctor } from '../../../../utils/doctor';
 type NotificationType = 'success' | 'error';
 const ViewDoctor = () => {
     const [doctor, setDoctor] = useState<Doctor>();
@@ -154,11 +155,14 @@ const ViewDoctor = () => {
                                         <div className="item__left col-6 d-flex border border-start-0 border-bottom-0 border-top-0 pe-3">
                                             <div className="col-3 text-center">
                                                 <Link
-                                                    onClick={() =>
+                                                    onClick={() => {
                                                         handleUpdateViewsDoctor(
                                                             Number(doctor.id)
-                                                        )
-                                                    }
+                                                        );
+                                                        addWatchedDoctor(
+                                                            doctor
+                                                        );
+                                                    }}
                                                     to={`/doctor/detail/${doctor.id}`}
                                                 >
                                                     <Image
@@ -175,11 +179,14 @@ const ViewDoctor = () => {
                                                 </Link>
 
                                                 <Link
-                                                    onClick={() =>
+                                                    onClick={() => {
                                                         handleUpdateViewsDoctor(
                                                             Number(doctor.id)
-                                                        )
-                                                    }
+                                                        );
+                                                        addWatchedDoctor(
+                                                            doctor
+                                                        );
+                                                    }}
                                                     to={`/doctor/detail/${doctor.id}`}
                                                     className="btn__more text-decoration-none mt-3"
                                                 >
@@ -189,13 +196,16 @@ const ViewDoctor = () => {
                                             <div className="col-9 doctor_info">
                                                 <h3 className="doctor__name fs-5">
                                                     <Link
-                                                        onClick={() =>
+                                                        onClick={() => {
                                                             handleUpdateViewsDoctor(
                                                                 Number(
                                                                     doctor.id
                                                                 )
-                                                            )
-                                                        }
+                                                            );
+                                                            addWatchedDoctor(
+                                                                doctor
+                                                            );
+                                                        }}
                                                         to={`/doctor/detail/${doctor.id}`}
                                                         className="text-decoration-none"
                                                     >

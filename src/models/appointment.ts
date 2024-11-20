@@ -21,3 +21,6 @@ export interface Appointment {
     type: string;
     gender: number;
 }
+export interface AppointmentViewForPatient extends Appointment {
+    status_name: string;
+}

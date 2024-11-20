@@ -19,6 +19,7 @@ import { Clinic } from '../../../../models/clinic';
 import { baseURL } from '../../../../constants/api';
 import ReactPaginate from 'react-paginate';
 import axios from 'axios';
+import { addWatchedClinic } from '../../../../utils/clinic';
 const { Search } = Input;
 const ViewClinic = () => {
     const [optionsFilter, setOptionsFilter] = useState<any>({
@@ -164,11 +165,12 @@ const ViewClinic = () => {
                                         <Link
                                             to={'/clinic/detail/' + clinic.id}
                                             className="d-inline-block"
-                                            onClick={() =>
+                                            onClick={() => {
                                                 handleUpdateViewsClinic(
                                                     Number(clinic.id)
-                                                )
-                                            }
+                                                );
+                                                addWatchedClinic(clinic);
+                                            }}
                                             style={{ width: '100%' }}
                                         >
                                             <Image
@@ -183,11 +185,12 @@ const ViewClinic = () => {
                                             ></Image>
                                         </Link>
                                         <Link
-                                            onClick={() =>
+                                            onClick={() => {
                                                 handleUpdateViewsClinic(
                                                     Number(clinic.id)
-                                                )
-                                            }
+                                                );
+                                                addWatchedClinic(clinic);
+                                            }}
                                             to={'/clinic/detail/' + clinic.id}
                                             className="text-decoration-none text-reset"
                                         >

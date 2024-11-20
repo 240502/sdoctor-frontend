@@ -28,9 +28,19 @@ import {
     NEWS_PATH,
     DOCTOR_MANAGEMENT_PATH,
     VIEW_PATIENT_PROFILE,
+    VIEW_WATCHED_DOCTOR,
+    VIEW_WATCHED_CLINIC,
+    VIEW_WATCHED_SERVICE,
+    VIEW_PATIENT_APPOINTMENT,
 } from './path';
 import { ScheduleManagement } from '../modules/auth/schedule';
-import { PatientProfile } from '../modules/account/patient_profile';
+import {
+    ViewAppointment,
+    ViewProfile,
+    ViewWatchedClinic,
+    ViewWatchedDoctor,
+    ViewWatchedService,
+} from '../modules/account/patient_profile';
 export const publicRoutes = [
     {
         path: HOME_PATH,
@@ -79,8 +89,28 @@ export const publicRoutes = [
         layout: null,
     },
     {
+        path: VIEW_WATCHED_DOCTOR,
+        component: ViewWatchedDoctor,
+        layout: AppLayout,
+    },
+    {
         path: VIEW_PATIENT_PROFILE,
-        component: PatientProfile,
+        component: ViewProfile,
+        layout: AppLayout,
+    },
+    {
+        path: VIEW_WATCHED_CLINIC,
+        component: ViewWatchedClinic,
+        layout: AppLayout,
+    },
+    {
+        path: VIEW_WATCHED_SERVICE,
+        component: ViewWatchedService,
+        layout: AppLayout,
+    },
+    {
+        path: VIEW_PATIENT_APPOINTMENT,
+        component: ViewAppointment,
         layout: AppLayout,
     },
 ];

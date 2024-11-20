@@ -38,10 +38,8 @@ import {
     patientProfileState,
     patientProfileValue,
 } from '../../../../stores/patientAtom';
-import { Appointment } from '../../../../models/appointment';
-import { appointmentListState } from '../../../../stores/appointmentAtom';
-import { NewsManagement } from '../../../auth/news';
 import { PatientProfile } from '../../../../models/patient_profile';
+import { AppointmentService } from '../../../../services/appointmentService';
 
 const { TextArea } = Input;
 export const ModalOrderAppointment = ({
@@ -293,10 +291,7 @@ export const ModalOrderAppointment = ({
 
     const CreateAppointment = async (data: any) => {
         try {
-            const res: any = await axios.post(
-                baseURL + 'api/appointment/create',
-                data
-            );
+            const res: any = await AppointmentService.createAppointment(data);
             openNotificationWithIcon(
                 'success',
                 'Thông báo',

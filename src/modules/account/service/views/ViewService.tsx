@@ -20,6 +20,7 @@ import { CategoryService } from '../../../../models/category_services';
 import { Clinic } from '../../../../models/clinic';
 import { CategoryServicesService } from '../../../../services/category_servicesService';
 import { ClinicService } from '../../../../services/clinicService';
+import { addWatchedService } from '../../../../utils/service';
 type NotificationType = 'success' | 'error';
 
 const ViewService = () => {
@@ -100,7 +101,6 @@ const ViewService = () => {
             province = value.slice(provinceStr.length, value.length);
         }
         const newOptions = { ...optionsFilter, location: province.trim() };
-        console.log(newOptions);
 
         setOptionsFilter(newOptions);
     };
@@ -117,7 +117,6 @@ const ViewService = () => {
             ...optionsFilter,
             categoryId: value !== '0' ? Number(value) : null,
         };
-        console.log(newOptions);
         setOptionsFilter(newOptions);
     };
     const handleChangePrice = (value: any) => {
@@ -150,15 +149,12 @@ const ViewService = () => {
             clinicId: value !== '0' ? Number(value) : null,
         };
 
-        console.log(newOptions);
-
         setOptionsFilter(newOptions);
     };
     const getAllCategoryServices = async () => {
         try {
             const res = await CategoryServicesService.getAllCategoryServices();
             setCategoryServices(res);
-            console.log(res);
         } catch (err: any) {
             console.log(err.message);
         }
@@ -435,11 +431,14 @@ const ViewService = () => {
                                         <div className="item__left col-6 d-flex border border-start-0 border-bottom-0 border-top-0 pe-3">
                                             <div className="col-3 text-center">
                                                 <Link
-                                                    onClick={() =>
+                                                    onClick={() => {
                                                         handleUpdateViewsService(
                                                             Number(service.id)
-                                                        )
-                                                    }
+                                                        );
+                                                        addWatchedService(
+                                                            service
+                                                        );
+                                                    }}
                                                     to={
                                                         `/service/detail/` +
                                                         service.id
@@ -459,11 +458,14 @@ const ViewService = () => {
                                                 </Link>
 
                                                 <Link
-                                                    onClick={() =>
+                                                    onClick={() => {
                                                         handleUpdateViewsService(
                                                             Number(service.id)
-                                                        )
-                                                    }
+                                                        );
+                                                        addWatchedService(
+                                                            service
+                                                        );
+                                                    }}
                                                     to={
                                                         `/service/detail/` +
                                                         service.id
@@ -473,16 +475,19 @@ const ViewService = () => {
                                                     Xem thêm
                                                 </Link>
                                             </div>
-                                            <div className="col-9 doctor_info">
+                                            <div className="col-9 doctor_info  ms-2">
                                                 <h3 className="doctor__name fs-5">
                                                     <Link
-                                                        onClick={() =>
+                                                        onClick={() => {
                                                             handleUpdateViewsService(
                                                                 Number(
                                                                     service.id
                                                                 )
-                                                            )
-                                                        }
+                                                            );
+                                                            addWatchedService(
+                                                                service
+                                                            );
+                                                        }}
                                                         to={
                                                             `/service/detail/` +
                                                             service.id

@@ -15,6 +15,10 @@ const NEWS_PATH = '/admin/news';
 const DOCTOR_MANAGEMENT_PATH = '/admin/doctor';
 const SCHEDULE_MANAGEMENT_PATH = '/admin/schedule';
 const VIEW_PATIENT_PROFILE = '/patient/profile';
+const VIEW_WATCHED_DOCTOR = '/patient/watched-doctor';
+const VIEW_WATCHED_CLINIC = '/patient/watched-clinic';
+const VIEW_WATCHED_SERVICE = '/patient/watched-service';
+const VIEW_PATIENT_APPOINTMENT = '/patient/appointment';
 export {
     HOME_PATH,
     VIEW_CLINIC_PATH,
@@ -33,4 +37,8 @@ export {
     DOCTOR_MANAGEMENT_PATH,
     SCHEDULE_MANAGEMENT_PATH,
     VIEW_PATIENT_PROFILE,
+    VIEW_WATCHED_DOCTOR,
+    VIEW_WATCHED_CLINIC,
+    VIEW_WATCHED_SERVICE,
+    VIEW_PATIENT_APPOINTMENT,
 };
