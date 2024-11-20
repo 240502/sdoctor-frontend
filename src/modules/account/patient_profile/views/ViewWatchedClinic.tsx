@@ -15,13 +15,14 @@ const ViewWatchedClinic = () => {
     };
     useEffect(() => {
         getWatchedClinics();
+        window.scrollTo(0, 0);
     }, []);
     return (
         <PatientProfileLayout breadcrumb="Cơ sở y tế đã xem">
-            <div className="d-flex ">
+            <div className="row ">
                 {watchedClinics.map((clinic: Clinic) => {
                     return (
-                        <div className="col-4 ps-2 pe-2">
+                        <div className="col-4 ps-2 pe-2 mb-5">
                             <Card
                                 cover={
                                     <img

@@ -205,6 +205,7 @@ const ViewProfile = () => {
         };
         setBirthday(String(dayjs(patientProfile.birthday, dateFormat)));
         getProvinces();
+        window.scrollTo(0, 0);
     }, []);
     useEffect(() => {
         const getProvince = () => {

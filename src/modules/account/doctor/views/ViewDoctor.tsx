@@ -39,10 +39,7 @@ const ViewDoctor = () => {
     const [majorId, setMajorId] = useState<number | null>(0);
     const doctors = useRecoilValue(doctorListValue);
     const setDoctors = useSetRecoilState(doctorListState);
-    const sectionTopRef = useRef<HTMLDivElement>(null);
-    const scrollToSection = (sectionRef: any) => {
-        sectionRef?.current?.scrollIntoView({ behavior: 'smooth' });
-    };
+
     const loadData = async () => {
         try {
             const data = {
@@ -97,11 +94,11 @@ const ViewDoctor = () => {
     useEffect(() => {
         loadData();
         getAllMajor();
-        scrollToSection(sectionTopRef);
+        window.scrollTo(0, 0);
     }, [majorId, pageIndex, pageSize]);
 
     return (
-        <div className="container home__content mt-4 mb-4" ref={sectionTopRef}>
+        <div className="container home__content mt-4 mb-4">
             {contextHolder}
             <Breadcrumb
                 items={[

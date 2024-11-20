@@ -27,7 +27,7 @@ const ViewDetailDoctor = () => {
     const doctors = useRecoilValue(doctorListValue);
     const [isModalAppointmentOpen, setIsModalAppointmentOpen] = useState(false);
     const [isModalCommentOpen, setIsModalCommentOpen] = useState(false);
-    const sectionTopRef = useRef<HTMLDivElement>(null);
+   
     const [time, setTime] = useState<Time>();
     const [appointmentDate, setAppointmentDate] = useState<string>();
 
@@ -45,9 +45,7 @@ const ViewDetailDoctor = () => {
             description: des,
         });
     };
-    const scrollToSection = (sectionRef: any) => {
-        sectionRef?.current?.scrollIntoView({ behavior: 'smooth' });
-    };
+   
     const getDoctorById = async (id: number) => {
         try {
             const res = doctors.find(
@@ -62,11 +60,12 @@ const ViewDetailDoctor = () => {
 
     useEffect(() => {
         getDoctorById(Number(id));
-        scrollToSection(sectionTopRef);
+        window.scrollTo(0, 0);
+
     }, [id]);
     console.log(id);
     return (
-        <div className="container mt-4 mb-4" ref={sectionTopRef}>
+        <div className="container mt-4 mb-4" >
             {contextHolder}
             <Breadcrumb
                 items={[

@@ -189,9 +189,7 @@ const ViewService = () => {
             setServices([]);
         }
     };
-    useEffect(() => {
-        console.log(services);
-    }, [services]);
+
     useEffect(() => {
         const getProvinces = async () => {
             try {
@@ -206,6 +204,7 @@ const ViewService = () => {
         getAllCategoryServices();
         getAllClinic();
         getProvinces();
+        window.scrollTo(0, 0);
     }, []);
     useEffect(() => {
         loadData();

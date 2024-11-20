@@ -35,10 +35,7 @@ const ViewClinic = () => {
     const [pageCount, setPageCount] = useState<number>(0);
     const setClinics = useSetRecoilState(clinicListState);
     const clinics = useRecoilValue(clinicListValue);
-    const sectionTopRef = useRef<HTMLDivElement>(null);
-    const scrollToSection = (sectionRef: any) => {
-        sectionRef?.current?.scrollIntoView({ behavior: 'smooth' });
-    };
+
     const viewClinic = async (data: any) => {
         try {
             const res = await ClinicService.viewClinic(data);
@@ -102,10 +99,10 @@ const ViewClinic = () => {
         };
         console.log(data);
         viewClinic(data);
-        scrollToSection(sectionTopRef);
+        window.scrollTo(0, 0);
     }, [pageIndex, pageSize, optionsFilter]);
     return (
-        <div className="container mt-5 mb-5" ref={sectionTopRef}>
+        <div className="container mt-5 mb-5">
             <Breadcrumb
                 items={[
                     {

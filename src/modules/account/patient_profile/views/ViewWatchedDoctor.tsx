@@ -22,17 +22,16 @@ const ViewWatchedDoctor = () => {
 
     useEffect(() => {
         getWatchedDoctor();
+        window.scrollTo(0, 0);
     }, []);
-    useEffect(() => {
-        console.log('watched doctor', watchedDoctors);
-    }, [watchedDoctors]);
+
     return (
         <PatientProfileLayout breadcrumb="Bác sĩ đã xem">
             {' '}
-            <div className="d-flex ">
+            <div className="row">
                 {watchedDoctors.map((doctor: Doctor) => {
                     return (
-                        <div className="col-4 ps-2 pe-2">
+                        <div className="col-4 ps-2 pe-2 mb-5">
                             <Card
                                 cover={
                                     <img

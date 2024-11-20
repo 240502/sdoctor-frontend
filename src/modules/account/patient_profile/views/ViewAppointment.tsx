@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { PatientProfileLayout } from '../components/PatientProfileLayout';
 import { useRecoilValue } from 'recoil';
 import { patientProfileValue } from '../../../../stores/patientAtom';
@@ -17,6 +17,8 @@ type NotificationType = 'success' | 'error';
 
 const ViewAppointment = () => {
     const navigate = useNavigate();
+    const sectionTopRef = useRef<HTMLDivElement>(null);
+
     const [api, contextHolder] = notification.useNotification();
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
     const [pageIndex, setPageIndex] = useState<number>(1);
@@ -135,6 +137,7 @@ const ViewAppointment = () => {
             ),
         },
     ];
+
     const getAppointmentByPatientPhone = async () => {
         const data = {
             pageIndex: pageIndex,
@@ -171,6 +174,9 @@ const ViewAppointment = () => {
     useEffect(() => {
         getAppointmentByPatientPhone();
     }, [pageIndex, pageSize]);
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, []);
     return (
         <PatientProfileLayout breadcrumb={'Lịch hẹn'}>
             {appointments.length > 0 ? (

@@ -14,14 +14,15 @@ const ViewWatchedService = () => {
     };
     useEffect(() => {
         getWatchedServices();
+        window.scrollTo(0, 0);
     }, []);
     return (
         <PatientProfileLayout breadcrumb="Dịch vụ đã xem">
             {watchedServices.length > 0 ? (
-                <div className="d-flex ">
+                <div className="row ">
                     {watchedServices.map((service: Services) => {
                         return (
-                            <div className="col-4 ps-2 pe-2">
+                            <div className="col-4 ps-2 pe-2 mb-5">
                                 <Card
                                     cover={
                                         <img

@@ -1,10 +1,13 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Image } from 'antd';
 import { BlockNewNews } from '../components/BlockNewNews';
 import { BlockCommonNews } from '../components/BlockCommonNews';
 import { BlockNewCategories } from '../components/BlockNewsCategories';
 
 const ViewNews = () => {
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, []);
     return (
         <div className="container mt-3">
             <div className="banner">

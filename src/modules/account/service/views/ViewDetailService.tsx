@@ -35,7 +35,6 @@ const ViewDetailService = () => {
     const services = useRecoilValue(serviceListValue);
     const [isModalAppointmentOpen, setIsModalAppointmentOpen] = useState(false);
     const [isModalCommentOpen, setIsModalCommentOpen] = useState(false);
-    const sectionTopRef = useRef<HTMLDivElement>(null);
     const [time, setTime] = useState<Time>();
     const [appointmentDate, setAppointmentDate] = useState<string>();
 
@@ -53,9 +52,7 @@ const ViewDetailService = () => {
             description: des,
         });
     };
-    const scrollToSection = (sectionRef: any) => {
-        sectionRef?.current?.scrollIntoView({ behavior: 'smooth' });
-    };
+
     const getServiceById = async (id: number) => {
         try {
             const res = services.find(
@@ -70,11 +67,11 @@ const ViewDetailService = () => {
 
     useEffect(() => {
         getServiceById(Number(id));
-        scrollToSection(sectionTopRef);
+        window.scrollTo(0, 0);
     }, [id]);
     console.log(id);
     return (
-        <div className="container mt-4 mb-4" ref={sectionTopRef}>
+        <div className="container mt-4 mb-4">
             {contextHolder}
             <Breadcrumb
                 items={[

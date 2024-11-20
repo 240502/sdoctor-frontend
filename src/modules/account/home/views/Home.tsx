@@ -6,8 +6,12 @@ import { BlockForYou } from '../components/BlockForYou';
 import { BlockClinic } from '../components/BlockClinic';
 import { BlockHotDoctor } from '../components/BlockHotDoctor';
 import { BlockCommonNews } from '../components/BlockCommonNews';
+import { useEffect } from 'react';
 
 export const Home = () => {
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, []);
     return (
         <div className="container home__content mt-4">
             <div className="slide__container row">

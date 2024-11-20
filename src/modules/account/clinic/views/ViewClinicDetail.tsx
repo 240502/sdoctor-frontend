@@ -14,11 +14,7 @@ export const ViewClinicDetail = () => {
     const [clinic, setClinic] = useState<Clinic>();
     const [current, setCurrent] = useState<string>('0');
     const sectionDoctorRef = useRef<HTMLDivElement>(null);
-    const sectionTop = useRef<HTMLDivElement>(null);
 
-    const scrollToSection = (sectionRef: any) => {
-        sectionRef?.current?.scrollIntoView({ behavior: 'smooth' });
-    };
     const handleGetClinicById = async (id: number) => {
         try {
             const clinic = clinics.find((item: Clinic) => item.id === id);
@@ -39,11 +35,11 @@ export const ViewClinicDetail = () => {
     };
     useEffect(() => {
         handleGetClinicById(Number(id));
-        scrollToSection(sectionTop);
+        window.scrollTo(0, 0);
     }, [id]);
 
     return (
-        <div className=" block__clinic__detail" ref={sectionTop}>
+        <div className=" block__clinic__detail">
             <div className="position-relative">
                 <div
                     className="block__image_cover position-relative overflow-hidden"
@@ -97,7 +93,7 @@ export const ViewClinicDetail = () => {
                             <Menu.Item
                                 key={'1'}
                                 onClick={() => {
-                                    scrollToSection(sectionDoctorRef);
+                                    window.scrollTo(0, 0);
                                 }}
                             >
                                 Đặt lịch khám
