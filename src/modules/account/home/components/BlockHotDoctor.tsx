@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Image, Button, Carousel, Card } from 'antd';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import NextArrow from './NextArrow';
 import PrevArrow from './PrevArrow';
 import 'slick-carousel/slick/slick.css';
@@ -9,7 +9,7 @@ import Slider from 'react-slick';
 import { doctorService } from '../../../../services/doctorService';
 import { Doctor } from '../../../../models/doctor';
 import { baseURL } from '../../../../constants/api';
-import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
+import { useRecoilValue, useSetRecoilState } from 'recoil';
 import {
     doctorListState,
     doctorListValue,
@@ -28,6 +28,7 @@ export const BlockHotDoctor = (): JSX.Element => {
         nextArrow: <NextArrow />,
         prevArrow: <PrevArrow />,
     };
+    const navigate = useNavigate();
 
     const setDoctors = useSetRecoilState(doctorListState);
     const doctors = useRecoilValue(doctorListValue);
@@ -70,6 +71,15 @@ export const BlockHotDoctor = (): JSX.Element => {
                                             className="shadow"
                                             cover={
                                                 <img
+                                                    onClick={() => {
+                                                        navigate(
+                                                            '/doctor/detail/' +
+                                                                doctor.id
+                                                        );
+                                                    }}
+                                                    style={{
+                                                        cursor: 'pointer',
+                                                    }}
                                                     alt="example"
                                                     src={baseURL + doctor.image}
                                                 />
@@ -96,7 +106,17 @@ export const BlockHotDoctor = (): JSX.Element => {
                                             ]}
                                         >
                                             <p>{doctor.title}</p>
-                                            <h6>{doctor.full_name}</h6>
+                                            <h6>
+                                                <Link
+                                                    className="text-decoration-none text-dark"
+                                                    to={
+                                                        '/doctor/detail/' +
+                                                        doctor.id
+                                                    }
+                                                >
+                                                    {doctor.full_name}
+                                                </Link>
+                                            </h6>
                                             <div
                                                 className="specialization mt-1 text-secondary"
                                                 style={{ fontSize: '12px' }}

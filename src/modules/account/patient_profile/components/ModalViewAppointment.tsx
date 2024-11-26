@@ -52,7 +52,6 @@ export const ModalViewAppointment = ({
     const getDoctorById = async (id: number) => {
         try {
             const res = await doctorService.getDoctorById(id);
-            console.log(res);
             setDoctor(res);
         } catch (err: any) {
             console.log(err.message);
@@ -194,7 +193,6 @@ export const ModalViewAppointment = ({
     const CreatePatientProfile = async (data: any) => {
         try {
             const res = await PatientProfileService.createPatientProfile(data);
-            console.log('newProfile', data);
             localStorage.setItem('uuid', JSON.stringify(data.uuid));
             openNotificationWithIcon(
                 'success',
@@ -202,7 +200,6 @@ export const ModalViewAppointment = ({
                 'Thêm hồ sơ thành công'
             );
             setPatientProfile(data);
-
             handleCancelModal();
         } catch (err: any) {
             console.log(err.message);
@@ -473,7 +470,7 @@ export const ModalViewAppointment = ({
                                             ref={selectProvinceRef}
                                             className="d-block"
                                             showSearch
-                                            value={province.province_id ?? 0}
+                                            value={province.province_id}
                                             onFocus={(e) =>
                                                 handleFocusSelect(
                                                     selectProvinceRef.current
@@ -493,10 +490,8 @@ export const ModalViewAppointment = ({
                                                 setWard({} as WardType);
                                             }}
                                             optionFilterProp="children"
+                                            placeholder="Chọn tỉnh/ thành phố"
                                         >
-                                            <Option key={0} value={0}>
-                                                Chọn tỉnh/ thành phố
-                                            </Option>
                                             {provinces.map((item) => {
                                                 return (
                                                     <Option
@@ -533,7 +528,7 @@ export const ModalViewAppointment = ({
                                     <>
                                         <Select
                                             ref={selectDistrictRef}
-                                            value={district.district_id ?? 0}
+                                            value={district.district_id}
                                             className="d-block"
                                             onFocus={(e) =>
                                                 handleFocusSelect(
@@ -555,10 +550,8 @@ export const ModalViewAppointment = ({
                                                 setWard({} as WardType);
                                             }}
                                             optionFilterProp="children"
+                                            placeholder="Chọn quận/ huyện/ thị xã"
                                         >
-                                            <Option key={0} value={0}>
-                                                Chọn quận/ huyện/ thị xã
-                                            </Option>
                                             {districts.map((item) => {
                                                 return (
                                                     <Option
@@ -593,7 +586,7 @@ export const ModalViewAppointment = ({
                                     <>
                                         <Select
                                             ref={selectWardRef}
-                                            value={ward.ward_id ?? 0}
+                                            value={ward.ward_id}
                                             onFocus={(e) =>
                                                 handleFocusSelect(
                                                     selectWardRef.current
@@ -611,10 +604,8 @@ export const ModalViewAppointment = ({
                                                 setWard(ward);
                                             }}
                                             optionFilterProp="children"
+                                            placeholder="Chọn xã/ phường"
                                         >
-                                            <Option value={0} key={0}>
-                                                Chọn xã/ phường
-                                            </Option>
                                             {wards.map((item) => {
                                                 return (
                                                     <Option

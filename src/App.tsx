@@ -38,7 +38,6 @@ function App() {
     useEffect(() => {
         getUser();
         getPatientProfile();
-        console.log('mouded');
     }, []);
     return (
         <div className="App">

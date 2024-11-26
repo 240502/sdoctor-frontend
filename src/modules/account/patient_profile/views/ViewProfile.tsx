@@ -16,6 +16,7 @@ import {
     isEmptyRadio,
     isEmptySelect,
     showSuccess,
+    validateBirthday,
     validateEmail,
     validateName,
     validatePhone,
@@ -31,10 +32,14 @@ import { PatientProfileLayout } from '../components/PatientProfileLayout';
 import { ModalViewAppointment } from '../components/ModalViewAppointment';
 import { ModalConfirmDeletePatientProfile } from '../components/ModalConfirmDeletePatientProfile';
 import { PatientProfile } from '../../../../models/patient_profile';
+import { ProvinceType, DistrictType, WardType } from '../../../../models/other';
 type NotificationType = 'success' | 'error';
 const ViewProfile = () => {
     const [patientProfile, setPatientProfile] =
         useRecoilState(patientProfileState);
+    const [profileCopy, setProfileCopy] = useState<PatientProfile>(
+        {} as PatientProfile
+    );
     const dateFormat = 'YYYY-MM-DD';
     const inputPatientNameRef = useRef<InputRef>(null);
     const inputPatientPhoneRef = useRef<InputRef>(null);
@@ -43,29 +48,23 @@ const ViewProfile = () => {
     const selectProvinceRef = useRef<any>(null);
     const selectDistrictRef = useRef<any>(null);
     const selectWardRef = useRef<any>(null);
-    const [birthday, setBirthday] = useState<string>();
-    const [provinces, setProvinces] = useState([
-        { province_id: 0, province_name: '' },
-    ]);
+
     const [isView, setIsView] = useState<boolean>(true);
     const [isOpenModalAddProfile, setIsOpenModalAddProfile] =
         useState<boolean>(false);
     const [isOpenModalConfirm, setIsOpenModalConfirm] =
         useState<boolean>(false);
-    const [districts, setDistricts] = useState([
-        { district_id: 0, district_name: '' },
-    ]);
-    const [district, setDistrict] = useState({
-        district_id: 0,
-        district_name: '',
-    });
-    const [province, setProvince] = useState({
-        province_id: 0,
-        province_name: '',
-    });
-    const [wards, setWards] = useState([{ ward_id: 0, ward_name: '' }]);
-    const [ward, setWard] = useState({ ward_id: 0, ward_name: '' });
+
+    const [provinces, setProvinces] = useState<ProvinceType[]>([]);
+    const [districts, setDistricts] = useState<DistrictType[]>([]);
+    const [wards, setWards] = useState<WardType[]>([]);
+    const [province, setProvince] = useState<ProvinceType>({} as ProvinceType);
+    const [district, setDistrict] = useState<DistrictType>({} as DistrictType);
+    const [ward, setWard] = useState<WardType>({} as WardType);
+
     const [api, contextHolder] = notification.useNotification();
+    const [error, setError] = useState<any>();
+    const [searchValue, setSearchValue] = useState<string>('');
     const openNotificationWithIcon = (
         type: NotificationType,
         title: string,
@@ -83,6 +82,7 @@ const ViewProfile = () => {
         setPatientProfile({ ...patientProfile, birthday: String(dateString) });
     };
     const handleUpdate = () => {
+        let errorMsg: any = {};
         const isEmptyPatientName = isEmpty(inputPatientNameRef.current?.input);
         const isEmptyPatientPhone = isEmpty(
             inputPatientPhoneRef.current?.input
@@ -90,13 +90,16 @@ const ViewProfile = () => {
         const isEmptyPatientEmail = isEmpty(
             inputPatientEmailRef.current?.input
         );
-        // const isEmptyPatientBirthday = isEmpty(
-        //     inputPatientBirthDateRef.current?.input
-        // );
-        // const isEmptyRadioGender = isEmptyRadio(
-        //     radioGenderRef.current,
-        //     radioGenderValue.current
-        // );
+
+        const isEmptyRadioGender =
+            patientProfile.gender === undefined ? true : false;
+        if (isEmptyRadioGender) {
+            errorMsg = {
+                ...errorMsg,
+                genderError: 'Không được để trống ô này!',
+            };
+        }
+
         const provinceId = province.province_id;
         const districtId = district.district_id;
         const wardId = ward.ward_id;
@@ -109,11 +112,21 @@ const ViewProfile = () => {
             districtId
         );
         const isEmptySelectWard = isEmptySelect(selectWardRef.current, wardId);
+        const isEmptyBirthday =
+            patientProfile?.birthday !== undefined ? false : true;
+        if (isEmptyBirthday) {
+            errorMsg = {
+                ...error,
+                birthdayError: 'Không được để trống ô này!',
+            };
+        }
+        setError(errorMsg);
         if (
-            // !isEmptyPatientBirthday &&
+            !isEmptyBirthday &&
             !isEmptyPatientName &&
             !isEmptyPatientPhone &&
             !isEmptyPatientEmail &&
+            !isEmptyRadioGender &&
             !isEmptySelectProvince &&
             !isEmptySelectDistrict &&
             !isEmptySelectWard
@@ -127,25 +140,26 @@ const ViewProfile = () => {
             const isErrorPatientPhone = validatePhone(
                 inputPatientPhoneRef.current?.input
             );
-            // const isErrorPatientBirthday = validatePatientBirthDay(
-            //     inputPatientBirthDateRef.current?.input
-            // );
+
             const isErrorPhoneLength = validatePhoneLength(
                 inputPatientPhoneRef.current?.input
             );
-
+            const isErrorBirthday = validateBirthday(
+                new Date(patientProfile.birthday),
+                setError
+            );
             if (
                 !isErrorPatientName &&
                 !isErrorPatientEmail &&
                 !isErrorPatientPhone &&
-                // !isErrorPatientBirthday &&
-                !isErrorPhoneLength
+                !isErrorPhoneLength &&
+                !isErrorBirthday
             ) {
                 const newProfile = {
                     patient_name: inputPatientNameRef.current?.input?.value,
                     patient_phone: inputPatientPhoneRef.current?.input?.value,
                     patient_email: inputPatientEmailRef.current?.input?.value,
-                    birthday: patientProfile.birthday,
+                    birthday: patientProfile.birthday.toString().slice(0, 10),
                     province: province.province_name,
                     district: district.district_name,
                     commune: ward.ward_name,
@@ -215,6 +229,12 @@ const ViewProfile = () => {
             localStorage.removeItem('uuid');
             setPatientProfile({} as PatientProfile);
             handleCancelModalConfirm();
+            setProvinces([]);
+            setDistricts([]);
+            setWards([]);
+            setProvince({} as ProvinceType);
+            setDistrict({} as DistrictType);
+            setWard({} as WardType);
             window.scrollTo(0, 0);
         } catch (err: any) {
             console.log(err.message);
@@ -225,6 +245,39 @@ const ViewProfile = () => {
             );
         }
     };
+    const handleGetProfileByPhoneOrEmail = () => {
+        if (searchValue === '') {
+            setError({
+                ...error,
+                searchContentError: 'Vui lòng nhập thông tin tìm kiếm',
+            });
+        } else {
+            const data = { searchContent: searchValue };
+            getProfileByPhoneOrEmail(data);
+        }
+    };
+    const getProfileByPhoneOrEmail = async (data: any) => {
+        try {
+            const res = await PatientProfileService.getProfileByPhoneOrEmail(
+                data
+            );
+            console.log(res);
+            localStorage.setItem('uuid', res.uuid);
+            setPatientProfile(res);
+        } catch (err: any) {
+            console.log(err.message);
+            openNotificationWithIcon(
+                'error',
+                'Thông báo!',
+                'Không tìm thấy hồ sơ nào!'
+            );
+        }
+    };
+    useEffect(() => {
+        if (patientProfile.uuid) {
+            setProfileCopy(patientProfile);
+        }
+    }, []);
     useEffect(() => {
         const getProvinces = async () => {
             try {
@@ -236,49 +289,12 @@ const ViewProfile = () => {
                 console.log(err);
             }
         };
-        setBirthday(String(dayjs(patientProfile.birthday, dateFormat)));
-        getProvinces();
+        if (patientProfile.uuid) {
+            console.log('get provinces');
+            getProvinces();
+        }
         window.scrollTo(0, 0);
-    }, []);
-    useEffect(() => {
-        const getProvince = () => {
-            const province: any = provinces.find(
-                (item) => item?.province_name === patientProfile.province
-            );
-            if (province) {
-                setProvince(province);
-            }
-        };
-        if (provinces.length > 1) {
-            getProvince();
-        }
-    }, [provinces.length]);
-    useEffect(() => {
-        const getDistrict = () => {
-            const district: any = districts.find(
-                (item) => item.district_name === patientProfile.district
-            );
-            if (district) {
-                setDistrict(district);
-            }
-        };
-        if (districts.length > 1) {
-            getDistrict();
-        }
-    }, [districts.length]);
-    useEffect(() => {
-        const getWards = () => {
-            const ward = wards.find(
-                (item) => item.ward_name === patientProfile.commune
-            );
-            if (ward) {
-                setWard(ward);
-            }
-        };
-        if (wards.length > 1) {
-            getWards();
-        }
-    }, [wards.length]);
+    }, [patientProfile.uuid]);
 
     useEffect(() => {
         if (province.province_id !== 0) {
@@ -292,17 +308,60 @@ const ViewProfile = () => {
             }
         }
     }, [district.district_id]);
-    useEffect(() => console.log(patientProfile), [patientProfile]);
+    useEffect(() => {
+        const getProvince = () => {
+            const province: any = provinces.find(
+                (item) => item?.province_name === patientProfile.province
+            );
+            if (province) {
+                setProvince(province);
+            }
+        };
+        if (provinces.length > 1) {
+            getProvince();
+        }
+    }, [provinces.length, patientProfile.uuid]);
+    useEffect(() => {
+        const getDistrict = () => {
+            const district: any = districts.find(
+                (item) => item.district_name === patientProfile.district
+            );
+            if (district) {
+                setDistrict(district);
+            }
+        };
+        if (districts.length > 1) {
+            console.log('get district');
+
+            getDistrict();
+        }
+    }, [districts.length]);
+    useEffect(() => {
+        const getWards = () => {
+            const ward = wards.find(
+                (item) => item.ward_name === patientProfile.commune
+            );
+            if (ward) {
+                setWard(ward);
+            }
+        };
+        if (wards.length > 1) {
+            console.log('get ward');
+
+            getWards();
+        }
+    }, [wards.length]);
+
     return (
         <>
-            {' '}
-            {contextHolder}{' '}
+            {contextHolder}
             <PatientProfileLayout breadcrumb="Hồ sơ">
                 {patientProfile?.uuid !== undefined ? (
                     <Card title="Hồ sơ bệnh nhân" bordered={false}>
                         <div className="info__item mb-3">
                             <label htmlFor="">Họ và tên</label>
                             <Input
+                                onFocus={(e) => handleFocusInput(e.target)}
                                 ref={inputPatientNameRef}
                                 className="mt-2"
                                 value={patientProfile.patient_name}
@@ -321,6 +380,7 @@ const ViewProfile = () => {
                         <div className="info__item mb-3">
                             <label htmlFor="">Số điện thoại</label>
                             <Input
+                                onFocus={(e) => handleFocusInput(e.target)}
                                 ref={inputPatientPhoneRef}
                                 className="mt-2"
                                 value={patientProfile.patient_phone}
@@ -339,6 +399,7 @@ const ViewProfile = () => {
                         <div className="info__item mb-3">
                             <label htmlFor="">Email</label>
                             <Input
+                                onFocus={(e) => handleFocusInput(e.target)}
                                 ref={inputPatientEmailRef}
                                 className="mt-2"
                                 value={patientProfile.patient_email}
@@ -357,6 +418,9 @@ const ViewProfile = () => {
                         <div className="info__item mb-3">
                             <label htmlFor="">Giới tính</label>
                             <Radio.Group
+                                onFocus={() => {
+                                    setError({ ...error, genderError: '' });
+                                }}
                                 className="ms-3 "
                                 value={Number(patientProfile.gender)}
                                 ref={radioGenderRef}
@@ -370,14 +434,24 @@ const ViewProfile = () => {
                                 <Radio value={1}>Nam</Radio>
                                 <Radio value={2}>Nữ</Radio>
                             </Radio.Group>
-                            <div
-                                className="error_message mt-3"
-                                style={{ color: 'red' }}
-                            ></div>
+                            {error?.genderError !== '' && (
+                                <div
+                                    className="error_message mt-3"
+                                    style={{ color: 'red' }}
+                                >
+                                    {error?.genderError}
+                                </div>
+                            )}
                         </div>
                         <div className="info__item mb-3">
                             <label htmlFor="">Ngày sinh</label>
                             <DatePicker
+                                onFocus={() => {
+                                    setError({
+                                        ...error,
+                                        birthdayError: '',
+                                    });
+                                }}
                                 onChange={onBirthDayChange}
                                 className="d-block mt-2"
                                 type="date"
@@ -389,16 +463,23 @@ const ViewProfile = () => {
                                 )}
                                 format={dateFormat}
                             />
-                            <div
-                                className="error_message mt-3"
-                                style={{ color: 'red' }}
-                            ></div>
+                            {error?.birthdayError !== '' && (
+                                <div
+                                    className="error_message mt-3"
+                                    style={{ color: 'red' }}
+                                >
+                                    {error?.birthdayError}
+                                </div>
+                            )}
                         </div>
                         <div className="mb-3">
                             <label htmlFor="" className="form-label fw-bold">
                                 Tỉnh/ Thành phố
                             </label>
                             <Select
+                                onFocus={(e) =>
+                                    handleFocusSelect(selectProvinceRef.current)
+                                }
                                 ref={selectProvinceRef}
                                 className="d-block"
                                 showSearch
@@ -409,14 +490,16 @@ const ViewProfile = () => {
                                         }
                                     );
                                     setProvince(province);
+                                    setPatientProfile({
+                                        ...patientProfile,
+                                        province: province.province_name,
+                                    });
+                                    setDistrict({} as DistrictType);
+                                    setWard({} as WardType);
                                 }}
                                 value={province.province_id}
                                 placeholder="Chọn tỉnh/ thành phố"
-                                filterOption={(input, option) =>
-                                    (option?.province_name)
-                                        .toLowerCase()
-                                        .includes(input.toLowerCase())
-                                }
+                                optionFilterProp="children"
                             >
                                 {provinces.map((item) => {
                                     return (
@@ -439,6 +522,9 @@ const ViewProfile = () => {
                                 Quận/ Huyện
                             </label>
                             <Select
+                                onFocus={(e) =>
+                                    handleFocusSelect(selectDistrictRef.current)
+                                }
                                 className="d-block"
                                 showSearch
                                 ref={selectDistrictRef}
@@ -448,15 +534,17 @@ const ViewProfile = () => {
                                             return item.district_id === e;
                                         }
                                     );
+                                    setPatientProfile({
+                                        ...patientProfile,
+                                        district: district.district_name,
+                                    });
                                     setDistrict(district);
+
+                                    setWard({} as WardType);
                                 }}
                                 value={district.district_id}
                                 placeholder="Chọn quận/ huyện/ thị xã"
-                                filterOption={(input, option) =>
-                                    (option?.district_name)
-                                        .toLowerCase()
-                                        .includes(input.toLowerCase())
-                                }
+                                optionFilterProp="children"
                             >
                                 {districts.map((item) => {
                                     return (
@@ -479,6 +567,9 @@ const ViewProfile = () => {
                                 Xã/ Phường
                             </label>
                             <Select
+                                onFocus={(e) =>
+                                    handleFocusSelect(selectWardRef.current)
+                                }
                                 className="d-block"
                                 showSearch
                                 ref={selectWardRef}
@@ -486,15 +577,15 @@ const ViewProfile = () => {
                                     const ward: any = wards.find((w: any) => {
                                         return w.ward_id === e;
                                     });
+                                    setPatientProfile({
+                                        ...patientProfile,
+                                        commune: ward.ward_name,
+                                    });
                                     setWard(ward);
                                 }}
                                 placeholder="Chọn xã/ phường"
                                 value={ward.ward_id}
-                                filterOption={(input, option) =>
-                                    (option?.ward_name)
-                                        .toLowerCase()
-                                        .includes(input.toLowerCase())
-                                }
+                                optionFilterProp="children"
                             >
                                 {wards.map((item) => {
                                     return (
@@ -516,7 +607,6 @@ const ViewProfile = () => {
                             <Button
                                 className="bg-primary text-white "
                                 onClick={() => {
-                                    console.log('oge');
                                     handleUpdate();
                                 }}
                             >
@@ -533,15 +623,55 @@ const ViewProfile = () => {
                         </div>
                     </Card>
                 ) : (
-                    <div className="text-center">
-                        <Button
-                            onClick={() => {
-                                setIsView(false);
-                                setIsOpenModalAddProfile(true);
-                            }}
+                    <div className="container mt-5">
+                        <Card
+                            className="mx-auto shadow-lg"
+                            style={{ maxWidth: '500px' }}
                         >
-                            Thêm hồ sơ
-                        </Button>
+                            <div className="mb-4">
+                                <label className="form-label">
+                                    Nhập số điện thoại hoặc email
+                                </label>
+                                <Input
+                                    onFocus={() => {
+                                        setError({});
+                                    }}
+                                    placeholder="Số điện thoại hoặc email"
+                                    value={searchValue}
+                                    onChange={(e) => {
+                                        setSearchValue(String(e.target.value));
+                                    }}
+                                />
+                                {error?.searchContentError && (
+                                    <div
+                                        className="error_message mt-3"
+                                        style={{ color: 'red' }}
+                                    >
+                                        {error?.searchContentError}
+                                    </div>
+                                )}
+                                <Button
+                                    type="primary"
+                                    block
+                                    className="mt-3"
+                                    onClick={handleGetProfileByPhoneOrEmail}
+                                >
+                                    Tìm kiếm
+                                </Button>
+                            </div>
+
+                            <Button
+                                type="default"
+                                block
+                                className="mt-4"
+                                onClick={() => {
+                                    setIsView(false);
+                                    setIsOpenModalAddProfile(true);
+                                }}
+                            >
+                                Thêm mới hồ sơ
+                            </Button>
+                        </Card>
                     </div>
                 )}
                 {isOpenModalAddProfile && (

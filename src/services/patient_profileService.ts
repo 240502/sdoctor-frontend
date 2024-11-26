@@ -27,4 +27,11 @@ export const PatientProfileService = {
         );
         return res.data;
     },
+    async getProfileByPhoneOrEmail(data: any): Promise<any> {
+        const res = await apiClient.post(
+            '/api/patient-profile/get-by-phone-or-email',
+            data
+        );
+        return res.data;
+    },
 };
