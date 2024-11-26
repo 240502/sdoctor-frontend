@@ -3,20 +3,14 @@ import {
     UserOutlined,
     SolutionOutlined,
 } from '@ant-design/icons';
-import { Breadcrumb, Button, Card, Divider, Input, Menu } from 'antd';
+import { Breadcrumb, Divider, Menu } from 'antd';
 import type { MenuProps } from 'antd';
-import React, { useEffect, useRef, useState } from 'react';
-import { useRecoilValue } from 'recoil';
-import { patientProfileValue } from '../../../../stores/patientAtom';
+import { useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 
 export const PatientProfileLayout = ({ children, breadcrumb }: any) => {
     const [currentKey, setCurrentKey] = useState<any>(['1']);
-    const patientProfile = useRecoilValue(patientProfileValue);
     const sectionTopRef = useRef<HTMLDivElement>(null);
-    const scrollToSection = (sectionRef: any) => {
-        sectionRef?.current?.scrollIntoView({ behavior: 'smooth' });
-    };
     const mockData: any = [
         {
             key: '1',
@@ -53,7 +47,7 @@ export const PatientProfileLayout = ({ children, breadcrumb }: any) => {
             link: '/patient/appointment',
         },
     ];
-   
+
     return (
         <div className="container mt-4 mb-4" ref={sectionTopRef}>
             <Breadcrumb

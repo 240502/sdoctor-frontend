@@ -26,6 +26,7 @@ import {
     isEmptyRadio,
     isEmptySelect,
     showSuccess,
+    validateBirthday,
     validateEmail,
     validateName,
     validatePhone,
@@ -40,6 +41,7 @@ import {
 } from '../../../../stores/patientAtom';
 import { PatientProfile } from '../../../../models/patient_profile';
 import { AppointmentService } from '../../../../services/appointmentService';
+import { DistrictType, ProvinceType, WardType } from '../../../../models/other';
 
 const { TextArea } = Input;
 export const ModalOrderAppointment = ({
@@ -55,34 +57,23 @@ export const ModalOrderAppointment = ({
     const patientProfile = useRecoilValue(patientProfileValue);
     const [isShowSwitchUpdateProfile, setIsShowSwitchUpdateProfile] =
         useState<boolean>(false);
-    const [provinces, setProvinces] = useState([
-        { province_id: 0, province_name: '' },
-    ]);
+    const [provinces, setProvinces] = useState<ProvinceType[]>([]);
 
-    const [districts, setDistricts] = useState([
-        { district_id: 0, district_name: '' },
-    ]);
+    const [districts, setDistricts] = useState<DistrictType[]>([]);
 
-    const [district, setDistrict] = useState({
-        district_id: 0,
-        district_name: '',
-    });
+    const [wards, setWards] = useState<WardType[]>([]);
+    const [district, setDistrict] = useState<DistrictType>({} as DistrictType);
 
-    const [province, setProvince] = useState({
-        province_id: 0,
-        province_name: '',
-    });
-
+    const [province, setProvince] = useState<ProvinceType>({} as ProvinceType);
+    const [ward, setWard] = useState<WardType>({} as WardType);
     const [isSaveProfile, setIsSaveProfile] = useState<boolean>(false);
     const [isUpdateProfile, setIsUpdateProfile] = useState<boolean>(false);
     const [patientProfileCopy, setPatientProfileCopy] =
         useState<PatientProfile>({} as PatientProfile);
-    const [wards, setWards] = useState([{ ward_id: 0, ward_name: '' }]);
-    const [ward, setWard] = useState({ ward_id: 0, ward_name: '' });
+
     const inputPatientNameRef = useRef<InputRef>(null);
     const inputPatientPhoneRef = useRef<InputRef>(null);
     const inputPatientEmailRef = useRef<InputRef>(null);
-    const inputVillageRef = useRef<InputRef>(null);
     const radioGenderRef = useRef<any>(undefined);
     const radioGenderValue = useRef<string | undefined>(undefined);
     const selectProvinceRef = useRef<any>(null);
@@ -91,8 +82,7 @@ export const ModalOrderAppointment = ({
     const [birthday, setBirthday] = useState<string>();
     const [examinationReason, setExaminationReason] = useState<string>();
     const [paymentMethod, setPaymentMethod] = useState(1);
-    const [birthdayError, setBirthDayError] = useState<any>();
-
+    const [error, setError] = useState<any>();
     const onChange: DatePickerProps['onChange'] = (date, dateString) => {
         setBirthday(String(dateString));
         setPatientProfileCopy({
@@ -119,43 +109,8 @@ export const ModalOrderAppointment = ({
         setIsUpdateProfile(checked);
     };
 
-    const validateBirthday = (date: any) => {
-        const now = new Date();
-        let error: boolean = false;
-        if (date.getFullYear() === now.getFullYear()) {
-            if (date.getMonth() === now.getMonth()) {
-                if (date.getDate() === now.getDate()) {
-                    error = true;
-                } else {
-                    error = false;
-                }
-            }
-            if (date.getMonth() > now.getMonth()) {
-                error = true;
-            }
-            if (date.getMonth() < now.getMonth()) {
-                error = false;
-            }
-        }
-        if (date.getFullYear() > now.getFullYear()) {
-            error = true;
-        }
-        if (date.getFullYear() < now.getFullYear()) {
-            error = false;
-        }
-        if (error) {
-            setBirthDayError({ message: 'Ngày/ Tháng/ Năm sinh không hợp lệ' });
-        }
-        return error;
-    };
-    const handleEmptyPatientBirthday = () => {
-        if (patientProfileCopy?.birthday) {
-            return false;
-        }
-        return true;
-    };
-
     const handleOk = () => {
+        let errorMsg: any = {};
         const isEmptyPatientName = isEmpty(inputPatientNameRef.current?.input);
         const isEmptyPatientPhone = isEmpty(
             inputPatientPhoneRef.current?.input
@@ -163,14 +118,26 @@ export const ModalOrderAppointment = ({
         const isEmptyPatientEmail = isEmpty(
             inputPatientEmailRef.current?.input
         );
-
         const isEmptyRadioGender =
-            patientProfile !== null
-                ? false
-                : isEmptyRadio(
-                      radioGenderRef.current,
-                      radioGenderValue.current
-                  );
+            patientProfileCopy.gender === undefined ? true : false;
+
+        if (isEmptyRadioGender) {
+            errorMsg = {
+                ...errorMsg,
+                genderError: 'Không được để trống ô này!',
+            };
+        }
+        const isEmptyBirthday =
+            patientProfile?.birthday !== undefined ? false : true;
+        if (isEmptyBirthday) {
+            errorMsg = {
+                ...errorMsg,
+                birthdayError: 'Không được để trống ô này!',
+            };
+        }
+        console.log(errorMsg);
+        setError(errorMsg);
+
         const provinceId = province.province_id;
         const districtId = district.district_id;
         const wardId = ward.ward_id;
@@ -185,7 +152,7 @@ export const ModalOrderAppointment = ({
         const isEmptySelectWard = isEmptySelect(selectWardRef.current, wardId);
 
         if (
-            patientProfileCopy.birthday !== null &&
+            !isEmptyBirthday &&
             !isEmptyPatientName &&
             !isEmptyPatientPhone &&
             !isEmptyPatientEmail &&
@@ -207,11 +174,10 @@ export const ModalOrderAppointment = ({
             const isErrorPhoneLength = validatePhoneLength(
                 inputPatientPhoneRef.current?.input
             );
-            const isErrorBirthday =
-                patientProfile === null
-                    ? false
-                    : validateBirthday(new Date(patientProfileCopy.birthday));
-
+            const isErrorBirthday = validateBirthday(
+                new Date(patientProfile.birthday),
+                setError
+            );
             if (
                 !isErrorPatientName &&
                 !isErrorPatientEmail &&
@@ -225,54 +191,59 @@ export const ModalOrderAppointment = ({
                     patient_name: inputPatientNameRef.current?.input?.value,
                     patient_phone: inputPatientPhoneRef.current?.input?.value,
                     patient_email: inputPatientEmailRef.current?.input?.value,
-                    birthday: patientProfileCopy.birthday,
+                    birthday: patientProfileCopy.birthday
+                        .toString()
+                        .slice(0, 10),
                     province: province.province_name,
                     district: district.district_name,
                     commune: ward.ward_name,
                     examination_reason: examinationReason,
                     time_id: time.id,
-                    gender: radioGenderValue.current,
+                    gender: radioGenderValue.current ?? patientProfile.gender,
                     doctor_name: doctor.full_name,
                     time_value: time.value,
                     price: doctor.fee,
                     location: doctor.location,
                     type: 'Bác sĩ',
                 };
-                CreateAppointment(appointment);
+                console.log(appointment);
+                //CreateAppointment(appointment);
+                // if (isSaveProfile) {
+                //     const uuid = uuidv4();
+                //     const newProfile = {
+                //         patient_name: inputPatientNameRef.current?.input?.value,
+                //         patient_phone:
+                //             inputPatientPhoneRef.current?.input?.value,
+                //         patient_email:
+                //             inputPatientEmailRef.current?.input?.value,
+                //         birthday: birthday,
+                //         province: province.province_name,
+                //         district: district.district_name,
+                //         commune: ward.ward_name,
+                //         gender: radioGenderValue.current,
+                //         uuid: uuid,
+                //     };
+                //     CreatePatientProfile(newProfile);
+                // }
+                // if (isUpdateProfile) {
+                //     const newProfile = {
+                //         ...patientProfileCopy,
+                //         birthday: patientProfileCopy.birthday
+                //             .toString()
+                //             .slice(0, 10),
+                //         province: province.province_name,
+                //         district: district.district_name,
+                //         commune: ward.ward_name,
+                //     };
 
-                if (isSaveProfile) {
-                    const uuid = uuidv4();
-                    const newProfile = {
-                        patient_name: inputPatientNameRef.current?.input?.value,
-                        patient_phone:
-                            inputPatientPhoneRef.current?.input?.value,
-                        patient_email:
-                            inputPatientEmailRef.current?.input?.value,
-                        birthday: birthday,
-                        province: province.province_name,
-                        district: district.district_name,
-                        commune: ward.ward_name,
-                        gender: radioGenderValue.current,
-                        uuid: uuid,
-                    };
-                    CreatePatientProfile(newProfile);
-                }
-                if (isUpdateProfile) {
-                    const newProfile = {
-                        ...patientProfileCopy,
-                        birthday: patientProfileCopy.birthday
-                            .toString()
-                            .slice(0, 10),
-                        province: province.province_name,
-                        district: district.district_name,
-                        commune: ward.ward_name,
-                    };
-
-                    UpdatePatientProfile(newProfile);
-                }
+                //     UpdatePatientProfile(newProfile);
+                // }
             }
         }
     };
+    useEffect(() => {
+        console.log(error);
+    }, [error]);
     const UpdatePatientProfile = async (data: any) => {
         try {
             setPatientProfile(data);
@@ -317,7 +288,6 @@ export const ModalOrderAppointment = ({
         setIsModalOpen(false);
     };
     const handleChange = (e: RadioChangeEvent) => {
-        radioGenderValue.current = e.target.value;
         setPatientProfileCopy({
             ...patientProfileCopy,
             gender: e.target.value,
@@ -534,7 +504,7 @@ export const ModalOrderAppointment = ({
                             <Radio.Group
                                 value={patientProfileCopy.gender}
                                 onFocus={() => {
-                                    showSuccess(radioGenderRef.current);
+                                    setError({ ...error, genderError: '' });
                                 }}
                                 className="d-block"
                                 ref={radioGenderRef}
@@ -544,10 +514,14 @@ export const ModalOrderAppointment = ({
                                 <Radio value={2}>Nữ</Radio>
                                 <Radio value={3}>Khác</Radio>
                             </Radio.Group>
-                            <div
-                                className="error_message mt-3"
-                                style={{ color: 'red' }}
-                            ></div>
+                            {error?.genderError && (
+                                <div
+                                    className="error_message mt-3"
+                                    style={{ color: 'red' }}
+                                >
+                                    {error?.genderError}
+                                </div>
+                            )}
                         </div>
                         <div className="mb-3">
                             <label
@@ -629,7 +603,7 @@ export const ModalOrderAppointment = ({
                             </label>
                             <DatePicker
                                 onFocus={() => {
-                                    setBirthDayError({});
+                                    setError({ ...error, birthdayError: '' });
                                 }}
                                 onChange={onChange}
                                 className="d-block mt-2"
@@ -645,12 +619,12 @@ export const ModalOrderAppointment = ({
                                 onBlur={() => {}}
                                 format={dateFormat}
                             />
-                            {birthdayError?.message && (
+                            {error?.birthdayError && (
                                 <div
                                     className="error_message mt-3"
                                     style={{ color: 'red' }}
                                 >
-                                    {birthdayError.message}
+                                    {error.birthdayError}
                                 </div>
                             )}
                         </div>
@@ -662,7 +636,7 @@ export const ModalOrderAppointment = ({
                                 ref={selectProvinceRef}
                                 className="d-block"
                                 showSearch
-                                value={province.province_id}
+                                value={province.province_id ?? 0}
                                 onFocus={(e) =>
                                     handleFocusSelect(selectProvinceRef.current)
                                 }
@@ -683,19 +657,10 @@ export const ModalOrderAppointment = ({
                                         setIsShowSwitchUpdateProfile(true);
                                     }
                                     setProvince(pro);
-                                    setDistrict({
-                                        district_id: 0,
-                                        district_name: '',
-                                    });
-
-                                    setWard({ ward_id: 0, ward_name: '' });
+                                    setDistrict({} as DistrictType);
+                                    setWard({} as WardType);
                                 }}
-                                placeholder="Chọn tỉnh/ thành phố"
-                                filterOption={(input, option) =>
-                                    (option?.province_name)
-                                        .toLowerCase()
-                                        .includes(input.toLowerCase())
-                                }
+                                optionFilterProp="children"
                             >
                                 <Select.Option key={0} value={0}>
                                     Chọn tỉnh/ thành phố
@@ -705,6 +670,7 @@ export const ModalOrderAppointment = ({
                                         <Select.Option
                                             key={item.province_id}
                                             value={item.province_id}
+                                            label={item.province_name}
                                         >
                                             {item.province_name}
                                         </Select.Option>
@@ -722,7 +688,7 @@ export const ModalOrderAppointment = ({
                             </label>
                             <Select
                                 ref={selectDistrictRef}
-                                value={district.district_id}
+                                value={district.district_id ?? 0}
                                 className="d-block"
                                 onFocus={(e) =>
                                     handleFocusSelect(selectDistrictRef.current)
@@ -747,15 +713,10 @@ export const ModalOrderAppointment = ({
 
                                     setDistrict(dis);
                                     if (ward.ward_id !== 0) {
-                                        setWard({ ward_id: 0, ward_name: '' });
+                                        setWard({} as WardType);
                                     }
                                 }}
-                                placeholder="Chọn quận/ huyện/ thị xã"
-                                filterOption={(input, option) =>
-                                    (option?.district_name)
-                                        .toLowerCase()
-                                        .includes(input.toLowerCase())
-                                }
+                                optionFilterProp="children"
                             >
                                 <Select.Option key={0} value={0}>
                                     Chọn quận/ huyện/ thị xã
@@ -765,6 +726,7 @@ export const ModalOrderAppointment = ({
                                         <Select.Option
                                             key={item.district_id}
                                             value={item.district_id}
+                                            label={item.district_name}
                                         >
                                             {item.district_name}
                                         </Select.Option>
@@ -782,7 +744,7 @@ export const ModalOrderAppointment = ({
                             </label>
                             <Select
                                 ref={selectWardRef}
-                                value={ward.ward_id}
+                                value={ward.ward_id ?? 0}
                                 onFocus={(e) =>
                                     handleFocusSelect(selectWardRef.current)
                                 }
@@ -804,11 +766,7 @@ export const ModalOrderAppointment = ({
                                     }
                                     setWard(ward);
                                 }}
-                                filterOption={(input, option) =>
-                                    (option?.ward_name)
-                                        .toLowerCase()
-                                        .includes(input.toLowerCase())
-                                }
+                                optionFilterProp="children"
                             >
                                 <Select.Option key={0} value={0}>
                                     Chọn xã/ phường
@@ -818,6 +776,7 @@ export const ModalOrderAppointment = ({
                                         <Select.Option
                                             key={item.ward_id}
                                             value={item.ward_id}
+                                            label={item.ward_name}
                                         >
                                             {item.ward_name}
                                         </Select.Option>

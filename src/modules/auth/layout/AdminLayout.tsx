@@ -21,8 +21,9 @@ const AdminLayout: React.FC = ({ children }: any) => {
                 <div className="mb-3">
                     <h3 className="fs-3 fw-bold text-white p-3 text-center">
                         <Link
+                            style={{ color: '#0d6efd' }}
                             to={'/'}
-                            className="text-decoration-none text-white"
+                            className="text-decoration-none "
                         >
                             SDOCTOR
                         </Link>

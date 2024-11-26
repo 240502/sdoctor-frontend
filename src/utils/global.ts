@@ -42,7 +42,7 @@ export const isEmptyRadio = (element: any, value: any): boolean => {
 };
 export const isEmptySelect = (element: any, value: any): boolean => {
     let isEmpty = false;
-    if (value === 0) {
+    if (value === 0 || value === undefined) {
         showError(element.nativeElement, 'Không được để trống ô này');
         isEmpty = true;
     }
@@ -60,17 +60,26 @@ export const isEmptyEditor = (element: any, value: any): boolean => {
     return isEmpty;
 };
 export const handleFocusSelect = (element: any) => {
-    console.log(element);
     showSuccess(element.nativeElement);
 };
 
+// export const validateName = (element: any) => {
+//     let isError = false;
+//     for (let i = 0; i < element.value.length; i++) {
+//         if (isNumber(element.value[i])) {
+//             showError(element, 'Tên bệnh nhân không bao gồm số');
+//             isError = true;
+//         }
+//     }
+//     return isError;
+// };
 export const validateName = (element: any) => {
     let isError = false;
-    for (let i = 0; i < element.value.length; i++) {
-        if (isNumber(element.value[i])) {
-            showError(element, 'Tên bệnh nhân không bao gồm số');
-            isError = true;
-        }
+    const name = element.value;
+    const regex = /^[\p{L}\s]+$/u;
+    if (!regex.test(name)) {
+        isError = true;
+        showError(element, 'Tên bệnh nhân không bao gồm số và ký tực đặc biệt');
     }
     return isError;
 };
@@ -108,4 +117,34 @@ export const validatePhoneLength = (element: any): boolean => {
         showError(element, 'Số điện thoại không hợp lệ');
     }
     return isError;
+};
+
+export const validateBirthday = (date: Date, setError: any) => {
+    const now = new Date();
+    let error: boolean = false;
+    if (date.getFullYear() === now.getFullYear()) {
+        if (date.getMonth() === now.getMonth()) {
+            if (date.getDate() === now.getDate()) {
+                error = true;
+            } else {
+                error = false;
+            }
+        }
+        if (date.getMonth() > now.getMonth()) {
+            error = true;
+        }
+        if (date.getMonth() < now.getMonth()) {
+            error = false;
+        }
+    }
+    if (date.getFullYear() > now.getFullYear()) {
+        error = true;
+    }
+    if (date.getFullYear() < now.getFullYear()) {
+        error = false;
+    }
+    if (error) {
+        setError({ birthdayError: 'Ngày/ Tháng/ Năm sinh không hợp lệ' });
+    }
+    return error;
 };

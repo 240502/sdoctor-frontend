@@ -24,6 +24,7 @@ const ViewWatchedService = () => {
                         return (
                             <div className="col-4 ps-2 pe-2 mb-5">
                                 <Card
+                                    className="shadow"
                                     cover={
                                         <img
                                             className="w-100 p-2"

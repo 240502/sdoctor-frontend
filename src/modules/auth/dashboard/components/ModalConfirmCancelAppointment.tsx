@@ -1,15 +1,16 @@
-import { Button, Modal } from 'antd';
+import { Button, Input, InputRef, Modal } from 'antd';
 import React, { useEffect, useRef } from 'react';
 import { AppointmentService } from '../../../../services/appointmentService';
-import TextArea from 'antd/es/input/TextArea';
+import { Appointment } from '../../../../models/appointment';
 
+const TextArea = Input.TextArea;
 export const ModalConfirmCancelAppointment = ({
     isOpenModalConfirm,
     handleCancelModalConfirm,
     appointment,
     setIsOpenModalConfirm,
     openNotificationWithIcon,
-    getAppointmentByPatientPhone,
+    setAppointments,
 }: any) => {
     const rejectionReasonInputRef = useRef<any>(null);
     const focusTextArea = () => {
@@ -17,6 +18,7 @@ export const ModalConfirmCancelAppointment = ({
             rejectionReasonInputRef.current.focus();
         }
     };
+
     const handleCancelAppointment = async () => {
         try {
             const data = {
@@ -27,18 +29,19 @@ export const ModalConfirmCancelAppointment = ({
                         rejectionReasonInputRef.current?.resizableTextArea
                             ?.textArea.value,
                 },
-                requirementObject: 'Bệnh nhân',
+                requirementObject: 'bác sĩ',
             };
             console.log(data);
             const res = await AppointmentService.cancelAppointment(data);
-
             openNotificationWithIcon(
                 'success',
                 'Thông báo!',
                 'Hủy lịch hẹn thành công!'
             );
             setIsOpenModalConfirm(false);
-            getAppointmentByPatientPhone();
+            setAppointments((prev: Appointment[]) =>
+                prev.filter((item: Appointment) => item.id !== appointment.id)
+            );
         } catch (err: any) {
             console.log(err.message);
             openNotificationWithIcon(

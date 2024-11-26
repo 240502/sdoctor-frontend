@@ -1,11 +1,5 @@
-import React, { useRef, useState } from 'react';
-import { Input, InputRef, Tabs } from 'antd';
-import { UserService } from '../../../services/userService';
-import { useSetRecoilState } from 'recoil';
-import { userState } from '../../../stores/userAtom';
-import { useNavigate } from 'react-router-dom';
+import { Tabs } from 'antd';
 import type { TabsProps } from 'antd';
-import TabPane from 'antd/es/tabs/TabPane.js';
 import { FormLogin } from './FormLogin';
 import { FormRegister } from './FormRegister';
 import '@/assets/scss/login.scss';

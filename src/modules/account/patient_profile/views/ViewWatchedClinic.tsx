@@ -24,6 +24,7 @@ const ViewWatchedClinic = () => {
                     return (
                         <div className="col-4 ps-2 pe-2 mb-5">
                             <Card
+                                className="shadow"
                                 cover={
                                     <img
                                         className="w-100 p-2"
@@ -47,7 +48,9 @@ const ViewWatchedClinic = () => {
                                     </Button>,
                                 ]}
                             >
-                                <h6>{clinic.name}</h6>
+                                <p className="fw-bold text-center">
+                                    {clinic.name}
+                                </p>
                             </Card>
                         </div>
                     );

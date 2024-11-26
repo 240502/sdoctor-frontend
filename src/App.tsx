@@ -11,7 +11,6 @@ import { PatientProfileService } from './services/patient_profileService';
 function App() {
     const setUser = useSetRecoilState(userState);
     const setPatientProfile = useSetRecoilState(patientProfileState);
-
     const getUser = async () => {
         try {
             const user = await JSON.parse(
@@ -39,6 +38,7 @@ function App() {
     useEffect(() => {
         getUser();
         getPatientProfile();
+        console.log('mouded');
     }, []);
     return (
         <div className="App">

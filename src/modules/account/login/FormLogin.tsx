@@ -1,36 +1,37 @@
-import { Button, Input, InputRef } from 'antd';
-import React, { useRef, useState } from 'react';
+import { Button, Input } from 'antd';
+import React, { useEffect, useState } from 'react';
 import { EyeOutlined, EyeInvisibleOutlined } from '@ant-design/icons';
 import { UserService } from '../../../services/userService';
 import { useSetRecoilState } from 'recoil';
 import { userState } from '../../../stores/userAtom';
 import { useNavigate } from 'react-router-dom';
+
 export const FormLogin = () => {
+    const [email, setEmail] = useState<string>('');
+    const [password, setPassword] = useState<string>('');
     const [showPassword, setShowPassword] = useState<boolean>(false);
-    const inputUserNameRef = useRef<InputRef>(null);
-    const inputUserPasswordRef = useRef<InputRef>(null);
     const [errors, setErrors] = useState<any>({});
     const setUser = useSetRecoilState(userState);
+    const [a, setA] = useState<number>(1);
     const navigate = useNavigate();
+
     const handleLogin = (): boolean => {
         const emailRegex =
             /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
         let tempErrors: any = {};
         let isValid: boolean = false;
-        const email: any = inputUserNameRef.current?.input?.value;
-        if (inputUserNameRef.current?.input?.value === '') {
+
+        if (!email) {
             tempErrors.email = 'Vui lòng nhập email';
             isValid = true;
         }
-        if (inputUserPasswordRef.current?.input?.value === '') {
+        if (!password) {
             tempErrors.password = 'Vui lòng nhập mật khẩu';
             isValid = true;
         }
-        if (!isValid) {
-            if (!emailRegex.test(email)) {
-                tempErrors.email = 'Email không hợp lệ';
-                isValid = true;
-            }
+        if (!isValid && !emailRegex.test(email)) {
+            tempErrors.email = 'Email không hợp lệ';
+            isValid = true;
         }
         setErrors(tempErrors);
         return isValid;
@@ -38,38 +39,64 @@ export const FormLogin = () => {
 
     const Login = async () => {
         if (!handleLogin()) {
-            const data = {
-                email: inputUserNameRef.current?.input?.value,
-                password: inputUserPasswordRef.current?.input?.value,
-            };
-            console.log(data);
             try {
-                const res = await UserService.login(data);
+                console.log('Before login:', { email, password });
+                const res = await UserService.login({ email, password });
+
+                // Đăng nhập thành công
                 sessionStorage.setItem('user', JSON.stringify(res));
                 setUser(res);
+
+                // Xóa nội dung email và password
+                setEmail('');
+                setPassword('');
+
                 navigate('/admin/dashboard');
             } catch (err: any) {
                 console.log(err.message);
             }
         }
     };
+
     return (
         <div className="container">
             <div className="form-group mt-3">
                 <label htmlFor="email">Email</label>
-                <Input ref={inputUserNameRef} id="email" type="email" />
+                <Input
+                    defaultValue={''}
+                    onFocus={() => {
+                        setErrors({ ...errors, email: null });
+                    }}
+                    onChange={(e) => setEmail(e.target.value)}
+                    id=""
+                    type="email"
+                />
+                {errors.email && (
+                    <p className="mt-1 text-danger">{errors.email}</p>
+                )}
             </div>
             <div className="form-group mt-3 position-relative">
                 <label htmlFor="password">Password</label>
                 <Input
-                    ref={inputUserPasswordRef}
+                    defaultValue={''}
+                    onFocus={() => {
+                        setErrors({ ...errors, password: null });
+                    }}
+                    onChange={(e) => setPassword(e.target.value)}
                     type={showPassword ? 'text' : 'password'}
-                    id="password"
-                ></Input>
+                    id=""
+                />
+                {errors.password && (
+                    <p className="mt-1 text-danger">{errors.password}</p>
+                )}
                 <Button
                     onClick={() => setShowPassword(!showPassword)}
-                    className="position-absolute border-0 bg-transparent p-0 m-0 translate-middle-y top-50"
-                    style={{ right: '10px', cursor: 'pointer' }}
+                    className="position-absolute border-0 bg-transparent p-0 m-0 d-flex align-items-center"
+                    style={{
+                        right: '10px',
+                        cursor: 'pointer',
+                        top: '40%',
+                    }}
                 >
                     {showPassword ? <EyeInvisibleOutlined /> : <EyeOutlined />}
                 </Button>
@@ -77,7 +104,7 @@ export const FormLogin = () => {
             <div className="form-group mt-3 text-center">
                 <Button
                     className="w-25 bg-success text-white fs-6 p-3"
-                    onClick={() => Login()}
+                    onClick={Login}
                 >
                     Login
                 </Button>

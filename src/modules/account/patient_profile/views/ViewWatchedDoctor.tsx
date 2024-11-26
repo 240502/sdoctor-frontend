@@ -27,12 +27,12 @@ const ViewWatchedDoctor = () => {
 
     return (
         <PatientProfileLayout breadcrumb="Bác sĩ đã xem">
-            {' '}
             <div className="row">
                 {watchedDoctors.map((doctor: Doctor) => {
                     return (
                         <div className="col-4 ps-2 pe-2 mb-5">
                             <Card
+                                className="shadow"
                                 cover={
                                     <img
                                         alt="example"
@@ -41,7 +41,6 @@ const ViewWatchedDoctor = () => {
                                 }
                                 actions={[
                                     <Button>
-                                        {' '}
                                         <Link
                                             to={'/doctor/detail/' + doctor.id}
                                             className="w-100 text-dark text-decoration-none"

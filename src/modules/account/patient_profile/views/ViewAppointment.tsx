@@ -9,7 +9,12 @@ import {
 import { AppointmentService } from '../../../../services/appointmentService';
 import { Button, Table, Tag, Tooltip, notification } from 'antd';
 import { TableColumnsType } from 'antd';
-import { DeleteOutlined, EyeOutlined, RedoOutlined } from '@ant-design/icons';
+import {
+    CloseOutlined,
+    DeleteOutlined,
+    EyeOutlined,
+    RedoOutlined,
+} from '@ant-design/icons';
 import { ModalViewAppointment } from '../components/ModalViewAppointment';
 import { ModalConfirmCancelAppointment } from '../components/ModalConfirmCancelAppointment';
 import { useNavigate } from 'react-router-dom';
@@ -17,7 +22,6 @@ type NotificationType = 'success' | 'error';
 
 const ViewAppointment = () => {
     const navigate = useNavigate();
-    const sectionTopRef = useRef<HTMLDivElement>(null);
 
     const [api, contextHolder] = notification.useNotification();
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
@@ -33,7 +37,7 @@ const ViewAppointment = () => {
     const [appointments, setAppointments] = useState<
         AppointmentViewForPatient[]
     >([]);
-    const [appointmentId, setAppointmentId] = useState<number>();
+
     const columns: TableColumnsType<Appointment> = [
         {
             title: 'Bác sĩ',
@@ -66,22 +70,22 @@ const ViewAppointment = () => {
                 <>
                     {text === 'Đã hủy' && (
                         <Tag bordered={false} color="magenta">
-                            {text}
+                            {text.toUpperCase()}
                         </Tag>
                     )}
                     {text === 'Chờ xác nhận' && (
-                        <Tag bordered={false} color="gold">
-                            {text}
+                        <Tag bordered={false} color="geekblue">
+                            {text.toUpperCase()}
                         </Tag>
                     )}
                     {text === 'Đã xác nhận' && (
-                        <Tag bordered={false} color="blue">
-                            {text}
+                        <Tag bordered={false} color="green">
+                            {text.toUpperCase()}
                         </Tag>
                     )}
                     {text === 'Hoàn thành' && (
                         <Tag bordered={false} color="cyan">
-                            {text}
+                            {text.toUpperCase()}
                         </Tag>
                     )}
                 </>
@@ -126,10 +130,10 @@ const ViewAppointment = () => {
                                 onClick={() => {
                                     console.log(record);
                                     setIsOpenModalConfirm(true);
-                                    setAppointmentId(Number(record.id));
+                                    setAppointment(record);
                                 }}
                             >
-                                <DeleteOutlined />
+                                <CloseOutlined className="text-danger" />
                             </Button>
                         </Tooltip>
                     )}
@@ -171,6 +175,7 @@ const ViewAppointment = () => {
             description: des,
         });
     };
+
     useEffect(() => {
         getAppointmentByPatientPhone();
     }, [pageIndex, pageSize]);
@@ -198,7 +203,7 @@ const ViewAppointment = () => {
                         <ModalConfirmCancelAppointment
                             isOpenModalConfirm
                             handleCancelModalConfirm={handleCancelModalConfirm}
-                            appointmentId={appointmentId}
+                            appointment={appointment}
                             setIsOpenModalConfirm={setIsOpenModalConfirm}
                             openNotificationWithIcon={openNotificationWithIcon}
                             getAppointmentByPatientPhone={

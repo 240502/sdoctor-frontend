@@ -15,9 +15,9 @@ export const PatientProfileService = {
         );
         return res;
     },
-    async deletePatientProfile(phone: any): Promise<any> {
+    async deletePatientProfile(uuid: any): Promise<any> {
         const res = await apiClient.delete(
-            '/api/patient-profile/delete/' + phone
+            '/api/patient-profile/delete/' + uuid
         );
         return res;
     },

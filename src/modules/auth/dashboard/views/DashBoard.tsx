@@ -1,69 +1,128 @@
-import React from 'react';
-import {
-    UserOutlined,
-    AuditOutlined,
-    DollarOutlined,
-    ExceptionOutlined,
-} from '@ant-design/icons';
-import BarChart from '../components/BarChart';
-import LineChart from '../components/LineChart';
+import { Card, Flex, notification } from 'antd';
+import SummaryCards from '../components/SummaryCards';
+import AppointmentTable from '../components/AppointmentTable';
+import { useRecoilState, useRecoilValue } from 'recoil';
+import { useEffect, useState } from 'react';
+import { userValue } from '../../../../stores/userAtom';
+import { useAppointments } from '../../../../hooks/useAppointments';
+import { ModalViewAppointment } from '../components/ModalViewAppointment';
+import { Appointment } from '../../../../models/appointment';
+import { ModalConfirmCancelAppointment } from '../components/ModalConfirmCancelAppointment';
+import { appointmentListInDayState } from '../../../../stores/appointmentAtom';
+import { WeeklyOverview } from '../components/WeeklyOverview';
+import { RecentPatientCard } from '../components/RecentPatientCard';
+import { RecentInvoicesTable } from '../components/RecentInvoicesTable';
+type NotificationType = 'success' | 'error';
+
 const DashBoard = () => {
+    const user = useRecoilValue(userValue);
+    const [appointments, setAppointments] = useRecoilState(
+        appointmentListInDayState
+    );
+    const [appointment, setAppointment] = useState<Appointment>();
+    const [pageIndex, setPageIndex] = useState<number>(1);
+    const [pageSize, setPageSize] = useState<number>(5);
+    const [api, contextHolder] = notification.useNotification();
+    const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+    const [isOpenModalConfirm, setIsOpenModalConfirm] =
+        useState<boolean>(false);
+    const {
+        totalPatientInDay,
+        totalPatientExaminedInDay,
+        pageCount,
+        fetchData,
+    } = useAppointments(user.token, pageIndex, pageSize, user.object_id);
+
+    const handleCancelModal = () => {
+        setIsModalOpen(false);
+    };
+    const handleCancelModalConfirm = () => {
+        setIsOpenModalConfirm(false);
+    };
+    const openNotificationWithIcon = (
+        type: NotificationType,
+        title: string,
+        des: string
+    ) => {
+        api[type]({
+            message: title,
+            description: des,
+        });
+    };
+    const handleClickViewDetail = (record: Appointment) => {
+        setAppointment(record);
+        setIsModalOpen(true);
+    };
+    const handleClickRejectBtn = (record: Appointment) => {
+        setAppointment(record);
+        setIsOpenModalConfirm(true);
+    };
+
+    const onPageChange = (current: number, pageSize: number) => {
+        setPageIndex(current);
+        setPageSize(pageSize);
+    };
     return (
-        <div className="container">
-            <div className="group__box d-flex  justify-content-between">
-                <div className="box__item col-3 bg-light bg-gradient rounded p-3 shadow-lg">
-                    <h6 className="box__title d-flex justify-content-between ">
-                        <span>
-                            Số lượng bệnh nhân
-                            <p className="total__patient text-center m-0">0</p>
-                        </span>
-                        <span>
-                            <UserOutlined className="fs-5"></UserOutlined>
-                        </span>
-                    </h6>
+        <div className="pe-3">
+            {contextHolder}
+            <Flex gap="middle">
+                <div className="col-3">
+                    <SummaryCards
+                        totalPatientInDay={totalPatientInDay}
+                        totalPatientExaminedInDay={totalPatientExaminedInDay}
+                    />
                 </div>
-                <div className="box__item col-3 bg-light bg-gradient rounded p-3 shadow-lg">
-                    <h6 className="box__title d-flex justify-content-between ">
-                        <span>
-                            Số lượng lịch hẹn
-                            <p className="total__patient text-center m-0">0</p>
-                        </span>
-                        <span>
-                            <AuditOutlined className="fs-5" />
-                        </span>
-                    </h6>
+                <div className="col-9">
+                    <Card title="Lịch hẹn hôm nay" className="rounded shadow">
+                        <AppointmentTable
+                            data={appointments}
+                            onPageChange={onPageChange}
+                            pageCount={pageCount}
+                            pageIndex={pageIndex}
+                            pageSize={pageSize}
+                            setPageSize={setPageSize}
+                            handleClickViewDetail={handleClickViewDetail}
+                            handleClickRejectBtn={handleClickRejectBtn}
+                            openNotificationWithIcon={openNotificationWithIcon}
+                            fetchData={fetchData}
+                        />
+                    </Card>
                 </div>
-                <div className="box__item col-3 bg-light bg-gradient rounded p-3 shadow-lg">
-                    <h6 className="box__title d-flex justify-content-between ">
-                        <span>
-                            Doanh thu
-                            <p className="total__patient text-center m-0 ">0</p>
-                        </span>
-                        <span>
-                            <DollarOutlined className="fs-5" />
-                        </span>
-                    </h6>
-                </div>
-                <div className="box__item col-3 bg-light bg-gradient rounded p-3 shadow-lg">
-                    <h6 className="box__title d-flex justify-content-between ">
-                        <span>
-                            Tỷ lệ hủy hẹn
-                            <p className="total__patient text-center m-0">0</p>
-                        </span>
-                        <span>
-                            <ExceptionOutlined className="fs-5" />
-                        </span>
-                    </h6>
-                </div>
+            </Flex>
+            <div className="mt-5">
+                <Flex gap="middle">
+                    <div className="col-4">
+                        <div>
+                            <WeeklyOverview />
+                        </div>
+                        <div className="mt-5">
+                            <RecentPatientCard />
+                        </div>
+                    </div>
+                    <div className="col-8">
+                        <RecentInvoicesTable />
+                    </div>
+                </Flex>
             </div>
-            <div className="block-line-chart mt-5 mb-3 d-flex justify-content-between ">
-                <div className="" style={{ width: '48%' }}>
-                    <BarChart />
-                </div>
-                <div className="" style={{ width: '48%' }}>
-                    <LineChart />
-                </div>
-            </div>
+
+            {isModalOpen && (
+                <ModalViewAppointment
+                    handleCancelModal={handleCancelModal}
+                    isModalOpen={isModalOpen}
+                    appointment={appointment}
+                />
+            )}
+            {isOpenModalConfirm && (
+                <ModalConfirmCancelAppointment
+                    isOpenModalConfirm={isOpenModalConfirm}
+                    handleCancelModalConfirm={handleCancelModalConfirm}
+                    appointment={appointment}
+                    setIsOpenModalConfirm={setIsOpenModalConfirm}
+                    openNotificationWithIcon={openNotificationWithIcon}
+                    setAppointments={setAppointments}
+                    fetchData={fetchData}
+                />
+            )}
         </div>
     );
 };

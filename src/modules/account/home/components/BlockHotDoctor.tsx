@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Image, Button, Carousel } from 'antd';
+import { Image, Button, Carousel, Card } from 'antd';
 import { Link } from 'react-router-dom';
 import NextArrow from './NextArrow';
 import PrevArrow from './PrevArrow';
@@ -20,8 +20,8 @@ export const BlockHotDoctor = (): JSX.Element => {
         infinite: true,
         slidesToShow: 4,
         slidesToScroll: 4,
-        autoplay: false,
-        speed: 2000,
+        autoplay: true,
+        speed: 1000,
         autoplaySpeed: 2000,
         cssEase: 'ease-in-out',
         arrow: true,
@@ -65,29 +65,45 @@ export const BlockHotDoctor = (): JSX.Element => {
                         doctors?.map((doctor: Doctor) => {
                             return (
                                 <div className="slide__container">
-                                    <div className="item   p-3 ">
-                                        <Link
-                                            onClick={() =>
-                                                handleUpdateViewsDoctor(
-                                                    Number(doctor.id)
-                                                )
+                                    <div className="item  p-3 ">
+                                        <Card
+                                            className="shadow"
+                                            cover={
+                                                <img
+                                                    alt="example"
+                                                    src={baseURL + doctor.image}
+                                                />
                                             }
-                                            to={`/doctor/detail/${doctor.id}`}
-                                            className="text-decoration-none text-center"
+                                            actions={[
+                                                <Button>
+                                                    <Link
+                                                        onClick={() =>
+                                                            handleUpdateViewsDoctor(
+                                                                Number(
+                                                                    doctor.id
+                                                                )
+                                                            )
+                                                        }
+                                                        to={
+                                                            '/doctor/detail/' +
+                                                            doctor.id
+                                                        }
+                                                        className="w-100 text-dark text-decoration-none"
+                                                    >
+                                                        Xem chi tiết
+                                                    </Link>
+                                                </Button>,
+                                            ]}
                                         >
-                                            <Image
-                                                preview={false}
-                                                width={222}
-                                                className="rounded-circle text-center"
-                                                src={baseURL + doctor.image}
-                                            ></Image>
-                                            <p className="item__text mt-3 text-center text-decoration-none fs-5 text-capitalize">
-                                                {doctor.full_name}
-                                                <div className="specialization fs-6 mt-1">
-                                                    {doctor.major_name}
-                                                </div>
-                                            </p>
-                                        </Link>
+                                            <p>{doctor.title}</p>
+                                            <h6>{doctor.full_name}</h6>
+                                            <div
+                                                className="specialization mt-1 text-secondary"
+                                                style={{ fontSize: '12px' }}
+                                            >
+                                                {doctor.major_name}
+                                            </div>
+                                        </Card>
                                     </div>
                                 </div>
                             );

@@ -28,6 +28,9 @@ import { useRecoilState } from 'recoil';
 import { patientProfileState } from '../../../../stores/patientAtom';
 import { PatientProfileService } from '../../../../services/patient_profileService';
 import { PatientProfileLayout } from '../components/PatientProfileLayout';
+import { ModalViewAppointment } from '../components/ModalViewAppointment';
+import { ModalConfirmDeletePatientProfile } from '../components/ModalConfirmDeletePatientProfile';
+import { PatientProfile } from '../../../../models/patient_profile';
 type NotificationType = 'success' | 'error';
 const ViewProfile = () => {
     const [patientProfile, setPatientProfile] =
@@ -37,7 +40,6 @@ const ViewProfile = () => {
     const inputPatientPhoneRef = useRef<InputRef>(null);
     const inputPatientEmailRef = useRef<InputRef>(null);
     const radioGenderRef = useRef<any>(undefined);
-    const radioGenderValue = useRef<string | undefined>(undefined);
     const selectProvinceRef = useRef<any>(null);
     const selectDistrictRef = useRef<any>(null);
     const selectWardRef = useRef<any>(null);
@@ -45,7 +47,11 @@ const ViewProfile = () => {
     const [provinces, setProvinces] = useState([
         { province_id: 0, province_name: '' },
     ]);
-
+    const [isView, setIsView] = useState<boolean>(true);
+    const [isOpenModalAddProfile, setIsOpenModalAddProfile] =
+        useState<boolean>(false);
+    const [isOpenModalConfirm, setIsOpenModalConfirm] =
+        useState<boolean>(false);
     const [districts, setDistricts] = useState([
         { district_id: 0, district_name: '' },
     ]);
@@ -192,6 +198,33 @@ const ViewProfile = () => {
             console.log(err);
         }
     };
+    const handleCancelModal = () => {
+        setIsOpenModalAddProfile(false);
+    };
+    const handleCancelModalConfirm = () => {
+        setIsOpenModalConfirm(false);
+    };
+    const handleDeleteProfile = async (uuid: string) => {
+        try {
+            const res = await PatientProfileService.deletePatientProfile(uuid);
+            openNotificationWithIcon(
+                'success',
+                'Thông báo!',
+                'Xóa thành công!'
+            );
+            localStorage.removeItem('uuid');
+            setPatientProfile({} as PatientProfile);
+            handleCancelModalConfirm();
+            window.scrollTo(0, 0);
+        } catch (err: any) {
+            console.log(err.message);
+            openNotificationWithIcon(
+                'error',
+                'Thông báo!',
+                'Xóa không thành công!'
+            );
+        }
+    };
     useEffect(() => {
         const getProvinces = async () => {
             try {
@@ -259,241 +292,276 @@ const ViewProfile = () => {
             }
         }
     }, [district.district_id]);
-
+    useEffect(() => console.log(patientProfile), [patientProfile]);
     return (
-        <PatientProfileLayout breadcrumb="Hồ sơ">
-            {patientProfile !== null ? (
-                <Card title="Hồ sơ bệnh nhân" bordered={false}>
-                    {contextHolder}
-                    <div className="infor__item mb-3">
-                        <label htmlFor="">Họ và tên</label>
-                        <Input
-                            ref={inputPatientNameRef}
-                            className="mt-2"
-                            value={patientProfile.patient_name}
-                            onChange={(e: any) =>
-                                setPatientProfile({
-                                    ...patientProfile,
-                                    patient_name: e.target.value,
-                                })
-                            }
-                        />
-                        <div
-                            className="error_message mt-3"
-                            style={{ color: 'red' }}
-                        ></div>
-                    </div>
-                    <div className="infor__item mb-3">
-                        <label htmlFor="">Số điện thoại</label>
-                        <Input
-                            ref={inputPatientPhoneRef}
-                            className="mt-2"
-                            value={patientProfile.patient_phone}
-                            onChange={(e) =>
-                                setPatientProfile({
-                                    ...patientProfile,
-                                    patient_phone: e.target.value,
-                                })
-                            }
-                        />
-                        <div
-                            className="error_message mt-3"
-                            style={{ color: 'red' }}
-                        ></div>
-                    </div>
-                    <div className="infor__item mb-3">
-                        <label htmlFor="">Email</label>
-                        <Input
-                            ref={inputPatientEmailRef}
-                            className="mt-2"
-                            value={patientProfile.patient_email}
-                            onChange={(e) =>
-                                setPatientProfile({
-                                    ...patientProfile,
-                                    patient_email: e.target.value,
-                                })
-                            }
-                        />
-                        <div
-                            className="error_message mt-3"
-                            style={{ color: 'red' }}
-                        ></div>
-                    </div>
-                    <div className="infor__item mb-3">
-                        <label htmlFor="">Giới tính</label>
-                        <Radio.Group
-                            className="ms-3 "
-                            value={Number(patientProfile.gender)}
-                            ref={radioGenderRef}
-                            onChange={(e) =>
-                                setPatientProfile({
-                                    ...patientProfile,
-                                    gender: e.target.value,
-                                })
-                            }
-                        >
-                            <Radio value={1}>Nam</Radio>
-                            <Radio value={2}>Nữ</Radio>
-                        </Radio.Group>
-                        <div
-                            className="error_message mt-3"
-                            style={{ color: 'red' }}
-                        ></div>
-                    </div>
-                    <div className="infor__item mb-3">
-                        <label htmlFor="">Ngày sinh</label>
-                        <DatePicker
-                            onChange={onBirthDayChange}
-                            className="d-block mt-2"
-                            type="date"
-                            defaultValue={dayjs(
-                                patientProfile.birthday,
-                                dateFormat
-                            )}
-                            format={dateFormat}
-                        />
-                        <div
-                            className="error_message mt-3"
-                            style={{ color: 'red' }}
-                        ></div>
-                    </div>
-                    <div className="mb-3">
-                        <label htmlFor="" className="form-label fw-bold">
-                            Tỉnh/ Thành phố
-                        </label>
-                        <Select
-                            ref={selectProvinceRef}
-                            className="d-block"
-                            showSearch
-                            onChange={(e) => {
-                                const province: any = provinces.find(
-                                    (province: any) => {
-                                        return province.province_id === e;
-                                    }
-                                );
-                                setProvince(province);
-                            }}
-                            value={province.province_id}
-                            placeholder="Chọn tỉnh/ thành phố"
-                            filterOption={(input, option) =>
-                                (option?.province_name)
-                                    .toLowerCase()
-                                    .includes(input.toLowerCase())
-                            }
-                        >
-                            {provinces.map((item) => {
-                                return (
-                                    <Select.Option
-                                        key={item.province_id}
-                                        value={item.province_id}
-                                    >
-                                        {item.province_name}
-                                    </Select.Option>
-                                );
-                            })}
-                        </Select>
-                        <div
-                            className="error_message mt-3"
-                            style={{ color: 'red' }}
-                        ></div>
-                    </div>
-                    <div className="mb-3">
-                        <label htmlFor="" className="form-label fw-bold">
-                            Quận/ Huyện
-                        </label>
-                        <Select
-                            className="d-block"
-                            showSearch
-                            ref={selectDistrictRef}
-                            onChange={(e) => {
-                                const district: any = districts.find(
-                                    (item: any) => {
-                                        return item.district_id === e;
-                                    }
-                                );
-                                setDistrict(district);
-                            }}
-                            value={district.district_id}
-                            placeholder="Chọn quận/ huyện/ thị xã"
-                            filterOption={(input, option) =>
-                                (option?.district_name)
-                                    .toLowerCase()
-                                    .includes(input.toLowerCase())
-                            }
-                        >
-                            {districts.map((item) => {
-                                return (
-                                    <Select.Option
-                                        key={item.district_id}
-                                        value={item.district_id}
-                                    >
-                                        {item.district_name}
-                                    </Select.Option>
-                                );
-                            })}
-                        </Select>
-                        <div
-                            className="error_message mt-3"
-                            style={{ color: 'red' }}
-                        ></div>
-                    </div>
-                    <div className="mb-3">
-                        <label htmlFor="" className="form-label fw-bold">
-                            Xã/ Phường
-                        </label>
-                        <Select
-                            className="d-block"
-                            showSearch
-                            ref={selectWardRef}
-                            onChange={(e) => {
-                                const ward: any = wards.find((w: any) => {
-                                    return w.ward_id === e;
-                                });
-                                setWard(ward);
-                            }}
-                            placeholder="Chọn xã/ phường"
-                            value={ward.ward_id}
-                            filterOption={(input, option) =>
-                                (option?.ward_name)
-                                    .toLowerCase()
-                                    .includes(input.toLowerCase())
-                            }
-                        >
-                            {wards.map((item) => {
-                                return (
-                                    <Select.Option
-                                        key={item.ward_id}
-                                        value={item.ward_id}
-                                    >
-                                        {item.ward_name}
-                                    </Select.Option>
-                                );
-                            })}
-                        </Select>
-                        <div
-                            className="error_message mt-3"
-                            style={{ color: 'red' }}
-                        ></div>
-                    </div>
-                    <div className="group__button d-flex justify-content-between">
+        <>
+            {' '}
+            {contextHolder}{' '}
+            <PatientProfileLayout breadcrumb="Hồ sơ">
+                {patientProfile?.uuid !== undefined ? (
+                    <Card title="Hồ sơ bệnh nhân" bordered={false}>
+                        <div className="info__item mb-3">
+                            <label htmlFor="">Họ và tên</label>
+                            <Input
+                                ref={inputPatientNameRef}
+                                className="mt-2"
+                                value={patientProfile.patient_name}
+                                onChange={(e: any) =>
+                                    setPatientProfile({
+                                        ...patientProfile,
+                                        patient_name: e.target.value,
+                                    })
+                                }
+                            />
+                            <div
+                                className="error_message mt-3"
+                                style={{ color: 'red' }}
+                            ></div>
+                        </div>
+                        <div className="info__item mb-3">
+                            <label htmlFor="">Số điện thoại</label>
+                            <Input
+                                ref={inputPatientPhoneRef}
+                                className="mt-2"
+                                value={patientProfile.patient_phone}
+                                onChange={(e) =>
+                                    setPatientProfile({
+                                        ...patientProfile,
+                                        patient_phone: e.target.value,
+                                    })
+                                }
+                            />
+                            <div
+                                className="error_message mt-3"
+                                style={{ color: 'red' }}
+                            ></div>
+                        </div>
+                        <div className="info__item mb-3">
+                            <label htmlFor="">Email</label>
+                            <Input
+                                ref={inputPatientEmailRef}
+                                className="mt-2"
+                                value={patientProfile.patient_email}
+                                onChange={(e) =>
+                                    setPatientProfile({
+                                        ...patientProfile,
+                                        patient_email: e.target.value,
+                                    })
+                                }
+                            />
+                            <div
+                                className="error_message mt-3"
+                                style={{ color: 'red' }}
+                            ></div>
+                        </div>
+                        <div className="info__item mb-3">
+                            <label htmlFor="">Giới tính</label>
+                            <Radio.Group
+                                className="ms-3 "
+                                value={Number(patientProfile.gender)}
+                                ref={radioGenderRef}
+                                onChange={(e) =>
+                                    setPatientProfile({
+                                        ...patientProfile,
+                                        gender: e.target.value,
+                                    })
+                                }
+                            >
+                                <Radio value={1}>Nam</Radio>
+                                <Radio value={2}>Nữ</Radio>
+                            </Radio.Group>
+                            <div
+                                className="error_message mt-3"
+                                style={{ color: 'red' }}
+                            ></div>
+                        </div>
+                        <div className="info__item mb-3">
+                            <label htmlFor="">Ngày sinh</label>
+                            <DatePicker
+                                onChange={onBirthDayChange}
+                                className="d-block mt-2"
+                                type="date"
+                                defaultValue={dayjs(
+                                    patientProfile.birthday
+                                        .toString()
+                                        .slice(0, 10),
+                                    dateFormat
+                                )}
+                                format={dateFormat}
+                            />
+                            <div
+                                className="error_message mt-3"
+                                style={{ color: 'red' }}
+                            ></div>
+                        </div>
+                        <div className="mb-3">
+                            <label htmlFor="" className="form-label fw-bold">
+                                Tỉnh/ Thành phố
+                            </label>
+                            <Select
+                                ref={selectProvinceRef}
+                                className="d-block"
+                                showSearch
+                                onChange={(e) => {
+                                    const province: any = provinces.find(
+                                        (province: any) => {
+                                            return province.province_id === e;
+                                        }
+                                    );
+                                    setProvince(province);
+                                }}
+                                value={province.province_id}
+                                placeholder="Chọn tỉnh/ thành phố"
+                                filterOption={(input, option) =>
+                                    (option?.province_name)
+                                        .toLowerCase()
+                                        .includes(input.toLowerCase())
+                                }
+                            >
+                                {provinces.map((item) => {
+                                    return (
+                                        <Select.Option
+                                            key={item.province_id}
+                                            value={item.province_id}
+                                        >
+                                            {item.province_name}
+                                        </Select.Option>
+                                    );
+                                })}
+                            </Select>
+                            <div
+                                className="error_message mt-3"
+                                style={{ color: 'red' }}
+                            ></div>
+                        </div>
+                        <div className="mb-3">
+                            <label htmlFor="" className="form-label fw-bold">
+                                Quận/ Huyện
+                            </label>
+                            <Select
+                                className="d-block"
+                                showSearch
+                                ref={selectDistrictRef}
+                                onChange={(e) => {
+                                    const district: any = districts.find(
+                                        (item: any) => {
+                                            return item.district_id === e;
+                                        }
+                                    );
+                                    setDistrict(district);
+                                }}
+                                value={district.district_id}
+                                placeholder="Chọn quận/ huyện/ thị xã"
+                                filterOption={(input, option) =>
+                                    (option?.district_name)
+                                        .toLowerCase()
+                                        .includes(input.toLowerCase())
+                                }
+                            >
+                                {districts.map((item) => {
+                                    return (
+                                        <Select.Option
+                                            key={item.district_id}
+                                            value={item.district_id}
+                                        >
+                                            {item.district_name}
+                                        </Select.Option>
+                                    );
+                                })}
+                            </Select>
+                            <div
+                                className="error_message mt-3"
+                                style={{ color: 'red' }}
+                            ></div>
+                        </div>
+                        <div className="mb-3">
+                            <label htmlFor="" className="form-label fw-bold">
+                                Xã/ Phường
+                            </label>
+                            <Select
+                                className="d-block"
+                                showSearch
+                                ref={selectWardRef}
+                                onChange={(e) => {
+                                    const ward: any = wards.find((w: any) => {
+                                        return w.ward_id === e;
+                                    });
+                                    setWard(ward);
+                                }}
+                                placeholder="Chọn xã/ phường"
+                                value={ward.ward_id}
+                                filterOption={(input, option) =>
+                                    (option?.ward_name)
+                                        .toLowerCase()
+                                        .includes(input.toLowerCase())
+                                }
+                            >
+                                {wards.map((item) => {
+                                    return (
+                                        <Select.Option
+                                            key={item.ward_id}
+                                            value={item.ward_id}
+                                        >
+                                            {item.ward_name}
+                                        </Select.Option>
+                                    );
+                                })}
+                            </Select>
+                            <div
+                                className="error_message mt-3"
+                                style={{ color: 'red' }}
+                            ></div>
+                        </div>
+                        <div className="group__button d-flex justify-content-between">
+                            <Button
+                                className="bg-primary text-white "
+                                onClick={() => {
+                                    console.log('oge');
+                                    handleUpdate();
+                                }}
+                            >
+                                Lưu thông tin
+                            </Button>
+                            <Button
+                                className=" bg-danger text-white"
+                                onClick={() => {
+                                    setIsOpenModalConfirm(true);
+                                }}
+                            >
+                                Xóa hồ sơ
+                            </Button>
+                        </div>
+                    </Card>
+                ) : (
+                    <div className="text-center">
                         <Button
-                            className="bg-primary text-white "
                             onClick={() => {
-                                console.log('oge');
-                                handleUpdate();
+                                setIsView(false);
+                                setIsOpenModalAddProfile(true);
                             }}
                         >
-                            Lưu thông tin
-                        </Button>
-                        <Button className=" bg-danger text-white">
-                            Xóa hồ sơ
+                            Thêm hồ sơ
                         </Button>
                     </div>
-                </Card>
-            ) : (
-                <Button>Thêm hồ sơ</Button>
-            )}
-        </PatientProfileLayout>
+                )}
+                {isOpenModalAddProfile && (
+                    <ModalViewAppointment
+                        handleCancelModal={handleCancelModal}
+                        isModalOpen={isOpenModalAddProfile}
+                        appointment={null}
+                        isView={isView}
+                        openNotificationWithIcon={openNotificationWithIcon}
+                    />
+                )}
+                {isOpenModalConfirm && (
+                    <ModalConfirmDeletePatientProfile
+                        handleCancelModalConfirm={handleCancelModalConfirm}
+                        isOpenModalConfirm={isOpenModalConfirm}
+                        handleDeleteProfile={handleDeleteProfile}
+                    />
+                )}
+            </PatientProfileLayout>
+        </>
     );
 };
 export default ViewProfile;

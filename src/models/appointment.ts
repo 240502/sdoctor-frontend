@@ -1,6 +1,6 @@
 export interface Appointment {
-    id: Number;
-    doctor_id: Number;
+    id: number;
+    doctor_id: number;
     appointment_date: Date;
     patient_name: string;
     patient_phone: string;
@@ -10,8 +10,8 @@ export interface Appointment {
     district: string;
     commune: string;
     examination_reason: string;
-    time_id: Number;
-    status_id: Number;
+    time_id: number;
+    status_id: number;
     created_at: Date;
     updated_at: Date;
     doctor_name: string;
@@ -20,6 +20,7 @@ export interface Appointment {
     location: string;
     type: string;
     gender: number;
+    rejectionReason: string;
 }
 export interface AppointmentViewForPatient extends Appointment {
     status_name: string;
