@@ -5,8 +5,8 @@ import { PlusOutlined } from '@ant-design/icons';
 import { TimeService } from '../../../../services/timeService';
 
 export const ListTime = ({
+    activeDay,
     timeType,
-    day,
     selectedTimes,
     setSelectedTimes,
     selectedTimeKeys,
@@ -19,7 +19,7 @@ export const ListTime = ({
             const data = { timeType: type };
             const res = await TimeService.getTimeByTimeType(data);
             const now = new Date();
-            if (now.getDay() === day) {
+            if (now.getDay() === activeDay) {
                 handleTimeOverRealTime(res);
             } else {
                 setTimes(res);
@@ -63,8 +63,8 @@ export const ListTime = ({
     };
     useEffect(() => {
         getTimeByType(timeType);
-        handleOverTime(day);
-    }, [day]);
+        handleOverTime(activeDay);
+    }, [activeDay, timeType]);
     useEffect(() => {
         setSelectedTimes([]);
         setSelectedTimeKeys([]);
@@ -80,7 +80,7 @@ export const ListTime = ({
             setSelectedTimes(newSelectedTimes);
         }
     }, [selectedTimeKeys]);
-    const handleSelectTime = (time: Time) => {
+    const handleSelectTimeAvailable = (time: Time) => {
         if (selectedTimes.length > 0) {
             const existsTime = selectedTimes.find(
                 (selectedTime: Time) => selectedTime.id === time.id
@@ -109,6 +109,7 @@ export const ListTime = ({
             );
 
             if (existsKey) {
+                console.log('exists');
                 const newListSelectedTimeKeys: any = selectedTimeKeys.filter(
                     (key: any) => key !== timeKey
                 );
@@ -139,15 +140,13 @@ export const ListTime = ({
                                                 : false || time.disable
                                         }
                                         className={`me-3 mt-3 border border-primary ${
-                                            selectedTimeKeys.includes(
-                                                Number(time.id)
-                                            )
+                                            selectedTimeKeys.includes(time.id)
                                                 ? 'bg-primary text-white'
                                                 : 'text-dark'
                                         }`}
                                         key={time.id}
                                         onClick={() => {
-                                            handleSelectTime(time);
+                                            handleSelectTimeAvailable(time);
                                             handleSelectedKeys(time.id);
                                         }}
                                     >

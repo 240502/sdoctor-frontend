@@ -9,12 +9,7 @@ import {
 import { AppointmentService } from '../../../../services/appointmentService';
 import { Button, Table, Tag, Tooltip, notification } from 'antd';
 import { TableColumnsType } from 'antd';
-import {
-    CloseOutlined,
-    DeleteOutlined,
-    EyeOutlined,
-    RedoOutlined,
-} from '@ant-design/icons';
+import { CloseOutlined, EyeOutlined, RedoOutlined } from '@ant-design/icons';
 import { ModalViewAppointment } from '../components/ModalViewAppointment';
 import { ModalConfirmCancelAppointment } from '../components/ModalConfirmCancelAppointment';
 import { useNavigate } from 'react-router-dom';

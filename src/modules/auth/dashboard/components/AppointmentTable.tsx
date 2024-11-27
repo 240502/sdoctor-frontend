@@ -11,7 +11,6 @@ import {
     Tooltip,
 } from 'antd';
 import Highlighter from 'react-highlight-words';
-import { ColumnType } from 'antd/es/list';
 import { useEffect, useRef, useState } from 'react';
 import { FilterDropdownProps } from 'antd/es/table/interface';
 import {
@@ -20,7 +19,6 @@ import {
     EyeOutlined,
     SearchOutlined,
 } from '@ant-design/icons';
-import type { PaginationProps } from 'antd';
 import { AppointmentService } from '../../../../services/appointmentService';
 type DataIndex = keyof AppointmentViewForPatient;
 const AppointmentTable = ({
@@ -252,32 +250,29 @@ const AppointmentTable = ({
             ),
         },
     ];
-    useEffect(() => {
-        console.log('data appointment table', data);
-    }, []);
 
-    return (
-        data.length > 0 && (
-            <>
-                <Table
-                    bordered
-                    columns={columns}
-                    dataSource={data}
-                    pagination={false}
-                />
-                <Pagination
-                    align="center"
-                    className="mt-3"
-                    current={pageIndex}
-                    pageSize={pageSize}
-                    total={pageCount * pageSize}
-                    onChange={onPageChange}
-                    showSizeChanger
-                    pageSizeOptions={['5', '10', '20', '50']}
-                    onShowSizeChange={(current, size) => setPageSize(size)}
-                />
-            </>
-        )
+    return data.length > 0 ? (
+        <>
+            <Table
+                bordered
+                columns={columns}
+                dataSource={data}
+                pagination={false}
+            />
+            <Pagination
+                align="center"
+                className="mt-3"
+                current={pageIndex}
+                pageSize={pageSize}
+                total={pageCount * pageSize}
+                onChange={onPageChange}
+                showSizeChanger
+                pageSizeOptions={['5', '10', '20', '50']}
+                onShowSizeChange={(current, size) => setPageSize(size)}
+            />
+        </>
+    ) : (
+        <p className="text-center">Chưa có lịch hẹn!</p>
     );
 };
 

@@ -23,8 +23,6 @@ export const ModalAddNews = ({
     loadData,
     post,
     setPost,
-    isView,
-    setIsView,
     setIsUpdate,
     config,
 }: any): JSX.Element => {
@@ -33,12 +31,9 @@ export const ModalAddNews = ({
     const selectCategoryRef = useRef<any>(null);
     const user = useRecoilValue(userValue);
     const labelContentRef = useRef<any>(null);
-    const [postCategory, setPostCategory] = useState<PostCategory>({
-        post_category_id: 0,
-        name: '',
-        description: '',
-        image: '',
-    });
+    const [postCategory, setPostCategory] = useState<PostCategory>(
+        {} as PostCategory
+    );
     const [postCategories, setPostCategories] = useState<PostCategory[]>([]);
     const getAllPostCategories = async () => {
         try {
@@ -55,12 +50,11 @@ export const ModalAddNews = ({
         return cate;
     };
     useEffect(() => {
-        if (isUpdate || isView) {
+        if (isUpdate) {
             const postCate: any = handleGetPostCategory(post.category_id);
             setPostCategory(postCate);
             setEditorData(post.content);
         }
-        console.log(isView);
         getAllPostCategories();
     }, []);
     const handleCreatePost = () => {
@@ -85,7 +79,6 @@ export const ModalAddNews = ({
                 category_id: post.category_id,
                 featured_image: firstImageSrc,
             };
-            console.log(data);
             CreatePost(data);
         }
     };
@@ -113,7 +106,7 @@ export const ModalAddNews = ({
     const handleUpdate = () => {
         const isEmptySelectCategory = isEmptySelect(
             selectCategoryRef.current,
-            postCategory?.post_category_id
+            postCategory?.post_category_id ?? postCategory.post_category_id
         );
         const isEmptyInputTitle = isEmpty(inputTitleRef.current?.input);
         const isEmptyCKEditor = isEmptyEditor(
@@ -132,7 +125,6 @@ export const ModalAddNews = ({
                 category_id: post.category_id,
                 featured_image: firstImageSrc,
             };
-            console.log(data);
             UpdatePost(data);
         }
     };
@@ -159,6 +151,7 @@ export const ModalAddNews = ({
         }
     };
     const handleOk = async () => {
+        console.log('ok', isUpdate);
         if (isUpdate) {
             handleUpdate();
         } else {
@@ -170,7 +163,6 @@ export const ModalAddNews = ({
         setIsShowModal(false);
         setPost({});
         setIsUpdate(false);
-        setIsView(false);
     };
     const changeCategoryPost = (value: number) => {
         if (value !== 0) {
@@ -198,16 +190,14 @@ export const ModalAddNews = ({
             onOk={handleOk}
             maskClosable={false}
             footer={[
-                !isView && (
-                    <Button
-                        key={'submit'}
-                        type="primary"
-                        className="bg-success"
-                        onClick={handleOk}
-                    >
-                        Lưu
-                    </Button>
-                ),
+                <Button
+                    key={'submit'}
+                    type="primary"
+                    className="bg-success"
+                    onClick={handleOk}
+                >
+                    Lưu
+                </Button>,
                 <Button key={'back'} onClick={handleCancel}>
                     Đóng
                 </Button>,
@@ -221,12 +211,11 @@ export const ModalAddNews = ({
                 <div className="form__group mb-2">
                     <label className="mb-2">Danh mục bài viết</label>
                     <Select
-                        disabled={isView}
                         ref={selectCategoryRef}
                         className="d-flex"
                         showSearch
                         optionFilterProp="children"
-                        defaultValue={isUpdate || isView ? post.category_id : 0}
+                        value={post.category_id}
                         onFocus={() =>
                             handleFocusSelect(selectCategoryRef.current)
                         }
@@ -236,8 +225,8 @@ export const ModalAddNews = ({
                                 category_id: value !== 0 ? value : null,
                             })
                         }
+                        placeholder="Chọn danh mục bài viết"
                     >
-                        <Select.Option value={0}>Chọn danh mục</Select.Option>
                         {postCategories.length > 0 ? (
                             postCategories.map((item: PostCategory) => {
                                 return (
@@ -260,7 +249,6 @@ export const ModalAddNews = ({
                 <div className="form__group mb-2">
                     <label className="mb-2">Tiêu đề bài viết</label>
                     <Input
-                        readOnly={isView}
                         value={post.title}
                         ref={inputTitleRef}
                         type="text"
@@ -288,7 +276,6 @@ export const ModalAddNews = ({
                         post={post}
                         setPost={setPost}
                         isUpdate={isUpdate}
-                        isView={isView}
                     />
                     <div
                         className="error_message mt-3"

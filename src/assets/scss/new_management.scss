@@ -1,0 +1,11 @@
+.feature-img-container {
+    display: inline-block;
+    overflow: hidden;
+    position: relative;
+}
+.feature-img {
+    transition: transform 0.4s ease;
+}
+.feature-img:hover {
+    transform: scale(1.2);
+}

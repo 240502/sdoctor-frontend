@@ -15,4 +15,8 @@ export const ServicesService = {
         );
         return res;
     },
+    async getServiceById(id: number): Promise<any> {
+        const res = await apiClient.get('/api/service//getById/' + id);
+        return res.data;
+    },
 };

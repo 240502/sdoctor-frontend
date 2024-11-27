@@ -54,7 +54,7 @@ export const BlockSchedule = ({
                 subscriberId: subscriberId,
                 type: 'Bác sĩ',
             };
-            const result = await scheduleService.getBySubscriberIdAndDate(data);
+            const result = await scheduleService.viewScheduleForClient(data);
             setSchedule(result.data);
 
             setSchedules((prev: Schedule[]) => {

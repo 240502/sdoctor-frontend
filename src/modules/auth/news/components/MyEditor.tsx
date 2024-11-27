@@ -10,19 +10,13 @@ const MyEditor = ({
     post,
     setPost,
     isUpdate,
-    isView,
 }: any) => {
     const editorRef = useRef<any>(null);
-    useEffect(() => {
-        if (editorRef.current) {
-            const editorInstance = editorRef.current;
-            if (isView) {
-                editorInstance.enableReadOnlyMode('my-editor');
-            } else {
-                editorInstance.disableReadOnlyMode('my-editor');
-            }
-        }
-    }, [isView]);
+    // useEffect(() => {
+    //     if (editorRef.current) {
+    //         const editorInstance = editorRef.current;
+    //     }
+    // }, []);
     return (
         <CKEditor
             editor={ClassicEditor}
@@ -59,12 +53,6 @@ const MyEditor = ({
             }}
             onReady={(editor) => {
                 editorRef.current = editor; // Lưu instance của editor vào ref
-                if (isView) {
-                    editor.enableReadOnlyMode('my-editor'); // Thiết lập chế độ chỉ đọc nếu cần
-                } else {
-                    editor.disableReadOnlyMode('my-editor'); // Thiết lập chế độ chỉnh sửa nếu cần
-                }
-                console.log('Editor is ready to use!', editor);
             }}
             onFocus={(event, editor) => {
                 showSuccess(labelContentRef.current);

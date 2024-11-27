@@ -37,8 +37,5 @@ export default class CustomUploadAdapter {
         );
     }
 
-    // Phương thức bắt buộc: abort
-    abort() {
-        // Bạn có thể triển khai hủy bỏ tải lên nếu cần
-    }
+    abort() {}
 }

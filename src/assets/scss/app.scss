@@ -42,3 +42,12 @@ main {
 .custom-menu .ant-menu-item-selected {
     background-color: transparent !important;
 }
+
+.option-add-time {
+    background-color: #f1f5f9;
+    transition: all 0.2s linear;
+}
+
+.option-add-time.active {
+    background-color: #0e82fd;
+}

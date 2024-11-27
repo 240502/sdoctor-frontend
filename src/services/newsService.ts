@@ -28,4 +28,8 @@ export const NewsService = {
         const res = await apiClient.delete('/api/post/delete/' + id, config);
         return res;
     },
+    async deleteImages(id: number, config: any): Promise<any> {
+        const res = await apiClient.delete('/api/delete/' + id, config);
+        return res;
+    },
 };

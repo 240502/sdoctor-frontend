@@ -1,5 +1,21 @@
-import { HomeOutlined } from '@ant-design/icons';
-import { Breadcrumb, Divider, notification, Pagination } from 'antd';
+import {
+    ClockCircleFilled,
+    ClockCircleOutlined,
+    DeleteOutlined,
+    EditOutlined,
+    HomeOutlined,
+    PlusOutlined,
+} from '@ant-design/icons';
+import {
+    Breadcrumb,
+    Divider,
+    notification,
+    Pagination,
+    Card,
+    Flex,
+    Button,
+    Image,
+} from 'antd';
 import React, { useEffect, useState } from 'react';
 import TableNews from '../components/TableNews';
 import { ModalAddNews } from '../components/ModalAddNews';
@@ -9,6 +25,10 @@ type NotificationType = 'success' | 'error';
 import type { PaginationProps } from 'antd';
 import { useRecoilValue } from 'recoil';
 import { userValue } from '../../../../stores/userAtom';
+import { baseURL } from '../../../../constants/api';
+import '@/assets/scss/new_management.scss';
+import { NewsCards } from '../components/NewsCards';
+import { ModalConfirmDeleteNews } from '../components/ModalConfirmDeleteNews';
 
 const NewsManagement = () => {
     const user = useRecoilValue(userValue);
@@ -16,27 +36,15 @@ const NewsManagement = () => {
     const [api, contextHolder] = notification.useNotification();
     const [isShowModal, setIsShowModal] = useState<boolean>(false);
     const [isUpdate, setIsUpdate] = useState<boolean>(false);
+    const [isShowModalConfirm, setIsShowModalConfirm] =
+        useState<boolean>(false);
     const [pageIndex, setPageIndex] = useState<number>(1);
-    const [pageSize, setPageSize] = useState<number>(10);
+    const [pageSize, setPageSize] = useState<number>(5);
     const [pageCount, setPageCount] = useState<number>(0);
-    const [status, setStatus] = useState<string>('');
     const [categoryId, setCategoryId] = useState<any>(null);
     const [posts, setPosts] = useState<News[]>([]);
-    const [post, setPost] = useState<News>({
-        id: 0,
-        title: '',
-        content: '',
-        author_id: 0,
-        public_date: null,
-        updated_at: null,
-        status: '',
-        category_id: 0,
-        featured_image: '',
-        created_at: null,
-        category_name: '',
-        author_name: '',
-    });
-    const [isView, setIsView] = useState<boolean>(false);
+    const [post, setPost] = useState<News>({} as News);
+    const [activeBtn, setActiveBtn] = useState<number>(0);
     const openNotificationWithIcon = (
         type: NotificationType,
         title: string,
@@ -47,15 +55,9 @@ const NewsManagement = () => {
             description: des,
         });
     };
-    const onShowSizeChange: PaginationProps['onShowSizeChange'] = (
-        current,
-        pageSize
-    ) => {
-        console.log(current, pageSize);
-    };
+
     const loadData = async () => {
         try {
-            console.log('api');
             const header = {
                 headers: { authorization: 'Bearer ' + user.token },
             };
@@ -64,21 +66,22 @@ const NewsManagement = () => {
             const data = {
                 pageIndex: pageIndex,
                 pageSize: pageSize,
-                status: status,
+                status: activeBtn === 0 ? 'Chờ duyệt' : 'Đã đăng',
                 categoryId: categoryId,
             };
             const res = await NewsService.viewNewsAdmin(data, header);
-
             setPageCount(res.pageCount);
             setPosts(res.data);
         } catch (err: any) {
             console.log(err.message);
         }
     };
-
+    const handleCloseModalConfirm = () => {
+        setIsShowModalConfirm(false);
+    };
     useEffect(() => {
         loadData();
-    }, []);
+    }, [pageIndex, pageSize, activeBtn]);
 
     return (
         <div className="container">
@@ -97,26 +100,67 @@ const NewsManagement = () => {
                 />
                 <Divider />
             </div>
-            <div className="block__list__appointment">
-                <h5 className="mb-3">Danh sách bài viết</h5>
-
-                <div className="mb-3"></div>
-                <TableNews
-                    setIsUpdate={setIsUpdate}
+            <div className="block__list__news">
+                <Flex className="justify-content-between ps-2 pe-2 mb-3">
+                    <Flex>
+                        <Button
+                            key={'pending'}
+                            onClick={() => {
+                                setActiveBtn(0);
+                            }}
+                            className={
+                                activeBtn === 0
+                                    ? 'bg-info text-white border-0'
+                                    : 'border-0 text-dark'
+                            }
+                        >
+                            Chờ duyệt
+                        </Button>
+                        <Button
+                            key={'active'}
+                            onClick={() => setActiveBtn(1)}
+                            className={
+                                activeBtn === 1
+                                    ? 'bg-info text-white border-0'
+                                    : 'border-0 text-dark'
+                            }
+                        >
+                            Đã đăng
+                        </Button>
+                    </Flex>
+                    <Button
+                        className="border-0 text-white bg-primary"
+                        onClick={() => setIsShowModal(true)}
+                    >
+                        <PlusOutlined /> Thêm mới
+                    </Button>
+                </Flex>
+                <NewsCards
+                    posts={posts}
                     setIsShowModal={setIsShowModal}
-                    news={posts}
                     setPost={setPost}
-                    setIsView={setIsView}
+                    setIsUpdate={setIsUpdate}
                     openNotificationWithIcon={openNotificationWithIcon}
                     loadData={loadData}
-                    config={config}
+                    setIsShowModalConfirm={setIsShowModalConfirm}
                 />
                 <Pagination
+                    className="mt-3"
                     showSizeChanger
                     align="center"
                     defaultCurrent={1}
-                    total={pageCount}
-                    onShowSizeChange={onShowSizeChange}
+                    current={pageIndex}
+                    pageSize={pageSize}
+                    total={pageCount * pageSize}
+                    pageSizeOptions={['5', '10', '20', '50']}
+                    onChange={(current: number, size: number) => {
+                        if (size !== pageSize) {
+                            setPageIndex(1);
+                            setPageSize(size);
+                        } else {
+                            setPageIndex(current);
+                        }
+                    }}
                 />
             </div>
             {isShowModal && (
@@ -128,10 +172,18 @@ const NewsManagement = () => {
                     loadData={loadData}
                     post={post}
                     setPost={setPost}
-                    isView={isView}
-                    setIsView={setIsView}
                     setIsUpdate={setIsUpdate}
                     config={config}
+                />
+            )}
+            {isShowModalConfirm && (
+                <ModalConfirmDeleteNews
+                    isShowModalConfirm={isShowModalConfirm}
+                    handleCloseModalConfirm={handleCloseModalConfirm}
+                    post={post}
+                    header={config}
+                    openNotificationWithIcon={openNotificationWithIcon}
+                    loadData={loadData}
                 />
             )}
         </div>

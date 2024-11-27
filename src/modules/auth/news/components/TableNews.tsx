@@ -1,23 +1,20 @@
-import React, { useEffect, useState } from 'react';
-import {
-    Button,
-    Flex,
-    Select,
-    Table,
-    Tooltip,
-    Pagination,
-    Tag,
-    Modal,
-} from 'antd';
-import type { TableColumnsType } from 'antd';
+import { useRef, useState } from 'react';
+import { Button, Flex, Table, Tooltip, Tag, Modal, Space, Input } from 'antd';
+import type { InputRef, TableColumnsType } from 'antd';
 import {
     DeleteOutlined,
     EditOutlined,
     EyeOutlined,
     PlusOutlined,
+    SearchOutlined,
 } from '@ant-design/icons';
 import { News } from '../../../../models/news';
 import { NewsService } from '../../../../services/newsService';
+import { FilterDropdownProps } from 'antd/es/table/interface';
+import Highlighter from 'react-highlight-words';
+
+type DataIndex = keyof News;
+
 const TableNews = ({
     setIsUpdate,
     setIsShowModal,
@@ -28,12 +25,115 @@ const TableNews = ({
     loadData,
     config,
 }: any) => {
+    const [searchText, setSearchText] = useState('');
+    const [searchedColumn, setSearchedColumn] = useState('');
+    const searchInput = useRef<InputRef>(null);
     const [isShowModalConfirm, setIsShowModalConfirm] =
         useState<boolean>(false);
     const [postId, setPostId] = useState<number>(0);
     const handleCancel = () => {
         setIsShowModalConfirm(false);
     };
+    const handleSearch = (
+        selectedKeys: string[],
+        confirm: FilterDropdownProps['confirm'],
+        dataIndex: DataIndex
+    ) => {
+        confirm();
+        setSearchText(selectedKeys[0]);
+        setSearchedColumn(dataIndex);
+    };
+
+    const handleReset = (clearFilters: () => void) => {
+        clearFilters();
+        setSearchText('');
+    };
+
+    const getColumnSearchProps = (dataIndex: DataIndex) => ({
+        filterDropdown: ({
+            setSelectedKeys,
+            selectedKeys,
+            confirm,
+            clearFilters,
+            close,
+        }: FilterDropdownProps) => (
+            <div style={{ padding: 8 }} onKeyDown={(e) => e.stopPropagation()}>
+                <Input
+                    ref={searchInput}
+                    placeholder={`Search ${dataIndex}`}
+                    value={selectedKeys[0]}
+                    onChange={(e) =>
+                        setSelectedKeys(e.target.value ? [e.target.value] : [])
+                    }
+                    onPressEnter={() =>
+                        handleSearch(
+                            selectedKeys as string[],
+                            confirm,
+                            dataIndex
+                        )
+                    }
+                    style={{ marginBottom: 8, display: 'block' }}
+                />
+                <Space>
+                    <Button
+                        type="primary"
+                        onClick={() =>
+                            handleSearch(
+                                selectedKeys as string[],
+                                confirm,
+                                dataIndex
+                            )
+                        }
+                        icon={<SearchOutlined />}
+                        size="small"
+                        style={{ width: 90 }}
+                    >
+                        Tìm kiếm
+                    </Button>
+                    <Button
+                        onClick={() =>
+                            clearFilters && handleReset(clearFilters)
+                        }
+                        size="small"
+                        style={{ width: 90 }}
+                    >
+                        Reset
+                    </Button>
+                    <Button
+                        type="link"
+                        size="small"
+                        onClick={() => {
+                            close();
+                        }}
+                    >
+                        Đóng
+                    </Button>
+                </Space>
+            </div>
+        ),
+        filterIcon: (filtered: boolean) => (
+            <SearchOutlined
+                style={{ color: filtered ? '#1677ff' : undefined }}
+            />
+        ),
+        onFilter: (value: any, record: any) =>
+            record[dataIndex]
+                .toString()
+                .toLowerCase()
+                .includes((value as string).toLowerCase()),
+
+        render: (text: any) =>
+            searchedColumn === dataIndex ? (
+                <Highlighter
+                    highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
+                    searchWords={[searchText]}
+                    autoEscape
+                    textToHighlight={text ? text.toString() : ''}
+                />
+            ) : (
+                text
+            ),
+    });
     const handleOk = async () => {
         console.log(postId);
         try {
@@ -59,9 +159,30 @@ const TableNews = ({
         {
             title: 'Tiêu đề bài viết',
             dataIndex: 'title',
+            ...getColumnSearchProps('title'),
+            render: (text) => (
+                <p
+                    style={{
+                        maxWidth: '250px',
+                        whiteSpace: 'nowrap',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                    }}
+                >
+                    {text}
+                </p>
+            ),
         },
-        { title: 'Tên danh mục', dataIndex: 'category_name' },
-        { title: 'Tên tác giả', dataIndex: 'author_name' },
+        {
+            title: 'Tên danh mục',
+            dataIndex: 'category_name',
+            ...getColumnSearchProps('category_name'),
+        },
+        {
+            title: 'Tên tác giả',
+            dataIndex: 'author_name',
+            ...getColumnSearchProps('author_name'),
+        },
         {
             title: 'Trạng thái',
             dataIndex: 'status',
@@ -70,6 +191,18 @@ const TableNews = ({
                     {text}
                 </Tag>
             ),
+            filters: [
+                {
+                    text: 'Chờ xác nhận',
+                    value: 'Chờ xác nhận',
+                },
+                {
+                    text: 'Đã xác nhận',
+                    value: 'Đã xác nhận',
+                },
+            ],
+            onFilter: (value, record) =>
+                record.status.indexOf(value as string) === 0,
         },
 
         {
@@ -138,7 +271,12 @@ const TableNews = ({
                         </Button>
                     </div>
                 </Flex>
-                <Table<News> bordered dataSource={news} columns={columns} />
+                <Table<News>
+                    bordered
+                    dataSource={news}
+                    columns={columns}
+                    pagination={false}
+                />
             </Flex>
             {isShowModalConfirm && (
                 <Modal

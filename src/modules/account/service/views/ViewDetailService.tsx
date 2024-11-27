@@ -1,13 +1,8 @@
-import {
-    EnvironmentFilled,
-    EnvironmentOutlined,
-    HomeOutlined,
-} from '@ant-design/icons';
-import { Breadcrumb, Button, Image, notification } from 'antd';
-import React, { useEffect, useRef, useState } from 'react';
+import { EnvironmentOutlined, HomeOutlined } from '@ant-design/icons';
+import { Breadcrumb, Image, notification } from 'antd';
+import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { BlockSchedule } from '../components/BlockScheudle';
-import { Doctor } from '../../../../models/doctor';
 import { Time } from '../../../../models/time';
 import { ModalOrderAppointment } from '../components/ModalOrderAppointment';
 import { baseURL } from '../../../../constants/api';
@@ -55,11 +50,15 @@ const ViewDetailService = () => {
 
     const getServiceById = async (id: number) => {
         try {
-            const res = services.find(
+            const service = services.find(
                 (service: Services) => service.id === Number(id)
             );
-            console.log(res);
-            setService(res);
+            if (service) {
+                setService(service);
+            } else {
+                const res = await ServicesService.getServiceById(id);
+                setService(res);
+            }
         } catch (err: any) {
             console.log(err.message);
         }
@@ -86,15 +85,15 @@ const ViewDetailService = () => {
             ></Breadcrumb>
             <div className=" row mt-4 pb-4">
                 <div className="doctor__info d-flex">
-                    <div className="doctor__image col-1">
+                    <div className="doctor__image col-2 position-relative">
                         <Image
-                            style={{ width: '100%' }}
+                            width={170}
                             preview={false}
-                            className="rounded"
+                            className="rounded w-full"
                             src={baseURL + service?.image}
                         ></Image>
                     </div>
-                    <div className="doctor__des col-11 ms-4">
+                    <div className="doctor__des col-10">
                         <h3 className="doctor__name">{service?.name}</h3>
                         <p className="des opacity-75">
                             {parse(String(service?.description))}
