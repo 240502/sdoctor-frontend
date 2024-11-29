@@ -1,5 +1,5 @@
 export interface Clinic {
-    id: Number;
+    id: number;
     name: String;
     description: String;
     location: String;

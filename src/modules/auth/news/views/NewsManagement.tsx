@@ -68,6 +68,7 @@ const NewsManagement = () => {
                 pageSize: pageSize,
                 status: activeBtn === 0 ? 'Chờ duyệt' : 'Đã đăng',
                 categoryId: categoryId,
+                authorId: user.id,
             };
             const res = await NewsService.viewNewsAdmin(data, header);
             setPageCount(res.pageCount);

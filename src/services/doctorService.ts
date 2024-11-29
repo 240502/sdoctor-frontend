@@ -19,4 +19,24 @@ export const doctorService = {
         );
         return res;
     },
+    async uploadImage(formData: any): Promise<any> {
+        const res = await apiClient.post('/api/upload-doctor-image', formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+        });
+        return res;
+    },
+    async createDoctor(data: any, config: any): Promise<any> {
+        const res = await apiClient.post('/api/doctor/create', data, config);
+        return res;
+    },
+    async updateDoctor(data: any, config: any): Promise<any> {
+        const res = await apiClient.put('/api/doctor/update', data, config);
+        return res;
+    },
+    async deleteDoctor(id: any, config: any): Promise<any> {
+        const res = await apiClient.delete('/api/doctor/delete/' + id, config);
+        return res;
+    },
 };

@@ -169,8 +169,14 @@ const ViewDoctor = () => {
                                                         }}
                                                         className="doctor__image rounded-circle"
                                                         src={
-                                                            baseURL +
-                                                            doctor.image
+                                                            doctor.image.includes(
+                                                                'cloudinary'
+                                                            )
+                                                                ? String(
+                                                                      doctor.image
+                                                                  )
+                                                                : baseURL +
+                                                                  doctor.image
                                                         }
                                                     ></Image>
                                                 </Link>

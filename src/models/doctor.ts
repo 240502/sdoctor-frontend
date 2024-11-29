@@ -1,10 +1,10 @@
 import { Schedule } from './schdule';
 
 export interface Doctor {
-    id: Number;
-    full_name: String;
-    clinic_id: Number;
-    major_id: Number;
+    id: number;
+    full_name: string;
+    clinic_id: number;
+    major_id: number;
     description: String;
     image: String;
     email: String;
@@ -13,14 +13,14 @@ export interface Doctor {
     created_at: Date;
     updated_at: Date;
     address: String;
-    gender: String;
+    gender: number;
     title: String;
-    fee: Number;
+    fee: number;
     examination_object: String;
     views: number;
     clinic_name: String;
     location: string;
-    major_name: String;
+    major_name: string;
     schedule: Schedule;
     introduction: string;
 }

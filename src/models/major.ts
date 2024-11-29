@@ -1,5 +1,5 @@
 export interface Major {
-    id: Number;
+    id: number;
     name: String;
     image: String;
 }

@@ -68,7 +68,9 @@ const ViewDetailDoctor = () => {
         getDoctorById(Number(id));
         window.scrollTo(0, 0);
     }, [id]);
-    console.log(id);
+    useEffect(() => {
+        console.log('doctor', doctor);
+    }, [doctor]);
     return (
         <div className="container mt-4 mb-4">
             {contextHolder}
@@ -90,7 +92,11 @@ const ViewDetailDoctor = () => {
                             style={{ width: '100%' }}
                             preview={false}
                             className="rounded-circle"
-                            src={baseURL + doctor?.image}
+                            src={
+                                doctor?.image.includes('cloudinary')
+                                    ? String(doctor.image)
+                                    : baseURL + doctor?.image
+                            }
                         ></Image>
                     </div>
                     <div className="doctor__des col-11 ms-4">
