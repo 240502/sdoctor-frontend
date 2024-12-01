@@ -35,17 +35,14 @@ export const BlockHotDoctor = (): JSX.Element => {
     const handleUpdateViewsDoctor = async (id: number) => {
         try {
             const res = await doctorService.updateViewsDoctor(id);
-            console.log(res);
         } catch (err: any) {
             console.log(err.message);
         }
     };
     const loadData = async () => {
-        console.log('call api');
         try {
             const data = await doctorService.getCommonDoctor();
             setDoctors(data);
-            console.log(data);
         } catch (err: any) {
             console.log(err.message);
             setDoctors([]);
@@ -81,7 +78,7 @@ export const BlockHotDoctor = (): JSX.Element => {
                                                         cursor: 'pointer',
                                                     }}
                                                     alt="example"
-                                                    src={baseURL + doctor.image}
+                                                    src={doctor.image}
                                                 />
                                             }
                                             actions={[

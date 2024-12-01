@@ -5,12 +5,19 @@ import { Link } from 'react-router-dom';
 
 import { Sidenav } from './components/Sidenav';
 import { HeaderLayout } from './components/Header';
+import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
+import { requestConfig, userValue } from '../../../stores/userAtom';
 const { Sider, Content } = Layout;
 
 const AdminLayout: React.FC = ({ children }: any) => {
     const [collapsed, setCollapsed] = useState(false);
     const [current, setCurrent] = useState<string[]>([]);
-
+    const user = useRecoilValue(userValue);
+    const setRequestConfig = useSetRecoilState(requestConfig);
+    useEffect(() => {
+        const config = { headers: { authorization: 'Bearer ' + user.token } };
+        setRequestConfig(config);
+    }, [user]);
     const {
         token: { colorBgContainer, borderRadiusLG },
     } = theme.useToken();

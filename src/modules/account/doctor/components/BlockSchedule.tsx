@@ -8,7 +8,7 @@ import { scheduleService } from '../../../../services/scheduleService';
 import socket from '../../../../socket';
 import { ScheduleDetails } from '../../../../models/schedule_details';
 import { schedule_detailsService } from '../../../../services/schedule_detailsService';
-import { Schedule } from '../../../../models/schdule';
+import { Schedule } from '../../../../models/schedule';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { ListTime } from './ListTime';
 import {

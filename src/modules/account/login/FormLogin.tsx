@@ -12,7 +12,6 @@ export const FormLogin = () => {
     const [showPassword, setShowPassword] = useState<boolean>(false);
     const [errors, setErrors] = useState<any>({});
     const setUser = useSetRecoilState(userState);
-    const [a, setA] = useState<number>(1);
     const navigate = useNavigate();
 
     const handleLogin = (): boolean => {
@@ -40,7 +39,6 @@ export const FormLogin = () => {
     const Login = async () => {
         if (!handleLogin()) {
             try {
-                console.log('Before login:', { email, password });
                 const res = await UserService.login({ email, password });
 
                 // Đăng nhập thành công

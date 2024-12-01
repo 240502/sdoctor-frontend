@@ -14,3 +14,14 @@ export const userValue = selector({
         return get(userState);
     },
 });
+
+export const requestConfig = atom({
+    key: 'requestConfig',
+    default: {},
+});
+export const configValue = selector({
+    key: 'config',
+    get: ({ get }) => {
+        return get(requestConfig);
+    },
+});

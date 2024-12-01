@@ -4,7 +4,6 @@ import {
     Flex,
     Modal,
     Input,
-    Radio,
     InputRef,
     Image,
     Upload,
@@ -14,8 +13,6 @@ import DoctorEditor from './DoctorEditor';
 import { useEffect, useRef, useState } from 'react';
 import { Clinic } from '../../../../models/clinic';
 import { Major } from '../../../../models/major';
-import { ClinicService } from '../../../../services/clinicService';
-import { MajorService } from '../../../../services/majorService';
 import {
     handleFocusInput,
     isEmpty,
@@ -29,7 +26,7 @@ import { PlusOutlined } from '@ant-design/icons';
 import type { GetProp, UploadFile, UploadProps } from 'antd';
 import { doctorService } from '../../../../services/doctorService';
 import { useRecoilValue } from 'recoil';
-import { userValue } from '../../../../stores/userAtom';
+import { configValue, userValue } from '../../../../stores/userAtom';
 type FileType = Parameters<GetProp<UploadProps, 'beforeUpload'>>[0];
 
 export const DoctorModal = ({
@@ -42,9 +39,8 @@ export const DoctorModal = ({
     isUpdate,
     clinics,
     majors,
+    config,
 }: any) => {
-    const user = useRecoilValue(userValue);
-    const [config, setConfig] = useState<any>();
     const [previewOpen, setPreviewOpen] = useState(false);
     const [previewImage, setPreviewImage] = useState('');
     const [fileList, setFileList] = useState<UploadFile[]>([]);
@@ -219,10 +215,6 @@ export const DoctorModal = ({
     };
 
     useEffect(() => {
-        const header = {
-            headers: { authorization: 'Bearer ' + user.token },
-        };
-        setConfig(header);
         if (doctor?.image && doctor?.image?.includes('cloudinary')) {
             const file: UploadFile[] = [
                 {

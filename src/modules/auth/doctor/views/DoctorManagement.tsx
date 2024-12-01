@@ -1,22 +1,15 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
 import { Doctor } from '../../../../models/doctor';
 import {
     Button,
-    Pagination,
     Flex,
     Divider,
     Breadcrumb,
     notification,
     Select,
-    Card,
     Input,
 } from 'antd';
-import { useNavigate } from 'react-router-dom';
-import { baseURL } from '../../../../constants/api';
 import { HomeOutlined, PlusOutlined, SearchOutlined } from '@ant-design/icons';
-import { useFetchNonParam } from '../../../../hooks/useFecthNonParam';
-import { useSearch } from '../../../../hooks/useSearch';
 import { doctorService } from '../../../../services/doctorService';
 import { DoctorCards } from '../components/DoctorCards';
 import { DoctorModal } from '../components/DoctorModal';
@@ -25,10 +18,13 @@ import { Major } from '../../../../models/major';
 import { Clinic } from '../../../../models/clinic';
 import { ClinicService } from '../../../../services/clinicService';
 import { MajorService } from '../../../../services/majorService';
+import { useRecoilValue } from 'recoil';
+import { configValue } from '../../../../stores/userAtom';
 type NotificationType = 'success' | 'warning' | 'error';
 const { Option } = Select;
 
 const DoctorManagement = () => {
+    const config = useRecoilValue(configValue);
     const [api, contextHolder] = notification.useNotification();
     const [options, setOptions] = useState({ clinicId: null, majorId: null });
     const [doctors, setDoctors] = useState<Doctor[]>([]);
@@ -260,6 +256,7 @@ const DoctorManagement = () => {
                     isUpdate={isUpdate}
                     clinics={clinics}
                     majors={majors}
+                    config={config}
                 />
             )}
             {showModalConfirm && (
@@ -269,6 +266,7 @@ const DoctorManagement = () => {
                     doctorId={doctor?.id}
                     openNotificationWithIcon={openNotificationWithIcon}
                     getDoctors={getDoctors}
+                    config={config}
                 />
             )}
         </div>

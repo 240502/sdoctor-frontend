@@ -19,10 +19,28 @@ export const ListTime = ({
             const data = { timeType: type };
             const res = await TimeService.getTimeByTimeType(data);
             const now = new Date();
-            if (now.getDay() === activeDay) {
-                handleTimeOverRealTime(res);
+
+            if (now.getDay() !== 0) {
+                if (now.getDay() < activeDay) {
+                    const newTimes = res.map((time: Time) => {
+                        return { ...time, disable: true };
+                    });
+                    setTimes(newTimes);
+                }
+                if (now.getDay() === activeDay) {
+                    handleTimeOverRealTime(res);
+                }
+                if (now.getDay() > activeDay) {
+                    setTimes(res);
+                }
             } else {
-                setTimes(res);
+                if (now.getDay() === activeDay) {
+                    handleTimeOverRealTime(res);
+                }
+                // CHO PHÉP NGƯỜI DÙNG ĐĂNG KÝ TIẾP TUẦN TIẾP THEO TỚI T7
+                else {
+                    setTimes(res);
+                }
             }
         } catch (err: any) {
             console.log(err);
@@ -64,6 +82,7 @@ export const ListTime = ({
     useEffect(() => {
         getTimeByType(timeType);
         handleOverTime(activeDay);
+        console.log('activeDay', activeDay);
     }, [activeDay, timeType]);
     useEffect(() => {
         setSelectedTimes([]);
@@ -109,7 +128,6 @@ export const ListTime = ({
             );
 
             if (existsKey) {
-                console.log('exists');
                 const newListSelectedTimeKeys: any = selectedTimeKeys.filter(
                     (key: any) => key !== timeKey
                 );

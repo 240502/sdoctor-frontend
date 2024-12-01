@@ -25,7 +25,6 @@ export const BlockService = () => {
     const loadData = async () => {
         try {
             const data = await ServicesService.getCommonService();
-            console.log(data);
             setCommonServices(data);
         } catch (err: any) {
             console.error(err);
@@ -34,7 +33,6 @@ export const BlockService = () => {
     const handleUpdateViewsService = async (id: number): Promise<any> => {
         try {
             const res = await ServicesService.updateViewsService(id);
-            console.log(res);
         } catch (err: any) {
             console.log(err.message);
         }

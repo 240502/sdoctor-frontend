@@ -346,8 +346,6 @@ const ViewProfile = () => {
             }
         };
         if (wards.length > 1) {
-            console.log('get ward');
-
             getWards();
         }
     }, [wards.length]);

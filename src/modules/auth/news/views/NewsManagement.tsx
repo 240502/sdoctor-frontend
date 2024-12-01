@@ -1,38 +1,26 @@
-import {
-    ClockCircleFilled,
-    ClockCircleOutlined,
-    DeleteOutlined,
-    EditOutlined,
-    HomeOutlined,
-    PlusOutlined,
-} from '@ant-design/icons';
+import { HomeOutlined, PlusOutlined } from '@ant-design/icons';
 import {
     Breadcrumb,
     Divider,
     notification,
     Pagination,
-    Card,
     Flex,
     Button,
-    Image,
 } from 'antd';
-import React, { useEffect, useState } from 'react';
-import TableNews from '../components/TableNews';
+import { useEffect, useState } from 'react';
 import { ModalAddNews } from '../components/ModalAddNews';
 import { News } from '../../../../models/news';
 import { NewsService } from '../../../../services/newsService';
 type NotificationType = 'success' | 'error';
-import type { PaginationProps } from 'antd';
 import { useRecoilValue } from 'recoil';
-import { userValue } from '../../../../stores/userAtom';
-import { baseURL } from '../../../../constants/api';
+import { configValue, userValue } from '../../../../stores/userAtom';
 import '@/assets/scss/new_management.scss';
 import { NewsCards } from '../components/NewsCards';
 import { ModalConfirmDeleteNews } from '../components/ModalConfirmDeleteNews';
 
 const NewsManagement = () => {
     const user = useRecoilValue(userValue);
-    const [config, setConfig] = useState<any>();
+    const config = useRecoilValue(configValue);
     const [api, contextHolder] = notification.useNotification();
     const [isShowModal, setIsShowModal] = useState<boolean>(false);
     const [isUpdate, setIsUpdate] = useState<boolean>(false);
@@ -58,11 +46,6 @@ const NewsManagement = () => {
 
     const loadData = async () => {
         try {
-            const header = {
-                headers: { authorization: 'Bearer ' + user.token },
-            };
-            setConfig(header);
-
             const data = {
                 pageIndex: pageIndex,
                 pageSize: pageSize,
@@ -70,7 +53,7 @@ const NewsManagement = () => {
                 categoryId: categoryId,
                 authorId: user.id,
             };
-            const res = await NewsService.viewNewsAdmin(data, header);
+            const res = await NewsService.viewNewsAdmin(data, config);
             setPageCount(res.pageCount);
             setPosts(res.data);
         } catch (err: any) {

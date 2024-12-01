@@ -1,21 +1,13 @@
 import { HomeOutlined } from '@ant-design/icons';
-import {
-    Breadcrumb,
-    Button,
-    Card,
-    Flex,
-    Select,
-    TabsProps,
-    notification,
-} from 'antd';
-import React, { useEffect, useState } from 'react';
+import { Breadcrumb, Button, Select, TabsProps, notification } from 'antd';
+import { useEffect, useState } from 'react';
 import { ListTime } from '../components/ListTime';
 import { ScheduleDetails } from '../../../../models/schedule_details';
 import { Time } from '../../../../models/time';
 import { useRecoilValue } from 'recoil';
-import { userValue } from '../../../../stores/userAtom';
+import { configValue, userValue } from '../../../../stores/userAtom';
 import { scheduleService } from '../../../../services/scheduleService';
-import { Schedule } from '../../../../models/schdule';
+import { Schedule } from '../../../../models/schedule';
 import { handleGetDateByActiveDay } from '../../../../utils/schedule_management';
 type NotificationType = 'success' | 'error';
 const tabs: TabsProps['items'] = [
@@ -49,9 +41,9 @@ const tabs: TabsProps['items'] = [
     },
 ];
 const ScheduleManagement = () => {
-    const [config, setConfig] = useState<any>();
-    const [api, contextHolder] = notification.useNotification();
     const user = useRecoilValue(userValue);
+    const config = useRecoilValue(configValue);
+    const [api, contextHolder] = notification.useNotification();
     const [timeType, setTimeType] = useState<string>('60 phút');
     const [activeDay, setActiveDay] = useState<string>('1');
     const [selectedTimes, setSelectedTimes] = useState<Time[]>([]);
@@ -59,6 +51,7 @@ const ScheduleManagement = () => {
     const [schedule, setSchedule] = useState<Schedule>({} as Schedule);
     const [isVisibleButtonSave, setIsVisibleButtonSave] =
         useState<boolean>(false);
+    const [isUpdate, setIsUpdate] = useState<boolean>(false);
     const openNotification = (
         type: NotificationType,
         title: string,
@@ -85,6 +78,7 @@ const ScheduleManagement = () => {
     const GetScheduleBySubscriberIdAndDate = async (data: any) => {
         try {
             const res = await scheduleService.viewScheduleForDoctor(data);
+            console.log('call api');
             setSchedule(res.data);
             let timeAvailable: any = [];
             res.data.listScheduleDetails.forEach((item: ScheduleDetails) => {
@@ -98,12 +92,14 @@ const ScheduleManagement = () => {
             });
             setSelectedTimeKeys(timeAvailable);
         } catch (err: any) {
-            console.error(err.message);
+            console.log(err.message);
+            setSchedule({} as Schedule);
+            setSelectedTimeKeys([]);
+            setSelectedTimeKeys([]);
         }
     };
     const handleOnClickSave = () => {
-        if (schedule?.id) {
-            console.log('update');
+        if (schedule?.id || isUpdate) {
             let isDiff = false;
             if (
                 schedule.listScheduleDetails.length === selectedTimeKeys.length
@@ -114,6 +110,7 @@ const ScheduleManagement = () => {
                 const combined = [
                     ...new Set([...existsTimeKeys, ...selectedTimeKeys]),
                 ];
+
                 if (combined.length > schedule.listScheduleDetails.length) {
                     isDiff = true;
                 }
@@ -125,7 +122,7 @@ const ScheduleManagement = () => {
                 handleUpdateSchedule();
             }
         } else {
-            // handleCreateSchedule();
+            handleCreateSchedule();
         }
     };
     const handleUpdateSchedule = () => {
@@ -204,17 +201,27 @@ const ScheduleManagement = () => {
         scheduleDetails: ScheduleDetails[]
     ) => {
         try {
-            console.log('update');
-            console.log('id', id);
-            console.log('scheduleDetail', scheduleDetails);
             const data = {
                 id: id,
-                scheduleDetails: JSON.stringify(scheduleDetails),
+                scheduleDetails: scheduleDetails.filter(
+                    (detail: ScheduleDetails) => detail?.action
+                ),
             };
+
             const res = await scheduleService.updateSchedule(data, config);
-            console.log(res);
+            handleGetScheduleBySubscriberAndDate();
+            openNotification(
+                'success',
+                'Thông báo !',
+                'Cập nhập thời gian thành công!'
+            );
         } catch (err: any) {
             console.log(err.message);
+            openNotification(
+                'error',
+                'Thông báo !',
+                'Cập nhập thời gian không thành công!'
+            );
         }
     };
     const handleCreateSchedule = () => {
@@ -254,8 +261,15 @@ const ScheduleManagement = () => {
                 'Thông báo !',
                 'Đăng ký lịch thành công'
             );
+            setIsUpdate(true);
+            handleGetScheduleBySubscriberAndDate();
         } catch (err: any) {
             console.log(err.message);
+            openNotification(
+                'error',
+                'Thông báo !',
+                'Đăng ký lịch không thành công'
+            );
         }
     };
 
@@ -263,19 +277,17 @@ const ScheduleManagement = () => {
 
     useEffect(() => {
         const now = new Date();
-        const header = {
-            headers: { authorization: 'Bearer ' + user.token },
-        };
-        setConfig(header);
         setActiveDay(String(now.getDay()));
     }, []);
+
     useEffect(() => {
-        if (selectedTimes.length > 0) {
+        if (selectedTimes.length > 0 || schedule?.id) {
             setIsVisibleButtonSave(true);
         } else {
             setIsVisibleButtonSave(false);
         }
-    }, [selectedTimes]);
+        console.log('selectedTimes', selectedTimes);
+    }, [selectedTimes, schedule]);
 
     return (
         <div className="">
@@ -307,6 +319,7 @@ const ScheduleManagement = () => {
                                     setSelectedTimeKeys([]);
                                     setSelectedTimes([]);
                                     setSchedule({} as Schedule);
+                                    setIsUpdate(false);
                                 }}
                                 key={tab.key}
                             >
@@ -343,6 +356,7 @@ const ScheduleManagement = () => {
                     setSelectedTimes={setSelectedTimes}
                     selectedTimeKeys={selectedTimeKeys}
                     setSelectedTimeKeys={setSelectedTimeKeys}
+                    schedule={schedule}
                 />
             </div>
             <div className="group__btn text-center mt-3">

@@ -3,9 +3,11 @@ import { AppointmentViewForPatient } from '../../../../models/appointment';
 import {
     App,
     Button,
+    Flex,
     Input,
     InputRef,
     Pagination,
+    Select,
     Space,
     Tag,
     Tooltip,
@@ -20,19 +22,20 @@ import {
     SearchOutlined,
 } from '@ant-design/icons';
 import { AppointmentService } from '../../../../services/appointmentService';
-import { useRecoilValue } from 'recoil';
-import { configValue } from '../../../../stores/userAtom';
 type DataIndex = keyof AppointmentViewForPatient;
+const { Option } = Select;
+
 const AppointmentTable = ({
     data,
     onPageChange,
     pageCount,
-    pageIndex,
     pageSize,
+    openNotificationWithIcon,
+    getAppointmentByStatusId,
+    pageIndex,
     setPageSize,
     handleClickViewDetail,
     handleClickRejectBtn,
-    openNotificationWithIcon,
     fetchData,
 }: any) => {
     const [searchText, setSearchText] = useState('');
@@ -47,13 +50,13 @@ const AppointmentTable = ({
                 'Thông báo!',
                 'Xác nhận lịch hẹn thành công!'
             );
-            fetchData();
+            getAppointmentByStatusId();
         } catch (err: any) {
             console.log(err.message);
             openNotificationWithIcon(
                 'error',
                 'Thông báo!',
-                'Xác nhậ lịch hẹn không thành công!'
+                'Xác nhận lịch hẹn không thành công!'
             );
         }
     };
@@ -191,6 +194,17 @@ const AppointmentTable = ({
             },
         },
         {
+            title: 'Ngày hẹn',
+            dataIndex: 'appointment_date',
+            render: (_, record) => (
+                <>{record.appointment_date.toString().slice(0, 10)}</>
+            ),
+        },
+        {
+            title: 'Giờ hẹn',
+            dataIndex: 'time_value',
+        },
+        {
             title: 'Trạng thái',
             dataIndex: 'status_name',
             render: (_, record) => (
@@ -262,15 +276,17 @@ const AppointmentTable = ({
                 pagination={false}
             />
             <Pagination
-                align="center"
                 className="mt-3"
+                showSizeChanger
+                align="center"
+                defaultCurrent={1}
                 current={pageIndex}
                 pageSize={pageSize}
                 total={pageCount * pageSize}
-                onChange={onPageChange}
-                showSizeChanger
                 pageSizeOptions={['5', '10', '20', '50']}
-                onShowSizeChange={(current, size) => setPageSize(size)}
+                onChange={(current: number, size: number) => {
+                    onPageChange(current, size);
+                }}
             />
         </>
     ) : (

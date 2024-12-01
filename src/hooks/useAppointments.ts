@@ -4,7 +4,7 @@ import { useSetRecoilState } from 'recoil';
 import { appointmentListInDayState } from '../stores/appointmentAtom';
 
 export const useAppointments = (
-    token: string,
+    config: any,
     pageIndex: number,
     pageSize: number,
     doctor_id: number
@@ -17,13 +17,11 @@ export const useAppointments = (
         useState<number>(0);
     const [pageCount, setPageCount] = useState<number>(0);
     const fetchData = async () => {
-        const header = { headers: { authorization: 'Bearer ' + token } };
-
         try {
             try {
                 const total = await AppointmentService.getTotalPatientInDay(
                     doctor_id,
-                    header
+                    config
                 );
                 setTotalPatientInDay(total[0].totalPatient);
             } catch (err) {
@@ -34,7 +32,7 @@ export const useAppointments = (
                 const examined =
                     await AppointmentService.getTotalPatientExaminedInDay(
                         doctor_id,
-                        header
+                        config
                     );
                 setTotalPatientExaminedInDay(examined[0].totalPatient);
             } catch (err) {
@@ -45,7 +43,7 @@ export const useAppointments = (
                 const appointmentData =
                     await AppointmentService.getAppointmentInDay(
                         { pageIndex, pageSize, doctorId: doctor_id },
-                        header
+                        config
                     );
                 setAppointmentListInDay(appointmentData.data);
                 setPageCount(appointmentData.pageCount);
@@ -60,7 +58,7 @@ export const useAppointments = (
     };
     useEffect(() => {
         fetchData();
-    }, [token, pageIndex, pageSize]);
+    }, [config, pageIndex, pageSize]);
 
     return {
         totalPatientInDay,

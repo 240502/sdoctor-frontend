@@ -207,7 +207,7 @@ export const ModalOrderAppointment = ({
                     type: 'Bác sĩ',
                 };
                 console.log(appointment);
-                //CreateAppointment(appointment);
+                CreateAppointment(appointment);
                 // if (isSaveProfile) {
                 //     const uuid = uuidv4();
                 //     const newProfile = {
@@ -428,7 +428,7 @@ export const ModalOrderAppointment = ({
                     <div className="doctor__info text-center">
                         <Image
                             preview={false}
-                            src={baseURL + doctor.image}
+                            src={doctor.image}
                             className="rounded-circle"
                             width={115}
                         ></Image>

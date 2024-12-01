@@ -3,7 +3,7 @@ import SummaryCards from '../components/SummaryCards';
 import AppointmentTable from '../components/AppointmentTable';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { useEffect, useState } from 'react';
-import { userValue } from '../../../../stores/userAtom';
+import { configValue, userValue } from '../../../../stores/userAtom';
 import { useAppointments } from '../../../../hooks/useAppointments';
 import { ModalViewAppointment } from '../components/ModalViewAppointment';
 import { Appointment } from '../../../../models/appointment';
@@ -16,9 +16,12 @@ type NotificationType = 'success' | 'error';
 
 const DashBoard = () => {
     const user = useRecoilValue(userValue);
+
     const [appointments, setAppointments] = useRecoilState(
         appointmentListInDayState
     );
+    const config = useRecoilValue(configValue);
+
     const [appointment, setAppointment] = useState<Appointment>();
     const [pageIndex, setPageIndex] = useState<number>(1);
     const [pageSize, setPageSize] = useState<number>(5);
@@ -31,7 +34,7 @@ const DashBoard = () => {
         totalPatientExaminedInDay,
         pageCount,
         fetchData,
-    } = useAppointments(user.token, pageIndex, pageSize, user.object_id);
+    } = useAppointments(config, pageIndex, pageSize, user.object_id);
 
     const handleCancelModal = () => {
         setIsModalOpen(false);

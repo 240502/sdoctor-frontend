@@ -1,21 +1,18 @@
 import { Button, Modal } from 'antd';
 import { doctorService } from '../../../../services/doctorService';
 import { useRecoilValue } from 'recoil';
-import { userValue } from '../../../../stores/userAtom';
+import { configValue, userValue } from '../../../../stores/userAtom';
 export const ModalConfirmDelete = ({
     showModalConfirm,
     handleCloseModalConfirm,
     doctorId,
     openNotificationWithIcon,
     getDoctors,
+    config,
 }: any) => {
-    const user = useRecoilValue(userValue);
     const DeleteDoctor = async () => {
         try {
-            const header = {
-                headers: { authorization: 'Bearer ' + user.token },
-            };
-            const res = await doctorService.deleteDoctor(doctorId, header);
+            const res = await doctorService.deleteDoctor(doctorId, config);
             console.log(res);
             openNotificationWithIcon('success', 'Thông báo', 'Xóa thành công');
             getDoctors();
