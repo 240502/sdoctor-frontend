@@ -32,7 +32,7 @@ export const ModalConfirmCancelAppointment = ({
                 requirementObject: 'bác sĩ',
             };
             console.log(data);
-            const res = await AppointmentService.cancelAppointment(data);
+            const res = await AppointmentService.updateAppointmentStatus(data);
             openNotificationWithIcon(
                 'success',
                 'Thông báo!',

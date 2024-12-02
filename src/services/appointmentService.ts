@@ -75,12 +75,11 @@ export const AppointmentService = {
         );
         return res.data;
     },
-    async cancelAppointment(data: any): Promise<any> {
-        const res = await apiClient.put('api/appointment/cancel', data);
-        return res;
-    },
-    async confirmAppointment(id: number): Promise<any> {
-        const res = await apiClient.put('api/appointment/confirm/' + id);
+    async updateAppointmentStatus(data: any): Promise<any> {
+        const res = await apiClient.put(
+            'api/appointment/update-appointment-status',
+            data
+        );
         return res;
     },
 };

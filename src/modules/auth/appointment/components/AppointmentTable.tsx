@@ -1,5 +1,8 @@
 import Table, { ColumnsType } from 'antd/es/table';
-import { AppointmentViewForPatient } from '../../../../models/appointment';
+import {
+    Appointment,
+    AppointmentViewForPatient,
+} from '../../../../models/appointment';
 import {
     App,
     Button,
@@ -22,6 +25,7 @@ import {
     SearchOutlined,
 } from '@ant-design/icons';
 import { AppointmentService } from '../../../../services/appointmentService';
+import { ConfirmAppointmentModal } from '../../../../components';
 type DataIndex = keyof AppointmentViewForPatient;
 const { Option } = Select;
 
@@ -32,6 +36,7 @@ const AppointmentTable = ({
     pageSize,
     openNotificationWithIcon,
     getAppointmentByStatusId,
+    appointmentStatuses,
     pageIndex,
     setPageSize,
     handleClickViewDetail,
@@ -41,23 +46,64 @@ const AppointmentTable = ({
     const [searchText, setSearchText] = useState('');
     const [searchedColumn, setSearchedColumn] = useState('');
     const searchInput = useRef<InputRef>(null);
+    const [openModalConfirm, setOpenModalConfirm] = useState<boolean>(false);
+    const [appointment, setAppointment] = useState<Appointment>(
+        {} as Appointment
+    );
+    const [type, setType] = useState<string>('');
+    const [message, setMessage] = useState<string>('');
+    const handleCancelModalConfirm = () => {
+        setAppointment({} as Appointment);
+        setOpenModalConfirm(false);
+    };
+    const rejectionReasonInputRef = useRef<any>(null);
 
-    const handleConfirmAppointment = async (id: number) => {
+    const ChangeAppointmentStatus = async (data: any) => {
         try {
-            const res = await AppointmentService.confirmAppointment(id);
+            const res = await AppointmentService.updateAppointmentStatus(data);
             openNotificationWithIcon(
                 'success',
                 'Thông báo!',
-                'Xác nhận lịch hẹn thành công!'
+                'Cập nhập trạng thái thành công!'
             );
+            handleCancelModalConfirm();
             getAppointmentByStatusId();
+            openNotificationWithIcon(
+                'error',
+                'Thông báo!',
+                'Cập nhập trạng thái thành công!'
+            );
         } catch (err: any) {
             console.log(err.message);
             openNotificationWithIcon(
                 'error',
                 'Thông báo!',
-                'Xác nhận lịch hẹn không thành công!'
+                'Cập nhập trạng thái không thành công!'
             );
+            handleCancelModalConfirm();
+        }
+    };
+
+    const handleOk = () => {
+        if (type === 'delete') {
+            const data = {
+                appointment: {
+                    ...appointment,
+
+                    rejectionReason:
+                        rejectionReasonInputRef.current?.resizableTextArea
+                            ?.textArea.value,
+                },
+                requirementObject: 'bác sĩ',
+            };
+            ChangeAppointmentStatus(data);
+        } else {
+            const data = {
+                appointment: {
+                    ...appointment,
+                },
+            };
+            ChangeAppointmentStatus(data);
         }
     };
     const handleSearch = (
@@ -208,10 +254,21 @@ const AppointmentTable = ({
             title: 'Trạng thái',
             dataIndex: 'status_name',
             render: (_, record) => (
-                <Tag color={record.status_id === 1 ? 'geekblue' : 'green'}>
+                <Tag
+                    color={
+                        record.status_id === 1
+                            ? 'geekblue'
+                            : record.status_id === 2
+                            ? 'green'
+                            : record.status_id === 3
+                            ? 'error'
+                            : 'cyan'
+                    }
+                >
                     {record.status_name.toUpperCase()}
                 </Tag>
             ),
+
             filters: [
                 {
                     text: 'Chờ xác nhận',
@@ -240,28 +297,62 @@ const AppointmentTable = ({
                             <EyeOutlined className="text-info" />
                         </Button>
                     </Tooltip>
-                    {record.status_id === 1 && (
-                        <Tooltip placement="top" title="Xác nhận">
+                    {(record.status_id === 2 || record.status_id === 1) && (
+                        <Tooltip
+                            placement="top"
+                            title={
+                                record.status_id === 1
+                                    ? 'Xác nhận'
+                                    : 'Hoàn thành'
+                            }
+                        >
                             <Button
                                 className="border-success me-2"
                                 onClick={() => {
-                                    handleConfirmAppointment(record.id);
+                                    setOpenModalConfirm(true);
+                                    setType('confirm');
+
+                                    if (record.status_id === 2) {
+                                        setAppointment({
+                                            ...record,
+                                            status_id: 4,
+                                        });
+                                        setMessage(
+                                            'Bạn chắc chắn muốn đánh dấu lịch hẹn đã hoàn thành này!'
+                                        );
+                                    } else {
+                                        setAppointment({
+                                            ...record,
+                                            status_id: 2,
+                                        });
+                                        setMessage(
+                                            'Bạn chắc chắn xác nhận lịch hẹn này!'
+                                        );
+                                    }
                                 }}
                             >
                                 <CheckOutlined className="text-success" />
                             </Button>
                         </Tooltip>
                     )}
-                    <Tooltip placement="top" title="Từ chối">
-                        <Button
-                            danger
-                            onClick={() => {
-                                handleClickRejectBtn(record);
-                            }}
-                        >
-                            <CloseOutlined className="text-danger" />
-                        </Button>{' '}
-                    </Tooltip>
+                    {(record.status_id === 2 || record.status_id === 1) && (
+                        <Tooltip placement="top" title="Từ chối">
+                            <Button
+                                danger
+                                onClick={() => {
+                                    setOpenModalConfirm(true);
+                                    //handleConfirmAppointment(record);
+                                    setAppointment({ ...record, status_id: 3 });
+                                    setMessage(
+                                        'Bạn chắc chắn hủy lịch hẹn này!'
+                                    );
+                                    setType('delete');
+                                }}
+                            >
+                                <CloseOutlined className="text-danger" />
+                            </Button>{' '}
+                        </Tooltip>
+                    )}
                 </>
             ),
         },
@@ -288,6 +379,16 @@ const AppointmentTable = ({
                     onPageChange(current, size);
                 }}
             />
+            {openModalConfirm && (
+                <ConfirmAppointmentModal
+                    type={type}
+                    message={message}
+                    openModalConfirm={openModalConfirm}
+                    handleCancelModalConfirm={handleCancelModalConfirm}
+                    handleOk={handleOk}
+                    rejectionReasonInputRef={rejectionReasonInputRef}
+                />
+            )}
         </>
     ) : (
         <p className="text-center">Chưa có lịch hẹn!</p>

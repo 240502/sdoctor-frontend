@@ -16,7 +16,7 @@ const AppointmentManagement = () => {
     const [appointments, setAppointments] = useState<Appointment[]>([]);
     const [options, setOptions] = useState<any>({ statusId: 1 });
     const [pageIndex, setPageIndex] = useState<number>(1);
-    const [pageSize, setPageSize] = useState<number>(1);
+    const [pageSize, setPageSize] = useState<number>(5);
     const [pageCount, setPageCount] = useState<number>(0);
     const [appointmentStatuses, setAppointmentStatuses] = useState<
         AppointmentStatus[]
@@ -121,6 +121,7 @@ const AppointmentManagement = () => {
                     pageSize={pageSize}
                     openNotificationWithIcon={openNotificationWithIcon}
                     getAppointmentByStatusId={getAppointmentByStatusId}
+                    appointmentStatuses={appointmentStatuses}
                 />
             </div>
         </div>
