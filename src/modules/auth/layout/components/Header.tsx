@@ -1,18 +1,15 @@
-import { Button, Image, theme, Dropdown, Space, Divider } from 'antd';
+import { Button, Image, theme, Dropdown, Divider } from 'antd';
 import type { MenuProps } from 'antd';
 import { Header } from 'antd/es/layout/layout';
 import {
     MenuFoldOutlined,
     MenuUnfoldOutlined,
-    UploadOutlined,
-    UserOutlined,
-    VideoCameraOutlined,
     BellOutlined,
     DownOutlined,
 } from '@ant-design/icons';
 import '@/assets/scss/animation.scss';
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSetRecoilState } from 'recoil';
 import { userState } from '../../../../stores/userAtom';
@@ -43,7 +40,7 @@ export const HeaderLayout = ({ collapsed, setCollapsed }: any) => {
                 <Button
                     onClick={() => {
                         navigate('/');
-                        sessionStorage.setItem('user', '{}');
+                        sessionStorage.removeItem('user');
                         setUser({} as User);
                     }}
                     style={{ width: '100%' }}

@@ -1,14 +1,26 @@
 import { useEffect, useState } from 'react';
 import { Clinic } from '../../../../models/clinic';
 import { ClinicService } from '../../../../services/clinicService';
-import { Breadcrumb, Button, Divider, Flex, notification } from 'antd';
-import { HomeOutlined, PlusOutlined } from '@ant-design/icons';
+import {
+    Breadcrumb,
+    Button,
+    Divider,
+    Flex,
+    Input,
+    notification,
+    Select,
+} from 'antd';
+import { HomeOutlined, PlusOutlined, SearchOutlined } from '@ant-design/icons';
 import { ClinicCards } from '../components/ClinicCards';
 import { InputClinicModal } from '../components/InputClinicModal';
 import { useRecoilValue } from 'recoil';
 import { configValue } from '../../../../stores/userAtom';
 import { ConfirmModal } from '../../../../components';
-
+import { ProvinceType } from '../../../../models/other';
+import { OtherService } from '../../../../services/otherService';
+import { SearchProps } from 'antd/es/input';
+const { Option } = Select;
+const { Search } = Input;
 type NotificationType = 'success' | 'error';
 const ClinicManagement = () => {
     const config = useRecoilValue(configValue);
@@ -23,7 +35,19 @@ const ClinicManagement = () => {
     const [openModalConfirmDelete, setOpenModalConfirmDelete] =
         useState<boolean>(false);
     const [isUpdate, setIsUpdate] = useState<boolean>(false);
-
+    const [options, setOptions] = useState<any>({
+        location: null,
+        name: null,
+    });
+    const [provinces, setProvinces] = useState<ProvinceType[]>([]);
+    const getProvinces = async () => {
+        try {
+            const res = await OtherService.getProvinces();
+            setProvinces(res);
+        } catch (err) {
+            console.log(err);
+        }
+    };
     const handleCancelModalConfirm = () => {
         setOpenModalConfirmDelete(false);
         setClinic({} as Clinic);
@@ -62,6 +86,19 @@ const ClinicManagement = () => {
             description: description,
         });
     };
+    const handleChangeLocation = (value: string) => {
+        let province: string = '';
+        const cityStr = 'thành phố';
+        const provinceStr = 'tỉnh';
+        if (value.toLowerCase().includes('thành phố')) {
+            province = value.slice(cityStr.length, value.length);
+        }
+        if (value.toLowerCase().includes('tỉnh')) {
+            province = value.slice(provinceStr.length, value.length);
+        }
+        const newOptions = { ...options, location: province };
+        setOptions(newOptions);
+    };
 
     const handleCloseInputModal = () => {
         setOpenModalInputClinic(false);
@@ -81,6 +118,7 @@ const ClinicManagement = () => {
             const data = {
                 pageIndex: pageIndex,
                 pageSize: pageSize,
+                ...options,
             };
             const res = await ClinicService.viewClinic(data);
             console.log(res);
@@ -92,9 +130,16 @@ const ClinicManagement = () => {
             setPageCount(0);
         }
     };
+    const onSearch: SearchProps['onSearch'] = (value, _e, info) => {
+        const newOptions = { ...options, name: value };
+        setOptions(newOptions);
+    };
     useEffect(() => {
         getClinics();
-    }, [pageIndex, pageSize]);
+    }, [pageIndex, pageSize, options]);
+    useEffect(() => {
+        getProvinces();
+    }, []);
     return (
         <div className="container">
             {contextHolder}
@@ -108,13 +153,46 @@ const ClinicManagement = () => {
             </div>
             <Divider />
             <div className="block-clinics">
-                <Flex className="justify-content-end ps-2 pe-2 mb-3 ">
+                <Flex className="justify-content-between ps-2 pe-2 mb-3 ">
+                    <h5>Danh sách cơ sở y tế</h5>
                     <Button
                         className="border-0 text-white bg-primary"
                         onClick={() => setOpenModalInputClinic(true)}
                     >
                         <PlusOutlined /> Thêm mới
                     </Button>
+                </Flex>
+                <Flex gap={'middle'} className="mb-3 justify-content-between">
+                    <Flex className="col-5" gap={'middle'}>
+                        <div className="col-5">
+                            <Select
+                                className="d-block"
+                                placeholder="Chọn tỉnh thành"
+                                optionFilterProp="children"
+                                allowClear
+                                showSearch
+                                value={options.majorId}
+                                onChange={handleChangeLocation}
+                            >
+                                {provinces.map((province: ProvinceType) => (
+                                    <Option
+                                        value={province.province_name}
+                                        key={province.province_id}
+                                    >
+                                        {province.province_name}
+                                    </Option>
+                                ))}
+                            </Select>
+                        </div>
+                    </Flex>
+                    <Flex className="col-5 justify-content-end position-relative">
+                        <Search
+                            onSearch={onSearch}
+                            placeholder="Nhập thông tin tìm kiếm"
+                            className=""
+                            style={{ width: '48%' }}
+                        />
+                    </Flex>
                 </Flex>
                 <ClinicCards
                     clinics={clinics}

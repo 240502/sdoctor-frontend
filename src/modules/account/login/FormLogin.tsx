@@ -35,7 +35,10 @@ export const FormLogin = () => {
         setErrors(tempErrors);
         return isValid;
     };
-
+    useEffect(() => {
+        console.log('email', email);
+        console.log('pass', password);
+    }, [email, password]);
     const Login = async () => {
         if (!handleLogin()) {
             try {
@@ -61,12 +64,17 @@ export const FormLogin = () => {
             <div className="form-group mt-3">
                 <label htmlFor="email">Email</label>
                 <Input
+                    autoComplete="off"
                     defaultValue={''}
+                    value={email}
                     onFocus={() => {
                         setErrors({ ...errors, email: null });
                     }}
-                    onChange={(e) => setEmail(e.target.value)}
-                    id=""
+                    onChange={(e) => {
+                        console.log(e.target.value);
+                        setEmail(e.target.value);
+                    }}
+                    id="user-email"
                     type="email"
                 />
                 {errors.email && (
@@ -76,13 +84,18 @@ export const FormLogin = () => {
             <div className="form-group mt-3 position-relative">
                 <label htmlFor="password">Password</label>
                 <Input
+                    autoComplete="off"
                     defaultValue={''}
+                    value={password}
                     onFocus={() => {
                         setErrors({ ...errors, password: null });
                     }}
-                    onChange={(e) => setPassword(e.target.value)}
+                    onChange={(e) => {
+                        console.log('e', e.target.value);
+                        setPassword(e.target.value);
+                    }}
                     type={showPassword ? 'text' : 'password'}
-                    id=""
+                    id="user-password"
                 />
                 {errors.password && (
                     <p className="mt-1 text-danger">{errors.password}</p>

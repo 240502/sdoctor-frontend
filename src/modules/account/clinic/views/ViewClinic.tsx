@@ -1,7 +1,15 @@
 import { HomeOutlined } from '@ant-design/icons';
 import '@/assets/scss/clinic.scss';
 
-import { Breadcrumb, Divider, Image, Input, Pagination, Select } from 'antd';
+import {
+    Breadcrumb,
+    Divider,
+    Flex,
+    Image,
+    Input,
+    Pagination,
+    Select,
+} from 'antd';
 import { Link } from 'react-router-dom';
 import { ClinicService } from '../../../../services/clinicService';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
@@ -22,7 +30,7 @@ const ViewClinic = () => {
         name: null,
     });
     const [pageIndex, setPageIndex] = useState<number>(1);
-    const [pageSize, setPageSize] = useState<number>(10);
+    const [pageSize, setPageSize] = useState<number>(5);
     const [provinces, setProvinces] = useState([
         { province_id: 0, province_name: '' },
     ]);
@@ -112,12 +120,14 @@ const ViewClinic = () => {
             />
             <div className="mt-3 d-flex">
                 <h3 className="fs-4 fw-bold col-6">Cơ sở y tế</h3>
-                <div className="group__search col-6 d-flex justify-content-between align-items-center">
+            </div>
+            <Divider />
+            <Flex className="group__search  d-flex justify-content-between align-items-center">
+                <div className="col-5">
                     <Select
                         className=""
                         style={{ width: '48%' }}
                         onChange={handleChangeLocation}
-                        // onSearch={onSearchMajor}
                         showSearch
                         placeholder="Chọn tỉnh"
                         optionFilterProp="children"
@@ -137,16 +147,16 @@ const ViewClinic = () => {
                             );
                         })}
                     </Select>
+                </div>
+                <Flex className="col-5 justify-content-end">
                     <Search
                         onSearch={onSearch}
-                        placeholder="Nhập thông tin tìm kiếm"
+                        placeholder="Nhập tên cơ sở y tế"
                         className=""
                         style={{ width: '48%' }}
                     />
-                </div>
-            </div>
-            <Divider />
-
+                </Flex>
+            </Flex>
             {clinics ? (
                 <>
                     <div className="bloc__clinics">

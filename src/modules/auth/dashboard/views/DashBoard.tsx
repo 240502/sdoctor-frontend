@@ -65,6 +65,9 @@ const DashBoard = () => {
         setPageIndex(current);
         setPageSize(pageSize);
     };
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, []);
     return (
         <div className="pe-3">
             {contextHolder}

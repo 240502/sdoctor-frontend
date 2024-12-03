@@ -1,6 +1,14 @@
 import { useState, useEffect } from 'react';
 import { HomeOutlined, EnvironmentOutlined } from '@ant-design/icons';
-import { Breadcrumb, Pagination, Image, notification, Select } from 'antd';
+import {
+    Breadcrumb,
+    Pagination,
+    Image,
+    notification,
+    Select,
+    Flex,
+    Input,
+} from 'antd';
 import { Link } from 'react-router-dom';
 import '@/assets/scss/doctor.scss';
 import { doctorService } from '../../../../services/doctorService';
@@ -18,28 +26,44 @@ import {
 import { MajorService } from '../../../../services/majorService';
 import { Major } from '../../../../models/major';
 import { addWatchedDoctor } from '../../../../utils/doctor';
+import { Clinic } from '../../../../models/clinic';
+import { ClinicService } from '../../../../services/clinicService';
+import { SearchProps } from 'antd/es/input';
 type NotificationType = 'success' | 'error';
+const { Option } = Select;
+const { Search } = Input;
 const ViewDoctor = () => {
     const [doctor, setDoctor] = useState<Doctor>();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [time, setTime] = useState<Time>();
     const [appointmentDate, setAppointmentDate] = useState<string>();
     const [api, contextHolder] = notification.useNotification();
-    const [majorList, setMajorList] = useState<Major[]>();
+    const [majors, setMajors] = useState<Major[]>([]);
     const [pageIndex, setPageIndex] = useState<number>(1);
     const [pageSize, setPageSize] = useState<number>(10);
     const [pageCount, setPageCount] = useState<number>(0);
-
-    const [majorId, setMajorId] = useState<number | null>(0);
+    const [clinics, setClinics] = useState<Clinic[]>([]);
+    const [options, setOptions] = useState<any>({
+        majorId: null,
+        name: null,
+        clinicId: null,
+    });
     const doctors = useRecoilValue(doctorListValue);
     const setDoctors = useSetRecoilState(doctorListState);
-
+    const getAllClinic = async () => {
+        try {
+            const res = await ClinicService.viewClinic({});
+            setClinics(res.data);
+        } catch (err: any) {
+            console.log(err.message);
+        }
+    };
     const loadData = async () => {
         try {
             const data = {
                 pageIndex: pageIndex,
                 pageSize: pageSize,
-                majorId: majorId != 0 ? majorId : null,
+                ...options,
             };
             const res = await doctorService.viewDoctor(data);
             setDoctors(res.data);
@@ -59,7 +83,7 @@ const ViewDoctor = () => {
     const getAllMajor = async () => {
         try {
             const majorList = await MajorService.getAllMajor();
-            setMajorList(majorList);
+            setMajors(majorList);
         } catch (err: any) {
             console.log(err.message);
         }
@@ -75,12 +99,9 @@ const ViewDoctor = () => {
         });
     };
     const handleChangeMajor = (value: number) => {
-        setMajorId(value);
+        setOptions({ ...options, majorId: value });
     };
-    const changePageSize = (value: any) => {
-        setPageIndex(1);
-        setPageSize(Number(value));
-    };
+
     const changePage = (current: number, size: number) => {
         if (size !== pageSize) {
             setPageIndex(1);
@@ -89,13 +110,18 @@ const ViewDoctor = () => {
             setPageIndex(current);
         }
     };
-
+    const onSearch: SearchProps['onSearch'] = (value, _e, info) => {
+        const newOptions = { ...options, name: value };
+        setOptions(newOptions);
+    };
     useEffect(() => {
         loadData();
         getAllMajor();
         window.scrollTo(0, 0);
-    }, [majorId, pageIndex, pageSize]);
-
+    }, [options, pageIndex, pageSize]);
+    useEffect(() => {
+        getAllClinic();
+    }, []);
     return (
         <div className="container home__content mt-4 mb-4">
             {contextHolder}
@@ -115,30 +141,71 @@ const ViewDoctor = () => {
                 Bác sĩ nổi bật
             </h3>
             <div className="block__list__doctor">
-                <div className="group__filter mb-3">
-                    <Select
-                        style={{ width: '20%' }}
-                        onChange={handleChangeMajor}
-                        showSearch
-                        placeholder="Chọn chuyên ngành"
-                        optionFilterProp="children"
-                        defaultValue={0}
-                    >
-                        <Select.Option value={0}>
-                            Chọn chuyên ngành
-                        </Select.Option>
-                        {majorList?.map((major: Major) => {
-                            return (
-                                <Select.Option
-                                    key={Number(major.id)}
-                                    value={major.id}
-                                >
-                                    {major.name}
-                                </Select.Option>
-                            );
-                        })}
-                    </Select>
-                </div>
+                <Flex gap={'middle'} className="mb-5 justify-content-between">
+                    <Flex className="col-5" gap={'middle'}>
+                        <div className="col">
+                            <Select
+                                className="d-block"
+                                placeholder="Chọn cơ sở y tế"
+                                optionFilterProp="children"
+                                allowClear
+                                showSearch
+                                value={options.clinicId}
+                                onChange={(value: any) => {
+                                    setOptions({
+                                        ...options,
+                                        clinicId: value ?? null,
+                                    });
+                                }}
+                            >
+                                {clinics.map((clinic: Clinic) => (
+                                    <Option
+                                        key={clinic.id}
+                                        value={clinic.id}
+                                        label={clinic.name}
+                                    >
+                                        {clinic.name}
+                                    </Option>
+                                ))}
+                            </Select>
+                        </div>
+                        <div className="col">
+                            <Select
+                                className="d-block"
+                                placeholder="Chọn chuyên ngành"
+                                optionFilterProp="children"
+                                allowClear
+                                showSearch
+                                value={options.majorId}
+                                onChange={(value: any) => {
+                                    console.log(value);
+                                    setOptions({
+                                        ...options,
+                                        majorId: value ?? null,
+                                    });
+                                }}
+                            >
+                                {majors?.map((major: Major) => (
+                                    <Option
+                                        key={major.id}
+                                        value={major.id}
+                                        label={major.name}
+                                    >
+                                        {major.name}
+                                    </Option>
+                                ))}
+                            </Select>
+                        </div>
+                    </Flex>
+                    <Flex className="col-5 justify-content-end position-relative">
+                        <Search
+                            onSearch={onSearch}
+                            placeholder="Nhập tên bác sĩ"
+                            className=""
+                            style={{ width: '48%' }}
+                        />
+                    </Flex>
+                </Flex>
                 {doctors?.length ? (
                     <div className="list__doctor m-0 p-0 ">
                         {doctors?.map((doctor: Doctor) => {

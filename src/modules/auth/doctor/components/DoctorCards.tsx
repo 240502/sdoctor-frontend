@@ -71,19 +71,21 @@ export const DoctorCards = ({
                     <p className="text-center">Chưa có bác sĩ nào!</p>
                 )}
             </Flex>
-            <Pagination
-                className="mt-3"
-                showSizeChanger
-                align="center"
-                defaultCurrent={1}
-                current={pageIndex}
-                pageSize={pageSize}
-                total={pageCount * pageSize}
-                pageSizeOptions={['5', '10', '20', '50']}
-                onChange={(current: number, size: number) => {
-                    handleChange(current, size);
-                }}
-            />
+            {pageCount > 0 && (
+                <Pagination
+                    className="mt-3"
+                    showSizeChanger
+                    align="center"
+                    defaultCurrent={1}
+                    current={pageIndex}
+                    pageSize={pageSize}
+                    total={pageCount * pageSize}
+                    pageSizeOptions={['5', '10', '20', '50']}
+                    onChange={(current: number, size: number) => {
+                        handleChange(current, size);
+                    }}
+                />
+            )}
         </>
     );
 };

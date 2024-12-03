@@ -4,10 +4,13 @@ import { Button, Layout } from 'antd';
 import { Link, useNavigate } from 'react-router-dom';
 import { UserOutlined, AuditOutlined } from '@ant-design/icons';
 import '@/assets/scss/app.scss';
+import { useRecoilValue } from 'recoil';
+import { userValue } from '../../../../stores/userAtom';
 
 const { Header, Content, Footer } = Layout;
 export const AppLayout = ({ children }: any) => {
     const navigate = useNavigate();
+    const user = useRecoilValue(userValue);
     return (
         <Layout>
             <Header
@@ -35,9 +38,13 @@ export const AppLayout = ({ children }: any) => {
 
                         <Button
                             className="border-0"
-                            onClick={() => navigate('/login')}
+                            onClick={() => {
+                                user?.token
+                                    ? navigate('/admin/dashboard')
+                                    : navigate('/login');
+                            }}
                         >
-                            Đăng nhập
+                            {user?.token ? 'Dashboard' : 'Đăng nhập'}
                         </Button>
                     </div>
                 </div>
