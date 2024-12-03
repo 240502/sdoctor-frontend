@@ -1,2 +1,3 @@
-import ViewNews from './views/ViewNews';
-export { ViewNews };
+import ViewPost from './views/ViewPost';
+import PostDetail from './views/PostDetail';
+export { ViewPost, PostDetail };

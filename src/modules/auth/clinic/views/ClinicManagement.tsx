@@ -10,7 +10,7 @@ import {
     notification,
     Select,
 } from 'antd';
-import { HomeOutlined, PlusOutlined, SearchOutlined } from '@ant-design/icons';
+import { HomeOutlined, PlusOutlined } from '@ant-design/icons';
 import { ClinicCards } from '../components/ClinicCards';
 import { InputClinicModal } from '../components/InputClinicModal';
 import { useRecoilValue } from 'recoil';
@@ -69,7 +69,6 @@ const ClinicManagement = () => {
         setClinic(clinic);
         setIsUpdate(true);
         setOpenModalInputClinic(true);
-        console.log('clinic', clinic);
     };
     const handleClickDeleteBtn = (clinic: Clinic) => {
         setClinic(clinic);

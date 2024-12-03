@@ -1,22 +1,21 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 import NextArrow from './NextArrow';
 import PrevArrow from './PrevArrow';
 import Slider from 'react-slick';
-import { News } from '../../../../models/post';
+import { Post } from '../../../../models/post';
 import { Button, Image } from 'antd';
-import { PostCategory } from '../../../../models/post_category';
-import { CategoryServicesService } from '../../../../services/category_servicesService';
-import { PostCategoryService } from '../../../../services/post_categorySerivce';
+import { PostService } from '../../../../services/postService';
 import { baseURL } from '../../../../constants/api';
-export const BlockNewCategories = () => {
+
+export const BlockCommonPost = () => {
     var settings = {
         dots: false,
         infinite: true,
-        slidesToShow: 6,
-        slidesToScroll: 6,
+        slidesToShow: 3,
+        slidesToScroll: 3,
         autoplay: false,
         speed: 2000,
         autoplaySpeed: 2000,
@@ -25,44 +24,52 @@ export const BlockNewCategories = () => {
         nextArrow: <NextArrow />,
         prevArrow: <PrevArrow />,
     };
-    const [newsCategories, setNewsCategories] = useState<PostCategory[]>();
-    const loadData = async () => {
+    const [posts, setPosts] = useState<Post[]>([]);
+    const getCommonNews = async () => {
         try {
-            const res = await PostCategoryService.getAllPostCategory();
+            const res = await PostService.getCommonPost();
             console.log(res);
-            setNewsCategories(res);
+            setPosts(res);
         } catch (err: any) {
             console.log(err.message);
         }
     };
-
     useEffect(() => {
-        loadData();
+        getCommonNews();
     }, []);
     return (
         <div className="row mt-5 mb-5">
             <div className="block__header d-flex justify-content-between align-items-center">
-                <h3 className="block__title fs-4 fw-bold">
-                    Danh mục sống khỏe
-                </h3>
+                <h3 className="block__title fs-4 fw-bold">Bài viết mới</h3>
+                <Button className="btn__more pt-3 pb-3 fs-5">Xem thêm</Button>
             </div>
             <div className="block__list mt-4 position-relative">
                 <Slider {...settings}>
-                    {newsCategories?.map((item: PostCategory) => {
+                    {posts.map((post: Post) => {
                         return (
                             <div className="slide__container col-3 ps-3 pe-3">
-                                <div className="item  border rounded p-3 text-center  ">
+                                <div className="item border border-1 rounded p-3 text-center  ">
                                     <Link
                                         to=""
                                         className=" text-decoration-none"
                                     >
                                         <Image
-                                            className="item__image rounded-circle"
+                                            className="item__image object-fit-contain"
                                             preview={false}
-                                            src={baseURL + item.image}
+                                            src={
+                                                post?.featured_image?.includes(
+                                                    'cloudinary'
+                                                )
+                                                    ? post?.featured_image
+                                                    : baseURL +
+                                                      post?.featured_image
+                                            }
                                         ></Image>
-                                        <p className="item__text mt-3 text-center text-dark fw-bold fs-6 text-capitalize">
-                                            {item.name}
+                                        <p
+                                            className="item__text mt-3 text-center text-dark fw-bold fs-6 text-capitalize"
+                                            style={{ height: '45px' }}
+                                        >
+                                            {post.title}
                                         </p>
                                     </Link>
                                 </div>

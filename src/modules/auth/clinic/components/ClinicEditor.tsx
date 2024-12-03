@@ -25,9 +25,9 @@ const ClinicEditor = ({ handleChangeClinicEditor, clinic }: any) => {
                     'bulletedList',
                     'numberedList',
                     '|',
-                    'alignment', // Add alignment option
-                    'imageUpload', // Enable image upload
-                    'insertTable', // Enable table insertion
+                    'alignment',
+                    'imageUpload',
+                    'insertTable',
                     'blockQuote',
                     '|',
                     'undo',

@@ -9,8 +9,8 @@ import {
 } from 'antd';
 import { useEffect, useState } from 'react';
 import { ModalAddNews } from '../components/ModalAddNews';
-import { News } from '../../../../models/news';
-import { NewsService } from '../../../../services/newsService';
+import { Post } from '../../../../models/post';
+import { PostService } from '../../../../services/postService';
 type NotificationType = 'success' | 'error';
 import { useRecoilValue } from 'recoil';
 import { configValue, userValue } from '../../../../stores/userAtom';
@@ -30,8 +30,8 @@ const NewsManagement = () => {
     const [pageSize, setPageSize] = useState<number>(5);
     const [pageCount, setPageCount] = useState<number>(0);
     const [categoryId, setCategoryId] = useState<any>(null);
-    const [posts, setPosts] = useState<News[]>([]);
-    const [post, setPost] = useState<News>({} as News);
+    const [posts, setPosts] = useState<Post[]>([]);
+    const [post, setPost] = useState<Post>({} as Post);
     const [activeBtn, setActiveBtn] = useState<number>(0);
     const openNotificationWithIcon = (
         type: NotificationType,
@@ -53,7 +53,7 @@ const NewsManagement = () => {
                 categoryId: categoryId,
                 authorId: user.id,
             };
-            const res = await NewsService.viewNewsAdmin(data, config);
+            const res = await PostService.viewPostAdmin(data, config);
             setPageCount(res.pageCount);
             setPosts(res.data);
         } catch (err: any) {

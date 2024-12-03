@@ -4,7 +4,7 @@ import { ViewClinicDetail } from '../modules/account/clinic/views/ViewClinicDeta
 import { ViewDetailDoctor, ViewDoctor } from '../modules/account/doctor';
 import { Home } from '../modules/account/home';
 import { LoginLayout } from '../modules/account/login/LoginLayout';
-import { ViewNews } from '../modules/account/news';
+import { PostDetail, ViewPost } from '../modules/account/news';
 import { ViewService, ViewDetailService } from '../modules/account/service';
 import { AppointmentManagement } from '../modules/auth/appointment';
 import { DashBoard } from '../modules/auth/dashboard';
@@ -13,26 +13,30 @@ import { NewsManagement } from '../modules/auth/news';
 import { DoctorManagement } from '../modules/auth/doctor';
 
 import {
+    VIEW_MAJOR_PATH,
+    CLINIC_MANAGEMENT_PATH,
     HOME_PATH,
-    VIEW_CLINIC_DETAIL_PATH,
     VIEW_CLINIC_PATH,
-    VIEW_DETAIL_DOCTOR_PATH,
     VIEW_DOCTOR_PATH,
+    VIEW_SPECIALIZATION_PATH,
+    VIEW_DETAIL_DOCTOR_PATH,
+    VIEW_CLINIC_DETAIL_PATH,
     VIEW_SERVICE_PATH,
     VIEW_SERVICE_DETAIL_PATH,
-    VIEW_NEWS_PATH,
-    SCHEDULE_MANAGEMENT_PATH,
+    VIEW_POST_PATH,
+    VIEW_POST_DETAIL_PATH,
     LOGIN_PATH,
+    ADMIN_PATH,
     DASHBOARD_PATH,
     APPOINTMENT_PATH,
     NEWS_PATH,
     DOCTOR_MANAGEMENT_PATH,
+    SCHEDULE_MANAGEMENT_PATH,
     VIEW_PATIENT_PROFILE,
     VIEW_WATCHED_DOCTOR,
     VIEW_WATCHED_CLINIC,
     VIEW_WATCHED_SERVICE,
     VIEW_PATIENT_APPOINTMENT,
-    CLINIC_MANAGEMENT_PATH,
 } from './path';
 import { ScheduleManagement } from '../modules/auth/schedule';
 import {
@@ -43,7 +47,14 @@ import {
     ViewWatchedService,
 } from '../modules/account/patient_profile';
 import { ClinicManagement } from '../modules/auth/clinic';
+import { ViewMajor } from '../modules/account/major';
+
 export const publicRoutes = [
+    {
+        path: VIEW_MAJOR_PATH,
+        component: ViewMajor,
+        layout: AppLayout,
+    },
     {
         path: HOME_PATH,
         component: Home,
@@ -81,8 +92,13 @@ export const publicRoutes = [
         layout: AppLayout,
     },
     {
-        path: VIEW_NEWS_PATH,
-        component: ViewNews,
+        path: VIEW_POST_PATH,
+        component: ViewPost,
+        layout: AppLayout,
+    },
+    {
+        path: VIEW_POST_DETAIL_PATH,
+        component: PostDetail,
         layout: AppLayout,
     },
     {

@@ -1,4 +1,4 @@
-export interface News {
+export interface Post {
     id: number;
     title: string;
     content: string;
@@ -11,4 +11,6 @@ export interface News {
     created_at: Date | null;
     category_name: string;
     author_name: string;
+    full_name: string;
+    image: string;
 }

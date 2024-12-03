@@ -1,7 +1,5 @@
 import { Button, Modal } from 'antd';
-import React from 'react';
-import { NewsService } from '../../../../services/newsService';
-import * as cheerio from 'cheerio';
+import { PostService } from '../../../../services/postService';
 
 export const ModalConfirmDeleteNews = ({
     isShowModalConfirm,
@@ -13,7 +11,7 @@ export const ModalConfirmDeleteNews = ({
 }: any) => {
     const handleDelete = async () => {
         try {
-            const res = await NewsService.deleteNews(post.id, header);
+            const res = await PostService.deletePost(post.id, header);
             console.log(res);
             openNotificationWithIcon(
                 'success',

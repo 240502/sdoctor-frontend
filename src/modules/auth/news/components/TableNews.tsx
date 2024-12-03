@@ -8,8 +8,8 @@ import {
     PlusOutlined,
     SearchOutlined,
 } from '@ant-design/icons';
-import { News } from '../../../../models/news';
-import { NewsService } from '../../../../services/newsService';
+import { News } from '../../../../models/post';
+import { NewsService } from '../../../../services/postService';
 import { FilterDropdownProps } from 'antd/es/table/interface';
 import Highlighter from 'react-highlight-words';
 

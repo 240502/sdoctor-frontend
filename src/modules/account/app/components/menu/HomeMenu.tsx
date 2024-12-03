@@ -8,8 +8,10 @@ import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import { userState, userValue } from '../../../../../stores/userAtom';
 import { patientProfileState } from '../../../../../stores/patientAtom';
 import { PatientProfile } from '../../../../../models/patient_profile';
+import { majorIdState } from '../../../../../stores/majorAtom';
 
 export const HomeMenu = () => {
+    const setMajorId = useSetRecoilState(majorIdState);
     const [homeMenus, setHomeMenus] = useState<HomeMenuModel[]>();
     const [selectedKeys, setSelectedKeys] = useState<string[]>([]);
     const loadData = async () => {
@@ -35,6 +37,7 @@ export const HomeMenu = () => {
             {homeMenus?.map((homeMenu: HomeMenuModel, index: number) => {
                 return (
                     <Menu.Item
+                        onClick={() => setMajorId(0)}
                         key={Number(homeMenu.id)}
                         className="home__menu__item text-decoration-none"
                     >

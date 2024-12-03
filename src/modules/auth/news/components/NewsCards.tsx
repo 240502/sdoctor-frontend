@@ -5,7 +5,7 @@ import {
     EditOutlined,
     DeleteOutlined,
 } from '@ant-design/icons';
-import { News } from '../../../../models/news';
+import { Post } from '../../../../models/post';
 
 export const NewsCards = ({
     posts,
@@ -16,7 +16,7 @@ export const NewsCards = ({
 }: any) => {
     return (
         <Flex wrap>
-            {posts.map((post: News) => {
+            {posts.map((post: Post) => {
                 return (
                     <div className="col-3 ps-2 pe-2 mb-3">
                         <Card className="shadow" actions={[,]}>

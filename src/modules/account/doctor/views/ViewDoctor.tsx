@@ -29,10 +29,12 @@ import { addWatchedDoctor } from '../../../../utils/doctor';
 import { Clinic } from '../../../../models/clinic';
 import { ClinicService } from '../../../../services/clinicService';
 import { SearchProps } from 'antd/es/input';
+import { majorIdValue } from '../../../../stores/majorAtom';
 type NotificationType = 'success' | 'error';
 const { Option } = Select;
 const { Search } = Input;
 const ViewDoctor = () => {
+    const majorIdGlobal = useRecoilValue(majorIdValue);
     const [doctor, setDoctor] = useState<Doctor>();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [time, setTime] = useState<Time>();
@@ -64,6 +66,7 @@ const ViewDoctor = () => {
                 pageIndex: pageIndex,
                 pageSize: pageSize,
                 ...options,
+                majorId: options.majorId,
             };
             const res = await doctorService.viewDoctor(data);
             setDoctors(res.data);
@@ -120,6 +123,9 @@ const ViewDoctor = () => {
         window.scrollTo(0, 0);
     }, [options, pageIndex, pageSize]);
     useEffect(() => {
+        if (majorIdGlobal !== 0) {
+            setOptions({ ...options, majorId: majorIdGlobal });
+        }
         getAllClinic();
     }, []);
     return (

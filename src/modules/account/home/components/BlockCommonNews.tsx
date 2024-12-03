@@ -8,7 +8,7 @@ import { HomeDirectory } from '../../../../models/home_directory';
 import { baseURL } from '../../../../constants/api';
 import NextArrow from './NextArrow';
 import PrevArrow from './PrevArrow';
-import { News } from '../../../../models/news';
+import { News } from '../../../../models/post';
 export const BlockCommonNews = () => {
     var settings = {
         dots: false,

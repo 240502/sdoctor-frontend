@@ -6,7 +6,8 @@ const VIEW_DETAIL_DOCTOR_PATH = '/doctor/detail/:id';
 const VIEW_CLINIC_DETAIL_PATH = '/clinic/detail/:id';
 const VIEW_SERVICE_PATH = '/list/service';
 const VIEW_SERVICE_DETAIL_PATH = '/service/detail/:id';
-const VIEW_NEWS_PATH = '/list/news';
+const VIEW_POST_PATH = '/list/post';
+const VIEW_POST_DETAIL_PATH = '/post/detail/:id';
 const LOGIN_PATH = '/login';
 const ADMIN_PATH = '/admin';
 const DASHBOARD_PATH = '/admin/dashboard';
@@ -20,8 +21,9 @@ const VIEW_WATCHED_CLINIC = '/patient/watched-clinic';
 const VIEW_WATCHED_SERVICE = '/patient/watched-service';
 const VIEW_PATIENT_APPOINTMENT = '/patient/appointment';
 const CLINIC_MANAGEMENT_PATH = '/admin/clinic';
-
+const VIEW_MAJOR_PATH = '/list/major';
 export {
+    VIEW_MAJOR_PATH,
     CLINIC_MANAGEMENT_PATH,
     HOME_PATH,
     VIEW_CLINIC_PATH,
@@ -31,7 +33,8 @@ export {
     VIEW_CLINIC_DETAIL_PATH,
     VIEW_SERVICE_PATH,
     VIEW_SERVICE_DETAIL_PATH,
-    VIEW_NEWS_PATH,
+    VIEW_POST_PATH,
+    VIEW_POST_DETAIL_PATH,
     LOGIN_PATH,
     ADMIN_PATH,
     DASHBOARD_PATH,

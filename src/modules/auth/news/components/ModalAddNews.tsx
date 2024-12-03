@@ -4,7 +4,7 @@ import MyEditor from './MyEditor';
 import { useRecoilValue } from 'recoil';
 import { userValue } from '../../../../stores/userAtom';
 import NewsManagement from '../views/NewsManagement';
-import { NewsService } from '../../../../services/newsService';
+import { PostService } from '../../../../services/postService';
 import * as cheerio from 'cheerio';
 import { PostCategory } from '../../../../models/post_category';
 import { PostCategoryService } from '../../../../services/post_categorySerivce';
@@ -84,7 +84,7 @@ export const ModalAddNews = ({
     };
     const CreatePost = async (data: any) => {
         try {
-            const res = await NewsService.createNews(data, config);
+            const res = await PostService.createPost(data, config);
             console.log(res);
             openNotificationWithIcon(
                 'success',
@@ -131,7 +131,7 @@ export const ModalAddNews = ({
     const UpdatePost = async (data: any) => {
         try {
             console.log(data);
-            const res = await NewsService.updateNews(data, config);
+            const res = await PostService.updatePost(data, config);
             console.log(res);
             openNotificationWithIcon(
                 'success',

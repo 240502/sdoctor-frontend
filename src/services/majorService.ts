@@ -13,4 +13,8 @@ export const MajorService = {
         const res: any = await apiClient.get('/api/major/get-by-id/' + id);
         return res?.data;
     },
+    async viewMajor(data: any): Promise<any> {
+        const res: any = await apiClient.post('/api/major/view', data);
+        return res?.data;
+    },
 };
