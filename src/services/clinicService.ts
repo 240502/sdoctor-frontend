@@ -19,4 +19,16 @@ export const ClinicService = {
         const res = await apiClient.get('/api/clinic//getById/' + id);
         return res.data;
     },
+    async createClinic(data: any, config: any): Promise<any> {
+        const res = await apiClient.post('/api/clinic/create', data, config);
+        return res;
+    },
+    async updateClinic(data: any, config: any): Promise<any> {
+        const res = await apiClient.put('/api/clinic/update', data, config);
+        return res;
+    },
+    async deleteClinic(id: number, config: any): Promise<any> {
+        const res = await apiClient.delete('/api/clinic/delete/' + id, config);
+        return res;
+    },
 };

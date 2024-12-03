@@ -19,7 +19,10 @@ const VIEW_WATCHED_DOCTOR = '/patient/watched-doctor';
 const VIEW_WATCHED_CLINIC = '/patient/watched-clinic';
 const VIEW_WATCHED_SERVICE = '/patient/watched-service';
 const VIEW_PATIENT_APPOINTMENT = '/patient/appointment';
+const CLINIC_MANAGEMENT_PATH = '/admin/clinic';
+
 export {
+    CLINIC_MANAGEMENT_PATH,
     HOME_PATH,
     VIEW_CLINIC_PATH,
     VIEW_DOCTOR_PATH,

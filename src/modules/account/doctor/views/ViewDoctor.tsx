@@ -1,11 +1,6 @@
-import { useState, useEffect, useRef } from 'react';
-import {
-    HomeOutlined,
-    EnvironmentOutlined,
-    DoubleLeftOutlined,
-    DoubleRightOutlined,
-} from '@ant-design/icons';
-import { Breadcrumb, Button, Image, notification, Select } from 'antd';
+import { useState, useEffect } from 'react';
+import { HomeOutlined, EnvironmentOutlined } from '@ant-design/icons';
+import { Breadcrumb, Pagination, Image, notification, Select } from 'antd';
 import { Link } from 'react-router-dom';
 import '@/assets/scss/doctor.scss';
 import { doctorService } from '../../../../services/doctorService';
@@ -22,7 +17,6 @@ import {
 } from '../../../../stores/doctorAtom';
 import { MajorService } from '../../../../services/majorService';
 import { Major } from '../../../../models/major';
-import ReactPaginate from 'react-paginate';
 import { addWatchedDoctor } from '../../../../utils/doctor';
 type NotificationType = 'success' | 'error';
 const ViewDoctor = () => {
@@ -87,8 +81,13 @@ const ViewDoctor = () => {
         setPageIndex(1);
         setPageSize(Number(value));
     };
-    const handlePageClick = (event: any) => {
-        setPageIndex(event.selected + 1);
+    const changePage = (current: number, size: number) => {
+        if (size !== pageSize) {
+            setPageIndex(1);
+            setPageSize(size);
+        } else {
+            setPageIndex(current);
+        }
     };
 
     useEffect(() => {
@@ -271,41 +270,24 @@ const ViewDoctor = () => {
 
                         <section className="page d-flex justify-content-center align-items-center">
                             {pageCount > 1 ? (
-                                <div className="col-2 list-page">
-                                    <ReactPaginate
-                                        containerClassName={'pagination'}
-                                        className="d-flex m-0 "
-                                        breakLabel="..."
-                                        onPageChange={handlePageClick}
-                                        pageRangeDisplayed={5}
-                                        pageCount={pageCount}
-                                        previousLabel={
-                                            <Button className="rounded">
-                                                <DoubleLeftOutlined />
-                                            </Button>
-                                        }
-                                        nextLabel={
-                                            <Button className="rounded">
-                                                <DoubleRightOutlined />
-                                            </Button>
-                                        }
-                                    />
-                                </div>
+                                <Pagination
+                                    showSizeChanger
+                                    defaultCurrent={1}
+                                    align="center"
+                                    current={pageIndex}
+                                    pageSize={pageSize}
+                                    total={pageCount * pageSize}
+                                    pageSizeOptions={['5', '10', '20', '30']}
+                                    onChange={(
+                                        current: number,
+                                        size: number
+                                    ) => {
+                                        changePage(current, size);
+                                    }}
+                                />
                             ) : (
                                 <></>
                             )}
-                            <div className="col-2 ms-5">
-                                <Select
-                                    defaultValue="10"
-                                    style={{ width: 120 }}
-                                    onChange={changePageSize}
-                                    options={[
-                                        { value: '5', label: '5' },
-                                        { value: '10', label: '10' },
-                                        { value: '15', label: '15' },
-                                    ]}
-                                />
-                            </div>
                         </section>
                     </div>
                 ) : (

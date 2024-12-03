@@ -1,25 +1,4 @@
-/* Pagination.css */
-
-/* Loại bỏ dấu chấm đen cho ul và li */
-.list-page ul {
-    list-style-type: none; /* Ẩn dấu chấm */
-    display: flex; /* Hiển thị các mục trên cùng một dòng */
-    padding-left: 0;
-    align-items: center;
-}
-
-.list-page li {
-    margin: 0 5px; /* Khoảng cách giữa các mục */
-}
-.list-page li a {
-    padding: 5px 12px;
-    color: #3498db;
-    text-decoration: none;
-    transition: all 0.3s linear;
-}
-
-.list-page li.active a {
-    background-color: #3498db;
-    color: white;
-    border-color: #3498db;
+.block__description figure {
+    display: flex;
+    justify-content: center;
 }

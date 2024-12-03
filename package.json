@@ -28,7 +28,6 @@
         "react-chartjs-2": "^5.2.0",
         "react-dom": "^18.3.1",
         "react-highlight-words": "^0.20.0",
-        "react-paginate": "^8.2.0",
         "react-router-dom": "^6.26.2",
         "react-slick": "^0.30.2",
         "recoil": "^0.7.7",

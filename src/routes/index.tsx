@@ -32,6 +32,7 @@ import {
     VIEW_WATCHED_CLINIC,
     VIEW_WATCHED_SERVICE,
     VIEW_PATIENT_APPOINTMENT,
+    CLINIC_MANAGEMENT_PATH,
 } from './path';
 import { ScheduleManagement } from '../modules/auth/schedule';
 import {
@@ -41,6 +42,7 @@ import {
     ViewWatchedDoctor,
     ViewWatchedService,
 } from '../modules/account/patient_profile';
+import { ClinicManagement } from '../modules/auth/clinic';
 export const publicRoutes = [
     {
         path: HOME_PATH,
@@ -139,6 +141,11 @@ export const privateRoutes = [
     {
         path: SCHEDULE_MANAGEMENT_PATH,
         component: ScheduleManagement,
+        layout: AdminLayout,
+    },
+    {
+        path: CLINIC_MANAGEMENT_PATH,
+        component: ClinicManagement,
         layout: AdminLayout,
     },
 ];

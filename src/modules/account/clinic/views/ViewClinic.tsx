@@ -1,11 +1,7 @@
-import {
-    DoubleLeftOutlined,
-    DoubleRightOutlined,
-    HomeOutlined,
-} from '@ant-design/icons';
+import { HomeOutlined } from '@ant-design/icons';
 import '@/assets/scss/clinic.scss';
 
-import { Breadcrumb, Button, Divider, Image, Input, Select } from 'antd';
+import { Breadcrumb, Divider, Image, Input, Pagination, Select } from 'antd';
 import { Link } from 'react-router-dom';
 import { ClinicService } from '../../../../services/clinicService';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
@@ -13,11 +9,10 @@ import {
     clinicListState,
     clinicListValue,
 } from '../../../../stores/clinicAtom';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { SearchProps } from 'antd/es/input';
 import { Clinic } from '../../../../models/clinic';
 import { baseURL } from '../../../../constants/api';
-import ReactPaginate from 'react-paginate';
 import axios from 'axios';
 import { addWatchedClinic } from '../../../../utils/clinic';
 const { Search } = Input;
@@ -65,10 +60,13 @@ const ViewClinic = () => {
         const newOptions = { ...optionsFilter, location: province };
         setOptionsFilter(newOptions);
     };
-    const changePageSize = (value: any) => {
-        setPageIndex(1);
-
-        setPageSize(Number(value));
+    const changePage = (current: number, size: number) => {
+        if (size !== pageSize) {
+            setPageIndex(1);
+            setPageSize(size);
+        } else {
+            setPageIndex(current);
+        }
     };
     const handleUpdateViewsClinic = async (id: number) => {
         try {
@@ -76,10 +74,7 @@ const ViewClinic = () => {
             console.log(res);
         } catch (err: any) {}
     };
-    const handlePageClick = (event: any) => {
-        console.log(event.selected);
-        setPageIndex(event.selected + 1);
-    };
+
     useEffect(() => {
         const getProvinces = async () => {
             try {
@@ -178,7 +173,14 @@ const ViewClinic = () => {
                                                     objectFit: 'contain',
                                                 }}
                                                 className="border rounded ps-2 pt-4 pb-4 pe-2"
-                                                src={baseURL + clinic.avatar}
+                                                src={
+                                                    clinic.avatar.includes(
+                                                        'cloudinary'
+                                                    )
+                                                        ? clinic.avatar
+                                                        : baseURL +
+                                                          clinic.avatar
+                                                }
                                             ></Image>
                                         </Link>
                                         <Link
@@ -202,41 +204,21 @@ const ViewClinic = () => {
                     </div>
                     <section className="page d-flex justify-content-center align-items-center">
                         {pageCount > 1 ? (
-                            <div className="col-2 list-page">
-                                <ReactPaginate
-                                    containerClassName={'pagination'}
-                                    className="d-flex m-0 "
-                                    breakLabel="..."
-                                    onPageChange={handlePageClick}
-                                    pageRangeDisplayed={5}
-                                    pageCount={pageCount}
-                                    previousLabel={
-                                        <Button className="rounded">
-                                            <DoubleLeftOutlined />
-                                        </Button>
-                                    }
-                                    nextLabel={
-                                        <Button className="rounded">
-                                            <DoubleRightOutlined />
-                                        </Button>
-                                    }
-                                />
-                            </div>
+                            <Pagination
+                                showSizeChanger
+                                defaultCurrent={1}
+                                align="center"
+                                current={pageIndex}
+                                pageSize={pageSize}
+                                total={pageCount * pageSize}
+                                pageSizeOptions={['5', '10', '20', '30']}
+                                onChange={(current: number, size: number) => {
+                                    changePage(current, size);
+                                }}
+                            />
                         ) : (
                             <></>
                         )}
-                        <div className="col-2 ms-5">
-                            <Select
-                                defaultValue="10"
-                                style={{ width: 120 }}
-                                onChange={changePageSize}
-                                options={[
-                                    { value: '5', label: '5' },
-                                    { value: '10', label: '10' },
-                                    { value: '15', label: '15' },
-                                ]}
-                            />
-                        </div>
                     </section>
                 </>
             ) : (

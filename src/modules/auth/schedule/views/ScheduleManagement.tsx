@@ -95,7 +95,6 @@ const ScheduleManagement = () => {
             console.log(err.message);
             setSchedule({} as Schedule);
             setSelectedTimeKeys([]);
-            setSelectedTimeKeys([]);
         }
     };
     const handleOnClickSave = () => {
@@ -114,7 +113,6 @@ const ScheduleManagement = () => {
                 if (combined.length > schedule.listScheduleDetails.length) {
                     isDiff = true;
                 }
-                console.log(isDiff);
             } else {
                 isDiff = true;
             }
@@ -286,7 +284,6 @@ const ScheduleManagement = () => {
         } else {
             setIsVisibleButtonSave(false);
         }
-        console.log('selectedTimes', selectedTimes);
     }, [selectedTimes, schedule]);
 
     return (

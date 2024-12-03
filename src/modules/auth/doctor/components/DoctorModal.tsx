@@ -25,8 +25,7 @@ const { Option } = Select;
 import { PlusOutlined } from '@ant-design/icons';
 import type { GetProp, UploadFile, UploadProps } from 'antd';
 import { doctorService } from '../../../../services/doctorService';
-import { useRecoilValue } from 'recoil';
-import { configValue, userValue } from '../../../../stores/userAtom';
+import { UploadService } from '../../../../services/upload';
 type FileType = Parameters<GetProp<UploadProps, 'beforeUpload'>>[0];
 
 export const DoctorModal = ({
@@ -91,7 +90,7 @@ export const DoctorModal = ({
         try {
             const formData = new FormData();
             formData.append('file', file);
-            const response = await doctorService.uploadImage(formData);
+            const response = await UploadService.uploadImage(formData);
             const { url } = response.data;
             file.url = url;
             onSuccess?.({}, file);
@@ -165,8 +164,24 @@ export const DoctorModal = ({
                     CreateDoctor(newDoctor);
                     console.log(newDoctor);
                 } else {
-                    UpdateDoctor(doctor);
-                    console.log(doctor);
+                    const newDoctor = {
+                        full_name: inputNameRef.current?.input?.value,
+                        clinic_id: doctor.clinic_id,
+                        major_id: doctor.major_id,
+                        description: doctor.description,
+                        image: fileList[0].url ?? '',
+                        email: inputEmailRef.current?.input?.value,
+                        phone: inputPhoneRef.current?.input?.value,
+                        address: inputAddressRef.current?.input?.value,
+                        gender: doctor.gender,
+                        title: inputTitleRef.current?.input?.value,
+                        fee: inputFeeRef.current?.input?.value,
+                        examination_object:
+                            inputExamninationObjectRef.current?.input?.value,
+                        introduction: doctor.introduction,
+                    };
+                    UpdateDoctor(newDoctor);
+                    console.log(newDoctor);
                 }
             }
         }
@@ -367,7 +382,7 @@ export const DoctorModal = ({
                         Giới tính
                     </label>
                     <Select
-                        value={Number(doctor?.gender)}
+                        value={doctor?.gender}
                         className="d-block mt-0 p-0"
                         placeholder="Chọn giới tính"
                         onChange={(value: number) => {

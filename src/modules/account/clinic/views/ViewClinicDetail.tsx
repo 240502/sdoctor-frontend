@@ -7,6 +7,8 @@ import { clinicListValue } from '../../../../stores/clinicAtom';
 import { Clinic } from '../../../../models/clinic';
 import { baseURL } from '../../../../constants/api';
 import { ClinicService } from '../../../../services/clinicService';
+import parse from 'html-react-parser';
+import '@/assets/scss/clinic.scss';
 
 export const ViewClinicDetail = () => {
     const { id } = useParams<any>();
@@ -14,6 +16,7 @@ export const ViewClinicDetail = () => {
     const [clinic, setClinic] = useState<Clinic>();
     const [current, setCurrent] = useState<string>('0');
     const sectionDoctorRef = useRef<HTMLDivElement>(null);
+    const sectionDescriptionRef = useRef<HTMLDivElement>(null);
 
     const handleGetClinicById = async (id: number) => {
         try {
@@ -51,7 +54,11 @@ export const ViewClinicDetail = () => {
                             width: '100%',
                         }}
                         // className="position-absolute start-0 end-0 bottom-0"
-                        src={baseURL + clinic?.cover_image}
+                        src={
+                            clinic?.cover_image?.includes('cloudinary')
+                                ? clinic?.cover_image
+                                : baseURL + clinic?.cover_image
+                        }
                     />
                 </div>
                 <div
@@ -71,7 +78,11 @@ export const ViewClinicDetail = () => {
                                         objectFit: 'fill',
                                     }}
                                     className="ps-2 pe-2"
-                                    src={baseURL + clinic?.avatar}
+                                    src={
+                                        clinic?.avatar?.includes('cloudinary')
+                                            ? clinic?.avatar
+                                            : baseURL + clinic?.avatar
+                                    }
                                     preview={false}
                                 />
                             </div>
@@ -89,11 +100,26 @@ export const ViewClinicDetail = () => {
                             onClick={handleChangeMenu}
                             selectedKeys={[current]}
                         >
-                            <Menu.Item key={'0'}>Giới thiệu chung</Menu.Item>
+                            <Menu.Item
+                                key={'0'}
+                                onClick={() => {
+                                    sectionDescriptionRef.current?.scrollIntoView(
+                                        {
+                                            behavior: 'smooth',
+                                            block: 'start',
+                                        }
+                                    );
+                                }}
+                            >
+                                Giới thiệu chung
+                            </Menu.Item>
                             <Menu.Item
                                 key={'1'}
                                 onClick={() => {
-                                    window.scrollTo(0, 0);
+                                    sectionDoctorRef.current?.scrollIntoView({
+                                        behavior: 'smooth',
+                                        block: 'start',
+                                    });
                                 }}
                             >
                                 Đặt lịch khám
@@ -102,78 +128,14 @@ export const ViewClinicDetail = () => {
                     </div>
                 </div>
             </div>
-            <div className="container block__description mt-5 pt-5">
-                <h3 className="text-uppercase fs-5 text-primary mt-3 mb-3">
-                    giới thiệu chung
-                </h3>
-                <p className="fs-6">
-                    Phòng Khám ACC - Chiropractic Quận 1 TP.HCM là đơn vị chuyên
-                    khoa thần kinh cột sống với đội ngũ các bác sĩ nước ngoài
-                    đến từ Mỹ, Canada, Pháp, NewZealand, Hàn Quốc và Nhật Bản
-                    giỏi chuyên môn, giàu kinh nghiệm.
-                </p>
-                <p className="fs-6">
-                    {' '}
-                    Phòng khám ACC là đơn vị tiên phong trong điều trị các bệnh
-                    lý về cột sống, thoát vị đĩa đệm, bệnh lý rễ dây thần kinh
-                    bằng phương pháp tự nhiên, không xâm lấn, không dùng thuốc
-                    và phẫu thuật.
-                </p>
-                <h3 className="fw-bold fs-6">Địa chỉ</h3>
-                <ul>
-                    <li className="fs-6">
-                        Cơ sở Quận 1: 99 Nguyễn Du, Phường Bến Thành, Quận 1, Tp
-                        Hồ Chí Minh
-                    </li>
-                </ul>
-
-                <h3 className="fw-bold fs-6">Thời gian làm việc</h3>
-                <ul>
-                    <li className="fs-6">Thứ 2 - Thứ 6: 7h30 - 17h30</li>
-                    <li className="fs-6"> Thứ 7: 7h30 - 12h00</li>
-                </ul>
+            <div
+                ref={sectionDescriptionRef}
+                className="container block__description  pt-5"
+                style={{ marginTop: '100px' }}
+            >
+                {parse(String(clinic?.description))}
             </div>
 
-            <div className="container block__description mt-4">
-                <h3 className="text-uppercase fs-5 text-primary mt-3 mb-3">
-                    Thế mạnh chuyên môn
-                </h3>
-                <p className="fs-6">
-                    Phòng khám có thế mạnh trong điều trị không sử dụng thuốc
-                    hay phẫu thuật với phương pháp kết hợp giữa trị liệu thần
-                    kinh cột sống và các bài tập vật lý trị liệu phục hồi năng.
-                    Đặc biệt phù hợp với các bệnh nhân thoát vị đĩa đệm nặng,
-                    không thành công với các phương pháp chữa trị thông thường.
-                </p>
-                <p className="fs-6">
-                    Sử dụng liệu trình điều trị thoát vị đĩa đệm cột sống mới:
-                    Pneumex PneuBack
-                </p>
-                <ul>
-                    <li className="fs-6">
-                        Là phương pháp tiên tiến đang được sử dụng và hiệu quả
-                        tại Mỹ và các nước Châu Âu{' '}
-                    </li>
-                    <li className="fs-6">
-                        Liệu trình hoạt động hiệu quả trong khi các phương pháp
-                        giảm áp khác không có tác dụng.
-                    </li>
-                    <li>Kết hợp vật lí trị liệu và phục hồi chức năng</li>
-                </ul>
-                <h3 className="fw-bold fs-6">Địa chỉ</h3>
-                <ul>
-                    <li className="fs-6">
-                        Cơ sở Quận 1: 99 Nguyễn Du, Phường Bến Thành, Quận 1, Tp
-                        Hồ Chí Minh
-                    </li>
-                </ul>
-
-                <h3 className="fw-bold fs-6">Thời gian làm việc</h3>
-                <ul>
-                    <li className="fs-6">Thứ 2 - Thứ 6: 7h30 - 17h30</li>
-                    <li className="fs-6"> Thứ 7: 7h30 - 12h00</li>
-                </ul>
-            </div>
             <Divider />
             <div className=" block__doctor" ref={sectionDoctorRef}>
                 <BlockDoctor clinicId={id} clinic={clinic} />

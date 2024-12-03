@@ -22,23 +22,15 @@ export const ListTime = ({
 
             if (now.getDay() !== 0) {
                 if (now.getDay() < activeDay) {
-                    const newTimes = res.map((time: Time) => {
-                        return { ...time, disable: true };
-                    });
-                    setTimes(newTimes);
+                    setTimes(res);
                 }
                 if (now.getDay() === activeDay) {
                     handleTimeOverRealTime(res);
-                }
-                if (now.getDay() > activeDay) {
-                    setTimes(res);
                 }
             } else {
                 if (now.getDay() === activeDay) {
                     handleTimeOverRealTime(res);
-                }
-                // CHO PHÉP NGƯỜI DÙNG ĐĂNG KÝ TIẾP TUẦN TIẾP THEO TỚI T7
-                else {
+                } else {
                     setTimes(res);
                 }
             }
@@ -82,12 +74,8 @@ export const ListTime = ({
     useEffect(() => {
         getTimeByType(timeType);
         handleOverTime(activeDay);
-        console.log('activeDay', activeDay);
     }, [activeDay, timeType]);
-    useEffect(() => {
-        setSelectedTimes([]);
-        setSelectedTimeKeys([]);
-    }, [times.length]);
+
     useEffect(() => {
         if (selectedTimeKeys.length > 0) {
             const newSelectedTimes = times.filter((time: Time) => {
@@ -98,6 +86,9 @@ export const ListTime = ({
             });
             setSelectedTimes(newSelectedTimes);
         }
+    }, [selectedTimeKeys]);
+    useEffect(() => {
+        console.log('selected time keys', selectedTimeKeys);
     }, [selectedTimeKeys]);
     const handleSelectTimeAvailable = (time: Time) => {
         if (selectedTimes.length > 0) {
@@ -134,7 +125,6 @@ export const ListTime = ({
                 setSelectedTimeKeys(newListSelectedTimeKeys);
             } else {
                 const newList: any = [...selectedTimeKeys, timeKey];
-
                 setSelectedTimeKeys(newList);
             }
         } else {
