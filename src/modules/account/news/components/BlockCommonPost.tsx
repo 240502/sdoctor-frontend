@@ -14,10 +14,10 @@ export const BlockCommonPost = () => {
     var settings = {
         dots: false,
         infinite: true,
-        slidesToShow: 3,
-        slidesToScroll: 3,
+        slidesToShow: 4,
+        slidesToScroll: 4,
         autoplay: false,
-        speed: 2000,
+        speed: 1000,
         autoplaySpeed: 2000,
         cssEase: 'ease-in-out',
         arrow: true,
@@ -34,48 +34,71 @@ export const BlockCommonPost = () => {
             console.log(err.message);
         }
     };
+    const updateViewPost = async (id: number) => {
+        try {
+            const res = await PostService.updateViewPost(id);
+            console.log(res);
+        } catch (err: any) {
+            console.log(err.message);
+        }
+    };
     useEffect(() => {
         getCommonNews();
     }, []);
     return (
         <div className="row mt-5 mb-5">
             <div className="block__header d-flex justify-content-between align-items-center">
-                <h3 className="block__title fs-4 fw-bold">Bài viết mới</h3>
+                <h3 className="block__title fs-4 fw-bold">Bài phổ biến</h3>
                 <Button className="btn__more pt-3 pb-3 fs-5">Xem thêm</Button>
             </div>
-            <div className="block__list mt-4 position-relative">
+            <div className="block__list mt-4 position-relative posts">
                 <Slider {...settings}>
-                    {posts.map((post: Post) => {
-                        return (
-                            <div className="slide__container col-3 ps-3 pe-3">
-                                <div className="item border border-1 rounded p-3 text-center  ">
-                                    <Link
-                                        to=""
-                                        className=" text-decoration-none"
-                                    >
-                                        <Image
-                                            className="item__image object-fit-contain"
-                                            preview={false}
-                                            src={
-                                                post?.featured_image?.includes(
-                                                    'cloudinary'
-                                                )
-                                                    ? post?.featured_image
-                                                    : baseURL +
-                                                      post?.featured_image
-                                            }
-                                        ></Image>
-                                        <p
-                                            className="item__text mt-3 text-center text-dark fw-bold fs-6 text-capitalize"
-                                            style={{ height: '45px' }}
+                    {posts?.length > 0 ? (
+                        posts.map((post: Post) => {
+                            return (
+                                <div className="slide__container  col-3 ps-3 pe-3">
+                                    <div className="item border border-1 rounded p-3 text-center   ">
+                                        <Link
+                                            onClick={() => {
+                                                updateViewPost(post.id);
+                                            }}
+                                            to={'/post/detail/' + post.id}
+                                            className=" text-decoration-none feature-img-container"
                                         >
-                                            {post.title}
-                                        </p>
-                                    </Link>
+                                            <Image
+                                                className="item__image feature-img object-fit-cover rounded "
+                                                preview={false}
+                                                src={
+                                                    post?.featured_image?.includes(
+                                                        'cloudinary'
+                                                    )
+                                                        ? post?.featured_image
+                                                        : baseURL +
+                                                          post?.featured_image
+                                                }
+                                            ></Image>
+                                            <p className="post-title mt-3 text-center text-dark fw-bold fs-6 text-capitalize">
+                                                <Link
+                                                    to={
+                                                        '/post/detail/' +
+                                                        post.id
+                                                    }
+                                                    className=" text-decoration-none text-dark"
+                                                    onClick={() => {
+                                                        updateViewPost(post.id);
+                                                    }}
+                                                >
+                                                    {post.title}
+                                                </Link>
+                                            </p>
+                                        </Link>
+                                    </div>
                                 </div>
-                            </div>
-                        );
-                    })}
+                            );
+                        })
+                    ) : (
+                        <></>
+                    )}
                 </Slider>
             </div>
         </div>

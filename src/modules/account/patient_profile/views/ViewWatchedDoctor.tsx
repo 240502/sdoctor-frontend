@@ -6,9 +6,7 @@ import {
     EllipsisOutlined,
     SettingOutlined,
 } from '@ant-design/icons';
-import Meta from 'antd/es/card/Meta';
 import { baseURL } from '../../../../constants/api';
-import parse from 'html-react-parser';
 import { Link, useNavigate } from 'react-router-dom';
 import { PatientProfileLayout } from '../components/PatientProfileLayout';
 const ViewWatchedDoctor = () => {

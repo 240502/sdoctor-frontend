@@ -40,4 +40,8 @@ export const PostService = {
         const res = await apiClient.get('/api/post/get-by-id/' + id);
         return res?.data;
     },
+    async getRelatedPost(data: any): Promise<any> {
+        const res = await apiClient.post('/api/post/get-related', data);
+        return res?.data;
+    },
 };

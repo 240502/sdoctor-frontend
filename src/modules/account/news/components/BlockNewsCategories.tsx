@@ -1,14 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 import NextArrow from './NextArrow';
 import PrevArrow from './PrevArrow';
 import Slider from 'react-slick';
-import { News } from '../../../../models/post';
-import { Button, Image } from 'antd';
+import { Image } from 'antd';
 import { PostCategory } from '../../../../models/post_category';
-import { CategoryServicesService } from '../../../../services/category_servicesService';
 import { PostCategoryService } from '../../../../services/post_categorySerivce';
 import { baseURL } from '../../../../constants/api';
 export const BlockNewCategories = () => {
@@ -53,7 +51,10 @@ export const BlockNewCategories = () => {
                             <div className="slide__container col-3 ps-3 pe-3">
                                 <div className="item  border rounded p-3 text-center  ">
                                     <Link
-                                        to=""
+                                        to={
+                                            '/list/post/category/' +
+                                            item.post_category_id
+                                        }
                                         className=" text-decoration-none"
                                     >
                                         <Image

@@ -23,13 +23,20 @@ export const BlockNewPost = () => {
         nextArrow: <NextArrow />,
         prevArrow: <PrevArrow />,
     };
-    const navigate = useNavigate();
     const [posts, setPosts] = useState<Post[]>([]);
     const getNewPost = async () => {
         try {
             const res = await PostService.getNewPost();
             console.log(res);
             setPosts(res);
+        } catch (err: any) {
+            console.log(err.message);
+        }
+    };
+    const updateViewPost = async (id: number) => {
+        try {
+            const res = await PostService.updateViewPost(id);
+            console.log(res);
         } catch (err: any) {
             console.log(err.message);
         }
@@ -43,19 +50,22 @@ export const BlockNewPost = () => {
                 <h3 className="block__title fs-4 fw-bold">Bài viết mới</h3>
                 <Button className="btn__more pt-3 pb-3 fs-5">Xem thêm</Button>
             </div>
-            <div className="block__list mt-4 position-relative">
+            <div className="block__list mt-4 position-relative posts">
                 <Slider {...settings}>
                     {posts?.length > 0 ? (
                         posts.map((post: Post) => {
                             return (
-                                <div className="slide__container col-3 ps-3 pe-3">
-                                    <div className="item border border-1 rounded p-3 text-center  ">
+                                <div className="slide__container  col-3 ps-3 pe-3">
+                                    <div className="item border border-1 rounded p-3 text-center   ">
                                         <Link
+                                            onClick={() => {
+                                                updateViewPost(post.id);
+                                            }}
                                             to={'/post/detail/' + post.id}
-                                            className=" text-decoration-none"
+                                            className=" text-decoration-none feature-img-container"
                                         >
                                             <Image
-                                                className="item__image object-fit-contain"
+                                                className="item__image feature-img object-fit-cover rounded "
                                                 preview={false}
                                                 src={
                                                     post?.featured_image?.includes(
@@ -66,8 +76,19 @@ export const BlockNewPost = () => {
                                                           post?.featured_image
                                                 }
                                             ></Image>
-                                            <p className="item__text mt-3 text-center text-dark fw-bold fs-6 text-capitalize">
-                                                {post.title}
+                                            <p className="post-title mt-3 text-center text-dark fw-bold fs-6 text-capitalize">
+                                                <Link
+                                                    to={
+                                                        '/post/detail/' +
+                                                        post.id
+                                                    }
+                                                    className=" text-decoration-none text-dark"
+                                                    onClick={() => {
+                                                        updateViewPost(post.id);
+                                                    }}
+                                                >
+                                                    {post.title}
+                                                </Link>
                                             </p>
                                         </Link>
                                     </div>

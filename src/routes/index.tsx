@@ -4,7 +4,11 @@ import { ViewClinicDetail } from '../modules/account/clinic/views/ViewClinicDeta
 import { ViewDetailDoctor, ViewDoctor } from '../modules/account/doctor';
 import { Home } from '../modules/account/home';
 import { LoginLayout } from '../modules/account/login/LoginLayout';
-import { PostDetail, ViewPost } from '../modules/account/news';
+import {
+    PostDetail,
+    ViewPost,
+    ViewPostByCategory,
+} from '../modules/account/news';
 import { ViewService, ViewDetailService } from '../modules/account/service';
 import { AppointmentManagement } from '../modules/auth/appointment';
 import { DashBoard } from '../modules/auth/dashboard';
@@ -13,6 +17,7 @@ import { NewsManagement } from '../modules/auth/news';
 import { DoctorManagement } from '../modules/auth/doctor';
 
 import {
+    VIEW_POST_BY_CATEGORY_PATH,
     VIEW_MAJOR_PATH,
     CLINIC_MANAGEMENT_PATH,
     HOME_PATH,
@@ -129,6 +134,11 @@ export const publicRoutes = [
     {
         path: VIEW_PATIENT_APPOINTMENT,
         component: ViewAppointment,
+        layout: AppLayout,
+    },
+    {
+        path: VIEW_POST_BY_CATEGORY_PATH,
+        component: ViewPostByCategory,
         layout: AppLayout,
     },
 ];

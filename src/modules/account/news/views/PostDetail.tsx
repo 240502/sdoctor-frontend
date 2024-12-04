@@ -8,6 +8,7 @@ import { Breadcrumb, Card, Image, Flex, Divider } from 'antd';
 import { CalendarOutlined, HomeOutlined } from '@ant-design/icons';
 import parse from 'html-react-parser';
 import '@/assets/scss/app.scss';
+import { Link } from 'react-router-dom';
 
 type DataParams = {
     id: string;
@@ -16,8 +17,13 @@ const PostDetail = () => {
     const posts = useRecoilValue(postsValue);
     const { id } = useParams<DataParams>();
     const [post, setPost] = useState<Post>({} as Post);
+    const [relatedPosts, setRelatedPosts] = useState<Post[]>([]);
+    const [pageIndex, setPageIndex] = useState<number>(1);
+    const [pageSize, setPageSize] = useState<number>(5);
+    const [pageCount, setPageCount] = useState<number>(0);
     const getPostById = async () => {
         if (posts.length > 0) {
+            console.log('ko call api');
             const post: any = posts.find(
                 (post: Post) => post.id === Number(id)
             );
@@ -25,6 +31,8 @@ const PostDetail = () => {
                 setPost(post);
             }
         } else {
+            console.log(' call api');
+
             try {
                 const res = await PostService.getPostById(Number(id));
                 console.log(res);
@@ -35,6 +43,30 @@ const PostDetail = () => {
             }
         }
     };
+    const getRelatedPosts = async () => {
+        try {
+            const data = {
+                id: post.id,
+                categoryId: post.category_id,
+                pageIndex: pageIndex,
+                pageSize: pageSize,
+            };
+
+            const res = await PostService.getRelatedPost(data);
+            setRelatedPosts(res.data);
+            setPageCount(res.pageCount);
+        } catch (err: any) {
+            setRelatedPosts([]);
+            setPageCount(0);
+
+            console.log(err.message);
+        }
+    };
+    useEffect(() => {
+        if (post?.id) {
+            getRelatedPosts();
+        }
+    }, [post]);
     useEffect(() => {
         getPostById();
     }, [id]);
@@ -76,13 +108,53 @@ const PostDetail = () => {
                             {post.public_date?.toString().slice(0, 10)}
                         </p>
                     </Flex>
-                    <div className="content">{parse(post.content)}</div>
+                    <div className="content">
+                        {post?.content ? parse(String(post?.content)) : ''}
+                    </div>
                 </Card>
                 <Flex className="col-4 ps-3" vertical>
-                    <Card
-                        title={'Bài viết liên quan'}
-                        className="w-full"
-                    ></Card>
+                    <div className="w-full border p-2 rounded">
+                        <h6 className="mt-2">Bài viết liên quan</h6>
+                        <Divider />
+                        {relatedPosts.map((post: Post) => {
+                            return (
+                                <>
+                                    <Flex className="align-items-center">
+                                        <div className="col-4 feature-img-container">
+                                            <Link
+                                                to={'/post/detail/' + post.id}
+                                            >
+                                                <Image
+                                                    className="feature-img object-fit-cover rounded"
+                                                    src={post.featured_image}
+                                                    preview={false}
+                                                />
+                                            </Link>
+                                        </div>
+                                        <div>
+                                            <p className="mb-0 ms-2 fw-bold">
+                                                <Link
+                                                    to={
+                                                        '/post/detail/' +
+                                                        post.id
+                                                    }
+                                                    className="text-decoration-none text-dark post-title"
+                                                >
+                                                    {post.title}
+                                                </Link>
+                                            </p>
+                                            <p className="ms-2">
+                                                <CalendarOutlined className="me-2" />
+                                                {post.public_date
+                                                    ?.toString()
+                                                    .slice(0, 10)}
+                                            </p>
+                                        </div>
+                                    </Flex>
+                                </>
+                            );
+                        })}
+                    </div>
                 </Flex>
             </Flex>
         </div>

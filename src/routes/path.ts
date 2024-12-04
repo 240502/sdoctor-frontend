@@ -22,7 +22,9 @@ const VIEW_WATCHED_SERVICE = '/patient/watched-service';
 const VIEW_PATIENT_APPOINTMENT = '/patient/appointment';
 const CLINIC_MANAGEMENT_PATH = '/admin/clinic';
 const VIEW_MAJOR_PATH = '/list/major';
+const VIEW_POST_BY_CATEGORY_PATH = '/list/post/category/:categoryId';
 export {
+    VIEW_POST_BY_CATEGORY_PATH,
     VIEW_MAJOR_PATH,
     CLINIC_MANAGEMENT_PATH,
     HOME_PATH,
