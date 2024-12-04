@@ -6,6 +6,8 @@ import {
     Pagination,
     Flex,
     Button,
+    Select,
+    Input,
 } from 'antd';
 import { useEffect, useState } from 'react';
 import { ModalAddNews } from '../components/ModalAddNews';
@@ -17,7 +19,11 @@ import { configValue, userValue } from '../../../../stores/userAtom';
 import '@/assets/scss/new_management.scss';
 import { NewsCards } from '../components/NewsCards';
 import { ModalConfirmDeleteNews } from '../components/ModalConfirmDeleteNews';
-
+import { PostCategory } from '../../../../models/post_category';
+import { PostCategoryService } from '../../../../services/post_categorySerivce';
+import { SearchProps } from 'antd/es/input';
+const { Option } = Select;
+const { Search } = Input;
 const NewsManagement = () => {
     const user = useRecoilValue(userValue);
     const config = useRecoilValue(configValue);
@@ -32,7 +38,12 @@ const NewsManagement = () => {
     const [categoryId, setCategoryId] = useState<any>(null);
     const [posts, setPosts] = useState<Post[]>([]);
     const [post, setPost] = useState<Post>({} as Post);
-    const [activeBtn, setActiveBtn] = useState<number>(0);
+    const [postCategories, setPostCategories] = useState<PostCategory[]>([]);
+    const [searchOptions, setSearchOptions] = useState<any>({
+        categoryId: null,
+        title: null,
+        status: 'Chờ duyệt',
+    });
     const openNotificationWithIcon = (
         type: NotificationType,
         title: string,
@@ -43,20 +54,35 @@ const NewsManagement = () => {
             description: des,
         });
     };
-
+    const getAllPostCategory = async () => {
+        try {
+            const res = await PostCategoryService.getAllPostCategory();
+            setPostCategories(res);
+        } catch (err: any) {
+            console.log(err.message);
+            setPostCategories([]);
+        }
+    };
+    const onSearch: SearchProps['onSearch'] = (value, _e, info) => {
+        setSearchOptions({
+            ...searchOptions,
+            title: value !== '' ? value : null,
+        });
+    };
     const loadData = async () => {
         try {
             const data = {
                 pageIndex: pageIndex,
                 pageSize: pageSize,
-                status: activeBtn === 0 ? 'Chờ duyệt' : 'Đã đăng',
-                categoryId: categoryId,
                 authorId: user.id,
+                ...searchOptions,
             };
             const res = await PostService.viewPostAdmin(data, config);
             setPageCount(res.pageCount);
             setPosts(res.data);
         } catch (err: any) {
+            setPageCount(0);
+            setPosts([]);
             console.log(err.message);
         }
     };
@@ -64,36 +90,50 @@ const NewsManagement = () => {
         setIsShowModalConfirm(false);
     };
     useEffect(() => {
+        getAllPostCategory();
+    }, []);
+    useEffect(() => {
         loadData();
-    }, [pageIndex, pageSize, activeBtn]);
+    }, [pageIndex, pageSize, searchOptions]);
 
     return (
         <div className="container">
             {contextHolder}
-            <div className="block__filter">
-                <Breadcrumb
-                    items={[
-                        {
-                            href: '',
-                            title: <HomeOutlined />,
-                        },
-                        {
-                            title: 'Bài viết',
-                        },
-                    ]}
-                />
-                <Divider />
-            </div>
+            <Flex className=" justify-content-between">
+                <div>
+                    <Breadcrumb
+                        items={[
+                            {
+                                href: '',
+                                title: <HomeOutlined />,
+                            },
+                            {
+                                title: 'Bài viết',
+                            },
+                        ]}
+                    />
+                </div>
+                <Button
+                    className="border-0 text-white bg-primary"
+                    onClick={() => setIsShowModal(true)}
+                >
+                    <PlusOutlined /> Thêm mới
+                </Button>
+            </Flex>
+            <Divider />
             <div className="block__list__news">
                 <Flex className="justify-content-between ps-2 pe-2 mb-3">
-                    <Flex>
+                    <Flex className="col-3">
                         <Button
                             key={'pending'}
                             onClick={() => {
-                                setActiveBtn(0);
+                                setSearchOptions({
+                                    ...searchOptions,
+                                    status: 'Chờ duyệt',
+                                });
                             }}
                             className={
-                                activeBtn === 0
+                                searchOptions.status === 'Chờ duyệt'
                                     ? 'bg-info text-white border-0'
                                     : 'border-0 text-dark'
                             }
@@ -102,9 +142,14 @@ const NewsManagement = () => {
                         </Button>
                         <Button
                             key={'active'}
-                            onClick={() => setActiveBtn(1)}
+                            onClick={() => {
+                                setSearchOptions({
+                                    ...searchOptions,
+                                    status: 'Đã đăng',
+                                });
+                            }}
                             className={
-                                activeBtn === 1
+                                searchOptions.status === 'Đã đăng'
                                     ? 'bg-info text-white border-0'
                                     : 'border-0 text-dark'
                             }
@@ -112,12 +157,43 @@ const NewsManagement = () => {
                             Đã đăng
                         </Button>
                     </Flex>
-                    <Button
-                        className="border-0 text-white bg-primary"
-                        onClick={() => setIsShowModal(true)}
-                    >
-                        <PlusOutlined /> Thêm mới
-                    </Button>
+                </Flex>
+                <Flex className="justify-content-between ps-2 pe-2 mb-3">
+                    <div className="col-4">
+                        <Select
+                            allowClear
+                            showSearch
+                            value={searchOptions.categoryId}
+                            className="w-50"
+                            onChange={(value: number) => {
+                                setSearchOptions({
+                                    ...searchOptions,
+                                    categoryId: value,
+                                });
+                                setPageIndex(1);
+                            }}
+                            optionFilterProp="children"
+                            placeholder="Chọn loại bài viết"
+                        >
+                            {postCategories.map((category: PostCategory) => {
+                                return (
+                                    <Option
+                                        key={category.post_category_id}
+                                        value={category.post_category_id}
+                                        label={category.name}
+                                    >
+                                        {category.name}
+                                    </Option>
+                                );
+                            })}
+                        </Select>
+                    </div>
+                    <div>
+                        <Search
+                            onSearch={onSearch}
+                            placeholder="Nhập tiêu đề bài viết"
+                        />
+                    </div>
                 </Flex>
                 <NewsCards
                     posts={posts}
@@ -128,24 +204,26 @@ const NewsManagement = () => {
                     loadData={loadData}
                     setIsShowModalConfirm={setIsShowModalConfirm}
                 />
-                <Pagination
-                    className="mt-3"
-                    showSizeChanger
-                    align="center"
-                    defaultCurrent={1}
-                    current={pageIndex}
-                    pageSize={pageSize}
-                    total={pageCount * pageSize}
-                    pageSizeOptions={['5', '10', '20', '50']}
-                    onChange={(current: number, size: number) => {
-                        if (size !== pageSize) {
-                            setPageIndex(1);
-                            setPageSize(size);
-                        } else {
-                            setPageIndex(current);
-                        }
-                    }}
-                />
+                {pageCount > 1 && (
+                    <Pagination
+                        className="mt-3"
+                        showSizeChanger
+                        align="center"
+                        defaultCurrent={1}
+                        current={pageIndex}
+                        pageSize={pageSize}
+                        total={pageCount * pageSize}
+                        pageSizeOptions={['5', '10', '20', '50']}
+                        onChange={(current: number, size: number) => {
+                            if (size !== pageSize) {
+                                setPageIndex(1);
+                                setPageSize(size);
+                            } else {
+                                setPageIndex(current);
+                            }
+                        }}
+                    />
+                )}
             </div>
             {isShowModal && (
                 <ModalAddNews

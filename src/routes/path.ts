@@ -23,7 +23,10 @@ const VIEW_PATIENT_APPOINTMENT = '/patient/appointment';
 const CLINIC_MANAGEMENT_PATH = '/admin/clinic';
 const VIEW_MAJOR_PATH = '/list/major';
 const VIEW_POST_BY_CATEGORY_PATH = '/list/post/category/:categoryId';
+const USER_MANAGEMENT_PATH = '/admin/user';
+
 export {
+    USER_MANAGEMENT_PATH,
     VIEW_POST_BY_CATEGORY_PATH,
     VIEW_MAJOR_PATH,
     CLINIC_MANAGEMENT_PATH,

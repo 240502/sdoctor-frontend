@@ -79,9 +79,17 @@ main {
 
 .post-detail {
     .post-title {
-        transition: all 0.3s ease;
+        margin-top: 0;
+        margin-bottom: 0;
     }
-    .post-title a:hover {
+    .post-title a {
+        transition: all 0.3s ease;
+        font-size: 13px;
+        height: 60px;
+        max-height: 60px;
+        display: inline-block;
+    }
+    .post-title:hover a {
         color: #20c0f3 !important;
     }
 }

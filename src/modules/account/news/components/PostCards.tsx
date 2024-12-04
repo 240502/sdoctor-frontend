@@ -28,66 +28,75 @@ export const PostCards = ({ posts }: any) => {
 
     return (
         <Flex className="mt-3 posts" vertical>
-            {posts.map((post: Post) => {
-                return (
-                    <>
-                        <div
-                            className="mb-3  d-flex p-3 mb-3 rounded align-items-center border border-top-0 border-start-0 border-end-0"
-                            style={{ maxHeight: '100px', overflow: 'hidden' }}
-                        >
-                            <div className="img col-1 ">
-                                <Image
-                                    onClick={() => {
-                                        navigate('/post/detail/' + post.id);
-                                        updateViewPost(post.id);
-                                    }}
-                                    style={{
-                                        cursor: 'pointer',
-                                    }}
-                                    src={post.featured_image}
-                                    preview={false}
-                                    className="rounded"
-                                />
+            {posts?.length > 0 ? (
+                posts.map((post: Post) => {
+                    return (
+                        <>
+                            <div
+                                className="mb-3  d-flex p-3 mb-3 rounded align-items-center border border-top-0 border-start-0 border-end-0"
+                                style={{
+                                    maxHeight: '100px',
+                                    overflow: 'hidden',
+                                }}
+                            >
+                                <div className="img col-1 ">
+                                    <Image
+                                        onClick={() => {
+                                            navigate('/post/detail/' + post.id);
+                                            updateViewPost(post.id);
+                                        }}
+                                        style={{
+                                            cursor: 'pointer',
+                                        }}
+                                        src={post.featured_image}
+                                        preview={false}
+                                        className="rounded"
+                                    />
+                                </div>
+                                <h6 className="col-9 ms-3">
+                                    <Link
+                                        style={{
+                                            textAlign: 'justify',
+                                            maxWidth: '100%',
+                                            textOverflow: 'ellipsis',
+                                            overflow: 'hidden',
+                                            whiteSpace: 'nowrap',
+                                            cursor: 'pointer',
+                                        }}
+                                        to={'/post/detail/' + post.id}
+                                        onClick={() => {
+                                            updateViewPost(post.id);
+                                        }}
+                                        className="text-decoration-none text-dark d-inline-block"
+                                    >
+                                        {post.title}
+                                    </Link>
+                                    <p
+                                        onClick={() => {
+                                            navigate('/post/detail/' + post.id);
+                                            updateViewPost(post.id);
+                                        }}
+                                        className="w-full post-content fw-normal m-0"
+                                        style={{
+                                            cursor: 'pointer',
+                                            maxWidth: '100%',
+                                            textOverflow: 'ellipsis',
+                                            overflow: 'hidden',
+                                            whiteSpace: 'nowrap',
+                                        }}
+                                    >
+                                        {handleShowDescriptionPost(
+                                            post.content
+                                        )}
+                                    </p>
+                                </h6>
                             </div>
-                            <h6 className="col-9 ms-3">
-                                <Link
-                                    style={{
-                                        textAlign: 'justify',
-                                        maxWidth: '100%',
-                                        textOverflow: 'ellipsis',
-                                        overflow: 'hidden',
-                                        whiteSpace: 'nowrap',
-                                        cursor: 'pointer',
-                                    }}
-                                    to={'/post/detail/' + post.id}
-                                    onClick={() => {
-                                        updateViewPost(post.id);
-                                    }}
-                                    className="text-decoration-none text-dark d-inline-block"
-                                >
-                                    {post.title}
-                                </Link>
-                                <p
-                                    onClick={() => {
-                                        navigate('/post/detail/' + post.id);
-                                        updateViewPost(post.id);
-                                    }}
-                                    className="w-full post-content fw-normal m-0"
-                                    style={{
-                                        cursor: 'pointer',
-                                        maxWidth: '100%',
-                                        textOverflow: 'ellipsis',
-                                        overflow: 'hidden',
-                                        whiteSpace: 'nowrap',
-                                    }}
-                                >
-                                    {handleShowDescriptionPost(post.content)}
-                                </p>
-                            </h6>
-                        </div>
-                    </>
-                );
-            })}
+                        </>
+                    );
+                })
+            ) : (
+                <p className="text-center">Không có bài viết nào</p>
+            )}
         </Flex>
     );
 };

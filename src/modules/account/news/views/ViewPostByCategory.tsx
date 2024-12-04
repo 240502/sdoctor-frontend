@@ -54,22 +54,26 @@ const ViewPostByCategory = () => {
                 pageIndex: pageIndex,
                 pageSize: pageSize,
                 ...searchOptions,
-                categoryId: Number(categoryId),
             };
             const res = await PostService.viewPostClient(data);
             setPosts(res.data);
             setPageCount(res.pageCount);
         } catch (err: any) {
-            console.log(err.message);
             setPosts([]);
             setPageCount(0);
+            console.log(err.message);
         }
     };
     useEffect(() => {
         setSearchOptions({ ...searchOptions, categoryId: Number(categoryId) });
-        getPostByCategory();
         getAllPostCategory();
     }, []);
+    useEffect(() => {
+        getPostByCategory();
+    }, [searchOptions]);
+    useEffect(() => {
+        console.log('post', pageCount);
+    });
     return (
         <div className="container">
             <Breadcrumb
@@ -93,7 +97,7 @@ const ViewPostByCategory = () => {
                 <div className="col-3">
                     <Select
                         className="w-75"
-                        value={Number(searchOptions.categoryId)}
+                        value={searchOptions.categoryId}
                         optionFilterProp="children"
                         allowClear
                         showSearch

@@ -9,6 +9,7 @@ import { CalendarOutlined, HomeOutlined } from '@ant-design/icons';
 import parse from 'html-react-parser';
 import '@/assets/scss/app.scss';
 import { Link } from 'react-router-dom';
+import { RelatedPost } from '../components/RelatedPost';
 
 type DataParams = {
     id: string;
@@ -62,6 +63,14 @@ const PostDetail = () => {
             console.log(err.message);
         }
     };
+    const changePage = (current: number, size: number) => {
+        if (size !== pageSize) {
+            setPageIndex(1);
+            setPageSize(size);
+        } else {
+            setPageIndex(current);
+        }
+    };
     useEffect(() => {
         if (post?.id) {
             getRelatedPosts();
@@ -69,6 +78,7 @@ const PostDetail = () => {
     }, [post]);
     useEffect(() => {
         getPostById();
+        window.scrollTo(0, 0);
     }, [id]);
     useEffect(() => {
         console.log('post', post);
@@ -116,44 +126,13 @@ const PostDetail = () => {
                     <div className="w-full border p-2 rounded">
                         <h6 className="mt-2">Bài viết liên quan</h6>
                         <Divider />
-                        {relatedPosts.map((post: Post) => {
-                            return (
-                                <>
-                                    <Flex className="align-items-center">
-                                        <div className="col-4 feature-img-container">
-                                            <Link
-                                                to={'/post/detail/' + post.id}
-                                            >
-                                                <Image
-                                                    className="feature-img object-fit-cover rounded"
-                                                    src={post.featured_image}
-                                                    preview={false}
-                                                />
-                                            </Link>
-                                        </div>
-                                        <div>
-                                            <p className="mb-0 ms-2 fw-bold">
-                                                <Link
-                                                    to={
-                                                        '/post/detail/' +
-                                                        post.id
-                                                    }
-                                                    className="text-decoration-none text-dark post-title"
-                                                >
-                                                    {post.title}
-                                                </Link>
-                                            </p>
-                                            <p className="ms-2">
-                                                <CalendarOutlined className="me-2" />
-                                                {post.public_date
-                                                    ?.toString()
-                                                    .slice(0, 10)}
-                                            </p>
-                                        </div>
-                                    </Flex>
-                                </>
-                            );
-                        })}
+                        <RelatedPost
+                            relatedPosts={relatedPosts}
+                            pageIndex={pageIndex}
+                            pageSize={pageSize}
+                            pageCount={pageCount}
+                            onChangePage={changePage}
+                        />
                     </div>
                 </Flex>
             </Flex>

@@ -1,12 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Doctor } from '../../../../models/doctor';
-import { Avatar, Button, Card } from 'antd';
-import {
-    EditOutlined,
-    EllipsisOutlined,
-    SettingOutlined,
-} from '@ant-design/icons';
-import { baseURL } from '../../../../constants/api';
+import { Button, Card } from 'antd';
 import { Link, useNavigate } from 'react-router-dom';
 import { PatientProfileLayout } from '../components/PatientProfileLayout';
 const ViewWatchedDoctor = () => {
@@ -42,7 +36,7 @@ const ViewWatchedDoctor = () => {
                                                 )
                                             }
                                             alt="example"
-                                            src={baseURL + doctor.image}
+                                            src={doctor.image}
                                         />
                                     }
                                     actions={[

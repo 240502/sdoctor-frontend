@@ -14,7 +14,7 @@ export const PostService = {
     },
     async viewPostAdmin(data: any, config: any): Promise<any> {
         const res = await apiClient.post(
-            '/api/post/view-news-admin',
+            '/api/post/view-news-doctor',
             data,
             config
         );
