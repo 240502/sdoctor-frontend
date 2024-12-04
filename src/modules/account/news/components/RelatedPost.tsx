@@ -8,6 +8,7 @@ export const RelatedPost = ({
     pageSize,
     pageCount,
     onChangePage,
+    setPageIndex,
 }: any) => {
     return (
         <>
@@ -17,7 +18,14 @@ export const RelatedPost = ({
                     <>
                         <Flex className="align-items-center">
                             <div className="col-4 feature-img-container">
-                                <Link to={'/post/detail/' + post.id}>
+                                <Link
+                                    to={'/post/detail/' + post.id}
+                                    onClick={() => {
+                                        if (pageIndex !== 1) {
+                                            setPageIndex(1);
+                                        }
+                                    }}
+                                >
                                     <Image
                                         className="feature-img object-fit-cover rounded"
                                         src={post.featured_image}
@@ -26,8 +34,13 @@ export const RelatedPost = ({
                                 </Link>
                             </div>
                             <div>
-                                <p className="mb-0 ms-2 fw-bold  post-title">
+                                <p className="mb-0 ms-2 fw-bold post-title">
                                     <Link
+                                        onClick={() => {
+                                            if (pageIndex !== 1) {
+                                                setPageIndex(1);
+                                            }
+                                        }}
                                         to={'/post/detail/' + post.id}
                                         className="text-decoration-none text-dark"
                                     >

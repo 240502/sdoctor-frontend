@@ -50,7 +50,6 @@ import {
     ViewProfile,
     ViewWatchedClinic,
     ViewWatchedDoctor,
-    ViewWatchedService,
 } from '../modules/account/patient_profile';
 import { ClinicManagement } from '../modules/auth/clinic';
 import { ViewMajor } from '../modules/account/major';
@@ -126,11 +125,6 @@ export const publicRoutes = [
     {
         path: VIEW_WATCHED_CLINIC,
         component: ViewWatchedClinic,
-        layout: AppLayout,
-    },
-    {
-        path: VIEW_WATCHED_SERVICE,
-        component: ViewWatchedService,
         layout: AppLayout,
     },
     {

@@ -75,14 +75,12 @@ const PostDetail = () => {
         if (post?.id) {
             getRelatedPosts();
         }
-    }, [post]);
+    }, [post, pageIndex, pageSize]);
     useEffect(() => {
         getPostById();
         window.scrollTo(0, 0);
     }, [id]);
-    useEffect(() => {
-        console.log('post', post);
-    }, [post]);
+
     return (
         <div className="container post-detail mt-4 mb-4">
             <Breadcrumb
@@ -132,6 +130,7 @@ const PostDetail = () => {
                             pageSize={pageSize}
                             pageCount={pageCount}
                             onChangePage={changePage}
+                            setPageIndex={setPageIndex}
                         />
                     </div>
                 </Flex>

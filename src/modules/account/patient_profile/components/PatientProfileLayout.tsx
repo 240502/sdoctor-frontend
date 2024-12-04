@@ -35,13 +35,6 @@ export const PatientProfileLayout = ({ children, breadcrumb }: any) => {
 
         {
             key: '4',
-            label: 'Gói khám đã xem',
-            icon: <SolutionOutlined />,
-            link: '/patient/watched-service',
-        },
-
-        {
-            key: '5',
             label: 'Lịch hẹn',
             icon: <i className="fa-regular fa-calendar-check"></i>,
             link: '/patient/appointment',

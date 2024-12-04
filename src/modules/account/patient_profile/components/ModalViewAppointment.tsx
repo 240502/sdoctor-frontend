@@ -9,6 +9,7 @@ import {
     Radio,
     Select,
     notification,
+    Space,
 } from 'antd';
 import { useEffect, useRef, useState } from 'react';
 import { doctorService } from '../../../../services/doctorService';
@@ -34,8 +35,7 @@ import { useRecoilState } from 'recoil';
 import { patientProfileState } from '../../../../stores/patientAtom';
 import axios from 'axios';
 import { ProvinceType, DistrictType, WardType } from '../../../../models/other';
-
-type NotificationType = 'success' | 'error';
+import { Appointment } from '../../../../models/appointment';
 
 export const ModalViewAppointment = ({
     handleCancelModal,
@@ -100,6 +100,7 @@ export const ModalViewAppointment = ({
             console.log(err);
         }
     };
+
     const handleOk = () => {
         let errorMsg: any = {};
         const isEmptyPatientName = isEmpty(inputPatientNameRef.current?.input);
@@ -228,6 +229,9 @@ export const ModalViewAppointment = ({
         };
         getProvinces();
     }, []);
+    useEffect(() => {
+        console.log('isView', isView);
+    }, [isView]);
 
     //get list district of province when change province
     useEffect(() => {
@@ -258,9 +262,6 @@ export const ModalViewAppointment = ({
                 width={800}
                 maskClosable={false}
                 footer={[
-                    <Button key={'ok'} type="primary" onClick={handleOk}>
-                        Lưu
-                    </Button>,
                     <Button
                         key="back"
                         onClick={() => {
@@ -278,7 +279,7 @@ export const ModalViewAppointment = ({
                             <div className="doctor__info text-center">
                                 <Image
                                     preview={false}
-                                    src={baseURL + doctor.image}
+                                    src={doctor.image}
                                     className="rounded-circle"
                                     width={115}
                                 ></Image>
