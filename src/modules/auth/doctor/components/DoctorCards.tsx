@@ -1,4 +1,3 @@
-import React, { useEffect } from 'react';
 import { Card, Button, Flex, Pagination } from 'antd';
 import { Doctor } from '../../../../models/doctor';
 import { baseURL } from '../../../../constants/api';

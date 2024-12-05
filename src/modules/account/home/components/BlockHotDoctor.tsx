@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { Image, Button, Carousel, Card } from 'antd';
+import { useEffect } from 'react';
+import { Button, Card } from 'antd';
 import { Link, useNavigate } from 'react-router-dom';
 import NextArrow from './NextArrow';
 import PrevArrow from './PrevArrow';
@@ -8,7 +8,6 @@ import 'slick-carousel/slick/slick-theme.css';
 import Slider from 'react-slick';
 import { doctorService } from '../../../../services/doctorService';
 import { Doctor } from '../../../../models/doctor';
-import { baseURL } from '../../../../constants/api';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import {
     doctorListState,
@@ -71,7 +70,7 @@ export const BlockHotDoctor = (): JSX.Element => {
                                                     onClick={() => {
                                                         navigate(
                                                             '/doctor/detail/' +
-                                                                doctor.id
+                                                                doctor.doctor_id
                                                         );
                                                     }}
                                                     style={{
@@ -87,13 +86,13 @@ export const BlockHotDoctor = (): JSX.Element => {
                                                         onClick={() =>
                                                             handleUpdateViewsDoctor(
                                                                 Number(
-                                                                    doctor.id
+                                                                    doctor.doctor_id
                                                                 )
                                                             )
                                                         }
                                                         to={
                                                             '/doctor/detail/' +
-                                                            doctor.id
+                                                            doctor.doctor_id
                                                         }
                                                         className="w-100 text-dark text-decoration-none"
                                                     >
@@ -108,7 +107,7 @@ export const BlockHotDoctor = (): JSX.Element => {
                                                     className="text-decoration-none text-dark"
                                                     to={
                                                         '/doctor/detail/' +
-                                                        doctor.id
+                                                        doctor.doctor_id
                                                     }
                                                 >
                                                     {doctor.full_name}
@@ -126,7 +125,7 @@ export const BlockHotDoctor = (): JSX.Element => {
                             );
                         })
                     ) : (
-                        <p>Có bác sĩ nào !</p>
+                        <p>Không có bác sĩ nào !</p>
                     )}
                 </Slider>
             </div>

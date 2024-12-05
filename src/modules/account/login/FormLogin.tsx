@@ -35,20 +35,14 @@ export const FormLogin = () => {
         setErrors(tempErrors);
         return isValid;
     };
-    useEffect(() => {
-        console.log('email', email);
-        console.log('pass', password);
-    }, [email, password]);
+
     const Login = async () => {
         if (!handleLogin()) {
             try {
                 const res = await UserService.login({ email, password });
 
-                // Đăng nhập thành công
                 sessionStorage.setItem('user', JSON.stringify(res));
                 setUser(res);
-
-                // Xóa nội dung email và password
                 setEmail('');
                 setPassword('');
 

@@ -7,6 +7,7 @@ import {
     InputRef,
     Image,
     Upload,
+    DatePicker,
 } from 'antd';
 import TextArea from 'antd/es/input/TextArea';
 import DoctorEditor from './DoctorEditor';
@@ -23,11 +24,16 @@ import {
 } from '../../../../utils/global';
 const { Option } = Select;
 import { PlusOutlined } from '@ant-design/icons';
-import type { GetProp, UploadFile, UploadProps } from 'antd';
+import type { DatePickerProps, GetProp, UploadFile, UploadProps } from 'antd';
 import { doctorService } from '../../../../services/doctorService';
 import { UploadService } from '../../../../services/upload';
 type FileType = Parameters<GetProp<UploadProps, 'beforeUpload'>>[0];
+import dayjs from 'dayjs';
+import customParseFormat from 'dayjs/plugin/customParseFormat';
 
+dayjs.extend(customParseFormat);
+
+const dateFormat = 'YYYY-MM-DD';
 export const DoctorModal = ({
     showDoctorModal,
     handleCloseDoctorModal,
@@ -55,7 +61,12 @@ export const DoctorModal = ({
         clinicMsg: null,
         genderMsg: null,
         majorsMsg: null,
+        birthdayMsg: null,
     });
+    const onChange: DatePickerProps['onChange'] = (date, dateString) => {
+        console.log(date, dateString);
+        setDoctor({ ...doctor, birthday: dateString });
+    };
     const getBase64 = (file: FileType): Promise<string> =>
         new Promise((resolve, reject) => {
             const reader = new FileReader();
@@ -149,7 +160,7 @@ export const DoctorModal = ({
                         full_name: inputNameRef.current?.input?.value,
                         clinic_id: doctor.clinic_id,
                         major_id: doctor.major_id,
-                        description: doctor.description,
+                        summary: doctor.summary,
                         image: fileList[0].url ?? '',
                         email: inputEmailRef.current?.input?.value,
                         phone: inputPhoneRef.current?.input?.value,
@@ -160,15 +171,18 @@ export const DoctorModal = ({
                         examination_object:
                             inputExamninationObjectRef.current?.input?.value,
                         introduction: doctor.introduction,
+                        birthday: doctor.birthday.toString().slice(0, 10),
                     };
                     CreateDoctor(newDoctor);
                     console.log(newDoctor);
                 } else {
                     const newDoctor = {
+                        doctor_id: doctor.doctor_id,
+                        user_id: doctor.user_id,
                         full_name: inputNameRef.current?.input?.value,
                         clinic_id: doctor.clinic_id,
                         major_id: doctor.major_id,
-                        description: doctor.description,
+                        summary: doctor.summary,
                         image: fileList[0].url ?? '',
                         email: inputEmailRef.current?.input?.value,
                         phone: inputPhoneRef.current?.input?.value,
@@ -179,6 +193,7 @@ export const DoctorModal = ({
                         examination_object:
                             inputExamninationObjectRef.current?.input?.value,
                         introduction: doctor.introduction,
+                        birthday: doctor.birthday.toString().slice(0, 10),
                     };
                     UpdateDoctor(newDoctor);
                     console.log(newDoctor);
@@ -242,6 +257,10 @@ export const DoctorModal = ({
             setFileList(file);
         }
     }, []);
+
+    useEffect(() => {
+        console.log('doctor', dayjs(doctor.birthday));
+    }, [doctor]);
 
     return (
         <Modal
@@ -504,21 +523,30 @@ export const DoctorModal = ({
                         style={{ color: 'red' }}
                     ></div>
                 </div>
-                <div className="col-6 ps-2">
-                    <label htmlFor="" className="mb-2">
-                        Đối tượng khám
+                <div className="col-6  pe-2">
+                    <label htmlFor="" className="form-label">
+                        Ngày/ Tháng/ Năm Sinh
                     </label>
-                    <Input
-                        value={doctor?.examination_object}
-                        ref={inputExamninationObjectRef}
-                        placeholder="Nhập đối tượng ..."
-                        onChange={(e) => {
-                            setDoctor({
-                                ...doctor,
-                                examination_object: e.target.value,
-                            });
-                        }}
+                    <DatePicker
+                        className="d-block"
+                        format="YYYY-MM-DD"
+                        defaultValue={
+                            doctor?.birthday
+                                ? dayjs(doctor?.birthday, dateFormat)
+                                : null
+                        }
+                        onChange={onChange} // Hàm xử lý khi thay đổi ngày
+                        placeholder="Chọn ngày sinh"
                     />
+
+                    {errors?.birthdayMsg && (
+                        <div
+                            className="error_message mt-3"
+                            style={{ color: 'red' }}
+                        >
+                            {errors.birthdayMsg}
+                        </div>
+                    )}
                 </div>
             </Flex>
             <div className="mb-3">
@@ -526,9 +554,9 @@ export const DoctorModal = ({
                     Mô tả nhanh
                 </label>
                 <TextArea
-                    value={doctor?.description}
+                    value={doctor?.summary}
                     onChange={(e) => {
-                        setDoctor({ ...doctor, description: e.target.value });
+                        setDoctor({ ...doctor, summary: e.target.value });
                     }}
                     placeholder="Nhập mô tả nhanh ..."
                 />

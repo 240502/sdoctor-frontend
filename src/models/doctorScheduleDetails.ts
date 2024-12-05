@@ -1,4 +1,4 @@
-export interface ScheduleDetails {
+export interface DoctorScheduleDetail {
     id: number;
     schedule_id: number | null;
     time_id: number;

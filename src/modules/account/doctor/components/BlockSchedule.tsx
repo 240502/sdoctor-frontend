@@ -4,11 +4,11 @@ import { DatePicker } from 'antd';
 import { CalendarOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import type { DatePickerProps } from 'antd';
-import { scheduleService } from '../../../../services/scheduleService';
+import { scheduleService } from '../../../../services/doctorScheduleService';
 import socket from '../../../../socket';
-import { ScheduleDetails } from '../../../../models/schedule_details';
-import { schedule_detailsService } from '../../../../services/schedule_detailsService';
-import { Schedule } from '../../../../models/schedule';
+import { ScheduleDetails } from '../../../../models/doctorScheduleDetails';
+import { schedule_detailsService } from '../../../../services/doctorScheduleDetailService';
+import { Schedule } from '../../../../models/doctorSchedule';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { ListTime } from './ListTime';
 import {

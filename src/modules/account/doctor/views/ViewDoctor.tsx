@@ -218,7 +218,7 @@ const ViewDoctor = () => {
                             return (
                                 <div
                                     className="list__item mb-3 p-3 border rounded"
-                                    key={Number(doctor.id)}
+                                    key={Number(doctor.doctor_id)}
                                 >
                                     <div className="item_container d-flex pt-1">
                                         <div className="item__left col-6 d-flex border border-start-0 border-bottom-0 border-top-0 pe-3">
@@ -226,13 +226,15 @@ const ViewDoctor = () => {
                                                 <Link
                                                     onClick={() => {
                                                         handleUpdateViewsDoctor(
-                                                            Number(doctor.id)
+                                                            Number(
+                                                                doctor.doctor_id
+                                                            )
                                                         );
                                                         addWatchedDoctor(
                                                             doctor
                                                         );
                                                     }}
-                                                    to={`/doctor/detail/${doctor.id}`}
+                                                    to={`/doctor/detail/${doctor.doctor_id}`}
                                                 >
                                                     <Image
                                                         preview={false}
@@ -256,13 +258,15 @@ const ViewDoctor = () => {
                                                 <Link
                                                     onClick={() => {
                                                         handleUpdateViewsDoctor(
-                                                            Number(doctor.id)
+                                                            Number(
+                                                                doctor.doctor_id
+                                                            )
                                                         );
                                                         addWatchedDoctor(
                                                             doctor
                                                         );
                                                     }}
-                                                    to={`/doctor/detail/${doctor.id}`}
+                                                    to={`/doctor/detail/${doctor.doctor_id}`}
                                                     className="btn__more text-decoration-none mt-3"
                                                 >
                                                     Xem thêm
@@ -274,25 +278,23 @@ const ViewDoctor = () => {
                                                         onClick={() => {
                                                             handleUpdateViewsDoctor(
                                                                 Number(
-                                                                    doctor.id
+                                                                    doctor.doctor_id
                                                                 )
                                                             );
                                                             addWatchedDoctor(
                                                                 doctor
                                                             );
                                                         }}
-                                                        to={`/doctor/detail/${doctor.id}`}
+                                                        to={`/doctor/detail/${doctor.doctor_id}`}
                                                         className="text-decoration-none"
                                                     >
-                                                        {doctor.title}{' '}
+                                                        {doctor.title}
                                                         {doctor.full_name}
                                                     </Link>
                                                 </h3>
                                                 <div className="doctor__des">
                                                     {parse(
-                                                        String(
-                                                            doctor.description
-                                                        )
+                                                        String(doctor.summary)
                                                     )}
                                                     <p>
                                                         <EnvironmentOutlined className="fs-6 " />
@@ -303,7 +305,7 @@ const ViewDoctor = () => {
                                         </div>
                                         <div className="item__right col-6 ps-3  border border-end-0 border-start-0 border-top-0">
                                             <BlockSchedule
-                                                subscriberId={doctor.id}
+                                                subscriberId={doctor.doctor_id}
                                                 setIsModalOpen={setIsModalOpen}
                                                 doctor={doctor}
                                                 setDoctor={setDoctor}

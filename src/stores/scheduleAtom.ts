@@ -1,5 +1,5 @@
 import { atom, selector } from 'recoil';
-import { Schedule } from '../models/schedule';
+import { Schedule } from '../models/doctorSchedule';
 
 export const scheduleListState = atom({
     key: 'scheduleListState',

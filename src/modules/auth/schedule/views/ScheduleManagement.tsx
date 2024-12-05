@@ -2,12 +2,12 @@ import { HomeOutlined } from '@ant-design/icons';
 import { Breadcrumb, Button, Select, TabsProps, notification } from 'antd';
 import { useEffect, useState } from 'react';
 import { ListTime } from '../components/ListTime';
-import { ScheduleDetails } from '../../../../models/schedule_details';
+import { DoctorScheduleDetail } from '../../../../models/doctorScheduleDetails';
 import { Time } from '../../../../models/time';
 import { useRecoilValue } from 'recoil';
 import { configValue, userValue } from '../../../../stores/userAtom';
-import { scheduleService } from '../../../../services/scheduleService';
-import { Schedule } from '../../../../models/schedule';
+import { scheduleService } from '../../../../services/doctorScheduleService';
+import { DoctorSchedule } from '../../../../models/doctorSchedule';
 import { handleGetDateByActiveDay } from '../../../../utils/schedule_management';
 type NotificationType = 'success' | 'error';
 const tabs: TabsProps['items'] = [
@@ -48,7 +48,9 @@ const ScheduleManagement = () => {
     const [activeDay, setActiveDay] = useState<string>('1');
     const [selectedTimes, setSelectedTimes] = useState<Time[]>([]);
     const [selectedTimeKeys, setSelectedTimeKeys] = useState<number[]>([]);
-    const [schedule, setSchedule] = useState<Schedule>({} as Schedule);
+    const [schedule, setSchedule] = useState<DoctorSchedule>(
+        {} as DoctorSchedule
+    );
     const [isVisibleButtonSave, setIsVisibleButtonSave] =
         useState<boolean>(false);
     const [isUpdate, setIsUpdate] = useState<boolean>(false);
@@ -66,11 +68,10 @@ const ScheduleManagement = () => {
     const handleGetScheduleBySubscriberAndDate = () => {
         const dateOfWeek = handleGetDateByActiveDay(Number(activeDay));
         const data = {
-            subscriberId: user.object_id,
+            doctor_id: user.doctor_id,
             date: `${dateOfWeek.getFullYear()}-${
                 dateOfWeek.getMonth() + 1
             }-${dateOfWeek.getDate()}`,
-            type: user.role_id === 2 ? 'Bác sĩ' : 'Gói khám',
         };
 
         GetScheduleBySubscriberIdAndDate(data);
@@ -81,19 +82,21 @@ const ScheduleManagement = () => {
             console.log('call api');
             setSchedule(res.data);
             let timeAvailable: any = [];
-            res.data.listScheduleDetails.forEach((item: ScheduleDetails) => {
-                if (timeAvailable.length > 0) {
-                    if (!timeAvailable.includes(item.time_id)) {
-                        timeAvailable.push(item.time_id);
+            res.data.listScheduleDetails.forEach(
+                (item: DoctorScheduleDetail) => {
+                    if (timeAvailable.length > 0) {
+                        if (!timeAvailable.includes(item.time_id)) {
+                            timeAvailable.push(item.time_id);
+                        }
+                    } else {
+                        timeAvailable = [item.time_id];
                     }
-                } else {
-                    timeAvailable = [item.time_id];
                 }
-            });
+            );
             setSelectedTimeKeys(timeAvailable);
         } catch (err: any) {
             console.log(err.message);
-            setSchedule({} as Schedule);
+            setSchedule({} as DoctorSchedule);
             setSelectedTimeKeys([]);
         }
     };
@@ -104,7 +107,7 @@ const ScheduleManagement = () => {
                 schedule.listScheduleDetails.length === selectedTimeKeys.length
             ) {
                 const existsTimeKeys = schedule.listScheduleDetails.map(
-                    (detail: ScheduleDetails) => detail.time_id
+                    (detail: DoctorScheduleDetail) => detail.time_id
                 );
                 const combined = [
                     ...new Set([...existsTimeKeys, ...selectedTimeKeys]),
@@ -124,20 +127,20 @@ const ScheduleManagement = () => {
         }
     };
     const handleUpdateSchedule = () => {
-        let deletedDetails: ScheduleDetails[] = [];
+        let deletedDetails: DoctorScheduleDetail[] = [];
         let newTimes: Time[] = [];
         if (selectedTimes.length > schedule.listScheduleDetails.length) {
             console.log('add new time');
             newTimes = selectedTimes.filter((time: Time) => {
                 const exist = schedule.listScheduleDetails.find(
-                    (detail: ScheduleDetails) => detail.time_id === time.id
+                    (detail: DoctorScheduleDetail) => detail.time_id === time.id
                 );
                 if (!exist) {
                     return time;
                 }
             });
             deletedDetails = schedule.listScheduleDetails.filter(
-                (detail: ScheduleDetails) => {
+                (detail: DoctorScheduleDetail) => {
                     if (!selectedTimeKeys.includes(detail.time_id)) {
                         return detail;
                     }
@@ -147,7 +150,7 @@ const ScheduleManagement = () => {
         if (selectedTimes.length <= schedule.listScheduleDetails.length) {
             console.log('delete time');
             deletedDetails = schedule.listScheduleDetails.filter(
-                (detail: ScheduleDetails) => {
+                (detail: DoctorScheduleDetail) => {
                     if (!selectedTimeKeys.includes(detail.time_id)) {
                         return detail;
                     }
@@ -155,7 +158,7 @@ const ScheduleManagement = () => {
             );
             newTimes = selectedTimes.filter((time: Time) => {
                 const exist = schedule.listScheduleDetails.find(
-                    (detail: ScheduleDetails) => detail.time_id === time.id
+                    (detail: DoctorScheduleDetail) => detail.time_id === time.id
                 );
                 if (!exist) {
                     return time;
@@ -164,9 +167,9 @@ const ScheduleManagement = () => {
         }
         let scheduleDetailsAvailable = schedule.listScheduleDetails;
         if (newTimes.length > 0) {
-            const scheduleDetails: ScheduleDetails[] = [];
+            const scheduleDetails: DoctorScheduleDetail[] = [];
             newTimes.forEach((time: Time) => {
-                const scheduleDetail: ScheduleDetails = {
+                const scheduleDetail: DoctorScheduleDetail = {
                     id: 0,
                     time_id: time.id,
                     schedule_id: null,
@@ -183,7 +186,7 @@ const ScheduleManagement = () => {
         console.log('deleted', deletedDetails);
         if (deletedDetails.length > 0) {
             scheduleDetailsAvailable = scheduleDetailsAvailable.map(
-                (detail: ScheduleDetails) => {
+                (detail: DoctorScheduleDetail) => {
                     if (deletedDetails.includes(detail)) {
                         return { ...detail, action: 3 };
                     } else {
@@ -196,13 +199,13 @@ const ScheduleManagement = () => {
     };
     const updateSchedule = async (
         id: number,
-        scheduleDetails: ScheduleDetails[]
+        scheduleDetails: DoctorScheduleDetail[]
     ) => {
         try {
             const data = {
                 id: id,
                 scheduleDetails: scheduleDetails.filter(
-                    (detail: ScheduleDetails) => detail?.action
+                    (detail: DoctorScheduleDetail) => detail?.action
                 ),
             };
 
@@ -224,9 +227,9 @@ const ScheduleManagement = () => {
     };
     const handleCreateSchedule = () => {
         const now = new Date();
-        const scheduleDetails: ScheduleDetails[] = [];
+        const scheduleDetails: DoctorScheduleDetail[] = [];
         selectedTimes.forEach((selectedTime: Time) => {
-            const schedule: ScheduleDetails = {
+            const schedule: DoctorScheduleDetail = {
                 id: 0,
                 time_id: selectedTime.id,
                 schedule_id: null,
@@ -242,17 +245,17 @@ const ScheduleManagement = () => {
             dateOfWeek = handleGetDateByActiveDay(Number(activeDay));
         }
         const schedule = {
-            subscriber_id: user.object_id,
+            doctor_id: user.doctor_id,
             date: `${dateOfWeek.getFullYear()}-${
                 dateOfWeek.getMonth() + 1
             }-${dateOfWeek.getDate()}`,
-            type: user.role_id === 2 ? 'Bác sĩ' : 'Dịch vụ',
             listScheduleDetails: scheduleDetails,
         };
         CreateSchedule(schedule);
     };
     const CreateSchedule = async (data: any) => {
         try {
+            console.log(data);
             const res = await scheduleService.createSchedule(data, config);
             openNotification(
                 'success',
@@ -315,7 +318,7 @@ const ScheduleManagement = () => {
                                     setActiveDay(tab.key);
                                     setSelectedTimeKeys([]);
                                     setSelectedTimes([]);
-                                    setSchedule({} as Schedule);
+                                    setSchedule({} as DoctorSchedule);
                                     setIsUpdate(false);
                                 }}
                                 key={tab.key}
