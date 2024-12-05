@@ -1,17 +1,13 @@
-import {
-    EnvironmentFilled,
-    EnvironmentOutlined,
-    HomeOutlined,
-} from '@ant-design/icons';
-import { Breadcrumb, Button, Image, notification } from 'antd';
-import React, { useEffect, useRef, useState } from 'react';
+import { EnvironmentOutlined, HomeOutlined } from '@ant-design/icons';
+import { Breadcrumb, Image, notification } from 'antd';
+import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { BlockSchedule } from '../components/BlockSchedule';
 import { Doctor } from '../../../../models/doctor';
 import { Time } from '../../../../models/time';
 import { ModalOrderAppointment } from '../components/ModalOrderAppointment';
 import { doctorService } from '../../../../services/doctorService';
-import { apiClient, baseURL } from '../../../../constants/api';
+import { baseURL } from '../../../../constants/api';
 import parse from 'html-react-parser';
 import { BlockComment } from '../components/BlockComment';
 import { ModalComment } from '../components/ModalComment';
@@ -50,7 +46,7 @@ const ViewDetailDoctor = () => {
         try {
             if (doctors.length > 0) {
                 const res = doctors.find(
-                    (doctor: Doctor) => doctor.id === Number(id)
+                    (doctor: Doctor) => doctor.doctor_id === Number(id)
                 );
                 console.log(res);
                 setDoctor(res);
@@ -72,7 +68,7 @@ const ViewDetailDoctor = () => {
         console.log('doctor', doctor);
     }, [doctor]);
     return (
-        <div className="container mt-4 mb-4">
+        <div className="container doctor-detail mt-4 mb-4">
             {contextHolder}
             <Breadcrumb
                 items={[
@@ -104,7 +100,7 @@ const ViewDetailDoctor = () => {
                             {doctor?.title} {doctor?.full_name}
                         </h3>
                         <p className="des opacity-75">
-                            {parse(String(doctor?.description))}
+                            {parse(String(doctor?.summary))}
                         </p>
                         <p className="location">
                             <EnvironmentOutlined /> Hà Nội
@@ -113,7 +109,7 @@ const ViewDetailDoctor = () => {
                 </div>
                 <div className="schedule left col-6  border border-start-0 border-bottom-0 border-top-0">
                     <BlockSchedule
-                        subscriberId={doctor?.id}
+                        subscriberId={doctor?.doctor_id}
                         setIsModalOpen={setIsModalAppointmentOpen}
                         doctor={doctor}
                         setDoctor={setDoctor}

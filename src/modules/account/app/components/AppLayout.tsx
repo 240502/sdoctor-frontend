@@ -2,7 +2,7 @@ import { HomeMenu } from './menu/HomeMenu';
 import { HomeFooter } from './footer/HomeFooter';
 import { Button, Layout } from 'antd';
 import { Link, useNavigate } from 'react-router-dom';
-import { UserOutlined, AuditOutlined } from '@ant-design/icons';
+import { UserOutlined } from '@ant-design/icons';
 import '@/assets/scss/app.scss';
 import { useRecoilValue } from 'recoil';
 import { userValue } from '../../../../stores/userAtom';

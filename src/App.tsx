@@ -5,7 +5,6 @@ import { Fragment, useEffect } from 'react';
 import { useSetRecoilState } from 'recoil';
 import { userState } from './stores/userAtom';
 import './assets/fontawesome/css/all.min.css';
-import { PatientProfile } from './models/patient_profile';
 import { patientProfileState } from './stores/patientAtom';
 import { PatientProfileService } from './services/patient_profileService';
 function App() {

@@ -10,7 +10,6 @@ import {
     Input,
 } from 'antd';
 import { Link } from 'react-router-dom';
-import '@/assets/scss/doctor.scss';
 import { doctorService } from '../../../../services/doctorService';
 import { Doctor } from '../../../../models/doctor';
 import { baseURL } from '../../../../constants/api';
@@ -101,9 +100,6 @@ const ViewDoctor = () => {
             description: des,
         });
     };
-    const handleChangeMajor = (value: number) => {
-        setOptions({ ...options, majorId: value });
-    };
 
     const changePage = (current: number, size: number) => {
         if (size !== pageSize) {
@@ -129,7 +125,7 @@ const ViewDoctor = () => {
         getAllClinic();
     }, []);
     return (
-        <div className="container home__content mt-4 mb-4">
+        <div className="container doctor-list mt-4 mb-4">
             {contextHolder}
             <Breadcrumb
                 items={[
@@ -288,7 +284,7 @@ const ViewDoctor = () => {
                                                         to={`/doctor/detail/${doctor.doctor_id}`}
                                                         className="text-decoration-none"
                                                     >
-                                                        {doctor.title}
+                                                        {doctor.title}{' '}
                                                         {doctor.full_name}
                                                     </Link>
                                                 </h3>

@@ -66,9 +66,18 @@ export const BlockClinic = (): JSX.Element => {
                                         <Image
                                             className="item__image"
                                             preview={false}
-                                            src={baseURL + clinic.avatar}
+                                            src={
+                                                clinic.avatar.includes(
+                                                    'cloudinary'
+                                                )
+                                                    ? clinic.avatar
+                                                    : baseURL + clinic.avatar
+                                            }
                                         ></Image>
-                                        <p className="item__text mt-3 text-center text-decoration-none fs-6 text-capitalize">
+                                        <p
+                                            className="item__text mt-3 text-center text-decoration-none text-capitalize"
+                                            style={{ height: '30px' }}
+                                        >
                                             {clinic.name}
                                         </p>
                                     </Link>

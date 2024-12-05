@@ -3,16 +3,7 @@ import {
     Appointment,
     AppointmentViewForPatient,
 } from '../../../../models/appointment';
-import {
-    App,
-    Button,
-    Input,
-    InputRef,
-    Pagination,
-    Space,
-    Tag,
-    Tooltip,
-} from 'antd';
+import { Button, Input, InputRef, Pagination, Space, Tag, Tooltip } from 'antd';
 import Highlighter from 'react-highlight-words';
 import { useRef, useState } from 'react';
 import { FilterDropdownProps } from 'antd/es/table/interface';

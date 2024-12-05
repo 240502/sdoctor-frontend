@@ -5,7 +5,7 @@ import { useRecoilValue } from 'recoil';
 import { configValue } from '../../../../stores/userAtom';
 import { notification, Breadcrumb, Divider, Flex, Button } from 'antd';
 import { HomeOutlined, PlusOutlined } from '@ant-design/icons';
-import { UserCard } from '../components/UserCard';
+import { UserTable } from '../components/UserTable';
 
 type NotificationType = 'success' | 'error';
 const UserManagement = () => {
@@ -53,9 +53,9 @@ const UserManagement = () => {
     };
     useEffect(() => {
         getUsers();
-    }, []);
+    }, [pageIndex, pageSize]);
     return (
-        <div className="container">
+        <div className="container user-management">
             {contextHolder}
             <div>
                 <Breadcrumb
@@ -73,13 +73,10 @@ const UserManagement = () => {
             <Divider></Divider>
             <Flex className="justify-content-between">
                 <h5>Danh sách người dùng</h5>
-                <Button className="border-0 text-white bg-primary">
-                    <PlusOutlined /> Thêm mới
-                </Button>
             </Flex>
             <Divider></Divider>
             {/* <Flex></Flex> */}
-            <UserCard
+            <UserTable
                 users={users}
                 pageIndex={pageIndex}
                 pageSize={pageSize}

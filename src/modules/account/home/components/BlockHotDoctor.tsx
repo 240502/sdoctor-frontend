@@ -67,14 +67,17 @@ export const BlockHotDoctor = (): JSX.Element => {
                                             className="shadow"
                                             cover={
                                                 <img
+                                                    style={{
+                                                        maxWidth: '100%',
+                                                        height: '230px',
+                                                        cursor: 'pointer',
+                                                    }}
+                                                    className="object-fit-cover"
                                                     onClick={() => {
                                                         navigate(
                                                             '/doctor/detail/' +
                                                                 doctor.doctor_id
                                                         );
-                                                    }}
-                                                    style={{
-                                                        cursor: 'pointer',
                                                     }}
                                                     alt="example"
                                                     src={doctor.image}

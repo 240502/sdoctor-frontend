@@ -93,3 +93,28 @@ main {
         color: #20c0f3 !important;
     }
 }
+.doctor-list {
+    .doctor__name a {
+        color: rgb(69, 195, 210);
+    }
+    .btn__more {
+        color: rgb(69, 195, 210);
+    }
+    .list__item {
+        box-shadow: 0 10px 10px rgba(0, 0, 0, 0.1);
+    }
+}
+.doctor-detail {
+    .des p {
+        margin-bottom: 5px;
+    }
+}
+
+.user-management {
+    .ant-table-cell:first-child {
+        width: 20%;
+    }
+    .ant-table-cell:nth-child(5) {
+        width: 10%;
+    }
+}

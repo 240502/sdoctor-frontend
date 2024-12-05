@@ -23,6 +23,11 @@ export const DoctorCards = ({
                                     className="shadow text-center"
                                     cover={
                                         <img
+                                            style={{
+                                                maxWidth: '100%',
+                                                height: '230px',
+                                            }}
+                                            className="object-fit-cover"
                                             alt="example"
                                             src={
                                                 doctor.image.includes(

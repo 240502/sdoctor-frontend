@@ -14,7 +14,6 @@ import {
     Select,
 } from 'antd';
 import { Link } from 'react-router-dom';
-import '@/assets/scss/doctor.scss';
 import { doctorService } from '../../../../services/doctorService';
 import { Doctor } from '../../../../models/doctor';
 import { baseURL } from '../../../../constants/api';
@@ -157,13 +156,13 @@ const BlockDoctor = ({ clinicId, clinic }: any) => {
                             return (
                                 <div
                                     className="list__item mb-3 p-3 border rounded"
-                                    key={Number(doctor.id)}
+                                    key={Number(doctor.doctor_id)}
                                 >
                                     <div className="item_container d-flex pt-1">
                                         <div className="item__left col-6 d-flex border border-start-0 border-bottom-0 border-top-0 pe-3">
                                             <div className="col-3 text-center">
                                                 <Link
-                                                    to={`/doctor/detail/${doctor.id}`}
+                                                    to={`/doctor/detail/${doctor.doctor_id}`}
                                                 >
                                                     <Image
                                                         preview={false}
@@ -179,7 +178,7 @@ const BlockDoctor = ({ clinicId, clinic }: any) => {
                                                 </Link>
 
                                                 <Link
-                                                    to={`/doctor/detail/${doctor.id}`}
+                                                    to={`/doctor/detail/${doctor.doctor_id}`}
                                                     className="btn__more text-decoration-none mt-3"
                                                 >
                                                     Xem thêm
@@ -188,7 +187,7 @@ const BlockDoctor = ({ clinicId, clinic }: any) => {
                                             <div className="col-9 doctor_info">
                                                 <h3 className="doctor__name fs-5">
                                                     <Link
-                                                        to={`/doctor/detail/${doctor.id}`}
+                                                        to={`/doctor/detail/${doctor.doctor_id}`}
                                                         className="text-decoration-none"
                                                     >
                                                         {doctor.title}{' '}
@@ -197,9 +196,7 @@ const BlockDoctor = ({ clinicId, clinic }: any) => {
                                                 </h3>
                                                 <div className="doctor__des">
                                                     {parse(
-                                                        String(
-                                                            doctor.description
-                                                        )
+                                                        String(doctor.summary)
                                                     )}
                                                     <p>
                                                         <EnvironmentOutlined className="fs-6 " />
@@ -210,7 +207,7 @@ const BlockDoctor = ({ clinicId, clinic }: any) => {
                                         </div>
                                         <div className="item__right col-6 ps-3  border border-end-0 border-start-0 border-top-0">
                                             <BlockSchedule
-                                                subscriberId={doctor.id}
+                                                subscriberId={doctor.doctor_id}
                                                 setIsModalOpen={setIsModalOpen}
                                                 doctor={doctor}
                                                 setDoctor={setDoctor}

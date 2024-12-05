@@ -8,7 +8,7 @@ import { HomeDirectory } from '../../../../models/home_directory';
 import { baseURL } from '../../../../constants/api';
 import NextArrow from './NextArrow';
 import PrevArrow from './PrevArrow';
-import { News } from '../../../../models/post';
+import { Post } from '../../../../models/post';
 export const BlockCommonNews = () => {
     var settings = {
         dots: false,
@@ -23,7 +23,7 @@ export const BlockCommonNews = () => {
         nextArrow: <NextArrow />,
         prevArrow: <PrevArrow />,
     };
-    const [newNews, setNewNews] = useState<News>();
+    const [newNews, setNewNews] = useState<Post>();
     const loadData = async () => {
         try {
             const data = await HomeDirectoryService.getHomeDirectory();
