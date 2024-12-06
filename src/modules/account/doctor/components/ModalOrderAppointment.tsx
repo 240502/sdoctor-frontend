@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef } from 'react';
-import { v4 as uuidv4 } from 'uuid';
 import dayjs from 'dayjs';
 
 import {
@@ -16,8 +15,6 @@ import {
     Switch,
 } from 'antd';
 import type { DatePickerProps } from 'antd';
-
-import { baseURL } from '../../../../constants/api';
 import axios from 'axios';
 import {
     handleFocusInput,
@@ -77,12 +74,10 @@ export const ModalOrderAppointment = ({
     const selectProvinceRef = useRef<any>(null);
     const selectDistrictRef = useRef<any>(null);
     const selectWardRef = useRef<any>(null);
-    const [birthday, setBirthday] = useState<string>();
     const [examinationReason, setExaminationReason] = useState<string>();
     const [paymentMethod, setPaymentMethod] = useState(1);
     const [error, setError] = useState<any>();
     const onChange: DatePickerProps['onChange'] = (date, dateString) => {
-        setBirthday(String(dateString));
         setPatientProfileCopy({
             ...patientProfileCopy,
             birthday: String(dateString),
@@ -184,7 +179,7 @@ export const ModalOrderAppointment = ({
                 !isErrorBirthday
             ) {
                 const appointment = {
-                    doctor_id: doctor.id,
+                    doctor_id: doctor.doctor_id,
                     appointment_date: date,
                     patient_name: inputPatientNameRef.current?.input?.value,
                     patient_phone: inputPatientPhoneRef.current?.input?.value,

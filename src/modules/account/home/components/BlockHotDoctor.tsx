@@ -1,11 +1,6 @@
 import { useEffect } from 'react';
-import { Button, Card } from 'antd';
+import { Button, Card, Flex, Row, Col, Image, Tag } from 'antd';
 import { Link, useNavigate } from 'react-router-dom';
-import NextArrow from './NextArrow';
-import PrevArrow from './PrevArrow';
-import 'slick-carousel/slick/slick.css';
-import 'slick-carousel/slick/slick-theme.css';
-import Slider from 'react-slick';
 import { doctorService } from '../../../../services/doctorService';
 import { Doctor } from '../../../../models/doctor';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
@@ -13,20 +8,8 @@ import {
     doctorListState,
     doctorListValue,
 } from '../../../../stores/doctorAtom';
+import { EnvironmentFilled, EnvironmentOutlined } from '@ant-design/icons';
 export const BlockHotDoctor = (): JSX.Element => {
-    var settings = {
-        dots: false,
-        infinite: true,
-        slidesToShow: 4,
-        slidesToScroll: 4,
-        autoplay: true,
-        speed: 1000,
-        autoplaySpeed: 2000,
-        cssEase: 'ease-in-out',
-        arrow: true,
-        nextArrow: <NextArrow />,
-        prevArrow: <PrevArrow />,
-    };
     const navigate = useNavigate();
 
     const setDoctors = useSetRecoilState(doctorListState);
@@ -52,86 +35,66 @@ export const BlockHotDoctor = (): JSX.Element => {
     }, []);
 
     return (
-        <div className="block__hot__doctor row mt-5">
+        <div className="block-common-doctor row mt-5">
             <div className="block__header d-flex justify-content-between align-items-center">
                 <h3 className="block__title fs-4 fw-bold">Bác sĩ nổi bật</h3>
             </div>
-            <div className="block__list mt-4 position-relative">
-                <Slider {...settings}>
-                    {doctors.length > 0 ? (
-                        doctors?.map((doctor: Doctor) => {
-                            return (
-                                <div className="slide__container">
-                                    <div className="item  p-3 ">
-                                        <Card
-                                            className="shadow"
-                                            cover={
-                                                <img
-                                                    style={{
-                                                        maxWidth: '100%',
-                                                        height: '230px',
-                                                        cursor: 'pointer',
-                                                    }}
-                                                    className="object-fit-cover"
-                                                    onClick={() => {
-                                                        navigate(
-                                                            '/doctor/detail/' +
-                                                                doctor.doctor_id
-                                                        );
-                                                    }}
-                                                    alt="example"
-                                                    src={doctor.image}
-                                                />
+            <Row className="block-container mt-4" gutter={16}>
+                {doctors.length > 0 ? (
+                    doctors?.map((doctor: Doctor) => {
+                        return (
+                            <Col className=" mb-3" span={6}>
+                                <Card className="shadow" actions={[]}>
+                                    <Image
+                                        src={doctor.image}
+                                        onClick={() => {
+                                            navigate(
+                                                '/doctor/detail/' +
+                                                    doctor.doctor_id
+                                            );
+                                            handleUpdateViewsDoctor(
+                                                doctor.doctor_id
+                                            );
+                                        }}
+                                        preview={false}
+                                        className="rounded object-fit-cover doctor-image"
+                                    ></Image>
+                                    <Tag color="blue" className="mt-2">
+                                        {doctor.major_name}
+                                    </Tag>
+                                    <h6 className="mt-2">
+                                        <Link
+                                            className="text-decoration-none text-dark"
+                                            to={
+                                                '/doctor/detail/' +
+                                                doctor.doctor_id
                                             }
-                                            actions={[
-                                                <Button>
-                                                    <Link
-                                                        onClick={() =>
-                                                            handleUpdateViewsDoctor(
-                                                                Number(
-                                                                    doctor.doctor_id
-                                                                )
-                                                            )
-                                                        }
-                                                        to={
-                                                            '/doctor/detail/' +
-                                                            doctor.doctor_id
-                                                        }
-                                                        className="w-100 text-dark text-decoration-none"
-                                                    >
-                                                        Xem chi tiết
-                                                    </Link>
-                                                </Button>,
-                                            ]}
+                                            onClick={() => {
+                                                handleUpdateViewsDoctor(
+                                                    doctor.doctor_id
+                                                );
+                                            }}
                                         >
-                                            <p>{doctor.title}</p>
-                                            <h6>
-                                                <Link
-                                                    className="text-decoration-none text-dark"
-                                                    to={
-                                                        '/doctor/detail/' +
-                                                        doctor.doctor_id
-                                                    }
-                                                >
-                                                    {doctor.full_name}
-                                                </Link>
-                                            </h6>
-                                            <div
-                                                className="specialization mt-1 text-secondary"
-                                                style={{ fontSize: '12px' }}
-                                            >
-                                                {doctor.major_name}
-                                            </div>
-                                        </Card>
+                                            Bác sĩ. {doctor.full_name}
+                                        </Link>
+                                    </h6>
+                                    <div className="location">
+                                        <EnvironmentOutlined className="me-2" />
+                                        {doctor.location}
                                     </div>
-                                </div>
-                            );
-                        })
-                    ) : (
-                        <p>Không có bác sĩ nào !</p>
-                    )}
-                </Slider>
-            </div>
+                                    <div className="button-container text-center">
+                                        <Button className="mt-2 border-primary text-primary w-75 btn-book-now">
+                                            Đặt lịch ngay
+                                        </Button>
+                                    </div>
+                                </Card>
+                            </Col>
+                        );
+                    })
+                ) : (
+                    <p>Không có bác sĩ nào !</p>
+                )}
+            </Row>
         </div>
     );
 };

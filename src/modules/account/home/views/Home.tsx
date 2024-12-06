@@ -2,12 +2,13 @@ import { Button, Image, Input, Select } from 'antd';
 import { Carousel } from 'antd';
 import '@/assets/scss/home.scss';
 import { BlockService } from '../components/BlockService';
-import { BlockForYou } from '../components/BlockForYou';
+import { BlockCategories } from '../components/BlockCategories';
 import { BlockClinic } from '../components/BlockClinic';
 import { BlockHotDoctor } from '../components/BlockHotDoctor';
 import { BlockCommonNews } from '../components/BlockCommonNews';
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { BlockSearchDoctor } from '../components/BlockSearchDoctor';
 
 export const Home = () => {
     useEffect(() => {
@@ -46,15 +47,7 @@ export const Home = () => {
                             variant="solid"
                             className="p-6 text-light "
                         >
-                            Đặt lịch
-                        </Button>
-                        <Button
-                            onClick={() => navigate('/list/doctor')}
-                            className="ms-2 bg-transparent text-light"
-                            variant="outlined"
-                            color="default"
-                        >
-                            Xem bác sĩ
+                            Đặt lịch ngay
                         </Button>
                     </div>
                 </div>
@@ -133,7 +126,8 @@ export const Home = () => {
                 </div> */}
             </div>
             <div className="container home__content mt-4 ">
-                <BlockForYou />
+                <BlockSearchDoctor />
+                <BlockCategories />
                 <BlockHotDoctor />
                 <BlockService />
                 <BlockClinic />

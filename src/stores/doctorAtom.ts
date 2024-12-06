@@ -12,3 +12,8 @@ export const doctorListValue = selector({
         return get(doctorListState);
     },
 });
+
+export const homePageSearchContent = atom({
+    key: 'homePageSearchContent',
+    default: '',
+});

@@ -11,6 +11,7 @@
 main {
     margin-top: 78px;
 }
+//home page
 .home__header {
     background-color: #fff;
     box-shadow: 0 10px 10px rgba(0, 0, 0, 0.1);
@@ -32,6 +33,15 @@ main {
 .home__header__logo {
     max-width: 15%;
     text-align: center;
+}
+.block-category {
+    .category-list .category-item {
+        cursor: pointer;
+        transition: all 0.3s linear;
+    }
+    .category-list .category-item:hover {
+        transform: scale(1.1);
+    }
 }
 
 .home__header__logo .header__logo__text {
@@ -127,5 +137,86 @@ main {
         margin-left: 10px;
         margin-top: 5px;
         margin-bottom: 10px;
+    }
+}
+
+// home page block common doctor
+.block-common-doctor {
+    .block-container .ant-card {
+        border: 1px solid #ccc;
+        transition: all 0.5s linear;
+    }
+    .block-container .doctor-image {
+        max-height: 250px;
+        min-height: 250px;
+        cursor: pointer;
+    }
+
+    .block-container .ant-card:hover {
+        border: 1px solid rgb(13, 110, 253);
+    }
+    .block-container .ant-card .ant-card-body {
+        padding: 12px;
+    }
+    .block-container .button-container .btn-book-now {
+        transition: all 0.5s linear;
+    }
+    .block-container .button-container .btn-book-now:hover {
+        background-color: rgb(13, 110, 253);
+        color: #fff !important;
+    }
+    .block-container .location {
+        height: 40px;
+    }
+}
+
+//doctor
+.doctor-list {
+    .card-item {
+        display: flex;
+        flex: 1 0 25%;
+        box-sizing: border-box;
+        cursor: pointer;
+        padding: 12px 8px 8px 8px;
+    }
+
+    .card-container {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        height: 100%;
+        padding: 16px;
+        background: #fff;
+        border-radius: 8px;
+    }
+
+    .cards .card-item .ant-card-body {
+        padding: 10px;
+    }
+    .cards .clinic-info p:first-child {
+        max-height: 40px;
+    }
+    .cards .card-item .clinic-info {
+        border-radius: 8px;
+        background: rgb(248, 249, 252);
+        padding: 8px;
+        max-height: 128px;
+        font-size: 13px;
+    }
+    .cards .card-item .booking-btn {
+        transition: all 0.2s linear;
+    }
+    .cards .card-item:hover {
+        .card-container {
+            border: 1px solid rgb(145, 202, 255) !important;
+            box-shadow: rgba(0, 0, 0, 0.1) 0px 8px 40px 0px;
+        }
+        .booking-btn {
+            background-color: #0e82fd;
+            color: #fff;
+        }
+        .clinic-info {
+            background: rgb(227, 242, 255);
+        }
     }
 }

@@ -24,12 +24,7 @@ export const BlockSchedule = ({
     setAppointmentDate,
 }: any): JSX.Element => {
     const dateFormat = 'YYYY-MM-DD';
-    const today = new Date();
-    const stringDay = `${today.getFullYear()}-${today.getMonth() + 1}-${
-        today.getDate().toString().length === 1
-            ? '0' + today.getDate()
-            : today.getDate()
-    }`;
+
     const [date, setDate] = useState<string>();
     const setSchedules = useSetRecoilState(scheduleListState);
     const schedules = useRecoilValue(scheduleListValue);
@@ -42,7 +37,7 @@ export const BlockSchedule = ({
         setIsModalOpen(true);
         setDoctor(doctor);
         setTime(time);
-        setAppointmentDate(date ?? stringDay);
+        setAppointmentDate(date);
     };
     const getScheduleBySubscriberIdAndDate = async (
         date: string,
@@ -50,7 +45,7 @@ export const BlockSchedule = ({
     ) => {
         try {
             const data = {
-                date: date ?? stringDay,
+                date: date,
                 subscriberId: subscriberId,
             };
             const result = await scheduleService.viewScheduleForClient(data);
@@ -80,14 +75,17 @@ export const BlockSchedule = ({
                     scheduleDetailId
                 );
 
-            getScheduleBySubscriberIdAndDate(
-                String(date ?? stringDay),
-                subscriberId
-            );
+            getScheduleBySubscriberIdAndDate(String(date), subscriberId);
         } catch (err: any) {
             console.log(err.message);
         }
     };
+
+    useEffect(() => {
+        const today = new Date();
+        const formattedDate = today.toISOString().split('T')[0];
+        setDate(formattedDate);
+    }, []);
 
     useEffect(() => {
         let isDifferentDate = false;
@@ -102,10 +100,7 @@ export const BlockSchedule = ({
                 setSchedules(newSchedules);
             }
         });
-        getScheduleBySubscriberIdAndDate(
-            String(date ?? stringDay),
-            subscriberId
-        );
+        getScheduleBySubscriberIdAndDate(String(date), subscriberId);
     }, [date, subscriberId]);
 
     useEffect(() => {
@@ -134,7 +129,7 @@ export const BlockSchedule = ({
         <div className="block__schedule">
             <DatePicker
                 className="mb-3"
-                defaultValue={dayjs(stringDay, dateFormat)}
+                defaultValue={dayjs(date, dateFormat)}
                 defaultChecked={true}
                 onChange={onChange}
             ></DatePicker>
@@ -147,7 +142,7 @@ export const BlockSchedule = ({
                         (scheduleDetail: DoctorScheduleDetail) => {
                             return (
                                 <ListTime
-                                    date={date !== undefined ? date : stringDay}
+                                    date={date}
                                     handleOnClickBtnTime={handleOnClickBtnTime}
                                     timeId={scheduleDetail.time_id}
                                     updateAvailableScheduleDetail={

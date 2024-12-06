@@ -51,7 +51,7 @@ export const ListTime = ({
                 const listTime: any = time?.value.split('-');
                 const startMinute = listTime[0].split('.')[1];
                 const startHour = listTime[0].split('.')[0];
-                intervalId = handleTimeOverRealTime(startHour, startMinute);
+                // intervalId = handleTimeOverRealTime(startHour, startMinute);
             }
 
             return () => {
