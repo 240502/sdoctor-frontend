@@ -1,12 +1,13 @@
-import { Button, Input } from 'antd';
+import { Button, Input, notification } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { EyeOutlined, EyeInvisibleOutlined } from '@ant-design/icons';
 import { UserService } from '../../../services/userService';
 import { useSetRecoilState } from 'recoil';
 import { userState } from '../../../stores/userAtom';
 import { useNavigate } from 'react-router-dom';
-
+type NotificationType = 'success' | 'error';
 export const FormLogin = () => {
+    const [api, contextHolder] = notification.useNotification();
     const [email, setEmail] = useState<string>('');
     const [password, setPassword] = useState<string>('');
     const [showPassword, setShowPassword] = useState<boolean>(false);
@@ -35,26 +36,39 @@ export const FormLogin = () => {
         setErrors(tempErrors);
         return isValid;
     };
-
+    const openNotification = (
+        type: NotificationType,
+        title: string,
+        message: string
+    ) => {
+        api[type]({
+            message: title,
+            description: message,
+        });
+    };
     const Login = async () => {
         if (!handleLogin()) {
             try {
                 const res = await UserService.login({ email, password });
-
                 sessionStorage.setItem('user', JSON.stringify(res));
                 setUser(res);
                 setEmail('');
                 setPassword('');
-
                 navigate('/admin/dashboard');
             } catch (err: any) {
-                console.log(err.message);
+                openNotification(
+                    'error',
+                    'Thông báo',
+                    err.response.data.message
+                );
+                console.log(err.response.data.message);
             }
         }
     };
 
     return (
         <div className="container">
+            {contextHolder}
             <div className="form-group mt-3">
                 <label htmlFor="email">Email</label>
                 <Input

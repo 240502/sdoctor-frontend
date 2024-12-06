@@ -6,9 +6,9 @@ import dayjs from 'dayjs';
 import type { DatePickerProps } from 'antd';
 import { scheduleService } from '../../../../services/doctorScheduleService';
 import socket from '../../../../socket';
-import { ScheduleDetails } from '../../../../models/doctorScheduleDetails';
+import { DoctorScheduleDetail } from '../../../../models/doctorScheduleDetails';
 import { schedule_detailsService } from '../../../../services/doctorScheduleDetailService';
-import { Schedule } from '../../../../models/doctorSchedule';
+import { DoctorSchedule } from '../../../../models/doctorSchedule';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { ListTime } from './ListTime';
 import {
@@ -33,7 +33,7 @@ export const BlockSchedule = ({
     const [date, setDate] = useState<string>();
     const setSchedules = useSetRecoilState(scheduleListState);
     const schedules = useRecoilValue(scheduleListValue);
-    const [schedule, setSchedule] = useState<Schedule>();
+    const [schedule, setSchedule] = useState<DoctorSchedule>();
     const onChange: DatePickerProps['onChange'] = (date, dateString) => {
         setDate(String(dateString));
     };
@@ -52,15 +52,14 @@ export const BlockSchedule = ({
             const data = {
                 date: date ?? stringDay,
                 subscriberId: subscriberId,
-                type: 'Bác sĩ',
             };
             const result = await scheduleService.viewScheduleForClient(data);
             setSchedule(result.data);
 
-            setSchedules((prev: Schedule[]) => {
+            setSchedules((prev: DoctorSchedule[]) => {
                 const existingSchedule = prev.find(
-                    (schedule: Schedule) =>
-                        schedule.subscriber_id === subscriberId
+                    (schedule: DoctorSchedule) =>
+                        schedule.doctor_id === subscriberId
                 );
                 if (existingSchedule) {
                     return prev;
@@ -92,12 +91,14 @@ export const BlockSchedule = ({
 
     useEffect(() => {
         let isDifferentDate = false;
-        schedules.forEach((schedule: Schedule) => {
+        schedules.forEach((schedule: DoctorSchedule) => {
             if (String(schedule.date) !== date) {
                 isDifferentDate = true;
-                const newSchedules = schedules.filter((schedule: Schedule) => {
-                    return schedule.subscriber_id !== subscriberId;
-                });
+                const newSchedules = schedules.filter(
+                    (schedule: DoctorSchedule) => {
+                        return schedule.doctor_id !== subscriberId;
+                    }
+                );
                 setSchedules(newSchedules);
             }
         });
@@ -112,12 +113,12 @@ export const BlockSchedule = ({
             // setNewAppointment(newAppointment);
 
             const schedule = schedules?.find(
-                (schedule: Schedule, i: number) => {
-                    return schedule.subscriber_id === newAppointment.doctor_id;
+                (schedule: DoctorSchedule, i: number) => {
+                    return schedule.doctor_id === newAppointment.doctor_id;
                 }
             );
             const scheduleDetail = schedule?.listScheduleDetails.find(
-                (scheduleDetail: ScheduleDetails) => {
+                (scheduleDetail: DoctorScheduleDetail) => {
                     return scheduleDetail.time_id === newAppointment.time_id;
                 }
             );
@@ -143,7 +144,7 @@ export const BlockSchedule = ({
             <span className="list__time">
                 {schedule ? (
                     schedule.listScheduleDetails?.map(
-                        (scheduleDetail: ScheduleDetails) => {
+                        (scheduleDetail: DoctorScheduleDetail) => {
                             return (
                                 <ListTime
                                     date={date !== undefined ? date : stringDay}

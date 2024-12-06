@@ -4,9 +4,7 @@ import {
     AppointmentViewForPatient,
 } from '../../../../models/appointment';
 import {
-    App,
     Button,
-    Flex,
     Input,
     InputRef,
     Pagination,
@@ -16,7 +14,7 @@ import {
     Tooltip,
 } from 'antd';
 import Highlighter from 'react-highlight-words';
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { FilterDropdownProps } from 'antd/es/table/interface';
 import {
     CheckOutlined,

@@ -118,3 +118,14 @@ main {
         width: 10%;
     }
 }
+.account-modal {
+    label {
+        display: inline-block;
+        width: 80px;
+    }
+    .ant-form-item-explain-error {
+        margin-left: 10px;
+        margin-top: 5px;
+        margin-bottom: 10px;
+    }
+}

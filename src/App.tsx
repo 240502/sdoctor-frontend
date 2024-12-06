@@ -15,6 +15,7 @@ function App() {
             const user = await JSON.parse(
                 sessionStorage.getItem('user') || '{}'
             );
+            console.log('get user');
             setUser(user);
         } catch (e: any) {
             console.error(e.message);

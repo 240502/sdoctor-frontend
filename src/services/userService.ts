@@ -21,6 +21,30 @@ export const UserService = {
         const res = await apiClient.post('/api/user/view', data, config);
         return res?.data;
     },
+    async createAccount(data: any, config: any): Promise<any> {
+        const res = await apiClient.post(
+            '/api/user/create-account',
+            data,
+            config
+        );
+        return res?.data;
+    },
+    async updateUserActiveStatus(data: any, config: any): Promise<any> {
+        const res = await apiClient.put(
+            '/api/user/update-active',
+            data,
+            config
+        );
+        return res?.data;
+    },
+    async resetPassword(data: any, config: any): Promise<any> {
+        const res = await apiClient.put(
+            '/api/user/reset-password',
+            data,
+            config
+        );
+        return res?.data;
+    },
     async getById(id: number): Promise<any> {
         const res = await apiClient.get('/api/user/getById/' + id);
         return res?.data;
