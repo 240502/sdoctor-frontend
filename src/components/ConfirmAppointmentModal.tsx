@@ -1,5 +1,4 @@
 import { Button, Modal, Input } from 'antd';
-import { useRef } from 'react';
 const TextArea = Input.TextArea;
 const ConfirmAppointmentModal = ({
     type,

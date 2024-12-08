@@ -144,7 +144,7 @@ const ViewDoctor = () => {
                 ]}
             />
             <h3 className="block__heading fs-5 fw-bold mt-4 mb-4">
-                Bác sĩ nổi bật
+                Danh sách bác sĩ
             </h3>
             <div className="block__list__doctor">
                 <Flex gap={'middle'} className="mb-5 justify-content-between">
@@ -217,7 +217,7 @@ const ViewDoctor = () => {
                     </Flex>
                 </Flex>
                 {doctors?.length ? (
-                    <DoctorCard doctors = {doctors} />
+                    <DoctorCard doctors={doctors} />
                 ) : (
                     // <div className="list__doctor m-0 p-0 ">
                     //     {doctors?.map((doctor: Doctor) => {

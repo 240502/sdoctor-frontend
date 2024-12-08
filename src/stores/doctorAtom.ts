@@ -17,3 +17,15 @@ export const homePageSearchContent = atom({
     key: 'homePageSearchContent',
     default: '',
 });
+
+export const doctorState = atom({
+    key: 'doctorState',
+    default: {} as Doctor,
+});
+
+export const doctorValue = selector({
+    key: 'doctorValue',
+    get: ({ get }) => {
+        return get(doctorState);
+    },
+});

@@ -114,9 +114,34 @@ main {
         box-shadow: 0 10px 10px rgba(0, 0, 0, 0.1);
     }
 }
+
+//doctor detail
 .doctor-detail {
     .des p {
         margin-bottom: 5px;
+    }
+    .summary {
+        background-color: rgb(227, 242, 255);
+        border-radius: 6px;
+        padding: 16px;
+    }
+    .summary h6 {
+        gap: 8px;
+        align-items: center;
+    }
+    .summary h6::before {
+        display: block;
+        content: '';
+        width: 2px;
+        height: 15px;
+        background: #2d87f3;
+    }
+    .summary p {
+        margin-bottom: 5px;
+        font-size: 16px;
+    }
+    .ant-tabs-nav-wrap {
+        justify-content: start;
     }
 }
 
@@ -154,17 +179,21 @@ main {
 
     .block-container .ant-card:hover {
         border: 1px solid rgb(13, 110, 253);
+        .btn-book-now {
+            background-color: rgb(13, 110, 253);
+            color: #fff !important;
+        }
     }
     .block-container .ant-card .ant-card-body {
         padding: 12px;
     }
+    .ant-card-body .ant-image {
+        display: block;
+    }
     .block-container .button-container .btn-book-now {
         transition: all 0.5s linear;
     }
-    .block-container .button-container .btn-book-now:hover {
-        background-color: rgb(13, 110, 253);
-        color: #fff !important;
-    }
+
     .block-container .location {
         height: 40px;
     }

@@ -137,7 +137,7 @@ export const BlockSchedule = ({
                 <CalendarOutlined /> Lịch khám
             </p>
             <span className="list__time">
-                {schedule ? (
+                {/* {schedule ? (
                     schedule.listScheduleDetails?.map(
                         (scheduleDetail: DoctorScheduleDetail) => {
                             return (
@@ -155,7 +155,7 @@ export const BlockSchedule = ({
                     )
                 ) : (
                     <p className="fs-6 ms-1 fw-bold">Không có lịch làm việc</p>
-                )}
+                )} */}
             </span>
 
             <p className="ms-1">Chọn và đặt (Phí đặt lịch 0đ)</p>

@@ -13,11 +13,11 @@ export const BlockClinic = (): JSX.Element => {
     var settings = {
         dots: false,
         infinite: true,
-        slidesToShow: 4,
-        slidesToScroll: 4,
+        slidesToShow: 3,
+        slidesToScroll: 3,
         autoplay: false,
-        speed: 2000,
-        autoplaySpeed: 2000,
+        speed: 1000,
+        autoplaySpeed: 1000,
         cssEase: 'ease-in-out',
         arrow: true,
         nextArrow: <NextArrow />,
@@ -52,8 +52,8 @@ export const BlockClinic = (): JSX.Element => {
                 <Slider {...settings}>
                     {clinics?.map((clinic: Clinic) => {
                         return (
-                            <div className="slide__container">
-                                <div className="item border border-1 rounded p-3 text-center  ">
+                            <div className="slide-container">
+                                <div className="item border border-1 rounded p-2 text-center  ">
                                     <Link
                                         onClick={() =>
                                             handleUpdateViewsClinic(

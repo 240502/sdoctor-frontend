@@ -1,8 +1,10 @@
 import { Col, Row, Image, Button, Card, Tag } from 'antd';
 import { Doctor } from '../../../../models/doctor';
 import { EnvironmentOutlined } from '@ant-design/icons';
+import { useNavigate } from 'react-router-dom';
 
 export const DoctorCard = ({ doctors }: any) => {
+    const navigate = useNavigate();
     return (
         <Row gutter={[16, 16]} className="cards">
             {doctors.map((doctor: Doctor) => {
@@ -11,12 +13,25 @@ export const DoctorCard = ({ doctors }: any) => {
                         <div className="card-container rounded border border-1 ">
                             <div className="doctor-image col-3 text-center m-auto">
                                 <Image
+                                    onClick={() => {
+                                        navigate(
+                                            '/doctor/detail/' +
+                                                doctor?.doctor_id
+                                        );
+                                    }}
                                     className="rounded-circle"
                                     preview={false}
                                     src={doctor.image}
                                 ></Image>
                             </div>
-                            <h6 className="doctor-name text-center mt-3">
+                            <h6
+                                className="doctor-name text-center mt-3"
+                                onClick={() => {
+                                    navigate(
+                                        '/doctor/detail/' + doctor?.doctor_id
+                                    );
+                                }}
+                            >
                                 {doctor.full_name}
                             </h6>
                             <p className="mb-0 opacity-75 text-center mb-3">

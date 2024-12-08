@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Button, Card, Flex, Row, Col, Image, Tag } from 'antd';
 import { Link, useNavigate } from 'react-router-dom';
 import { doctorService } from '../../../../services/doctorService';
@@ -7,12 +7,13 @@ import { useRecoilValue, useSetRecoilState } from 'recoil';
 import {
     doctorListState,
     doctorListValue,
+    doctorState,
 } from '../../../../stores/doctorAtom';
-import { EnvironmentFilled, EnvironmentOutlined } from '@ant-design/icons';
+import { EnvironmentOutlined } from '@ant-design/icons';
 export const BlockHotDoctor = (): JSX.Element => {
     const navigate = useNavigate();
-
     const setDoctors = useSetRecoilState(doctorListState);
+    const setDoctor = useSetRecoilState(doctorState);
     const doctors = useRecoilValue(doctorListValue);
     const handleUpdateViewsDoctor = async (id: number) => {
         try {
@@ -83,7 +84,15 @@ export const BlockHotDoctor = (): JSX.Element => {
                                         {doctor.location}
                                     </div>
                                     <div className="button-container text-center">
-                                        <Button className="mt-2 border-primary text-primary w-75 btn-book-now">
+                                        <Button
+                                            className="mt-2 border-primary text-primary w-75 btn-book-now"
+                                            onClick={() => {
+                                                navigate(
+                                                    '/booking-appointment'
+                                                );
+                                                setDoctor(doctor);
+                                            }}
+                                        >
                                             Đặt lịch ngay
                                         </Button>
                                     </div>

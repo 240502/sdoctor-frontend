@@ -24,8 +24,9 @@ const CLINIC_MANAGEMENT_PATH = '/admin/clinic';
 const VIEW_MAJOR_PATH = '/list/major';
 const VIEW_POST_BY_CATEGORY_PATH = '/list/post/category/:categoryId';
 const USER_MANAGEMENT_PATH = '/admin/user';
-
+const BOOKING_APPOINTMENT_PATH = '/booking-appointment';
 export {
+    BOOKING_APPOINTMENT_PATH,
     USER_MANAGEMENT_PATH,
     VIEW_POST_BY_CATEGORY_PATH,
     VIEW_MAJOR_PATH,

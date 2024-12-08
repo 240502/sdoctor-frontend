@@ -1,5 +1,17 @@
 import { EnvironmentOutlined, HomeOutlined } from '@ant-design/icons';
-import { Breadcrumb, Image, notification } from 'antd';
+import {
+    Breadcrumb,
+    Image,
+    notification,
+    Button,
+    Tag,
+    Divider,
+    Tabs,
+    TabsProps,
+    Row,
+    Col,
+    Flex,
+} from 'antd';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { BlockSchedule } from '../components/BlockSchedule';
@@ -13,6 +25,7 @@ import { BlockComment } from '../components/BlockComment';
 import { ModalComment } from '../components/ModalComment';
 import { useRecoilValue } from 'recoil';
 import { doctorListValue } from '../../../../stores/doctorAtom';
+import { CalendarDoctor } from '../components/CalendarDoctor';
 
 type NotificationType = 'success' | 'error';
 
@@ -41,7 +54,23 @@ const ViewDetailDoctor = () => {
             description: des,
         });
     };
-
+    const items: TabsProps['items'] = [
+        {
+            key: '1',
+            label: 'Thông tin chi tiết',
+            children: <>{parse(String(doctor?.introduction))}</>,
+        },
+        {
+            key: '2',
+            label: 'Đánh giá',
+            children: (
+                <BlockComment
+                    userId={id}
+                    setIsModalCommentOpen={setIsModalCommentOpen}
+                />
+            ),
+        },
+    ];
     const getDoctorById = async (id: number) => {
         try {
             if (doctors.length > 0) {
@@ -81,43 +110,93 @@ const ViewDetailDoctor = () => {
                     },
                 ]}
             ></Breadcrumb>
-            <div className=" row mt-4 pb-4">
-                <div className="doctor__info d-flex">
-                    <div className="doctor__image col-1">
-                        <Image
-                            style={{ width: '100%' }}
-                            preview={false}
-                            className="rounded-circle"
-                            src={
-                                doctor?.image.includes('cloudinary')
-                                    ? String(doctor.image)
-                                    : baseURL + doctor?.image
-                            }
-                        ></Image>
-                    </div>
-                    <div className="doctor__des col-11 ms-4">
-                        <h3 className="doctor__name">
-                            {doctor?.title} {doctor?.full_name}
-                        </h3>
-                        <p className="des opacity-75">
+            <Row className="mt-4 justify-content-between" gutter={24}>
+                <Col span={16} className="doctor-info border rounded p-3">
+                    <Flex className="">
+                        <div className="doctor-image col-2">
+                            <Image
+                                style={{ width: '80%' }}
+                                preview={false}
+                                className="rounded-circle"
+                                src={
+                                    doctor?.image.includes('cloudinary')
+                                        ? String(doctor.image)
+                                        : baseURL + doctor?.image
+                                }
+                            ></Image>
+                        </div>
+                        <div className="info ms-3">
+                            <h5 className="doctor-name">
+                                {doctor?.title} {doctor?.full_name}
+                            </h5>
+                            <Tag color="blue">
+                                {doctor?.major_name} Sản phụ khoa
+                            </Tag>
+                            <p className="doctor-location mt-2">
+                                <EnvironmentOutlined className="me-2"></EnvironmentOutlined>
+                                {doctor?.location}
+                                Láng Hạ - Đống Đa - Hà Nội
+                            </p>
+
+                            <div className="mt-3">
+                                <Button className="border-primary text-primary">
+                                    Đặt lịch khám
+                                </Button>
+                            </div>
+                        </div>
+                    </Flex>
+                    <Divider className="mt-3" />
+
+                    <div className="summary">
+                        <h6 className="title d-flex">Điểm nổi bật</h6>
+                        <ul className="summary-content">
                             {parse(String(doctor?.summary))}
-                        </p>
-                        <p className="location">
-                            <EnvironmentOutlined /> Hà Nội
-                        </p>
+                        </ul>
                     </div>
-                </div>
+                    <Tabs items={items}></Tabs>
+                </Col>
+                <Col
+                    span={7}
+                    className="block-doctor-suggestion border rounded p-3"
+                >
+                    <h6 className="mb-3">Gợi ý</h6>
+                    <Row gutter={16}>
+                        <Col span={16}>
+                            <Flex className="suggestion-doctor-item mt-3">
+                                <div className="doctor-image col-2">
+                                    <Image
+                                        className="rounded-circle"
+                                        preview={false}
+                                        src={doctor?.image}
+                                    ></Image>
+                                </div>
+                                <div className="doctor-info ms-2">
+                                    <Tag color="blue">Sản phụ khoa</Tag>
+                                    <h6 className="mt-2">
+                                        Bác sĩ Nguyễn Văn Sang
+                                    </h6>
+                                    <p>
+                                        <EnvironmentOutlined /> Hà Nội
+                                    </p>
+                                </div>
+                            </Flex>
+                            <Divider className="mt-2 mb-3"></Divider>
+                        </Col>
+                    </Row>
+                </Col>
                 <div className="schedule left col-6  border border-start-0 border-bottom-0 border-top-0">
-                    <BlockSchedule
+                    {/* <Button>Đặt lịch h</Button> */}
+                    {/* <BlockSchedule
                         subscriberId={doctor?.doctor_id}
                         setIsModalOpen={setIsModalAppointmentOpen}
                         doctor={doctor}
                         setDoctor={setDoctor}
                         setTime={setTime}
                         setAppointmentDate={setAppointmentDate}
-                    />
+                    /> */}
+                    {/* <CalendarDoctor /> */}
                 </div>
-                <div className="right col-6">
+                {/* <div className="right col-6">
                     <div className="block__clinic__info mt-3 border border-end-0 border-start-0 border-top-0">
                         <h6 className="opacity-75">Địa chỉ phòng khám</h6>
                         <h6 className="clinic__name">{doctor?.clinic_name}</h6>
@@ -133,19 +212,19 @@ const ViewDetailDoctor = () => {
                             {doctor?.fee.toLocaleString(undefined)}đ
                         </span>
                     </div>
-                </div>
-            </div>
-            {doctor?.introduction && (
+                </div> */}
+            </Row>
+            {/* {doctor?.introduction && (
                 <div className="doctor__introduction border border-start-0 border-bottom-0 border-end-0 pt-4 pb-4">
                     {parse(String(doctor?.introduction))}
                 </div>
-            )}
-            <div className="block__comment border border-start-0 border-bottom-0 border-end-0 pt-4 pb-4">
+            )} */}
+            {/* <div className="block__comment border border-start-0 border-bottom-0 border-end-0 pt-4 pb-4">
                 <BlockComment
                     userId={id}
                     setIsModalCommentOpen={setIsModalCommentOpen}
                 />
-            </div>
+            </div> */}
 
             {isModalAppointmentOpen && (
                 <ModalOrderAppointment

@@ -43,6 +43,7 @@ import {
     VIEW_WATCHED_SERVICE,
     VIEW_PATIENT_APPOINTMENT,
     USER_MANAGEMENT_PATH,
+    BOOKING_APPOINTMENT_PATH,
 } from './path';
 import { ScheduleManagement } from '../modules/auth/schedule';
 import {
@@ -54,6 +55,7 @@ import {
 import { ClinicManagement } from '../modules/auth/clinic';
 import { ViewMajor } from '../modules/account/major';
 import { UserManagement } from '../modules/auth/user';
+import { BookingAppointment } from '../components';
 
 export const publicRoutes = [
     {
@@ -135,6 +137,11 @@ export const publicRoutes = [
     {
         path: VIEW_POST_BY_CATEGORY_PATH,
         component: ViewPostByCategory,
+        layout: AppLayout,
+    },
+    {
+        path: BOOKING_APPOINTMENT_PATH,
+        component: BookingAppointment,
         layout: AppLayout,
     },
 ];
