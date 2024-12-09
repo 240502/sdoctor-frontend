@@ -263,7 +263,7 @@ const DoctorManagement = () => {
                 <ModalConfirmDelete
                     showModalConfirm={showModalConfirm}
                     handleCloseModalConfirm={handleCloseModalConfirm}
-                    doctorId={doctor?.id}
+                    doctorId={doctor?.doctor_id}
                     openNotificationWithIcon={openNotificationWithIcon}
                     getDoctors={getDoctors}
                     config={config}

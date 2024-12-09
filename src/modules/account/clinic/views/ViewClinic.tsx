@@ -8,7 +8,9 @@ import {
     Image,
     Input,
     Pagination,
+    Row,
     Select,
+    Col,
 } from 'antd';
 import { Link } from 'react-router-dom';
 import { ClinicService } from '../../../../services/clinicService';
@@ -64,7 +66,6 @@ const ViewClinic = () => {
         if (value.toLowerCase().includes('tỉnh')) {
             province = value.slice(provinceStr.length, value.length);
         }
-        console.log(`selected ${province}`);
         const newOptions = { ...optionsFilter, location: province };
         setOptionsFilter(newOptions);
     };
@@ -159,14 +160,17 @@ const ViewClinic = () => {
             </Flex>
             {clinics ? (
                 <>
-                    <div className="bloc__clinics">
-                        <div className="clinic_list row">
+                    <div className="block-clinics">
+                        <Row className="clinic_list mt-3" gutter={[24, 24]}>
                             {clinics?.map((clinic: Clinic) => {
                                 return (
-                                    <div className="col-3 clinic ps-3 pe-3 mt-3 mb-3 text-center">
+                                    <Col
+                                        className="clinic-item  text-center"
+                                        span={6}
+                                    >
                                         <Link
                                             to={'/clinic/detail/' + clinic.id}
-                                            className="d-inline-block"
+                                            className="d-inline-block clinic-img-container"
                                             onClick={() => {
                                                 handleUpdateViewsClinic(
                                                     Number(clinic.id)
@@ -203,14 +207,14 @@ const ViewClinic = () => {
                                             to={'/clinic/detail/' + clinic.id}
                                             className="text-decoration-none text-reset"
                                         >
-                                            <h6 className="mt-3 fs-5">
+                                            <h6 className="mt-3 clinic-name">
                                                 {clinic.name}
                                             </h6>
                                         </Link>
-                                    </div>
+                                    </Col>
                                 );
                             })}
-                        </div>
+                        </Row>
                     </div>
                     <section className="page d-flex justify-content-center align-items-center">
                         {pageCount > 1 ? (

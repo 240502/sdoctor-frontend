@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { MajorService } from '../../../../services/majorService';
-import { Breadcrumb, Flex, Pagination } from 'antd';
+import { Breadcrumb } from 'antd';
 import { HomeOutlined } from '@ant-design/icons';
 import { MajorCards } from '../components/MajorCards';
 import { Major } from '../../../../models/major';
@@ -33,6 +33,7 @@ const ViewMajor = () => {
     };
     useEffect(() => {
         getMajors();
+        window.scrollTo(0, 0);
     }, [pageIndex, pageSize]);
     return (
         <div className="container home__content mt-4 mb-4">

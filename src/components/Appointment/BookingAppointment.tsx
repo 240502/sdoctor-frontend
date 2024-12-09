@@ -80,13 +80,16 @@ const BookingAppointment = () => {
     };
 
     const getDoctorSchedule = async () => {
-        const data = {
-            date: date,
-            subscriberId: doctor.doctor_id,
-        };
-        const result = await scheduleService.viewScheduleForClient(data);
-        console.log(result);
-        setSchedule(result.data);
+        try {
+            const data = {
+                date: date,
+                subscriberId: doctor.doctor_id,
+            };
+            const result = await scheduleService.viewScheduleForClient(data);
+            setSchedule(result.data);
+        } catch (err: any) {
+            setSchedule({} as DoctorSchedule);
+        }
     };
     const handleTimeOverRealTime = () => {
         const intervalId = setInterval(() => {
@@ -106,10 +109,20 @@ const BookingAppointment = () => {
                     );
 
                 if (Number(startHour) === Number(hours)) {
-                    if (
-                        Math.abs(Number(startMinute) - Number(minutes)) === 20
-                    ) {
-                        console.log('update');
+                    if (Math.abs(Number(startMinute) - Number(minutes)) <= 20) {
+                        const newTimes = times.filter(
+                            (item: Time) => item.id !== time?.id
+                        );
+                        setTimes(newTimes);
+                        updateAvailableScheduleDetail(doctorScheduleDetail?.id);
+                    }
+                }
+
+                if (
+                    Number(startHour) > Number(hours) &&
+                    Math.abs(Number(startHour) - Number(hours)) === 1
+                ) {
+                    if (Math.abs(60 - Number(minutes)) <= 20) {
                         const newTimes = times.filter(
                             (item: Time) => item.id !== time?.id
                         );
@@ -118,7 +131,6 @@ const BookingAppointment = () => {
                     }
                 }
                 if (Number(startHour) < Number(hours)) {
-                    console.log('update');
                     const newTimes = times.filter(
                         (item: Time) => item.id !== time?.id
                     );
@@ -126,10 +138,9 @@ const BookingAppointment = () => {
                     updateAvailableScheduleDetail(doctorScheduleDetail?.id);
                 }
             });
-        }, 10000);
+        }, 5000);
         return intervalId;
     };
-    useEffect(() => {}, []);
 
     useEffect(() => {
         const today = new Date();
@@ -152,7 +163,9 @@ const BookingAppointment = () => {
         };
     }, []);
     useEffect(() => {
-        getDoctorSchedule();
+        if (date !== '') {
+            getDoctorSchedule();
+        }
     }, [date]);
     useEffect(() => {
         let intervalId: any;
@@ -168,7 +181,7 @@ const BookingAppointment = () => {
             clearInterval(intervalId);
             console.log('clear:' + intervalId);
         };
-    }, [times]);
+    }, [times.length]);
 
     return (
         <div className="container mt-4 mb-4">

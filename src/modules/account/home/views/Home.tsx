@@ -5,7 +5,7 @@ import { BlockService } from '../components/BlockService';
 import { BlockCategories } from '../components/BlockCategories';
 import { BlockClinic } from '../components/BlockClinic';
 import { BlockHotDoctor } from '../components/BlockHotDoctor';
-import { BlockCommonNews } from '../components/BlockCommonNews';
+import { BlockCommonPost } from '../components/BlockCommonNews';
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { BlockSearchDoctor } from '../components/BlockSearchDoctor';
@@ -57,8 +57,8 @@ export const Home = () => {
                 <BlockCategories />
                 <BlockHotDoctor />
                 <BlockService />
+                <BlockCommonPost />
                 <BlockClinic />
-                <BlockCommonNews />
             </div>
         </>
     );

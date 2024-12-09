@@ -1,7 +1,5 @@
 import { Button, Modal } from 'antd';
 import { doctorService } from '../../../../services/doctorService';
-import { useRecoilValue } from 'recoil';
-import { configValue, userValue } from '../../../../stores/userAtom';
 export const ModalConfirmDelete = ({
     showModalConfirm,
     handleCloseModalConfirm,

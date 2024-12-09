@@ -29,6 +29,7 @@ const ViewDoctor = () => {
     const [options, setOptions] = useState<any>({
         majorId: null,
         clinicId: null,
+        name: null,
     });
     const setDoctors = useSetRecoilState(doctorListState);
     const getAllClinic = async () => {
@@ -45,6 +46,7 @@ const ViewDoctor = () => {
                 pageIndex: pageIndex,
                 pageSize: pageSize,
                 ...options,
+                name: options.name === null ? optionsGlobal.name : options.name,
             };
             const res = await doctorService.viewDoctor(data);
             setDoctors(res.data);
@@ -93,6 +95,7 @@ const ViewDoctor = () => {
             majorId: optionsGlobal.majorId,
         });
         getAllClinic();
+        console.log(optionsGlobal);
         return () => {
             setOptions({
                 majorId: null,
