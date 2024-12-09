@@ -1,6 +1,6 @@
 import { apiClient } from '../constants/api';
 
-export const schedule_detailsService = {
+export const doctorScheduleDetaiService = {
     async getScheduleDetailByScheduleId(scheduleId: number): Promise<any> {
         const res = await apiClient.get(
             '/api/schedule-details/get-by-schedule-id/' + scheduleId

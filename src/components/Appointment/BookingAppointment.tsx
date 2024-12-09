@@ -3,21 +3,23 @@ import {
     ClockCircleOutlined,
     HomeOutlined,
 } from '@ant-design/icons';
-import { Breadcrumb, Col, Calendar, Row, Select } from 'antd';
-import type { CalendarProps } from 'antd';
-import type { Dayjs } from 'dayjs';
-import dayjs from 'dayjs';
+import { Breadcrumb, Col, notification, Row } from 'antd';
 import 'dayjs/locale/vi';
 import { useEffect, useState } from 'react';
-import { scheduleService } from '../services/doctorScheduleService';
+import { scheduleService } from '../../services/doctorScheduleService';
 import { useRecoilValue } from 'recoil';
-import { doctorValue } from '../stores/doctorAtom';
-import { DoctorSchedule } from '../models/doctorSchedule';
+import { doctorValue } from '../../stores/doctorAtom';
+import { DoctorSchedule } from '../../models/doctorSchedule';
 import { BlockCalendar } from './BlockCalendar';
 import { TimeButton } from './TimeButton';
-import { TimeService } from '../services/timeService';
-import { Time } from '../models/time';
-import { DoctorScheduleDetail } from '../models/doctorScheduleDetails';
+import { Time } from '../../models/time';
+import { DoctorScheduleDetail } from '../../models/doctorScheduleDetails';
+import { InputAppointmentModal } from './InputAppointmentModal';
+import { patientProfileValue } from '../../stores/patientAtom';
+import { PatientProfile } from '../../models/patient_profile';
+import { doctorScheduleDetaiService } from '../../services/doctorScheduleDetailService';
+import socket from '../../socket';
+type NotificationType = 'success' | 'error';
 // import weekday from 'dayjs/plugin/weekday';
 // import localeData from 'dayjs/plugin/localeData';
 // import isoWeek from 'dayjs/plugin/isoWeek';
@@ -28,18 +30,48 @@ import { DoctorScheduleDetail } from '../models/doctorScheduleDetails';
 // dayjs.locale('vi');
 
 const BookingAppointment = () => {
+    const [api, contextHolder] = notification.useNotification();
     const doctor = useRecoilValue(doctorValue);
     const currentDate = new Date();
     const [date, setDate] = useState<string>();
     const [schedule, setSchedule] = useState<DoctorSchedule>(
         {} as DoctorSchedule
     );
+    const patientProfile = useRecoilValue(patientProfileValue);
+    const [patientProfileCopy, setPatientProfileCopy] =
+        useState<PatientProfile>({} as PatientProfile);
     const [times, setTimes] = useState<Time[]>([]);
+    const [time, setTime] = useState<Time>({} as Time);
+    const [openInputModal, setOpenInputModal] = useState<boolean>(false);
 
-    const getTimeById = async (timeId: number) => {
+    const openNotification = (
+        type: NotificationType,
+        title: string,
+        message: string
+    ) => {
+        api[type]({
+            message: title,
+            description: message,
+        });
+    };
+
+    const handleClickTimeButton = (time: Time) => {
+        setTime(time);
+        setOpenInputModal(true);
+    };
+    const cancelInputModal = () => {
+        setTime({} as Time);
+        setOpenInputModal(false);
+    };
+
+    const updateAvailableScheduleDetail = async (scheduleDetailId: number) => {
         try {
-            const result = await TimeService.getTimeById(timeId);
-            setTimes((prevTimes) => [...prevTimes, result]);
+            const res =
+                await doctorScheduleDetaiService.updateAvailableScheduleDetail(
+                    scheduleDetailId
+                );
+
+            getDoctorSchedule();
         } catch (err: any) {
             console.log(err.message);
         }
@@ -55,38 +87,34 @@ const BookingAppointment = () => {
         setSchedule(result.data);
     };
 
-    const handleGetAllTimes = async (schedule: any) => {
-        if (schedule?.id) {
-            try {
-                // Gọi tất cả các API song song
-                const promises = schedule.listScheduleDetails.map(
-                    (detail: DoctorScheduleDetail) =>
-                        getTimeById(detail.time_id)
-                );
-                await Promise.all(promises);
-            } catch (error) {
-                console.error('Error fetching times:', error);
-            }
-        }
-    };
     useEffect(() => {
         console.log(doctor);
         const today = new Date();
         const formattedDate = today.toISOString().split('T')[0];
         setDate(formattedDate);
+        window.scrollTo(0, 0);
+        setPatientProfileCopy(patientProfile);
+        socket.on('newAppointment', (newAppointment) => {
+            const scheduleDetail = schedule?.listScheduleDetails.find(
+                (scheduleDetail: DoctorScheduleDetail) => {
+                    return scheduleDetail.time_id === newAppointment.time_id;
+                }
+            );
+
+            updateAvailableScheduleDetail(Number(scheduleDetail?.id));
+        });
+
+        return () => {
+            socket.off('newAppointment');
+        };
     }, []);
     useEffect(() => {
         getDoctorSchedule();
     }, [date]);
 
-    useEffect(() => {
-        if (schedule?.id) {
-            handleGetAllTimes(schedule);
-        }
-    }, [schedule]);
-
     return (
         <div className="container mt-4 mb-4">
+            {contextHolder}
             <Breadcrumb
                 items={[
                     {
@@ -98,7 +126,7 @@ const BookingAppointment = () => {
                     },
                 ]}
             />
-            <div className="booking-form mt-4">
+            <div className="mt-4">
                 <h6 className="heading">Phiếu hẹn khám</h6>
                 <Row gutter={24}>
                     <Col span={12}>
@@ -130,6 +158,9 @@ const BookingAppointment = () => {
                                             return (
                                                 <Col span={6}>
                                                     <TimeButton
+                                                        handleClickTimeButton={
+                                                            handleClickTimeButton
+                                                        }
                                                         timeId={detail.time_id}
                                                     />
                                                 </Col>
@@ -144,6 +175,17 @@ const BookingAppointment = () => {
                     </Col>
                 </Row>
             </div>
+            {openInputModal && (
+                <InputAppointmentModal
+                    openModal={openInputModal}
+                    cancelModal={cancelInputModal}
+                    time={time}
+                    date={date}
+                    doctor={doctor}
+                    patientProfileCopy={patientProfileCopy}
+                    openNotification={openNotification}
+                />
+            )}
         </div>
     );
 };

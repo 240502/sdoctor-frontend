@@ -1,21 +1,15 @@
 import { SearchOutlined } from '@ant-design/icons';
-import { Button, Input, Flex } from 'antd';
-import { useState } from 'react';
-import { useRecoilState, useSetRecoilState } from 'recoil';
-import { homePageSearchContent } from '../../../../stores/doctorAtom';
+import { Button, Input, Flex, InputRef } from 'antd';
+import { useRef } from 'react';
+import { useRecoilState } from 'recoil';
+import { searchDoctorOptionsGlobal } from '../../../../stores/doctorAtom';
 import { doctorService } from '../../../../services/doctorService';
 import { useNavigate } from 'react-router-dom';
 
 export const BlockSearchDoctor = () => {
-    const [searchContent, setSearchContent] = useRecoilState(
-        homePageSearchContent
-    );
+    const [options, setOptions] = useRecoilState(searchDoctorOptionsGlobal);
+    const inputSearchRef = useRef<InputRef>(null);
     const navigate = useNavigate();
-    const handleSearchDoctor = () => {
-        if (searchContent !== '') {
-            setSearchContent(searchContent);
-        }
-    };
 
     return (
         <div className="search-group">
@@ -24,18 +18,16 @@ export const BlockSearchDoctor = () => {
                 Tìm kiếm bác sĩ của bạn và đặt lịch khám trong 1 lần bấm
             </p>
             <Flex className="group-button w-50 m-auto">
-                <Input
-                    value={searchContent}
-                    placeholder="Tìm kiếm ..."
-                    onChange={(e: any) => {
-                        setSearchContent(e.target.value);
-                    }}
-                ></Input>
+                <Input ref={inputSearchRef} placeholder="Tìm kiếm ..."></Input>
                 <Button
                     className="ms-2"
                     type="primary"
                     onClick={() => {
-                        handleSearchDoctor();
+                        const newOptions = {
+                            ...options,
+                            name: inputSearchRef?.current?.input?.value,
+                        };
+                        setOptions(newOptions);
                         navigate('/list/doctor');
                     }}
                 >

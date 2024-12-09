@@ -1,25 +1,11 @@
 import { useState, useEffect } from 'react';
-import {
-    HomeOutlined,
-    EnvironmentOutlined,
-    DoubleLeftOutlined,
-    DoubleRightOutlined,
-} from '@ant-design/icons';
-import {
-    Breadcrumb,
-    Button,
-    Image,
-    notification,
-    Pagination,
-    Select,
-} from 'antd';
+import { EnvironmentOutlined } from '@ant-design/icons';
+import { Image, notification, Pagination, Select } from 'antd';
 import { Link } from 'react-router-dom';
 import { doctorService } from '../../../../services/doctorService';
 import { Doctor } from '../../../../models/doctor';
 import { baseURL } from '../../../../constants/api';
 import parse from 'html-react-parser';
-import { ModalOrderAppointment } from '../../doctor/components/ModalOrderAppointment';
-import { BlockSchedule } from '../../doctor/components/BlockSchedule';
 import { Time } from '../../../../models/time';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import {
@@ -205,7 +191,7 @@ const BlockDoctor = ({ clinicId, clinic }: any) => {
                                                 </div>
                                             </div>
                                         </div>
-                                        <div className="item__right col-6 ps-3  border border-end-0 border-start-0 border-top-0">
+                                        {/* <div className="item__right col-6 ps-3  border border-end-0 border-start-0 border-top-0">
                                             <BlockSchedule
                                                 subscriberId={doctor.doctor_id}
                                                 setIsModalOpen={setIsModalOpen}
@@ -239,7 +225,7 @@ const BlockDoctor = ({ clinicId, clinic }: any) => {
                                                     đ
                                                 </span>
                                             </div>
-                                        </div>
+                                        </div> */}
                                     </div>
                                 </div>
                             );
@@ -305,16 +291,6 @@ const BlockDoctor = ({ clinicId, clinic }: any) => {
                     </p>
                 )}
             </div>
-            {isModalOpen && (
-                <ModalOrderAppointment
-                    isModalOpen={isModalOpen}
-                    doctor={doctor}
-                    setIsModalOpen={setIsModalOpen}
-                    time={time}
-                    date={appointmentDate}
-                    openNotificationWithIcon={openNotificationWithIcon}
-                />
-            )}
         </div>
     );
 };

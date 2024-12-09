@@ -1,9 +1,9 @@
 import { Button, Col, Row } from 'antd';
 import { useEffect, useState } from 'react';
-import { Time } from '../models/time';
-import { TimeService } from '../services/timeService';
+import { Time } from '../../models/time';
+import { TimeService } from '../../services/timeService';
 
-export const TimeButton = ({ timeId }: any) => {
+export const TimeButton = ({ handleClickTimeButton, timeId }: any) => {
     const [time, setTime] = useState<Time>();
     const getTimeById = async (timeId: string) => {
         try {
@@ -16,5 +16,13 @@ export const TimeButton = ({ timeId }: any) => {
     useEffect(() => {
         getTimeById(timeId);
     }, [timeId]);
-    return <Button>{time?.value}</Button>;
+    return (
+        <Button
+            onClick={() => {
+                handleClickTimeButton(time);
+            }}
+        >
+            {time?.value}
+        </Button>
+    );
 };

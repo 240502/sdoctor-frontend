@@ -3,8 +3,8 @@ import type { CalendarProps } from 'antd';
 import type { Dayjs } from 'dayjs';
 import 'dayjs/locale/vi';
 import { useEffect } from 'react';
-import { scheduleService } from '../services/doctorScheduleService';
-import { DoctorSchedule } from '../models/doctorSchedule';
+import { scheduleService } from '../../services/doctorScheduleService';
+import { DoctorSchedule } from '../../models/doctorSchedule';
 export const BlockCalendar = ({
     date,
     doctor,

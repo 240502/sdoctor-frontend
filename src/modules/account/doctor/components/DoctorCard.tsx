@@ -2,9 +2,12 @@ import { Col, Row, Image, Button, Card, Tag } from 'antd';
 import { Doctor } from '../../../../models/doctor';
 import { EnvironmentOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
+import { useSetRecoilState } from 'recoil';
+import { doctorState } from '../../../../stores/doctorAtom';
 
-export const DoctorCard = ({ doctors }: any) => {
+export const DoctorCard = ({ doctors, handleUpdateViewsDoctor }: any) => {
     const navigate = useNavigate();
+    const setDoctor = useSetRecoilState(doctorState);
     return (
         <Row gutter={[16, 16]} className="cards">
             {doctors.map((doctor: Doctor) => {
@@ -18,6 +21,9 @@ export const DoctorCard = ({ doctors }: any) => {
                                             '/doctor/detail/' +
                                                 doctor?.doctor_id
                                         );
+                                        handleUpdateViewsDoctor(
+                                            doctor?.doctor_id
+                                        );
                                     }}
                                     className="rounded-circle"
                                     preview={false}
@@ -30,6 +36,7 @@ export const DoctorCard = ({ doctors }: any) => {
                                     navigate(
                                         '/doctor/detail/' + doctor?.doctor_id
                                     );
+                                    handleUpdateViewsDoctor(doctor?.doctor_id);
                                 }}
                             >
                                 {doctor.full_name}
@@ -55,7 +62,13 @@ export const DoctorCard = ({ doctors }: any) => {
                                     {doctor.address}
                                 </p>
                                 <div className="button text-center">
-                                    <Button className="booking-btn w-75">
+                                    <Button
+                                        className="booking-btn w-75"
+                                        onClick={() => {
+                                            navigate('/booking-appointment');
+                                            setDoctor(doctor);
+                                        }}
+                                    >
                                         Đặt lịch bác sĩ
                                     </Button>
                                 </div>

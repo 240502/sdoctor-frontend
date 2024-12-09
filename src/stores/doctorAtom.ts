@@ -13,9 +13,15 @@ export const doctorListValue = selector({
     },
 });
 
-export const homePageSearchContent = atom({
-    key: 'homePageSearchContent',
-    default: '',
+export const searchDoctorOptionsGlobal = atom({
+    key: 'searchDoctorOptionsGlobal',
+    default: { name: null, majorId: null } as any,
+});
+export const searchDoctorOptionsGlobalValue = selector({
+    key: 'searchDoctorOptionsGlobalValue',
+    get: ({ get }) => {
+        return get(searchDoctorOptionsGlobal);
+    },
 });
 
 export const doctorState = atom({

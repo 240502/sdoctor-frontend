@@ -1,10 +1,14 @@
-import { Link } from 'react-router-dom';
-import { Card, Col, Flex, Image, Row } from 'antd';
+import { Link, useNavigate } from 'react-router-dom';
+import { Card, Col, Flex, Image, InputRef, Row } from 'antd';
 import { baseURL } from '../../../../constants/api';
 import { MajorService } from '../../../../services/majorService';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Major } from '../../../../models/major';
+import { useRecoilState } from 'recoil';
+import { searchDoctorOptionsGlobal } from '../../../../stores/doctorAtom';
 export const BlockCategories = (): JSX.Element => {
+    const [options, setOptions] = useRecoilState(searchDoctorOptionsGlobal);
+    const navigate = useNavigate();
     const [pageIndex, setPageIndex] = useState<number>(1);
     const [pageSize, setPageSize] = useState<number>(10);
     const [pageCount, setPageCount] = useState<number>(0);
@@ -27,7 +31,17 @@ export const BlockCategories = (): JSX.Element => {
             <Row className="category-list" gutter={[16, 16]}>
                 {majors.map((major: Major) => {
                     return (
-                        <Col span={4}>
+                        <Col
+                            span={4}
+                            onClick={() => {
+                                const newOptions = {
+                                    ...options,
+                                    majorId: major.id,
+                                };
+                                setOptions(newOptions);
+                                navigate('/list/doctor');
+                            }}
+                        >
                             <div className="category-item rounded border border-1  gutter-row ">
                                 <Image
                                     preview={false}

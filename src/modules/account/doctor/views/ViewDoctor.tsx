@@ -1,27 +1,19 @@
 import { useState, useEffect } from 'react';
-import { HomeOutlined, EnvironmentOutlined } from '@ant-design/icons';
+import { HomeOutlined } from '@ant-design/icons';
 import {
     Breadcrumb,
     Pagination,
-    Image,
     notification,
     Select,
     Flex,
     Input,
 } from 'antd';
-import { Link } from 'react-router-dom';
 import { doctorService } from '../../../../services/doctorService';
-import { Doctor } from '../../../../models/doctor';
-import { baseURL } from '../../../../constants/api';
-import parse from 'html-react-parser';
-import { ModalOrderAppointment } from '../components/ModalOrderAppointment';
-import { BlockSchedule } from '../components/BlockSchedule';
-import { Time } from '../../../../models/time';
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import {
     doctorListState,
     doctorListValue,
-    homePageSearchContent,
+    searchDoctorOptionsGlobal,
 } from '../../../../stores/doctorAtom';
 import { MajorService } from '../../../../services/majorService';
 import { Major } from '../../../../models/major';
@@ -29,21 +21,14 @@ import { addWatchedDoctor } from '../../../../utils/doctor';
 import { Clinic } from '../../../../models/clinic';
 import { ClinicService } from '../../../../services/clinicService';
 import { SearchProps } from 'antd/es/input';
-import { majorIdValue } from '../../../../stores/majorAtom';
 import { DoctorCard } from '../components/DoctorCard';
-type NotificationType = 'success' | 'error';
 const { Option } = Select;
 const { Search } = Input;
 const ViewDoctor = () => {
-    const [searchContent, setSearchContent] = useRecoilState(
-        homePageSearchContent
+    const [optionsGlobal, setOptionsGlobal] = useRecoilState(
+        searchDoctorOptionsGlobal
     );
     const doctors = useRecoilValue(doctorListValue);
-    const majorIdGlobal = useRecoilValue(majorIdValue);
-    const [doctor, setDoctor] = useState<Doctor>();
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [time, setTime] = useState<Time>();
-    const [appointmentDate, setAppointmentDate] = useState<string>();
     const [api, contextHolder] = notification.useNotification();
     const [majors, setMajors] = useState<Major[]>([]);
     const [pageIndex, setPageIndex] = useState<number>(1);
@@ -54,7 +39,6 @@ const ViewDoctor = () => {
         majorId: null,
         clinicId: null,
     });
-    //const doctors = useRecoilValue(doctorListValue);
     const setDoctors = useSetRecoilState(doctorListState);
     const getAllClinic = async () => {
         try {
@@ -70,7 +54,6 @@ const ViewDoctor = () => {
                 pageIndex: pageIndex,
                 pageSize: pageSize,
                 ...options,
-                name: searchContent,
             };
             const res = await doctorService.viewDoctor(data);
             setDoctors(res.data);
@@ -95,16 +78,6 @@ const ViewDoctor = () => {
             console.log(err.message);
         }
     };
-    const openNotificationWithIcon = (
-        type: NotificationType,
-        title: string,
-        des: string
-    ) => {
-        api[type]({
-            message: title,
-            description: des,
-        });
-    };
 
     const changePage = (current: number, size: number) => {
         if (size !== pageSize) {
@@ -121,12 +94,24 @@ const ViewDoctor = () => {
         loadData();
         getAllMajor();
         window.scrollTo(0, 0);
-    }, [options, pageIndex, pageSize]);
+    }, [options.clinicId, options.majorId, pageIndex, pageSize]);
     useEffect(() => {
-        if (majorIdGlobal !== 0) {
-            setOptions({ ...options, majorId: majorIdGlobal });
-        }
+        setOptions({
+            ...options,
+            name: optionsGlobal.name,
+            majorId: optionsGlobal.majorId,
+        });
         getAllClinic();
+        return () => {
+            setOptions({
+                majorId: null,
+                clinicId: null,
+            });
+            setOptionsGlobal({
+                majorId: null,
+                name: null,
+            });
+        };
     }, []);
     return (
         <div className="container doctor-list mt-4 mb-4">
@@ -184,7 +169,6 @@ const ViewDoctor = () => {
                                 showSearch
                                 value={options.majorId}
                                 onChange={(value: any) => {
-                                    console.log(value);
                                     setOptions({
                                         ...options,
                                         majorId: value ?? null,
@@ -207,185 +191,28 @@ const ViewDoctor = () => {
                         <Search
                             onSearch={onSearch}
                             onChange={(e) => {
-                                setSearchContent(e.target.value);
+                                setOptions({
+                                    ...options,
+                                    name: e.target.value,
+                                });
                             }}
                             placeholder="Nhập tên bác sĩ"
-                            className=""
-                            value={searchContent}
+                            value={options.name}
                             style={{ width: '48%' }}
                         />
                     </Flex>
                 </Flex>
                 {doctors?.length ? (
-                    <DoctorCard doctors={doctors} />
+                    <DoctorCard
+                        doctors={doctors}
+                        handleUpdateViewsDoctor={handleUpdateViewsDoctor}
+                    />
                 ) : (
-                    // <div className="list__doctor m-0 p-0 ">
-                    //     {doctors?.map((doctor: Doctor) => {
-                    //         return (
-                    //             <div
-                    //                 className="list__item mb-3 p-3 border rounded"
-                    //                 key={Number(doctor.doctor_id)}
-                    //             >
-                    //                 <div className="item_container d-flex pt-1">
-                    //                     <div className="item__left col-6 d-flex border border-start-0 border-bottom-0 border-top-0 pe-3">
-                    //                         <div className="col-3 text-center">
-                    //                             <Link
-                    //                                 onClick={() => {
-                    //                                     handleUpdateViewsDoctor(
-                    //                                         Number(
-                    //                                             doctor.doctor_id
-                    //                                         )
-                    //                                     );
-                    //                                     addWatchedDoctor(
-                    //                                         doctor
-                    //                                     );
-                    //                                 }}
-                    //                                 to={`/doctor/detail/${doctor.doctor_id}`}
-                    //                             >
-                    //                                 <Image
-                    //                                     preview={false}
-                    //                                     style={{
-                    //                                         width: '50%',
-                    //                                     }}
-                    //                                     className="doctor__image rounded-circle"
-                    //                                     src={
-                    //                                         doctor.image.includes(
-                    //                                             'cloudinary'
-                    //                                         )
-                    //                                             ? String(
-                    //                                                   doctor.image
-                    //                                               )
-                    //                                             : baseURL +
-                    //                                               doctor.image
-                    //                                     }
-                    //                                 ></Image>
-                    //                             </Link>
-
-                    //                             <Link
-                    //                                 onClick={() => {
-                    //                                     handleUpdateViewsDoctor(
-                    //                                         Number(
-                    //                                             doctor.doctor_id
-                    //                                         )
-                    //                                     );
-                    //                                     addWatchedDoctor(
-                    //                                         doctor
-                    //                                     );
-                    //                                 }}
-                    //                                 to={`/doctor/detail/${doctor.doctor_id}`}
-                    //                                 className="btn__more text-decoration-none mt-3"
-                    //                             >
-                    //                                 Xem thêm
-                    //                             </Link>
-                    //                         </div>
-                    //                         <div className="col-9 doctor_info">
-                    //                             <h3 className="doctor__name fs-5">
-                    //                                 <Link
-                    //                                     onClick={() => {
-                    //                                         handleUpdateViewsDoctor(
-                    //                                             Number(
-                    //                                                 doctor.doctor_id
-                    //                                             )
-                    //                                         );
-                    //                                         addWatchedDoctor(
-                    //                                             doctor
-                    //                                         );
-                    //                                     }}
-                    //                                     to={`/doctor/detail/${doctor.doctor_id}`}
-                    //                                     className="text-decoration-none"
-                    //                                 >
-                    //                                     {doctor.title}{' '}
-                    //                                     {doctor.full_name}
-                    //                                 </Link>
-                    //                             </h3>
-                    //                             <div className="doctor__des">
-                    //                                 {parse(
-                    //                                     String(doctor.summary)
-                    //                                 )}
-                    //                                 <p>
-                    //                                     <EnvironmentOutlined className="fs-6 " />
-                    //                                     {doctor.address}
-                    //                                 </p>
-                    //                             </div>
-                    //                         </div>
-                    //                     </div>
-                    //                     <div className="item__right col-6 ps-3  border border-end-0 border-start-0 border-top-0">
-                    //                         <BlockSchedule
-                    //                             subscriberId={doctor.doctor_id}
-                    //                             setIsModalOpen={setIsModalOpen}
-                    //                             doctor={doctor}
-                    //                             setDoctor={setDoctor}
-                    //                             setTime={setTime}
-                    //                             setAppointmentDate={
-                    //                                 setAppointmentDate
-                    //                             }
-                    //                         />
-
-                    //                         <div className="block__clinic__info mt-3 border border-end-0 border-start-0 border-top-0">
-                    //                             <h6 className="opacity-75">
-                    //                                 Địa chỉ phòng khám
-                    //                             </h6>
-                    //                             <h6 className="clinic__name">
-                    //                                 {doctor.clinic_name}
-                    //                             </h6>
-                    //                             <p className="clinic__location fs-6">
-                    //                                 {doctor.location}
-                    //                             </p>
-                    //                         </div>
-                    //                         <div className="fee mt-3">
-                    //                             <span className="opacity-75 fs-6 fw-bold">
-                    //                                 Giá khám:
-                    //                             </span>
-                    //                             <span className="price fs-6 ms-2">
-                    //                                 {doctor.fee.toLocaleString(
-                    //                                     undefined
-                    //                                 )}
-                    //                                 đ
-                    //                             </span>
-                    //                         </div>
-                    //                     </div>
-                    //                 </div>
-                    //             </div>
-                    //         );
-                    //     })}
-
-                    //     <section className="page d-flex justify-content-center align-items-center">
-                    //         {pageCount > 1 ? (
-                    //             <Pagination
-                    //                 showSizeChanger
-                    //                 defaultCurrent={1}
-                    //                 align="center"
-                    //                 current={pageIndex}
-                    //                 pageSize={pageSize}
-                    //                 total={pageCount * pageSize}
-                    //                 pageSizeOptions={['5', '10', '20', '30']}
-                    //                 onChange={(
-                    //                     current: number,
-                    //                     size: number
-                    //                 ) => {
-                    //                     changePage(current, size);
-                    //                 }}
-                    //             />
-                    //         ) : (
-                    //             <></>
-                    //         )}
-                    //     </section>
-                    // </div>
                     <p className="fs-5 fw-bold text-center">
                         Không có bác sĩ nào
                     </p>
                 )}
             </div>
-            {isModalOpen && (
-                <ModalOrderAppointment
-                    isModalOpen={isModalOpen}
-                    doctor={doctor}
-                    setIsModalOpen={setIsModalOpen}
-                    time={time}
-                    date={appointmentDate}
-                    openNotificationWithIcon={openNotificationWithIcon}
-                />
-            )}
         </div>
     );
 };

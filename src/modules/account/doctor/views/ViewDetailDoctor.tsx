@@ -14,10 +14,8 @@ import {
 } from 'antd';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { BlockSchedule } from '../components/BlockSchedule';
 import { Doctor } from '../../../../models/doctor';
 import { Time } from '../../../../models/time';
-import { ModalOrderAppointment } from '../components/ModalOrderAppointment';
 import { doctorService } from '../../../../services/doctorService';
 import { baseURL } from '../../../../constants/api';
 import parse from 'html-react-parser';
@@ -25,7 +23,6 @@ import { BlockComment } from '../components/BlockComment';
 import { ModalComment } from '../components/ModalComment';
 import { useRecoilValue } from 'recoil';
 import { doctorListValue } from '../../../../stores/doctorAtom';
-import { CalendarDoctor } from '../components/CalendarDoctor';
 
 type NotificationType = 'success' | 'error';
 
@@ -135,7 +132,6 @@ const ViewDetailDoctor = () => {
                             <p className="doctor-location mt-2">
                                 <EnvironmentOutlined className="me-2"></EnvironmentOutlined>
                                 {doctor?.location}
-                                Láng Hạ - Đống Đa - Hà Nội
                             </p>
 
                             <div className="mt-3">
@@ -184,35 +180,6 @@ const ViewDetailDoctor = () => {
                         </Col>
                     </Row>
                 </Col>
-                <div className="schedule left col-6  border border-start-0 border-bottom-0 border-top-0">
-                    {/* <Button>Đặt lịch h</Button> */}
-                    {/* <BlockSchedule
-                        subscriberId={doctor?.doctor_id}
-                        setIsModalOpen={setIsModalAppointmentOpen}
-                        doctor={doctor}
-                        setDoctor={setDoctor}
-                        setTime={setTime}
-                        setAppointmentDate={setAppointmentDate}
-                    /> */}
-                    {/* <CalendarDoctor /> */}
-                </div>
-                {/* <div className="right col-6">
-                    <div className="block__clinic__info mt-3 border border-end-0 border-start-0 border-top-0">
-                        <h6 className="opacity-75">Địa chỉ phòng khám</h6>
-                        <h6 className="clinic__name">{doctor?.clinic_name}</h6>
-                        <p className="clinic__location fs-6 opacity-75">
-                            {doctor?.location}
-                        </p>
-                    </div>
-                    <div className="fee mt-3">
-                        <span className="opacity-75 fs-6 fw-bold">
-                            Giá khám:
-                        </span>
-                        <span className="price fs-6 ms-2">
-                            {doctor?.fee.toLocaleString(undefined)}đ
-                        </span>
-                    </div>
-                </div> */}
             </Row>
             {/* {doctor?.introduction && (
                 <div className="doctor__introduction border border-start-0 border-bottom-0 border-end-0 pt-4 pb-4">
@@ -226,16 +193,6 @@ const ViewDetailDoctor = () => {
                 />
             </div> */}
 
-            {isModalAppointmentOpen && (
-                <ModalOrderAppointment
-                    isModalOpen={isModalAppointmentOpen}
-                    doctor={doctor}
-                    setIsModalOpen={setIsModalAppointmentOpen}
-                    time={time}
-                    date={appointmentDate}
-                    openNotificationWithIcon={openNotificationWithIcon}
-                />
-            )}
             {isModalCommentOpen && (
                 <ModalComment
                     openNotificationWithIcon={openNotificationWithIcon}

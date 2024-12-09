@@ -1,5 +1,4 @@
 import { Form, Modal, Input, Button } from 'antd';
-import { useEffect } from 'react';
 import { UserService } from '../../../../services/userService';
 
 export const UserAddModal = ({
@@ -60,7 +59,10 @@ export const UserAddModal = ({
                     label={<span className="w-25 d-inline-block">Email</span>}
                     name="email"
                     rules={[
-                        { required: true, message: 'Email is required!' },
+                        {
+                            required: true,
+                            message: 'Email không được bỏ trống!',
+                        },
                         {
                             type: 'email',
                             message: 'Please enter a valid email!',
