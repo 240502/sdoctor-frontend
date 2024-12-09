@@ -15,10 +15,10 @@ import dayjs from 'dayjs';
 
 import TextArea from 'antd/es/input/TextArea';
 import { useEffect, useState } from 'react';
-import { ProvinceType, DistrictType, WardType } from '../../models/other';
+import { ProvinceType, DistrictType, WardType } from '../../../../models/other';
 import axios from 'axios';
-import { AppointmentService } from '../../services/appointmentService';
-import socket from '../../socket';
+import { AppointmentService } from '../../../../services/appointmentService';
+import socket from '../../../../socket';
 export const InputAppointmentModal = ({
     openModal,
     cancelModal,

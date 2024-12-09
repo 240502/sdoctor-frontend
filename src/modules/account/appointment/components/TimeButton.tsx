@@ -1,7 +1,7 @@
 import { Button, Col, Row } from 'antd';
 import { useEffect, useState } from 'react';
-import { Time } from '../../models/time';
-import { TimeService } from '../../services/timeService';
+import { Time } from '../../../../models/time';
+import { TimeService } from '../../../../services/timeService';
 
 export const TimeButton = ({
     setTimes,

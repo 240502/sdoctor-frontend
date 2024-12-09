@@ -55,7 +55,7 @@ import {
 import { ClinicManagement } from '../modules/auth/clinic';
 import { ViewMajor } from '../modules/account/major';
 import { UserManagement } from '../modules/auth/user';
-import { BookingAppointment } from '../components';
+import BookingAppointment from '../modules/account/appointment';
 
 export const publicRoutes = [
     {

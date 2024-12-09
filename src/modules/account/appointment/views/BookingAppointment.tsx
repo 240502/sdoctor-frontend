@@ -6,19 +6,20 @@ import {
 import { Breadcrumb, Col, notification, Row } from 'antd';
 import 'dayjs/locale/vi';
 import { useEffect, useState } from 'react';
-import { scheduleService } from '../../services/doctorScheduleService';
+import { scheduleService } from '../../../../services/doctorScheduleService';
 import { useRecoilValue } from 'recoil';
-import { doctorValue } from '../../stores/doctorAtom';
-import { DoctorSchedule } from '../../models/doctorSchedule';
-import { BlockCalendar } from './BlockCalendar';
-import { TimeButton } from './TimeButton';
-import { Time } from '../../models/time';
-import { DoctorScheduleDetail } from '../../models/doctorScheduleDetails';
-import { InputAppointmentModal } from './InputAppointmentModal';
-import { patientProfileValue } from '../../stores/patientAtom';
-import { PatientProfile } from '../../models/patient_profile';
-import { doctorScheduleDetaiService } from '../../services/doctorScheduleDetailService';
-import socket from '../../socket';
+import { doctorValue } from '../../../../stores/doctorAtom';
+import { DoctorSchedule } from '../../../../models/doctorSchedule';
+import { BlockCalendar } from '../components/BlockCalendar';
+import { TimeButton } from '../components/TimeButton';
+import { Time } from '../../../../models/time';
+import { DoctorScheduleDetail } from '../../../../models/doctorScheduleDetails';
+import { InputAppointmentModal } from '../components/InputAppointmentModal';
+import { patientProfileValue } from '../../../../stores/patientAtom';
+import { PatientProfile } from '../../../../models/patient_profile';
+import { doctorScheduleDetailService } from '../../../../services/doctorScheduleDetailService';
+import socket from '../../../../socket';
+import { NotificationService } from '../../../../services/notificationService';
 type NotificationType = 'success' | 'error';
 // import weekday from 'dayjs/plugin/weekday';
 // import localeData from 'dayjs/plugin/localeData';
@@ -69,7 +70,7 @@ const BookingAppointment = () => {
     const updateAvailableScheduleDetail = async (scheduleDetailId: number) => {
         try {
             const res =
-                await doctorScheduleDetaiService.updateAvailableScheduleDetail(
+                await doctorScheduleDetailService.updateAvailableScheduleDetail(
                     scheduleDetailId
                 );
 
@@ -93,8 +94,6 @@ const BookingAppointment = () => {
     };
     const handleTimeOverRealTime = () => {
         const intervalId = setInterval(() => {
-            console.log('chạy');
-
             times.forEach((time: Time) => {
                 const now = new Date();
                 const hours = now.getHours();
@@ -109,7 +108,14 @@ const BookingAppointment = () => {
                     );
 
                 if (Number(startHour) === Number(hours)) {
-                    if (Math.abs(Number(startMinute) - Number(minutes)) <= 20) {
+                    if (Number(startMinute) === 0) {
+                        const newTimes = times.filter(
+                            (item: Time) => item.id !== time?.id
+                        );
+                        setTimes(newTimes);
+                        updateAvailableScheduleDetail(doctorScheduleDetail?.id);
+                    }
+                    if (Math.abs(Number(startHour) - Number(minutes)) >= 20) {
                         const newTimes = times.filter(
                             (item: Time) => item.id !== time?.id
                         );
@@ -138,10 +144,17 @@ const BookingAppointment = () => {
                     updateAvailableScheduleDetail(doctorScheduleDetail?.id);
                 }
             });
-        }, 5000);
+        }, 1000);
         return intervalId;
     };
-
+    const CreateNotification = async (data: any) => {
+        try {
+            const res = await NotificationService.createNotification(data);
+            console.log(res);
+        } catch (err: any) {
+            console.log(err);
+        }
+    };
     useEffect(() => {
         const today = new Date();
         const formattedDate = today.toISOString().split('T')[0];
@@ -154,6 +167,13 @@ const BookingAppointment = () => {
                     return scheduleDetail.time_id === newAppointment.time_id;
                 }
             );
+            console.log('newAppointmentSocket', newAppointment);
+            const newNotification = {
+                doctor_id: newAppointment.doctor_id,
+                message: 'Bạn có một lịch hẹn mới!',
+                appointment_id: newAppointment.id,
+            };
+            CreateNotification(newNotification);
 
             updateAvailableScheduleDetail(Number(scheduleDetail?.id));
         });
@@ -168,19 +188,18 @@ const BookingAppointment = () => {
         }
     }, [date]);
     useEffect(() => {
-        let intervalId: any;
-        if (times.length > 0) {
-            const newDate = new Date(date);
-            const now = new Date();
-
-            if (newDate.getDate() === now.getDate()) {
-                intervalId = handleTimeOverRealTime();
-            }
-        }
-        return () => {
-            clearInterval(intervalId);
-            console.log('clear:' + intervalId);
-        };
+        // let intervalId: any;
+        // if (times.length > 0) {
+        //     const newDate = new Date(date);
+        //     const now = new Date();
+        //     if (newDate.getDate() === now.getDate()) {
+        //         intervalId = handleTimeOverRealTime();
+        //     }
+        // }
+        // return () => {
+        //     clearInterval(intervalId);
+        //     console.log('clear:' + intervalId);
+        // };
     }, [times.length]);
 
     return (
