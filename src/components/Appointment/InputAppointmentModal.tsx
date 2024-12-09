@@ -16,12 +16,6 @@ import dayjs from 'dayjs';
 import TextArea from 'antd/es/input/TextArea';
 import { useEffect, useState } from 'react';
 import { ProvinceType, DistrictType, WardType } from '../../models/other';
-import { useRecoilValue, useSetRecoilState } from 'recoil';
-import {
-    patientProfileState,
-    patientProfileValue,
-} from '../../stores/patientAtom';
-import { PatientProfile } from '../../models/patient_profile';
 import axios from 'axios';
 import { AppointmentService } from '../../services/appointmentService';
 import socket from '../../socket';

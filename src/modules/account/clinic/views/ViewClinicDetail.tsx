@@ -21,7 +21,6 @@ export const ViewClinicDetail = () => {
     const handleGetClinicById = async (id: number) => {
         try {
             const clinic = clinics.find((item: Clinic) => item.id === id);
-            console.log(clinic);
             if (clinic) {
                 setClinic(clinic);
             } else {
@@ -40,6 +39,9 @@ export const ViewClinicDetail = () => {
         handleGetClinicById(Number(id));
         window.scrollTo(0, 0);
     }, [id]);
+    useEffect(() => {
+        console.log('clinic', clinic);
+    }, [clinic]);
 
     return (
         <div className=" block__clinic__detail">
@@ -128,17 +130,22 @@ export const ViewClinicDetail = () => {
                     </div>
                 </div>
             </div>
-            <div
-                ref={sectionDescriptionRef}
-                className="container block__description  pt-5"
-                style={{ marginTop: '100px' }}
-            >
-                {parse(String(clinic?.description))}
-            </div>
-
-            <Divider />
-            <div className=" block__doctor" ref={sectionDoctorRef}>
-                <BlockDoctor clinicId={id} clinic={clinic} />
+            <div className="mt-5 pt-2 container">
+                {clinic?.description !== null && (
+                    <>
+                        <div
+                            ref={sectionDescriptionRef}
+                            className=" block__description "
+                            style={{ marginTop: '100px' }}
+                        >
+                            {parse(String(clinic?.description))}
+                        </div>
+                        <Divider />
+                    </>
+                )}
+                <div className="" ref={sectionDoctorRef}>
+                    <BlockDoctor clinicId={id} clinic={clinic} />
+                </div>
             </div>
         </div>
     );

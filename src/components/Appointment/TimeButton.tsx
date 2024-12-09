@@ -3,16 +3,23 @@ import { useEffect, useState } from 'react';
 import { Time } from '../../models/time';
 import { TimeService } from '../../services/timeService';
 
-export const TimeButton = ({ handleClickTimeButton, timeId }: any) => {
+export const TimeButton = ({
+    setTimes,
+    handleClickTimeButton,
+    timeId,
+}: any) => {
     const [time, setTime] = useState<Time>();
+
     const getTimeById = async (timeId: string) => {
         try {
             const result = await TimeService.getTimeById(Number(timeId));
+            setTimes((prevTime: Time[]) => [...prevTime, result]);
             setTime(result);
         } catch (err: any) {
             console.log(err.message);
         }
     };
+
     useEffect(() => {
         getTimeById(timeId);
     }, [timeId]);

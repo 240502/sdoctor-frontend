@@ -15,32 +15,27 @@ import {
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Doctor } from '../../../../models/doctor';
-import { Time } from '../../../../models/time';
 import { doctorService } from '../../../../services/doctorService';
 import { baseURL } from '../../../../constants/api';
 import parse from 'html-react-parser';
 import { BlockComment } from '../components/BlockComment';
 import { ModalComment } from '../components/ModalComment';
-import { useRecoilValue } from 'recoil';
-import { doctorListValue } from '../../../../stores/doctorAtom';
-
+import { useRecoilValue, useSetRecoilState } from 'recoil';
+import { doctorListValue, doctorState } from '../../../../stores/doctorAtom';
+import { useNavigate } from 'react-router-dom';
 type NotificationType = 'success' | 'error';
 
 type DataParams = {
     id: string;
 };
 const ViewDetailDoctor = () => {
+    const navigate = useNavigate();
     const doctors = useRecoilValue(doctorListValue);
-    const [isModalAppointmentOpen, setIsModalAppointmentOpen] = useState(false);
     const [isModalCommentOpen, setIsModalCommentOpen] = useState(false);
-
-    const [time, setTime] = useState<Time>();
-    const [appointmentDate, setAppointmentDate] = useState<string>();
-
     const { id } = useParams<DataParams>();
-    const [doctor, setDoctor] = useState<Doctor>();
+    const [doctor, setDoctor] = useState<Doctor>({} as Doctor);
     const [api, contextHolder] = notification.useNotification();
-
+    const setDoctorGlobal = useSetRecoilState(doctorState);
     const openNotificationWithIcon = (
         type: NotificationType,
         title: string,
@@ -71,10 +66,9 @@ const ViewDetailDoctor = () => {
     const getDoctorById = async (id: number) => {
         try {
             if (doctors.length > 0) {
-                const res = doctors.find(
-                    (doctor: Doctor) => doctor.doctor_id === Number(id)
-                );
-                console.log(res);
+                const res: any = doctors.find((doctor: Doctor) => {
+                    if (doctor.doctor_id === Number(id)) return doctor;
+                });
                 setDoctor(res);
             } else {
                 const res = await doctorService.getDoctorById(id);
@@ -87,12 +81,11 @@ const ViewDetailDoctor = () => {
     };
 
     useEffect(() => {
+        console.log(doctors.length);
         getDoctorById(Number(id));
         window.scrollTo(0, 0);
     }, [id]);
-    useEffect(() => {
-        console.log('doctor', doctor);
-    }, [doctor]);
+
     return (
         <div className="container doctor-detail mt-4 mb-4">
             {contextHolder}
@@ -116,7 +109,7 @@ const ViewDetailDoctor = () => {
                                 preview={false}
                                 className="rounded-circle"
                                 src={
-                                    doctor?.image.includes('cloudinary')
+                                    doctor?.image?.includes('cloudinary')
                                         ? String(doctor.image)
                                         : baseURL + doctor?.image
                                 }
@@ -126,16 +119,20 @@ const ViewDetailDoctor = () => {
                             <h5 className="doctor-name">
                                 {doctor?.title} {doctor?.full_name}
                             </h5>
-                            <Tag color="blue">
-                                {doctor?.major_name} Sản phụ khoa
-                            </Tag>
+                            <Tag color="blue">{doctor?.major_name}</Tag>
                             <p className="doctor-location mt-2">
                                 <EnvironmentOutlined className="me-2"></EnvironmentOutlined>
                                 {doctor?.location}
                             </p>
 
                             <div className="mt-3">
-                                <Button className="border-primary text-primary">
+                                <Button
+                                    className="border-primary text-primary button-booking-now"
+                                    onClick={() => {
+                                        navigate('/booking-appointment');
+                                        setDoctorGlobal(doctor);
+                                    }}
+                                >
                                     Đặt lịch khám
                                 </Button>
                             </div>
@@ -181,17 +178,6 @@ const ViewDetailDoctor = () => {
                     </Row>
                 </Col>
             </Row>
-            {/* {doctor?.introduction && (
-                <div className="doctor__introduction border border-start-0 border-bottom-0 border-end-0 pt-4 pb-4">
-                    {parse(String(doctor?.introduction))}
-                </div>
-            )} */}
-            {/* <div className="block__comment border border-start-0 border-bottom-0 border-end-0 pt-4 pb-4">
-                <BlockComment
-                    userId={id}
-                    setIsModalCommentOpen={setIsModalCommentOpen}
-                />
-            </div> */}
 
             {isModalCommentOpen && (
                 <ModalComment

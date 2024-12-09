@@ -4,6 +4,7 @@ import { EnvironmentOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { useSetRecoilState } from 'recoil';
 import { doctorState } from '../../../../stores/doctorAtom';
+import { addWatchedDoctor } from '../../../../utils/doctor';
 
 export const DoctorCard = ({ doctors, handleUpdateViewsDoctor }: any) => {
     const navigate = useNavigate();
@@ -24,6 +25,7 @@ export const DoctorCard = ({ doctors, handleUpdateViewsDoctor }: any) => {
                                         handleUpdateViewsDoctor(
                                             doctor?.doctor_id
                                         );
+                                        addWatchedDoctor(doctor);
                                     }}
                                     className="rounded-circle"
                                     preview={false}
@@ -37,6 +39,7 @@ export const DoctorCard = ({ doctors, handleUpdateViewsDoctor }: any) => {
                                         '/doctor/detail/' + doctor?.doctor_id
                                     );
                                     handleUpdateViewsDoctor(doctor?.doctor_id);
+                                    addWatchedDoctor(doctor);
                                 }}
                             >
                                 {doctor.full_name}

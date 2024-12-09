@@ -143,6 +143,13 @@ main {
     .ant-tabs-nav-wrap {
         justify-content: start;
     }
+    .button-booking-now {
+        transition: all 0.3s linear;
+    }
+    .button-booking-now:hover {
+        background-color: #0e82fd !important;
+        color: #fff !important;
+    }
 }
 
 .user-management {

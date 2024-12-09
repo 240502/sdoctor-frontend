@@ -1,13 +1,6 @@
 import { useState, useEffect } from 'react';
 import { HomeOutlined } from '@ant-design/icons';
-import {
-    Breadcrumb,
-    Pagination,
-    notification,
-    Select,
-    Flex,
-    Input,
-} from 'antd';
+import { Breadcrumb, Pagination, Select, Flex, Input } from 'antd';
 import { doctorService } from '../../../../services/doctorService';
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import {
@@ -17,7 +10,6 @@ import {
 } from '../../../../stores/doctorAtom';
 import { MajorService } from '../../../../services/majorService';
 import { Major } from '../../../../models/major';
-import { addWatchedDoctor } from '../../../../utils/doctor';
 import { Clinic } from '../../../../models/clinic';
 import { ClinicService } from '../../../../services/clinicService';
 import { SearchProps } from 'antd/es/input';
@@ -29,7 +21,6 @@ const ViewDoctor = () => {
         searchDoctorOptionsGlobal
     );
     const doctors = useRecoilValue(doctorListValue);
-    const [api, contextHolder] = notification.useNotification();
     const [majors, setMajors] = useState<Major[]>([]);
     const [pageIndex, setPageIndex] = useState<number>(1);
     const [pageSize, setPageSize] = useState<number>(10);
@@ -115,7 +106,6 @@ const ViewDoctor = () => {
     }, []);
     return (
         <div className="container doctor-list mt-4 mb-4">
-            {contextHolder}
             <Breadcrumb
                 items={[
                     {
@@ -203,10 +193,24 @@ const ViewDoctor = () => {
                     </Flex>
                 </Flex>
                 {doctors?.length ? (
-                    <DoctorCard
-                        doctors={doctors}
-                        handleUpdateViewsDoctor={handleUpdateViewsDoctor}
-                    />
+                    <>
+                        <DoctorCard
+                            doctors={doctors}
+                            handleUpdateViewsDoctor={handleUpdateViewsDoctor}
+                        />
+                        {pageCount > 1 && (
+                            <Pagination
+                                className="mt-3"
+                                align="center"
+                                current={pageIndex}
+                                pageSize={pageSize}
+                                showSizeChanger
+                                pageSizeOptions={['5', '10', '15', '20']}
+                                onChange={changePage}
+                                total={pageCount * pageSize}
+                            />
+                        )}
+                    </>
                 ) : (
                     <p className="fs-5 fw-bold text-center">
                         Không có bác sĩ nào
