@@ -1,10 +1,11 @@
 import { Button, Input, notification } from 'antd';
-import React, { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { EyeOutlined, EyeInvisibleOutlined } from '@ant-design/icons';
 import { UserService } from '../../../services/userService';
 import { useSetRecoilState } from 'recoil';
 import { userState } from '../../../stores/userAtom';
 import { useNavigate } from 'react-router-dom';
+import socket from '../../../socket';
 type NotificationType = 'success' | 'error';
 export const FormLogin = () => {
     const [api, contextHolder] = notification.useNotification();
@@ -50,8 +51,10 @@ export const FormLogin = () => {
         if (!handleLogin()) {
             try {
                 const res = await UserService.login({ email, password });
+                console.log('user', res);
                 sessionStorage.setItem('user', JSON.stringify(res));
                 setUser(res);
+                socket.emit('join', res.user_id);
                 setEmail('');
                 setPassword('');
                 navigate('/admin/dashboard');

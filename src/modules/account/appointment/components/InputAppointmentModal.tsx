@@ -38,7 +38,6 @@ export const InputAppointmentModal = ({
     const [form] = Form.useForm();
 
     const onFinish = (values: any) => {
-        console.log('Form submitted values: ', values);
         const newAppointment = {
             doctor_id: doctor?.doctor_id,
             appointment_date: date,
@@ -57,7 +56,6 @@ export const InputAppointmentModal = ({
             time_id: time.id,
             price: doctor.fee,
         };
-        console.log('newAppointment', newAppointment);
         CreateAppointment(newAppointment);
     };
     const CreateAppointment = async (newAppointment: any) => {

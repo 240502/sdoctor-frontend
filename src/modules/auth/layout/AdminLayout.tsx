@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
 
-import { Button, Layout, Menu, theme } from 'antd';
+import { Layout, theme } from 'antd';
 import { Link } from 'react-router-dom';
 
 import { Sidenav } from './components/Sidenav';
 import { HeaderLayout } from './components/Header';
-import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
+import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { requestConfig, userValue } from '../../../stores/userAtom';
+import socket from '../../../socket';
 const { Sider, Content } = Layout;
 
 const AdminLayout: React.FC = ({ children }: any) => {
@@ -14,10 +15,20 @@ const AdminLayout: React.FC = ({ children }: any) => {
     const [current, setCurrent] = useState<string[]>([]);
     const user = useRecoilValue(userValue);
     const setRequestConfig = useSetRecoilState(requestConfig);
+
     useEffect(() => {
         const config = { headers: { authorization: 'Bearer ' + user.token } };
         setRequestConfig(config);
     }, [user]);
+    useEffect(() => {
+        socket.on('newNotification', (newNotification) => {
+            console.log('New Notification', newNotification);
+        });
+
+        return () => {
+            socket.off('newNotification');
+        };
+    }, []);
     const {
         token: { colorBgContainer, borderRadiusLG },
     } = theme.useToken();

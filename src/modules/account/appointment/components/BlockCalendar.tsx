@@ -3,15 +3,7 @@ import type { CalendarProps } from 'antd';
 import type { Dayjs } from 'dayjs';
 import 'dayjs/locale/vi';
 import { useEffect } from 'react';
-import { scheduleService } from '../../../../services/doctorScheduleService';
-import { DoctorSchedule } from '../../../../models/doctorSchedule';
-export const BlockCalendar = ({
-    date,
-    doctor,
-    setDate,
-    setSchedule,
-    setTimes,
-}: any) => {
+export const BlockCalendar = ({ setDate, setSchedule, setTimes }: any) => {
     const currentDate = new Date();
 
     const headerRender: CalendarProps<Dayjs>['headerRender'] = ({
@@ -75,31 +67,12 @@ export const BlockCalendar = ({
     const handleChangeDate = (value: Dayjs) => {
         setDate(value.format('YYYY-MM-DD'));
         setTimes([]);
-        setSchedule({} as DoctorSchedule);
     };
-    const getDoctorSchedule = async () => {
-        try {
-            const data = {
-                date: date,
-                subscriberId: doctor.doctor_id,
-            };
-            const result = await scheduleService.viewScheduleForClient(data);
-            console.log(result);
-            setSchedule(result.data);
-        } catch (err: any) {
-            console.log(err.message);
-            setSchedule({} as DoctorSchedule);
-        }
-    };
-
     useEffect(() => {
         const today = new Date();
         const formattedDate = today.toISOString().split('T')[0];
         setDate(formattedDate);
     }, []);
-    useEffect(() => {
-        getDoctorSchedule();
-    }, [date]);
     return (
         <Calendar
             onChange={handleChangeDate}

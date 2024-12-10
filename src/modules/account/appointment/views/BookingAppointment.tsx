@@ -21,24 +21,17 @@ import { doctorScheduleDetailService } from '../../../../services/doctorSchedule
 import socket from '../../../../socket';
 import { NotificationService } from '../../../../services/notificationService';
 type NotificationType = 'success' | 'error';
-// import weekday from 'dayjs/plugin/weekday';
-// import localeData from 'dayjs/plugin/localeData';
-// import isoWeek from 'dayjs/plugin/isoWeek';
-
-// dayjs.extend(weekday);
-// dayjs.extend(localeData);
-// dayjs.extend(isoWeek);
-// dayjs.locale('vi');
 
 const BookingAppointment = () => {
     const [api, contextHolder] = notification.useNotification();
     const doctor = useRecoilValue(doctorValue);
-    const currentDate = new Date();
-    const [date, setDate] = useState<string>('');
+    const now = new Date();
+    const [date, setDate] = useState<string>(
+        `${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()}`
+    );
     const [schedule, setSchedule] = useState<DoctorSchedule>(
         {} as DoctorSchedule
     );
-
     const patientProfile = useRecoilValue(patientProfileValue);
     const [patientProfileCopy, setPatientProfileCopy] =
         useState<PatientProfile>({} as PatientProfile);
@@ -156,23 +149,21 @@ const BookingAppointment = () => {
         }
     };
     useEffect(() => {
-        const today = new Date();
-        const formattedDate = today.toISOString().split('T')[0];
-        setDate(formattedDate);
-        window.scrollTo(0, 0);
-        setPatientProfileCopy(patientProfile);
         socket.on('newAppointment', (newAppointment) => {
-            const scheduleDetail = schedule?.listScheduleDetails.find(
+            console.log(schedule);
+
+            console.log('newAppointmentSocket', newAppointment);
+            const scheduleDetail = schedule?.listScheduleDetails?.find(
                 (scheduleDetail: DoctorScheduleDetail) => {
                     return scheduleDetail.time_id === newAppointment.time_id;
                 }
             );
-            console.log('newAppointmentSocket', newAppointment);
             const newNotification = {
-                doctor_id: newAppointment.doctor_id,
+                user_id: doctor.user_id,
                 message: 'Bạn có một lịch hẹn mới!',
                 appointment_id: newAppointment.id,
             };
+            console.log('newNotification', newNotification);
             CreateNotification(newNotification);
 
             updateAvailableScheduleDetail(Number(scheduleDetail?.id));
@@ -181,25 +172,28 @@ const BookingAppointment = () => {
         return () => {
             socket.off('newAppointment');
         };
+    }, [schedule]);
+    useEffect(() => {
+        window.scrollTo(0, 0);
+        setPatientProfileCopy(patientProfile);
     }, []);
     useEffect(() => {
-        if (date !== '') {
-            getDoctorSchedule();
-        }
+        console.log('date changed');
+        getDoctorSchedule();
     }, [date]);
     useEffect(() => {
-        // let intervalId: any;
-        // if (times.length > 0) {
-        //     const newDate = new Date(date);
-        //     const now = new Date();
-        //     if (newDate.getDate() === now.getDate()) {
-        //         intervalId = handleTimeOverRealTime();
-        //     }
-        // }
-        // return () => {
-        //     clearInterval(intervalId);
-        //     console.log('clear:' + intervalId);
-        // };
+        let intervalId: any;
+        if (times.length > 0) {
+            const newDate = new Date(date);
+            const now = new Date();
+            if (newDate.getDate() === now.getDate()) {
+                intervalId = handleTimeOverRealTime();
+            }
+        }
+        return () => {
+            clearInterval(intervalId);
+            console.log('clear:' + intervalId);
+        };
     }, [times.length]);
 
     return (

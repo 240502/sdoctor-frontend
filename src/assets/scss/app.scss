@@ -272,3 +272,46 @@ main {
         }
     }
 }
+
+// notification list
+.notification-list {
+    overflow: scroll;
+    max-height: 300px;
+    // .notification {
+    //     transition: all 0.2s linear;
+    //     cursor: pointer;
+    // }
+    // .notification:hover {
+    //     background-color: #e6f7ff;
+    // }
+    /* Thông báo chưa đọc */
+    .notification-unread {
+        background-color: #fff; /* Màu nền sáng nổi bật */
+        font-weight: 600; /* Đậm chữ để nổi bật */
+    }
+
+    .notification-unread:hover {
+        cursor: pointer;
+        background-color: #d5e4f4;
+    }
+
+    .notification-unread::before {
+        content: '●'; /* Dấu chấm tròn nhỏ để biểu thị mới */
+        color: #007bff;
+        margin-right: 10px;
+    }
+
+    /* Thông báo đã đọc */
+    .notification-read {
+        background-color: #f2f6fc; /* Màu nền nhẹ cho thông báo đã đọc */
+        font-weight: normal;
+    }
+
+    .notification-read:hover {
+        box-shadow: inset 1px 0 0 #dadce0, inset -1px 0 0 #dadce0,
+            0 1px 2px 0 rgba(60, 64, 67, 0.3),
+            0 1px 3px 1px rgba(60, 64, 67, 0.15);
+        z-index: 2;
+        cursor: pointer;
+    }
+}

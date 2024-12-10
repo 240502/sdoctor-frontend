@@ -21,7 +21,8 @@ export const NotificationService = {
         const res = await apiClient.post('/api/notification/create', data);
         return res;
     },
-    async deleteNotification(id: string): Promise<any> {
-        const res = await apiClient.delete('/api/notification/delete' + id);
+    async deleteNotification(id: number): Promise<any> {
+        const res = await apiClient.delete('/api/notification/delete/' + id);
+        return res;
     },
 };

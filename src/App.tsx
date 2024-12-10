@@ -7,16 +7,27 @@ import { userState } from './stores/userAtom';
 import './assets/fontawesome/css/all.min.css';
 import { patientProfileState } from './stores/patientAtom';
 import { PatientProfileService } from './services/patient_profileService';
+import socket from './socket';
+import { User } from './models/user';
 function App() {
     const setUser = useSetRecoilState(userState);
     const setPatientProfile = useSetRecoilState(patientProfileState);
+    const handleWindowLoad = (user: User) => {
+        console.log('Window fully loaded');
+        console.log('user', user);
+        socket.emit('join', user?.user_id);
+    };
     const getUser = async () => {
         try {
             const user = await JSON.parse(
                 sessionStorage.getItem('user') || '{}'
             );
             console.log('get user');
-            setUser(user);
+            console.log(user);
+            if (user?.user_id) {
+                setUser(user);
+                handleWindowLoad(user);
+            }
         } catch (e: any) {
             console.error(e.message);
         }
