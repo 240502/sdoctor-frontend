@@ -7,7 +7,6 @@ import { configValue, userValue } from '../../../../stores/userAtom';
 import { useAppointments } from '../../../../hooks/useAppointments';
 import { ModalViewAppointment } from '../components/ModalViewAppointment';
 import { Appointment } from '../../../../models/appointment';
-import { ModalConfirmCancelAppointment } from '../components/ModalConfirmCancelAppointment';
 import { appointmentListInDayState } from '../../../../stores/appointmentAtom';
 import { WeeklyOverview } from '../components/WeeklyOverview';
 import { RecentPatientCard } from '../components/RecentPatientCard';
@@ -16,7 +15,6 @@ type NotificationType = 'success' | 'error';
 
 const DashBoard = () => {
     const user = useRecoilValue(userValue);
-
     const [appointments, setAppointments] = useRecoilState(
         appointmentListInDayState
     );
@@ -24,7 +22,7 @@ const DashBoard = () => {
 
     const [appointment, setAppointment] = useState<Appointment>();
     const [pageIndex, setPageIndex] = useState<number>(1);
-    const [pageSize, setPageSize] = useState<number>(5);
+    const [pageSize, setPageSize] = useState<number>(10);
     const [api, contextHolder] = notification.useNotification();
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
     const [isOpenModalConfirm, setIsOpenModalConfirm] =
@@ -34,7 +32,7 @@ const DashBoard = () => {
         totalPatientExaminedInDay,
         pageCount,
         fetchData,
-    } = useAppointments(config, pageIndex, pageSize, user.object_id);
+    } = useAppointments(config, pageIndex, pageSize, user.doctor_id);
 
     const handleCancelModal = () => {
         setIsModalOpen(false);
@@ -116,17 +114,6 @@ const DashBoard = () => {
                     handleCancelModal={handleCancelModal}
                     isModalOpen={isModalOpen}
                     appointment={appointment}
-                />
-            )}
-            {isOpenModalConfirm && (
-                <ModalConfirmCancelAppointment
-                    isOpenModalConfirm={isOpenModalConfirm}
-                    handleCancelModalConfirm={handleCancelModalConfirm}
-                    appointment={appointment}
-                    setIsOpenModalConfirm={setIsOpenModalConfirm}
-                    openNotificationWithIcon={openNotificationWithIcon}
-                    setAppointments={setAppointments}
-                    fetchData={fetchData}
                 />
             )}
         </div>

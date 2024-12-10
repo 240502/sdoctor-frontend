@@ -11,7 +11,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { userState, userValue } from '../../../../stores/userAtom';
-import { notificationsValue } from '../../../../stores/notifiction';
+import { notificationsValue } from '../../../../stores/notification';
 import { Notifications } from '../../../../models/notification';
 import NotificationList from './NotificationList';
 export const HeaderLayout = ({ collapsed, setCollapsed }: any) => {

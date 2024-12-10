@@ -9,7 +9,6 @@ import {
 import { AppointmentService } from '../../../../services/appointmentService';
 import { useRecoilValue } from 'recoil';
 import { userValue } from '../../../../stores/userAtom';
-import { useRevenueStatistics } from '../../../../hooks/useRevenueStatistics';
 
 // Register the components of Chart.js that are needed
 Chart.register(BarController, BarElement, CategoryScale, LinearScale);
@@ -99,7 +98,7 @@ const BarChart = ({ type }: any) => {
         const data = {
             startWeek: startOfWeek,
             endWeek: endOfWeek,
-            doctorId: user.object_id,
+            doctorId: user.doctor_id,
         };
         if (type === 'appointment') {
             getTotalAppointmentByWeek(data, header);

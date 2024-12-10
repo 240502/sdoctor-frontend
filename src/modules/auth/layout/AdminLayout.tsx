@@ -8,11 +8,10 @@ import { HeaderLayout } from './components/Header';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { requestConfig, userValue } from '../../../stores/userAtom';
 import socket from '../../../socket';
-import { NotificationService } from '../../../services/notificationService';
 import {
     notificationsState,
     notificationsValue,
-} from '../../../stores/notifiction';
+} from '../../../stores/notification';
 const { Sider, Content } = Layout;
 
 const AdminLayout: React.FC = ({ children }: any) => {

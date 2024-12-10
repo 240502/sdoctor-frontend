@@ -1,7 +1,6 @@
-import { Button, DatePicker, Form, Input, Modal, Radio, Select } from 'antd';
-import React, { useEffect, useState } from 'react';
+import { Button, DatePicker, Form, Input, Modal, Radio } from 'antd';
+import { useEffect, useState } from 'react';
 import { doctorService } from '../../../../services/doctorService';
-import { baseURL } from '../../../../constants/api';
 import { Doctor } from '../../../../models/doctor';
 import { Image } from 'antd';
 import TextArea from 'antd/es/input/TextArea';
@@ -55,7 +54,7 @@ export const ModalViewAppointment = ({
                     <div className="doctor__info text-center">
                         <Image
                             preview={false}
-                            src={baseURL + doctor.image}
+                            src={doctor.image}
                             className="rounded-circle"
                             width={115}
                         ></Image>

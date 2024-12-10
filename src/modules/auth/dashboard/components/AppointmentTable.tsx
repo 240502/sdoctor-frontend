@@ -47,11 +47,11 @@ const AppointmentTable = ({
         try {
             const res = await AppointmentService.updateAppointmentStatus(data);
             console.log(data);
-            // openNotificationWithIcon(
-            //     'success',
-            //     'Thông báo!',
-            //     'Xác nhận lịch hẹn thành công!'
-            // );
+            openNotificationWithIcon(
+                'success',
+                'Thông báo!',
+                'Xác nhận lịch hẹn thành công!'
+            );
             fetchData();
             handleCancelModalConfirm();
         } catch (err: any) {

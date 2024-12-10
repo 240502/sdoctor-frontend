@@ -267,9 +267,7 @@ export const DoctorModal = ({
             className="w-50"
             title={'Thêm bác sĩ'}
             open={showDoctorModal}
-            onOk={() => {
-                console.log('Oke');
-            }}
+            maskClosable={false}
             onCancel={handleCloseDoctorModal}
             footer={[
                 <Button type="primary" onClick={handleData}>
@@ -412,8 +410,8 @@ export const DoctorModal = ({
                             setErrors({ ...errors, genderMsg: null })
                         }
                     >
-                        <Select.Option value={1}> Nam</Select.Option>
-                        <Select.Option value={2}> Nữ</Select.Option>
+                        <Select.Option value={'1'}> Nam</Select.Option>
+                        <Select.Option value={'2'}> Nữ</Select.Option>
                     </Select>
                     {errors?.genderMsg && (
                         <div

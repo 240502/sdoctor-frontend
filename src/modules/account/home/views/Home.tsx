@@ -1,7 +1,6 @@
 import { Button, Image, Input, Select } from 'antd';
 import { Carousel } from 'antd';
 import '@/assets/scss/home.scss';
-import { BlockService } from '../components/BlockService';
 import { BlockCategories } from '../components/BlockCategories';
 import { BlockClinic } from '../components/BlockClinic';
 import { BlockHotDoctor } from '../components/BlockHotDoctor';
@@ -56,7 +55,6 @@ export const Home = () => {
                 <BlockSearchDoctor />
                 <BlockCategories />
                 <BlockHotDoctor />
-                <BlockService />
                 <BlockCommonPost />
                 <BlockClinic />
             </div>

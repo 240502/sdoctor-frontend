@@ -3,7 +3,7 @@ import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import {
     notificationsState,
     notificationsValue,
-} from '../../../../stores/notifiction';
+} from '../../../../stores/notification';
 import { useEffect, useState } from 'react';
 import { BellOutlined, CloseOutlined } from '@ant-design/icons';
 import { NotificationService } from '../../../../services/notificationService';

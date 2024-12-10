@@ -341,7 +341,7 @@ const ViewAppointment = () => {
     }, []);
     return (
         <PatientProfileLayout breadcrumb={'Lịch hẹn'}>
-            {appointments.length > 0 ? (
+            {appointments?.length > 0 ? (
                 <>
                     {contextHolder}{' '}
                     <Table<AppointmentViewForPatient>
