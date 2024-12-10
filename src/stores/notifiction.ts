@@ -7,7 +7,8 @@ export const notificationsState = atom({
 
 export const notificationsValue = selector({
     key: 'notificationsValue',
-    get: ({ get }) => {
-        return get(notificationsState);
-    },
+    get: ({ get }) => ({
+        notifications: get(notificationsState),
+        total: get(notificationsState).length,
+    }),
 });

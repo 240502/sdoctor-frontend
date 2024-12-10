@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
-import { Layout, theme } from 'antd';
+import { Layout, theme, message } from 'antd';
 import { Link } from 'react-router-dom';
 
 import { Sidenav } from './components/Sidenav';
@@ -8,21 +8,37 @@ import { HeaderLayout } from './components/Header';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { requestConfig, userValue } from '../../../stores/userAtom';
 import socket from '../../../socket';
+import { NotificationService } from '../../../services/notificationService';
+import {
+    notificationsState,
+    notificationsValue,
+} from '../../../stores/notifiction';
 const { Sider, Content } = Layout;
 
 const AdminLayout: React.FC = ({ children }: any) => {
     const [collapsed, setCollapsed] = useState(false);
     const [current, setCurrent] = useState<string[]>([]);
+    const [messageApi, contextHolder] = message.useMessage();
     const user = useRecoilValue(userValue);
     const setRequestConfig = useSetRecoilState(requestConfig);
-
+    const setNotifications = useSetRecoilState(notificationsState);
+    const notificationsSelector = useRecoilValue(notificationsValue);
     useEffect(() => {
         const config = { headers: { authorization: 'Bearer ' + user.token } };
         setRequestConfig(config);
     }, [user]);
     useEffect(() => {
         socket.on('newNotification', (newNotification) => {
-            console.log('New Notification', newNotification);
+            messageApi.info('Có thông báo mới');
+            console.log('newNotification', newNotification);
+            const newNotifications = [
+                ...notificationsSelector.notifications,
+                newNotification,
+            ];
+            const sortedNotificationsAsc = newNotifications.sort(
+                (a, b) => b.id - a.id
+            );
+            setNotifications(sortedNotificationsAsc);
         });
 
         return () => {
@@ -35,6 +51,7 @@ const AdminLayout: React.FC = ({ children }: any) => {
 
     return (
         <Layout style={{ minHeight: '100vh' }}>
+            {contextHolder}
             <Sider trigger={null} collapsible collapsed={collapsed}>
                 <div className="mb-3">
                     <h3 className="fs-3 fw-bold text-white p-3 text-center">
