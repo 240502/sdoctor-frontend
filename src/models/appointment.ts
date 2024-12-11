@@ -21,6 +21,8 @@ export interface Appointment {
     type: string;
     gender: number;
     rejectionReason: string;
+    service_id: number;
+    service_name: string;
 }
 export interface AppointmentViewForPatient extends Appointment {
     status_name: string;

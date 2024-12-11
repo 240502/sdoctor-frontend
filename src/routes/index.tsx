@@ -23,7 +23,6 @@ import {
     HOME_PATH,
     VIEW_CLINIC_PATH,
     VIEW_DOCTOR_PATH,
-    VIEW_SPECIALIZATION_PATH,
     VIEW_DETAIL_DOCTOR_PATH,
     VIEW_CLINIC_DETAIL_PATH,
     VIEW_SERVICE_PATH,
@@ -31,7 +30,6 @@ import {
     VIEW_POST_PATH,
     VIEW_POST_DETAIL_PATH,
     LOGIN_PATH,
-    ADMIN_PATH,
     DASHBOARD_PATH,
     APPOINTMENT_PATH,
     NEWS_PATH,
@@ -40,10 +38,10 @@ import {
     VIEW_PATIENT_PROFILE,
     VIEW_WATCHED_DOCTOR,
     VIEW_WATCHED_CLINIC,
-    VIEW_WATCHED_SERVICE,
     VIEW_PATIENT_APPOINTMENT,
     USER_MANAGEMENT_PATH,
     BOOKING_APPOINTMENT_PATH,
+    BOOKING_SUCCESS_PATH,
 } from './path';
 import { ScheduleManagement } from '../modules/auth/schedule';
 import {
@@ -56,8 +54,14 @@ import { ClinicManagement } from '../modules/auth/clinic';
 import { ViewMajor } from '../modules/account/major';
 import { UserManagement } from '../modules/auth/user';
 import BookingAppointment from '../modules/account/appointment';
+import { BookingSuccess } from '../components/BookingSuccess';
 
 export const publicRoutes = [
+    {
+        path: BOOKING_SUCCESS_PATH,
+        component: BookingSuccess,
+        layout: null,
+    },
     {
         path: VIEW_MAJOR_PATH,
         component: ViewMajor,

@@ -25,7 +25,9 @@ const VIEW_MAJOR_PATH = '/list/major';
 const VIEW_POST_BY_CATEGORY_PATH = '/list/post/category/:categoryId';
 const USER_MANAGEMENT_PATH = '/admin/user';
 const BOOKING_APPOINTMENT_PATH = '/booking-appointment';
+const BOOKING_SUCCESS_PATH = '/booking-success';
 export {
+    BOOKING_SUCCESS_PATH,
     BOOKING_APPOINTMENT_PATH,
     USER_MANAGEMENT_PATH,
     VIEW_POST_BY_CATEGORY_PATH,

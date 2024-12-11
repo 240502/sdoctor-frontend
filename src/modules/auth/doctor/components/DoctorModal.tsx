@@ -8,6 +8,7 @@ import {
     Image,
     Upload,
     DatePicker,
+    Form,
 } from 'antd';
 import TextArea from 'antd/es/input/TextArea';
 import DoctorEditor from './DoctorEditor';
@@ -56,7 +57,7 @@ export const DoctorModal = ({
     const inputTitleRef = useRef<InputRef>(null);
     const inputFeeRef = useRef<InputRef>(null);
     const inputExamninationObjectRef = useRef<InputRef>(null);
-
+    const [form] = Form.useForm();
     const [errors, setErrors] = useState<any>({
         clinicMsg: null,
         genderMsg: null,
@@ -109,7 +110,10 @@ export const DoctorModal = ({
             onError?.(error);
         }
     };
-
+    const onFinish = (values: any) => {
+        console.log(values);
+        // handleData(values); // Gửi dữ liệu từ form
+    };
     const handleData = () => {
         let errorMsg: any = {};
         let isEmptyClinic: boolean = false;
@@ -270,306 +274,486 @@ export const DoctorModal = ({
             maskClosable={false}
             onCancel={handleCloseDoctorModal}
             footer={[
-                <Button type="primary" onClick={handleData}>
+                <Button
+                    type="primary"
+                    htmlType="submit"
+                    onClick={() => form.submit()}
+                >
                     {isUpdate ? 'Lưu' : 'Thêm mới'}
                 </Button>,
                 <Button onClick={handleCloseDoctorModal}>Đóng</Button>,
             ]}
         >
-            <div>
-                <Upload
-                    customRequest={UploadDoctorImage}
-                    listType="picture-circle"
-                    fileList={fileList}
-                    onPreview={handlePreview}
-                    onChange={handleChange}
-                    maxCount={1}
+            <Form
+                form={form}
+                layout="vertical"
+                onFinish={onFinish}
+                initialValues={{
+                    ...doctor,
+                    birthday: doctor?.birthday ? dayjs(doctor?.birthday) : null,
+                }}
+            >
+                {/* <div>
+                    <Upload
+                        customRequest={UploadDoctorImage}
+                        listType="picture-circle"
+                        fileList={fileList}
+                        onPreview={handlePreview}
+                        onChange={handleChange}
+                        maxCount={1}
+                    >
+                        {fileList.length === 0 && uploadButton}
+                    </Upload>
+                    {previewImage && (
+                        <Image
+                            wrapperStyle={{ display: 'none' }}
+                            preview={{
+                                visible: previewOpen,
+                                onVisibleChange: (visible) =>
+                                    setPreviewOpen(visible),
+                                afterOpenChange: (visible) =>
+                                    !visible && setPreviewImage(''),
+                            }}
+                            src={previewImage}
+                        />
+                    )}
+                </div> */}
+                <Form.Item label="Ảnh bác sĩ" valuePropName="fileList">
+                    <Upload
+                        customRequest={UploadDoctorImage}
+                        listType="picture-circle"
+                        fileList={fileList}
+                        onPreview={handlePreview}
+                        onChange={handleChange}
+                        maxCount={1}
+                    >
+                        {fileList.length === 0 && uploadButton}
+                    </Upload>
+                    {previewImage && (
+                        <Image
+                            wrapperStyle={{ display: 'none' }}
+                            preview={{
+                                visible: previewOpen,
+                                onVisibleChange: (visible) =>
+                                    setPreviewOpen(visible),
+                                afterOpenChange: (visible) =>
+                                    !visible && setPreviewImage(''),
+                            }}
+                            src={previewImage}
+                        />
+                    )}
+                </Form.Item>
+                <Form.Item
+                    label="Cơ sở y tế"
+                    name="clinic_id"
+                    rules={[
+                        {
+                            required: true,
+                            message: 'Vui lòng chọn cơ sở y tế!',
+                        },
+                    ]}
                 >
-                    {fileList.length === 0 && uploadButton}
-                </Upload>
-                {previewImage && (
-                    <Image
-                        wrapperStyle={{ display: 'none' }}
-                        preview={{
-                            visible: previewOpen,
-                            onVisibleChange: (visible) =>
-                                setPreviewOpen(visible),
-                            afterOpenChange: (visible) =>
-                                !visible && setPreviewImage(''),
-                        }}
-                        src={previewImage}
-                    />
-                )}
-            </div>
-            <Flex className="justify-content-between mb-3">
-                <div className="col-6  pe-2">
-                    <label htmlFor="" className="d-flex mb-2">
-                        Cơ sở y tế
-                    </label>
                     <Select
-                        value={doctor?.clinic_id}
-                        className="d-block"
                         placeholder="Chọn cơ sở y tế"
-                        optionFilterProp="children"
                         allowClear
-                        onChange={(e) => {
-                            setDoctor({ ...doctor, clinic_id: e });
-                        }}
                         onFocus={() =>
                             setErrors({ ...errors, clinicMsg: null })
                         }
                     >
                         {clinics.map((clinic: Clinic) => (
-                            <Option
-                                key={clinic.id}
-                                value={clinic.id}
-                                label={clinic.name}
-                            >
+                            <Select.Option key={clinic.id} value={clinic.id}>
                                 {clinic.name}
-                            </Option>
+                            </Select.Option>
                         ))}
                     </Select>
-                    {errors?.clinicMsg && (
-                        <div
-                            className="error_message mt-3"
-                            style={{ color: 'red' }}
-                        >
-                            {errors.clinicMsg}
-                        </div>
-                    )}
-                </div>
-                <div className="col-6 ps-2">
-                    <label htmlFor="" className="d-flex mb-2">
-                        Chuyên ngành
-                    </label>
+                </Form.Item>
+
+                <Form.Item
+                    label="Chuyên ngành"
+                    name="major_id"
+                    rules={[
+                        {
+                            required: true,
+                            message: 'Vui lòng chọn chuyên ngành!',
+                        },
+                    ]}
+                >
                     <Select
-                        value={doctor?.major_id}
-                        className="d-block"
                         placeholder="Chọn chuyên ngành"
                         allowClear
-                        optionFilterProp="children"
-                        onChange={(e) => {
-                            setDoctor({ ...doctor, major_id: e });
-                        }}
                         onFocus={() => setErrors({ ...errors, majorMsg: null })}
                     >
                         {majors.map((major: Major) => (
-                            <Option
-                                key={major.id}
-                                value={major.id}
-                                label={major.name}
-                            >
+                            <Select.Option key={major.id} value={major.id}>
                                 {major.name}
-                            </Option>
+                            </Select.Option>
                         ))}
                     </Select>
-                    {errors?.majorMsg && (
-                        <div
-                            className="error_message mt-3"
-                            style={{ color: 'red' }}
-                        >
-                            {errors.majorMsg}
-                        </div>
-                    )}
-                </div>
-            </Flex>
-            <Flex className="justify-content-between mb-3">
-                <div className="col-6  pe-2">
-                    <label htmlFor="" className="mb-2">
-                        Họ và tên
-                    </label>
-                    <Input
-                        onFocus={(e: any) => {
-                            handleFocusInput(e.target);
-                        }}
-                        value={doctor?.full_name}
-                        ref={inputNameRef}
-                        placeholder="Nhập họ và tên ..."
-                        onChange={(e) => {
-                            setDoctor({ ...doctor, full_name: e.target.value });
-                        }}
-                    />
-                    <div
-                        className="error_message mt-3"
-                        style={{ color: 'red' }}
-                    ></div>
-                </div>
-                <div className="col-6 ps-2">
-                    <label htmlFor="" className="mb-2">
-                        Giới tính
-                    </label>
-                    <Select
-                        value={doctor?.gender}
-                        className="d-block mt-0 p-0"
-                        placeholder="Chọn giới tính"
-                        onChange={(value: number) => {
-                            console.log(value);
-                            setDoctor({ ...doctor, gender: value });
-                        }}
-                        onFocus={() =>
-                            setErrors({ ...errors, genderMsg: null })
-                        }
-                    >
-                        <Select.Option value={'1'}> Nam</Select.Option>
-                        <Select.Option value={'2'}> Nữ</Select.Option>
+                </Form.Item>
+
+                <Form.Item
+                    label="Họ và tên"
+                    name="full_name"
+                    rules={[
+                        { required: true, message: 'Vui lòng nhập họ và tên!' },
+                    ]}
+                >
+                    <Input placeholder="Nhập họ và tên ..." />
+                </Form.Item>
+
+                <Form.Item
+                    label="Giới tính"
+                    name="gender"
+                    rules={[
+                        { required: true, message: 'Vui lòng chọn giới tính!' },
+                    ]}
+                >
+                    <Select placeholder="Chọn giới tính">
+                        <Select.Option value="1">Nam</Select.Option>
+                        <Select.Option value="2">Nữ</Select.Option>
                     </Select>
-                    {errors?.genderMsg && (
-                        <div
-                            className="error_message mt-3"
-                            style={{ color: 'red' }}
-                        >
-                            {errors.genderMsg}
-                        </div>
-                    )}
-                </div>
-            </Flex>
-            <Flex className="justify-content-between mb-3">
-                <div className="col-6  pe-2">
-                    <label htmlFor="" className="mb-2">
-                        Số điện thoại
-                    </label>
-                    <Input
-                        onFocus={(e: any) => {
-                            handleFocusInput(e.target);
-                        }}
-                        value={doctor?.phone}
-                        ref={inputPhoneRef}
-                        placeholder="Nhập số điện thoại ..."
-                        onChange={(e) => {
-                            setDoctor({ ...doctor, phone: e.target.value });
-                        }}
-                    />
-                    <div
-                        className="error_message mt-3"
-                        style={{ color: 'red' }}
-                    ></div>
-                </div>
-                <div className="col-6 ps-2">
-                    <label htmlFor="" className="mb-2">
-                        Email
-                    </label>
-                    <Input
-                        onFocus={(e: any) => {
-                            handleFocusInput(e.target);
-                        }}
-                        value={doctor?.email}
-                        ref={inputEmailRef}
-                        placeholder="Nhập email ..."
-                        onChange={(e) => {
-                            setDoctor({ ...doctor, email: e.target.value });
-                        }}
-                    />
-                    <div
-                        className="error_message mt-3"
-                        style={{ color: 'red' }}
-                    ></div>
-                </div>
-            </Flex>
-            <Flex className="justify-content-between mb-3">
-                <div className="col-6  pe-2">
-                    <label htmlFor="" className="mb-2">
-                        Địa chỉ
-                    </label>
-                    <Input
-                        onFocus={(e: any) => {
-                            handleFocusInput(e.target);
-                        }}
-                        value={doctor?.address}
-                        ref={inputAddressRef}
-                        placeholder="Nhập địa chỉ ..."
-                        onChange={(e) => {
-                            setDoctor({ ...doctor, address: e.target.value });
-                        }}
-                    />
-                    <div
-                        className="error_message mt-3"
-                        style={{ color: 'red' }}
-                    ></div>
-                </div>
-                <div className="col-6 ps-2">
-                    <label htmlFor="" className="mb-2">
-                        Học vấn
-                    </label>
-                    <Input
-                        value={doctor?.title}
-                        ref={inputTitleRef}
-                        placeholder="Nhập học vấn ..."
-                        onChange={(e) => {
-                            setDoctor({ ...doctor, title: e.target.value });
-                        }}
-                    />
-                </div>
-            </Flex>
-            <Flex className="justify-content-between mb-3">
-                <div className="col-6  pe-2">
-                    <label htmlFor="" className="mb-2">
-                        Chi giá khám
-                    </label>
-                    <Input
-                        onFocus={(e: any) => {
-                            handleFocusInput(e.target);
-                        }}
-                        value={doctor?.fee}
-                        ref={inputFeeRef}
-                        placeholder="Nhập giá khám..."
-                        onChange={(e) => {
-                            setDoctor({ ...doctor, fee: e.target.value });
-                        }}
-                    />
-                    <div
-                        className="error_message mt-3"
-                        style={{ color: 'red' }}
-                    ></div>
-                </div>
-                <div className="col-6  pe-2">
-                    <label htmlFor="" className="form-label">
-                        Ngày/ Tháng/ Năm Sinh
-                    </label>
+                </Form.Item>
+
+                <Form.Item
+                    label="Số điện thoại"
+                    name="phone"
+                    rules={[
+                        {
+                            required: true,
+                            message: 'Vui lòng nhập số điện thoại!',
+                        },
+                    ]}
+                >
+                    <Input placeholder="Nhập số điện thoại ..." />
+                </Form.Item>
+
+                <Form.Item
+                    label="Email"
+                    name="email"
+                    rules={[
+                        { required: true, message: 'Vui lòng nhập email!' },
+                        { type: 'email', message: 'Email không hợp lệ!' },
+                    ]}
+                >
+                    <Input placeholder="Nhập email ..." />
+                </Form.Item>
+
+                <Form.Item label="Địa chỉ" name="address">
+                    <Input placeholder="Nhập địa chỉ ..." />
+                </Form.Item>
+
+                <Form.Item label="Học vấn" name="title">
+                    <Input placeholder="Nhập học vấn ..." />
+                </Form.Item>
+
+                <Form.Item
+                    label="Chi phí khám"
+                    name="fee"
+                    rules={[
+                        {
+                            required: true,
+                            message: 'Vui lòng nhập chi phí khám!',
+                        },
+                    ]}
+                >
+                    <Input placeholder="Nhập giá khám ..." />
+                </Form.Item>
+
+                <Form.Item label="Ngày sinh" name="birthday">
                     <DatePicker
-                        className="d-block"
                         format="YYYY-MM-DD"
-                        defaultValue={
-                            doctor?.birthday
-                                ? dayjs(doctor?.birthday, dateFormat)
-                                : null
-                        }
-                        onChange={onChange} // Hàm xử lý khi thay đổi ngày
                         placeholder="Chọn ngày sinh"
                     />
+                </Form.Item>
 
-                    {errors?.birthdayMsg && (
+                <Form.Item label="Mô tả nhanh" name="summary">
+                    <TextArea placeholder="Nhập mô tả nhanh ..." />
+                </Form.Item>
+
+                <Form.Item label="Chi tiết" name="details">
+                    <DoctorEditor
+                        handleChangeDoctorEditor={handleChangeDoctorEditor}
+                        doctor={doctor}
+                    />
+                </Form.Item>
+                {/* <Flex className="justify-content-between mb-3">
+                    <div className="col-6  pe-2">
+                        <label htmlFor="" className="d-flex mb-2">
+                            Cơ sở y tế
+                        </label>
+                        <Select
+                            value={doctor?.clinic_id}
+                            className="d-block"
+                            placeholder="Chọn cơ sở y tế"
+                            optionFilterProp="children"
+                            allowClear
+                            onChange={(e) => {
+                                setDoctor({ ...doctor, clinic_id: e });
+                            }}
+                            onFocus={() =>
+                                setErrors({ ...errors, clinicMsg: null })
+                            }
+                        >
+                            {clinics.map((clinic: Clinic) => (
+                                <Option
+                                    key={clinic.id}
+                                    value={clinic.id}
+                                    label={clinic.name}
+                                >
+                                    {clinic.name}
+                                </Option>
+                            ))}
+                        </Select>
+                        {errors?.clinicMsg && (
+                            <div
+                                className="error_message mt-3"
+                                style={{ color: 'red' }}
+                            >
+                                {errors.clinicMsg}
+                            </div>
+                        )}
+                    </div>
+                    <div className="col-6 ps-2">
+                        <label htmlFor="" className="d-flex mb-2">
+                            Chuyên ngành
+                        </label>
+                        <Select
+                            value={doctor?.major_id}
+                            className="d-block"
+                            placeholder="Chọn chuyên ngành"
+                            allowClear
+                            optionFilterProp="children"
+                            onChange={(e) => {
+                                setDoctor({ ...doctor, major_id: e });
+                            }}
+                            onFocus={() =>
+                                setErrors({ ...errors, majorMsg: null })
+                            }
+                        >
+                            {majors.map((major: Major) => (
+                                <Option
+                                    key={major.id}
+                                    value={major.id}
+                                    label={major.name}
+                                >
+                                    {major.name}
+                                </Option>
+                            ))}
+                        </Select>
+                        {errors?.majorMsg && (
+                            <div
+                                className="error_message mt-3"
+                                style={{ color: 'red' }}
+                            >
+                                {errors.majorMsg}
+                            </div>
+                        )}
+                    </div>
+                </Flex>
+                <Flex className="justify-content-between mb-3">
+                    <div className="col-6  pe-2">
+                        <label htmlFor="" className="mb-2">
+                            Họ và tên
+                        </label>
+                        <Input
+                            onFocus={(e: any) => {
+                                handleFocusInput(e.target);
+                            }}
+                            value={doctor?.full_name}
+                            ref={inputNameRef}
+                            placeholder="Nhập họ và tên ..."
+                            onChange={(e) => {
+                                setDoctor({
+                                    ...doctor,
+                                    full_name: e.target.value,
+                                });
+                            }}
+                        />
                         <div
                             className="error_message mt-3"
                             style={{ color: 'red' }}
+                        ></div>
+                    </div>
+                    <div className="col-6 ps-2">
+                        <label htmlFor="" className="mb-2">
+                            Giới tính
+                        </label>
+                        <Select
+                            value={doctor?.gender}
+                            className="d-block mt-0 p-0"
+                            placeholder="Chọn giới tính"
+                            onChange={(value: number) => {
+                                console.log(value);
+                                setDoctor({ ...doctor, gender: value });
+                            }}
+                            onFocus={() =>
+                                setErrors({ ...errors, genderMsg: null })
+                            }
                         >
-                            {errors.birthdayMsg}
-                        </div>
-                    )}
+                            <Select.Option value={'1'}> Nam</Select.Option>
+                            <Select.Option value={'2'}> Nữ</Select.Option>
+                        </Select>
+                        {errors?.genderMsg && (
+                            <div
+                                className="error_message mt-3"
+                                style={{ color: 'red' }}
+                            >
+                                {errors.genderMsg}
+                            </div>
+                        )}
+                    </div>
+                </Flex>
+                <Flex className="justify-content-between mb-3">
+                    <div className="col-6  pe-2">
+                        <label htmlFor="" className="mb-2">
+                            Số điện thoại
+                        </label>
+                        <Input
+                            onFocus={(e: any) => {
+                                handleFocusInput(e.target);
+                            }}
+                            value={doctor?.phone}
+                            ref={inputPhoneRef}
+                            placeholder="Nhập số điện thoại ..."
+                            onChange={(e) => {
+                                setDoctor({ ...doctor, phone: e.target.value });
+                            }}
+                        />
+                        <div
+                            className="error_message mt-3"
+                            style={{ color: 'red' }}
+                        ></div>
+                    </div>
+                    <div className="col-6 ps-2">
+                        <label htmlFor="" className="mb-2">
+                            Email
+                        </label>
+                        <Input
+                            onFocus={(e: any) => {
+                                handleFocusInput(e.target);
+                            }}
+                            value={doctor?.email}
+                            ref={inputEmailRef}
+                            placeholder="Nhập email ..."
+                            onChange={(e) => {
+                                setDoctor({ ...doctor, email: e.target.value });
+                            }}
+                        />
+                        <div
+                            className="error_message mt-3"
+                            style={{ color: 'red' }}
+                        ></div>
+                    </div>
+                </Flex>
+                <Flex className="justify-content-between mb-3">
+                    <div className="col-6  pe-2">
+                        <label htmlFor="" className="mb-2">
+                            Địa chỉ
+                        </label>
+                        <Input
+                            onFocus={(e: any) => {
+                                handleFocusInput(e.target);
+                            }}
+                            value={doctor?.address}
+                            ref={inputAddressRef}
+                            placeholder="Nhập địa chỉ ..."
+                            onChange={(e) => {
+                                setDoctor({
+                                    ...doctor,
+                                    address: e.target.value,
+                                });
+                            }}
+                        />
+                        <div
+                            className="error_message mt-3"
+                            style={{ color: 'red' }}
+                        ></div>
+                    </div>
+                    <div className="col-6 ps-2">
+                        <label htmlFor="" className="mb-2">
+                            Học vấn
+                        </label>
+                        <Input
+                            value={doctor?.title}
+                            ref={inputTitleRef}
+                            placeholder="Nhập học vấn ..."
+                            onChange={(e) => {
+                                setDoctor({ ...doctor, title: e.target.value });
+                            }}
+                        />
+                    </div>
+                </Flex>
+                <Flex className="justify-content-between mb-3">
+                    <div className="col-6  pe-2">
+                        <label htmlFor="" className="mb-2">
+                            Chi giá khám
+                        </label>
+                        <Input
+                            onFocus={(e: any) => {
+                                handleFocusInput(e.target);
+                            }}
+                            value={doctor?.fee}
+                            ref={inputFeeRef}
+                            placeholder="Nhập giá khám..."
+                            onChange={(e) => {
+                                setDoctor({ ...doctor, fee: e.target.value });
+                            }}
+                        />
+                        <div
+                            className="error_message mt-3"
+                            style={{ color: 'red' }}
+                        ></div>
+                    </div>
+                    <div className="col-6  pe-2">
+                        <label htmlFor="" className="form-label">
+                            Ngày/ Tháng/ Năm Sinh
+                        </label>
+                        <DatePicker
+                            className="d-block"
+                            format="YYYY-MM-DD"
+                            defaultValue={
+                                doctor?.birthday
+                                    ? dayjs(doctor?.birthday, dateFormat)
+                                    : null
+                            }
+                            onChange={onChange} // Hàm xử lý khi thay đổi ngày
+                            placeholder="Chọn ngày sinh"
+                        />
+
+                        {errors?.birthdayMsg && (
+                            <div
+                                className="error_message mt-3"
+                                style={{ color: 'red' }}
+                            >
+                                {errors.birthdayMsg}
+                            </div>
+                        )}
+                    </div>
+                </Flex>
+                <div className="mb-3">
+                    <label htmlFor="" className="mb-2">
+                        Mô tả nhanh
+                    </label>
+                    <TextArea
+                        value={doctor?.summary}
+                        onChange={(e) => {
+                            setDoctor({ ...doctor, summary: e.target.value });
+                        }}
+                        placeholder="Nhập mô tả nhanh ..."
+                    />
+                    <div
+                        className="error_message mt-3"
+                        style={{ color: 'red' }}
+                    ></div>
                 </div>
-            </Flex>
-            <div className="mb-3">
-                <label htmlFor="" className="mb-2">
-                    Mô tả nhanh
-                </label>
-                <TextArea
-                    value={doctor?.summary}
-                    onChange={(e) => {
-                        setDoctor({ ...doctor, summary: e.target.value });
-                    }}
-                    placeholder="Nhập mô tả nhanh ..."
-                />
-                <div
-                    className="error_message mt-3"
-                    style={{ color: 'red' }}
-                ></div>
-            </div>
-            <div className="mb-3">
-                <label htmlFor="">Chi tiết</label>
-                <DoctorEditor
-                    handleChangeDoctorEditor={handleChangeDoctorEditor}
-                    doctor={doctor}
-                />
-            </div>
+                <div className="mb-3">
+                    <label htmlFor="">Chi tiết</label>
+                    <DoctorEditor
+                        handleChangeDoctorEditor={handleChangeDoctorEditor}
+                        doctor={doctor}
+                    />
+                </div> */}
+            </Form>
         </Modal>
     );
 };

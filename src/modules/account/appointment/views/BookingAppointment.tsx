@@ -7,7 +7,7 @@ import { Breadcrumb, Col, notification, Row } from 'antd';
 import 'dayjs/locale/vi';
 import { useEffect, useState } from 'react';
 import { scheduleService } from '../../../../services/doctorScheduleService';
-import { useRecoilValue } from 'recoil';
+import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { doctorValue } from '../../../../stores/doctorAtom';
 import { DoctorSchedule } from '../../../../models/doctorSchedule';
 import { BlockCalendar } from '../components/BlockCalendar';
@@ -20,6 +20,7 @@ import { PatientProfile } from '../../../../models/patient_profile';
 import { doctorScheduleDetailService } from '../../../../services/doctorScheduleDetailService';
 import socket from '../../../../socket';
 import { NotificationService } from '../../../../services/notificationService';
+import { newAppointmentState } from '../../../../stores/appointmentAtom';
 type NotificationType = 'success' | 'error';
 
 const BookingAppointment = () => {
@@ -37,7 +38,7 @@ const BookingAppointment = () => {
         useState<PatientProfile>({} as PatientProfile);
     const [times, setTimes] = useState<Time[]>([]);
     const [time, setTime] = useState<Time>({} as Time);
-
+    const setNewAppointment = useSetRecoilState(newAppointmentState);
     const [openInputModal, setOpenInputModal] = useState<boolean>(false);
 
     const openNotification = (
@@ -150,9 +151,8 @@ const BookingAppointment = () => {
     };
     useEffect(() => {
         socket.on('newAppointment', (newAppointment) => {
-            console.log(schedule);
-
             console.log('newAppointmentSocket', newAppointment);
+            setNewAppointment(newAppointment);
             const scheduleDetail = schedule?.listScheduleDetails?.find(
                 (scheduleDetail: DoctorScheduleDetail) => {
                     return scheduleDetail.time_id === newAppointment.time_id;
@@ -163,9 +163,7 @@ const BookingAppointment = () => {
                 message: 'Bạn có một lịch hẹn mới!',
                 appointment_id: newAppointment.id,
             };
-            console.log('newNotification', newNotification);
             CreateNotification(newNotification);
-
             updateAvailableScheduleDetail(Number(scheduleDetail?.id));
         });
 

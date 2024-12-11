@@ -16,7 +16,7 @@ export interface Doctor {
     address: string;
     gender: number;
     title: string;
-    fee: number;
+    price: number;
     views: number;
     clinic_name: string;
     location: string;
@@ -24,4 +24,6 @@ export interface Doctor {
     schedule: DoctorSchedule;
     introduction: string;
     birthday: Date;
+    service_id: number;
+    service_name: string;
 }

@@ -19,6 +19,7 @@ import { ProvinceType, DistrictType, WardType } from '../../../../models/other';
 import axios from 'axios';
 import { AppointmentService } from '../../../../services/appointmentService';
 import socket from '../../../../socket';
+import { useNavigate } from 'react-router-dom';
 export const InputAppointmentModal = ({
     openModal,
     cancelModal,
@@ -36,7 +37,7 @@ export const InputAppointmentModal = ({
     const [ward, setWard] = useState<WardType>({} as WardType);
 
     const [form] = Form.useForm();
-
+    const navigate = useNavigate();
     const onFinish = (values: any) => {
         const newAppointment = {
             doctor_id: doctor?.doctor_id,
@@ -54,8 +55,11 @@ export const InputAppointmentModal = ({
             location: doctor.location,
             time_value: time.value,
             time_id: time.id,
-            price: doctor.fee,
+            price: doctor.price,
+            service_id: doctor.service_id,
+            service_name: doctor.service_name,
         };
+        console.log('newAppointment', newAppointment);
         CreateAppointment(newAppointment);
     };
     const CreateAppointment = async (newAppointment: any) => {
@@ -69,6 +73,7 @@ export const InputAppointmentModal = ({
                 'Đặt lịch hẹn thành công!'
             );
             cancelModal();
+            navigate('/booking-success');
 
             socket.emit('addApp', newAppointment);
         } catch (err: any) {
@@ -230,12 +235,23 @@ export const InputAppointmentModal = ({
                             {date}
                         </p>
                     </div>
-                    <div className="location">
-                        <strong>Địa điểm: </strong> {doctor.location}
+                    <div className="location ">
+                        <p>
+                            {' '}
+                            <strong>Địa điểm: </strong> {doctor.location}
+                        </p>
                     </div>
                     <div className="fee">
-                        <strong>Phí khám: </strong>{' '}
-                        {doctor.fee.toLocaleString(undefined)} đ
+                        <p>
+                            {' '}
+                            <strong>Phí khám: </strong>{' '}
+                            {doctor.price.toLocaleString(undefined)} đ
+                        </p>
+                    </div>
+                    <div className="service">
+                        <p>
+                            <strong>Dịch vụ khám:</strong> {doctor.service_name}
+                        </p>
                     </div>
                 </Col>
                 <Col span={16}>
@@ -459,10 +475,11 @@ export const InputAppointmentModal = ({
                                 })}
                             </Select>
                         </Form.Item>
-                        {/* Phone */}
+                        {/* Reason */}
                         <Form.Item label="Lý do khám" name="reason">
                             <TextArea placeholder="Nhập lý do khám..." />
                         </Form.Item>
+
                         {/* Nút Lưu */}
                         <Form.Item className="text-center">
                             <Button

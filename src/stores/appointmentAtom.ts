@@ -16,3 +16,15 @@ export const appointmentListInDayValue = selector({
         return get(appointmentListInDayState);
     },
 });
+
+export const newAppointmentState = atom({
+    key: 'newAppointmentState',
+    default: {} as Appointment,
+});
+
+export const newAppointmentValue = selector({
+    key: 'newAppointmentValue',
+    get: ({ get }) => {
+        return get(newAppointmentState);
+    },
+});
