@@ -267,6 +267,8 @@ const BookingAppointment = () => {
                     doctor={doctor}
                     patientProfileCopy={patientProfileCopy}
                     openNotification={openNotification}
+                    setPatientProfileCopy={setPatientProfileCopy}
+                    patientProfile={patientProfile}
                 />
             )}
         </div>

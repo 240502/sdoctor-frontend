@@ -3,11 +3,15 @@ import { CheckCircleOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { useRecoilValue } from 'recoil';
 import { newAppointmentValue } from '../stores/appointmentAtom';
+import { useEffect } from 'react';
 
 const { Title, Text } = Typography;
 export const BookingSuccess = () => {
     const navigate = useNavigate();
     const newAppointment = useRecoilValue(newAppointmentValue);
+    useEffect(() => {
+        console.log('new appointment booking success', newAppointment);
+    }, []);
     return (
         <div
             style={{
@@ -53,7 +57,9 @@ export const BookingSuccess = () => {
                     <Button type="primary" onClick={() => navigate('/')}>
                         Về trang chính
                     </Button>
-                    <Button onClick={() => navigate('/')}>Xem chi tiết</Button>
+                    <Button onClick={() => navigate('/patient/appointment')}>
+                        Xem chi tiết
+                    </Button>
                 </Space>
             </Card>
         </div>

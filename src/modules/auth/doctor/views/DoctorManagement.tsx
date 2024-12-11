@@ -20,6 +20,8 @@ import { ClinicService } from '../../../../services/clinicService';
 import { MajorService } from '../../../../services/majorService';
 import { useRecoilValue } from 'recoil';
 import { configValue } from '../../../../stores/userAtom';
+import { DoctorServiceService } from '../../../../services/doctorServiceService';
+import { DoctorService } from '../../../../models/doctorService';
 type NotificationType = 'success' | 'warning' | 'error';
 const { Option } = Select;
 
@@ -30,13 +32,14 @@ const DoctorManagement = () => {
     const [doctors, setDoctors] = useState<Doctor[]>([]);
     const [doctor, setDoctor] = useState<Doctor>({} as Doctor);
     const [pageIndex, setPageIndex] = useState<number>(1);
-    const [pageSize, setPageSize] = useState<number>(5);
+    const [pageSize, setPageSize] = useState<number>(10);
     const [pageCount, setPageCount] = useState<number>();
     const [showDoctorModal, setShowDoctorModal] = useState<boolean>(false);
     const [showModalConfirm, setShowModalConfirm] = useState<boolean>(false);
     const [isUpdate, setIsUpdate] = useState<boolean>(false);
     const [majors, setMajors] = useState<Major[]>([]);
     const [clinics, setClinics] = useState<Clinic[]>([]);
+    const [doctorServices, setDoctorServices] = useState<DoctorService[]>([]);
     const [searchContent, setSearchContent] = useState<string>('');
     const [filteredDoctors, setFilteredDoctors] = useState<Doctor[]>([]);
     const [totalItem, setTotalItem] = useState<number>(0);
@@ -44,6 +47,15 @@ const DoctorManagement = () => {
         try {
             const res = await ClinicService.viewClinic({});
             setClinics(res.data);
+        } catch (err: any) {
+            console.log(err.message);
+        }
+    };
+    const getAllService = async () => {
+        try {
+            const res = await DoctorServiceService.getAll();
+            console.log(res);
+            setDoctorServices(res);
         } catch (err: any) {
             console.log(err.message);
         }
@@ -92,6 +104,7 @@ const DoctorManagement = () => {
                 ...options,
             };
             const res = await doctorService.viewDoctor(data);
+
             setPageCount(res.pageCount);
             setDoctors(res.data);
             setTotalItem(res.totalItems);
@@ -118,6 +131,7 @@ const DoctorManagement = () => {
         getDoctors();
         getAllClinic();
         getAllMajor();
+        getAllService();
         window.scrollTo(0, 0);
     }, [pageIndex, pageSize, options]);
 
@@ -140,7 +154,7 @@ const DoctorManagement = () => {
         }
     }, [searchContent, doctors]);
     return (
-        <div className="container">
+        <div className="container doctor-management">
             {contextHolder}
             <div className="block__filter">
                 <Breadcrumb
@@ -257,6 +271,7 @@ const DoctorManagement = () => {
                     clinics={clinics}
                     majors={majors}
                     config={config}
+                    doctorServices={doctorServices}
                 />
             )}
             {showModalConfirm && (

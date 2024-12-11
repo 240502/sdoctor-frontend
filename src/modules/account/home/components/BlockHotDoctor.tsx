@@ -3,18 +3,18 @@ import { Button, Card, Flex, Row, Col, Image, Tag } from 'antd';
 import { Link, useNavigate } from 'react-router-dom';
 import { doctorService } from '../../../../services/doctorService';
 import { Doctor } from '../../../../models/doctor';
-import { useRecoilValue, useSetRecoilState } from 'recoil';
+import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import {
-    doctorListState,
+    commonDoctorsState,
     doctorListValue,
     doctorState,
 } from '../../../../stores/doctorAtom';
 import { EnvironmentOutlined } from '@ant-design/icons';
 export const BlockHotDoctor = (): JSX.Element => {
     const navigate = useNavigate();
-    const setDoctors = useSetRecoilState(doctorListState);
     const setDoctor = useSetRecoilState(doctorState);
-    const doctors = useRecoilValue(doctorListValue);
+    const [commonDoctors, setCommonDoctors] =
+        useRecoilState(commonDoctorsState);
     const handleUpdateViewsDoctor = async (id: number) => {
         try {
             const res = await doctorService.updateViewsDoctor(id);
@@ -24,11 +24,13 @@ export const BlockHotDoctor = (): JSX.Element => {
     };
     const loadData = async () => {
         try {
-            const data = await doctorService.getCommonDoctor();
-            setDoctors(data);
+            const data = {};
+            const res = await doctorService.getCommonDoctor(data);
+            console.log(res.data);
+            setCommonDoctors(res.data);
         } catch (err: any) {
             console.log(err.message);
-            setDoctors([]);
+            setCommonDoctors([]);
         }
     };
     useEffect(() => {
@@ -41,8 +43,8 @@ export const BlockHotDoctor = (): JSX.Element => {
                 <h3 className="block__title fs-4 fw-bold">Bác sĩ nổi bật</h3>
             </div>
             <Row className="block-container mt-4" gutter={16}>
-                {doctors.length > 0 ? (
-                    doctors?.map((doctor: Doctor) => {
+                {commonDoctors.length > 0 ? (
+                    commonDoctors?.map((doctor: Doctor) => {
                         return (
                             <Col className=" mb-3" span={6}>
                                 <Card className="shadow" actions={[]}>

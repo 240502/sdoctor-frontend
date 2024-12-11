@@ -46,7 +46,7 @@ const AppointmentManagement = () => {
                 pageIndex: pageIndex,
                 pageSize: pageSize,
                 type: options.statusId,
-                doctorId: user.object_id,
+                doctorId: user.doctor_id,
             };
             const res = await AppointmentService.getAppointmentByType(data);
             setAppointments(res.data);

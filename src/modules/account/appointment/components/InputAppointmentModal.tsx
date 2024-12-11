@@ -10,9 +10,9 @@ import {
     Radio,
     DatePicker,
     Select,
+    Switch,
 } from 'antd';
-import dayjs from 'dayjs';
-
+import dayjs, { Dayjs } from 'dayjs';
 import TextArea from 'antd/es/input/TextArea';
 import { useEffect, useState } from 'react';
 import { ProvinceType, DistrictType, WardType } from '../../../../models/other';
@@ -20,6 +20,10 @@ import axios from 'axios';
 import { AppointmentService } from '../../../../services/appointmentService';
 import socket from '../../../../socket';
 import { useNavigate } from 'react-router-dom';
+import { DatePickerProps } from 'antd/lib';
+import { PatientProfileService } from '../../../../services/patient_profileService';
+import { useSetRecoilState } from 'recoil';
+import { patientProfileState } from '../../../../stores/patientAtom';
 export const InputAppointmentModal = ({
     openModal,
     cancelModal,
@@ -28,6 +32,8 @@ export const InputAppointmentModal = ({
     doctor,
     patientProfileCopy,
     openNotification,
+    setPatientProfileCopy,
+    patientProfile,
 }: any) => {
     const [provinces, setProvinces] = useState<ProvinceType[]>([]);
     const [districts, setDistricts] = useState<DistrictType[]>([]);
@@ -35,9 +41,15 @@ export const InputAppointmentModal = ({
     const [district, setDistrict] = useState<DistrictType>({} as DistrictType);
     const [province, setProvince] = useState<ProvinceType>({} as ProvinceType);
     const [ward, setWard] = useState<WardType>({} as WardType);
-
+    const [different, setDifferent] = useState<boolean>(false);
+    const [saveProfile, setSaveProfile] = useState<boolean>(false);
     const [form] = Form.useForm();
+    const setPatientProfile = useSetRecoilState(patientProfileState);
     const navigate = useNavigate();
+    const onChangeSwitch = (checked: boolean) => {
+        console.log(`switch to ${checked}`);
+        setSaveProfile(checked);
+    };
     const onFinish = (values: any) => {
         const newAppointment = {
             doctor_id: doctor?.doctor_id,
@@ -61,7 +73,23 @@ export const InputAppointmentModal = ({
         };
         console.log('newAppointment', newAppointment);
         CreateAppointment(newAppointment);
+        if (saveProfile) {
+            UpdateProfile();
+        }
     };
+    const UpdateProfile = async () => {
+        try {
+            const res = await PatientProfileService.updatePatientProfile({
+                ...patientProfileCopy,
+                birthday: patientProfileCopy.birthday.toString().slice(0, 10),
+            });
+            setPatientProfile(patientProfileCopy);
+            console.log(res);
+        } catch (err: any) {
+            console.log(err.message);
+        }
+    };
+
     const CreateAppointment = async (newAppointment: any) => {
         try {
             const res: any = await AppointmentService.createAppointment(
@@ -105,6 +133,10 @@ export const InputAppointmentModal = ({
         } catch (err) {
             console.log(err);
         }
+    };
+    const onChange: DatePickerProps['onChange'] = (date, dateString) => {
+        console.log(date, dateString);
+        setPatientProfileCopy({ ...patientProfileCopy, birthday: dateString });
     };
 
     //find province when patient had a profile
@@ -194,7 +226,28 @@ export const InputAppointmentModal = ({
         };
         getProvinces();
     }, []);
-
+    useEffect(() => {
+        console.log(patientProfile);
+        console.log(patientProfileCopy);
+        if (
+            JSON.stringify({
+                ...patientProfile,
+                birthday: patientProfile.birthday.toString().slice(0, 10),
+            }) !==
+            JSON.stringify({
+                ...patientProfileCopy,
+                birthday: patientProfileCopy.birthday.toString().slice(0, 10),
+            })
+        ) {
+            setDifferent(true);
+        } else {
+            console.log('set false');
+            setDifferent(false);
+        }
+    }, [patientProfileCopy]);
+    useEffect(() => {
+        console.log('different', different);
+    }, [different]);
     return (
         <Modal
             title={
@@ -300,6 +353,12 @@ export const InputAppointmentModal = ({
                         >
                             <Input
                                 placeholder="Nhập họ và tên..."
+                                onChange={(e) => {
+                                    setPatientProfileCopy({
+                                        ...patientProfileCopy,
+                                        patient_name: e.target.value,
+                                    });
+                                }}
                                 // value={patientProfile?.patient_name}
                             />
                         </Form.Item>
@@ -336,7 +395,12 @@ export const InputAppointmentModal = ({
                         >
                             <Input
                                 placeholder="Nhập địa chỉ email..."
-                                // value={patientProfile?.patient_email}
+                                onChange={(e) => {
+                                    setPatientProfileCopy({
+                                        ...patientProfileCopy,
+                                        patient_email: e.target.value,
+                                    });
+                                }}
                             />
                         </Form.Item>
                         {/* Phone */}
@@ -357,7 +421,12 @@ export const InputAppointmentModal = ({
                         >
                             <Input
                                 placeholder="Nhập số điện thoại..."
-                                //  value={patientProfile?.patient_phone}
+                                onChange={(e) => {
+                                    setPatientProfileCopy({
+                                        ...patientProfileCopy,
+                                        patient_phone: e.target.value,
+                                    });
+                                }}
                             />
                         </Form.Item>
                         {/* Birthday */}
@@ -372,6 +441,7 @@ export const InputAppointmentModal = ({
                             ]}
                         >
                             <DatePicker
+                                onChange={onChange}
                                 className="d-block"
                                 format={'YYYY-MM-DD'}
                             />
@@ -398,6 +468,10 @@ export const InputAppointmentModal = ({
                                             return province.province_name === e;
                                         }
                                     );
+                                    setPatientProfileCopy({
+                                        ...patientProfileCopy,
+                                        province: pro.province_name,
+                                    });
                                     setProvince(pro);
 
                                     form.setFieldValue('patientDistrict', null);
@@ -429,12 +503,19 @@ export const InputAppointmentModal = ({
                         >
                             <Select
                                 placeholder="Chọn quân/huyện"
+                                showSearch
+                                allowClear
+                                optionFilterProp="children"
                                 onChange={(e) => {
                                     const dis: any = districts.find(
                                         (item: any) => {
                                             return item.district_name === e;
                                         }
                                     );
+                                    setPatientProfileCopy({
+                                        ...patientProfileCopy,
+                                        district: dis.district_name,
+                                    });
                                     setDistrict(dis);
                                     form.setFieldValue('patientCommune', null);
                                 }}
@@ -462,7 +543,19 @@ export const InputAppointmentModal = ({
                                 },
                             ]}
                         >
-                            <Select placeholder="Chọn xã/phường">
+                            <Select
+                                placeholder="Chọn xã/phường"
+                                showSearch
+                                allowClear
+                                optionFilterProp="children"
+                                onChange={(e) => {
+                                    console.log(e);
+                                    setPatientProfileCopy({
+                                        ...patientProfileCopy,
+                                        commune: e,
+                                    });
+                                }}
+                            >
                                 {wards.map((ward: WardType) => {
                                     return (
                                         <Select.Option
@@ -479,7 +572,14 @@ export const InputAppointmentModal = ({
                         <Form.Item label="Lý do khám" name="reason">
                             <TextArea placeholder="Nhập lý do khám..." />
                         </Form.Item>
-
+                        {different && (
+                            <Form.Item>
+                                <Switch onChange={onChangeSwitch} />
+                                <label className="ms-2">
+                                    Cập nhập lại hồ sơ
+                                </label>
+                            </Form.Item>
+                        )}
                         {/* Nút Lưu */}
                         <Form.Item className="text-center">
                             <Button

@@ -11,6 +11,7 @@ import {
     Row,
     Col,
     Flex,
+    Pagination,
 } from 'antd';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
@@ -20,8 +21,12 @@ import { baseURL } from '../../../../constants/api';
 import parse from 'html-react-parser';
 import { BlockComment } from '../components/BlockComment';
 import { ModalComment } from '../components/ModalComment';
-import { useRecoilValue, useSetRecoilState } from 'recoil';
-import { doctorListValue, doctorState } from '../../../../stores/doctorAtom';
+import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
+import {
+    commonDoctorsState,
+    doctorListValue,
+    doctorState,
+} from '../../../../stores/doctorAtom';
 import { useNavigate } from 'react-router-dom';
 type NotificationType = 'success' | 'error';
 
@@ -34,7 +39,12 @@ const ViewDetailDoctor = () => {
     const [isModalCommentOpen, setIsModalCommentOpen] = useState(false);
     const { id } = useParams<DataParams>();
     const [doctor, setDoctor] = useState<Doctor>({} as Doctor);
+    const [commonDoctors, setCommonDoctors] =
+        useRecoilState(commonDoctorsState);
     const [api, contextHolder] = notification.useNotification();
+    const [pageSize, setPageSize] = useState<number>(4);
+    const [pageIndex, setPageIndex] = useState<number>(1);
+    const [pageCount, setPageCount] = useState<number>(0);
     const setDoctorGlobal = useSetRecoilState(doctorState);
     const openNotificationWithIcon = (
         type: NotificationType,
@@ -79,13 +89,25 @@ const ViewDetailDoctor = () => {
             console.log(err.message);
         }
     };
-
+    const getCommonDoctor = async () => {
+        try {
+            const data = { pageIndex: pageIndex, pageSize: pageSize };
+            const res = await doctorService.getCommonDoctor(data);
+            setCommonDoctors(res.data);
+            setPageCount(res.pageCount);
+        } catch (err: any) {
+            console.log(err.message);
+            setCommonDoctors([]);
+            setPageCount(0);
+        }
+    };
     useEffect(() => {
-        console.log(doctors.length);
         getDoctorById(Number(id));
         window.scrollTo(0, 0);
     }, [id]);
-
+    useEffect(() => {
+        getCommonDoctor();
+    }, [pageIndex, pageSize]);
     return (
         <div className="container doctor-detail mt-4 mb-4">
             {contextHolder}
@@ -152,29 +174,81 @@ const ViewDetailDoctor = () => {
                     span={7}
                     className="block-doctor-suggestion border rounded p-3"
                 >
-                    <h6 className="mb-3">Gợi ý</h6>
-                    <Row gutter={16}>
-                        <Col span={16}>
-                            <Flex className="suggestion-doctor-item mt-3">
-                                <div className="doctor-image col-2">
-                                    <Image
-                                        className="rounded-circle"
-                                        preview={false}
-                                        src={doctor?.image}
-                                    ></Image>
-                                </div>
-                                <div className="doctor-info ms-2">
-                                    <Tag color="blue">Sản phụ khoa</Tag>
-                                    <h6 className="mt-2">
-                                        Bác sĩ Nguyễn Văn Sang
-                                    </h6>
-                                    <p>
-                                        <EnvironmentOutlined /> Hà Nội
-                                    </p>
-                                </div>
-                            </Flex>
-                            <Divider className="mt-2 mb-3"></Divider>
-                        </Col>
+                    <h6 className="mb-3 fw-bold">Gợi ý</h6>
+                    <Divider></Divider>
+                    <Row gutter={24}>
+                        {commonDoctors?.map((doctor: Doctor) => {
+                            if (doctor.doctor_id !== Number(id)) {
+                                return (
+                                    <Col
+                                        span={24}
+                                        style={{ cursor: 'pointer' }}
+                                    >
+                                        <Flex className="suggestion-doctor-item mt-2">
+                                            <div className="doctor-image col-2">
+                                                <Image
+                                                    onClick={() => {
+                                                        navigate(
+                                                            '/doctor/detail/' +
+                                                                doctor.doctor_id
+                                                        );
+                                                    }}
+                                                    className="rounded-circle"
+                                                    preview={false}
+                                                    src={doctor?.image}
+                                                ></Image>
+                                            </div>
+                                            <div className="doctor-info ms-2">
+                                                <p
+                                                    className="mt-2 mb-1 fw-bold doctor-name"
+                                                    onClick={() => {
+                                                        navigate(
+                                                            '/doctor/detail/' +
+                                                                doctor.doctor_id
+                                                        );
+                                                    }}
+                                                >
+                                                    {doctor?.full_name}
+                                                </p>
+                                                <Tag color="blue">
+                                                    {doctor.major_name}
+                                                </Tag>
+                                                <p>
+                                                    <EnvironmentOutlined />{' '}
+                                                    {doctor?.address}
+                                                </p>
+                                            </div>
+                                        </Flex>
+                                        <Divider className="mt-2 mb-2"></Divider>
+                                    </Col>
+                                );
+                            } else {
+                                return <></>;
+                            }
+                        })}
+                        {pageCount > 1 && (
+                            <Col span={24}>
+                                <Pagination
+                                    pageSize={pageSize}
+                                    align="center"
+                                    total={pageSize * pageCount}
+                                    current={pageIndex}
+                                    onChange={(
+                                        current: number,
+                                        size: number
+                                    ) => {
+                                        if (size !== pageSize) {
+                                            setPageSize(size);
+                                            setPageIndex(1);
+                                        } else {
+                                            setPageIndex(current);
+                                        }
+                                    }}
+                                    showSizeChanger
+                                    pageSizeOptions={['4', '8']}
+                                />
+                            </Col>
+                        )}
                     </Row>
                 </Col>
             </Row>

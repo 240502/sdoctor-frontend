@@ -1,20 +1,14 @@
-import React, { useEffect, useRef } from 'react';
 import { CKEditor } from '@ckeditor/ckeditor5-react';
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
-import { Select } from 'antd';
 import CustomUploadAdapterPlugin from '../../../../utils/MyUploadAdapterPlugin';
-import { showError, showSuccess } from '../../../../utils/global';
-const DoctorEditor = ({ handleChangeDoctorEditor, doctor }: any) => {
+import { useRef } from 'react';
+const SummaryEditor = ({ doctor, handleChangeSummaryEditor }: any) => {
     const editorRef = useRef<any>(null);
-    // useEffect(() => {
-    //     if (editorRef.current) {
-    //         const editorInstance = editorRef.current;
-    //     }
-    // }, []);
+
     return (
         <CKEditor
             editor={ClassicEditor}
-            data={doctor !== undefined ? doctor?.introduction : ''}
+            data={doctor !== undefined ? doctor?.summary : ''}
             config={{
                 extraPlugins: [CustomUploadAdapterPlugin],
                 // Các cấu hình khác nếu cần
@@ -57,11 +51,11 @@ const DoctorEditor = ({ handleChangeDoctorEditor, doctor }: any) => {
                 // if (isUpdate) {
                 //     setPost({ ...post, content: data });
                 // } else {
-                handleChangeDoctorEditor(data);
+                handleChangeSummaryEditor(data);
                 // }
             }}
         />
     );
 };
 
-export default DoctorEditor;
+export default SummaryEditor;

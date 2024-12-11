@@ -35,3 +35,14 @@ export const doctorValue = selector({
         return get(doctorState);
     },
 });
+
+export const commonDoctorsState = atom({
+    key: 'commonDoctorState',
+    default: [] as Doctor[],
+});
+export const commonDoctorValue = selector({
+    key: 'commonDoctorValue',
+    get: ({ get }) => {
+        return get(commonDoctorsState);
+    },
+});

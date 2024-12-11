@@ -75,7 +75,7 @@ export const ModalAddNews = ({
             const data = {
                 title: inputTitleRef?.current?.input?.value,
                 content: editorData,
-                author_id: user.id,
+                author_id: user.user_id,
                 category_id: post.category_id,
                 featured_image: firstImageSrc,
             };
@@ -121,7 +121,7 @@ export const ModalAddNews = ({
                 id: post.id,
                 title: inputTitleRef?.current?.input?.value,
                 content: post.content,
-                author_id: user.id,
+                author_id: user.user_id,
                 category_id: post.category_id,
                 featured_image: firstImageSrc,
             };

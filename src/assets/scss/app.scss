@@ -166,6 +166,14 @@ main {
         background-color: #0e82fd !important;
         color: #fff !important;
     }
+    .block-doctor-suggestion {
+        .doctor-name {
+            transition: all 0.3s linear;
+        }
+        .doctor-name:hover {
+            color: #20c0f3;
+        }
+    }
 }
 
 .user-management {
@@ -189,7 +197,8 @@ main {
 }
 
 // home page block common doctor
-.block-common-doctor {
+.block-common-doctor,
+.block-watched-doctor {
     .block-container .ant-card {
         border: 1px solid #ccc;
         transition: all 0.5s linear;
@@ -313,5 +322,15 @@ main {
             0 1px 3px 1px rgba(60, 64, 67, 0.15);
         z-index: 2;
         cursor: pointer;
+    }
+}
+
+// doctor-management
+
+.doctor-management {
+}
+.input-doctor-modal {
+    .upload-doctor-image .ant-form-item-label:first-child {
+        margin-left: 15px !important;
     }
 }

@@ -9,9 +9,12 @@ import {
     Upload,
     DatePicker,
     Form,
+    Row,
+    Col,
+    ConfigProvider,
 } from 'antd';
 import TextArea from 'antd/es/input/TextArea';
-import DoctorEditor from './DoctorEditor';
+import DescriptionEditor from './DescriptionEditor';
 import { useEffect, useRef, useState } from 'react';
 import { Clinic } from '../../../../models/clinic';
 import { Major } from '../../../../models/major';
@@ -31,7 +34,12 @@ import { UploadService } from '../../../../services/upload';
 type FileType = Parameters<GetProp<UploadProps, 'beforeUpload'>>[0];
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
+import SummaryEditor from './SummaryEditor';
+import { DoctorService } from '../../../../models/doctorService';
+import viVN from 'antd/lib/locale/vi_VN';
+import 'dayjs/locale/vi';
 
+dayjs.locale('vi');
 dayjs.extend(customParseFormat);
 
 const dateFormat = 'YYYY-MM-DD';
@@ -46,6 +54,7 @@ export const DoctorModal = ({
     clinics,
     majors,
     config,
+    doctorServices,
 }: any) => {
     const [previewOpen, setPreviewOpen] = useState(false);
     const [previewImage, setPreviewImage] = useState('');
@@ -58,12 +67,7 @@ export const DoctorModal = ({
     const inputFeeRef = useRef<InputRef>(null);
     const inputExamninationObjectRef = useRef<InputRef>(null);
     const [form] = Form.useForm();
-    const [errors, setErrors] = useState<any>({
-        clinicMsg: null,
-        genderMsg: null,
-        majorsMsg: null,
-        birthdayMsg: null,
-    });
+    const [birthDayError, setBirthDayError] = useState<any>('');
     const onChange: DatePickerProps['onChange'] = (date, dateString) => {
         console.log(date, dateString);
         setDoctor({ ...doctor, birthday: dateString });
@@ -97,6 +101,9 @@ export const DoctorModal = ({
     const handleChangeDoctorEditor = (data: any) => {
         setDoctor({ ...doctor, introduction: data });
     };
+    const handleChangeSummaryEditor = (data: any) => {
+        setDoctor({ ...doctor, summary: data });
+    };
 
     const UploadDoctorImage = async ({ file, onSuccess, onError }: any) => {
         try {
@@ -111,100 +118,133 @@ export const DoctorModal = ({
         }
     };
     const onFinish = (values: any) => {
-        console.log(values);
+        console.log('values', values);
+        const today = dayjs();
+        const age = today.diff(values.birthday, 'year'); // Tính tuổi bằng year
+        console.log(age);
+        if (age < 22) {
+            setBirthDayError('Bác sĩ phải đủ 24 tuổi trở lên!');
+        }
+
+        if (isUpdate) {
+            const newDoctor = {
+                doctor_id: doctor.doctor_id,
+                full_name: values.full_name,
+                clinic_id: values.clinic_id,
+                major_id: values.major_id,
+                summary: doctor.summary,
+                image: fileList[0].url ?? '',
+                email: values.email,
+                phone: values.phone,
+                address: values.address,
+                gender: values.gender,
+                title: values.title,
+                service_id: values.service_id,
+                introduction: doctor.introduction,
+                birthday: dayjs(values.birthday)
+                    .format()
+                    .toString()
+                    .slice(0, 10),
+            };
+            console.log('new Doctor', newDoctor);
+
+            UpdateDoctor(newDoctor);
+        } else {
+            const newDoctor = {
+                full_name: values.full_name,
+                clinic_id: values.clinic_id,
+                major_id: values.major_id,
+                summary: doctor.summary,
+                image: fileList[0].url ?? '',
+                email: values.email,
+                phone: values.phone,
+                address: values.address,
+                gender: values.gender,
+                title: values.title,
+                service_id: values.service_id,
+                introduction: doctor.introduction,
+                birthday: dayjs(values.birthday)
+                    .format()
+                    .toString()
+                    .slice(0, 10),
+            };
+            CreateDoctor(newDoctor);
+        }
+
         // handleData(values); // Gửi dữ liệu từ form
     };
-    const handleData = () => {
-        let errorMsg: any = {};
-        let isEmptyClinic: boolean = false;
-        let isEmptyMajor: boolean = false;
-        let isEmptyGender: boolean = false;
-        const isEmptyName = isEmpty(inputNameRef.current?.input);
-        const isEmptyPhone = isEmpty(inputPhoneRef.current?.input);
-        const isEmptyEmail = isEmpty(inputEmailRef.current?.input);
-        const isEmptyAddress = isEmpty(inputAddressRef.current?.input);
-        const isEmptyFee = isEmpty(inputFeeRef.current?.input);
-        if (!doctor?.clinic_id) {
-            isEmptyClinic = true;
-            errorMsg = { ...errorMsg, clinicMsg: 'Vui lòng chọn cơ sở y tế' };
-        }
-        if (!doctor?.major_id) {
-            isEmptyMajor = true;
-            errorMsg = { ...errorMsg, majorMsg: 'Vui lòng chọn chuyên ngành' };
-        }
-        if (!doctor?.gender) {
-            isEmptyGender = true;
-            errorMsg = { ...errorMsg, genderMsg: 'Vui lòng chọn giới tính' };
-        }
-        setErrors(errorMsg);
-        if (
-            !isEmptyName &&
-            !isEmptyPhone &&
-            !isEmptyEmail &&
-            !isEmptyAddress &&
-            !isEmptyFee &&
-            !isEmptyClinic &&
-            !isEmptyMajor &&
-            !isEmptyGender
-        ) {
-            const isNameError = validateName(inputNameRef.current?.input);
-            const isEmailError = validateEmail(inputEmailRef.current?.input);
-            const isPhoneError = validatePhone(inputPhoneRef.current?.input);
-            const isErrorPhoneLength = validatePhoneLength(
-                inputPhoneRef.current?.input
-            );
-            if (
-                !isNameError &&
-                !isErrorPhoneLength &&
-                !isPhoneError &&
-                !isEmailError
-            ) {
-                if (!isUpdate) {
-                    const newDoctor = {
-                        full_name: inputNameRef.current?.input?.value,
-                        clinic_id: doctor.clinic_id,
-                        major_id: doctor.major_id,
-                        summary: doctor.summary,
-                        image: fileList[0].url ?? '',
-                        email: inputEmailRef.current?.input?.value,
-                        phone: inputPhoneRef.current?.input?.value,
-                        address: inputAddressRef.current?.input?.value,
-                        gender: doctor.gender,
-                        title: inputTitleRef.current?.input?.value,
-                        fee: inputFeeRef.current?.input?.value,
-                        examination_object:
-                            inputExamninationObjectRef.current?.input?.value,
-                        introduction: doctor.introduction,
-                        birthday: doctor.birthday.toString().slice(0, 10),
-                    };
-                    CreateDoctor(newDoctor);
-                    console.log(newDoctor);
-                } else {
-                    const newDoctor = {
-                        doctor_id: doctor.doctor_id,
-                        user_id: doctor.user_id,
-                        full_name: inputNameRef.current?.input?.value,
-                        clinic_id: doctor.clinic_id,
-                        major_id: doctor.major_id,
-                        summary: doctor.summary,
-                        image: fileList[0].url ?? '',
-                        email: inputEmailRef.current?.input?.value,
-                        phone: inputPhoneRef.current?.input?.value,
-                        address: inputAddressRef.current?.input?.value,
-                        gender: doctor.gender,
-                        title: inputTitleRef.current?.input?.value,
-                        fee: inputFeeRef.current?.input?.value,
-                        examination_object:
-                            inputExamninationObjectRef.current?.input?.value,
-                        introduction: doctor.introduction,
-                        birthday: doctor.birthday.toString().slice(0, 10),
-                    };
-                    UpdateDoctor(newDoctor);
-                    console.log(newDoctor);
-                }
-            }
-        }
-    };
+    // const handleData = () => {
+    //     let errorMsg: any = {};
+
+    //     setError(errorMsg);
+    //     if (
+    //         !isEmptyName &&
+    //         !isEmptyPhone &&
+    //         !isEmptyEmail &&
+    //         !isEmptyAddress &&
+    //         !isEmptyFee &&
+    //         !isEmptyClinic &&
+    //         !isEmptyMajor &&
+    //         !isEmptyGender
+    //     ) {
+    //         const isNameError = validateName(inputNameRef.current?.input);
+    //         const isEmailError = validateEmail(inputEmailRef.current?.input);
+    //         const isPhoneError = validatePhone(inputPhoneRef.current?.input);
+    //         const isErrorPhoneLength = validatePhoneLength(
+    //             inputPhoneRef.current?.input
+    //         );
+    //         if (
+    //             !isNameError &&
+    //             !isErrorPhoneLength &&
+    //             !isPhoneError &&
+    //             !isEmailError
+    //         ) {
+    //             if (!isUpdate) {
+    //                 const newDoctor = {
+    //                     full_name: inputNameRef.current?.input?.value,
+    //                     clinic_id: doctor.clinic_id,
+    //                     major_id: doctor.major_id,
+    //                     summary: doctor.summary,
+    //                     image: fileList[0].url ?? '',
+    //                     email: inputEmailRef.current?.input?.value,
+    //                     phone: inputPhoneRef.current?.input?.value,
+    //                     address: inputAddressRef.current?.input?.value,
+    //                     gender: doctor.gender,
+    //                     title: inputTitleRef.current?.input?.value,
+    //                     fee: inputFeeRef.current?.input?.value,
+    //                     examination_object:
+    //                         inputExamninationObjectRef.current?.input?.value,
+    //                     introduction: doctor.introduction,
+    //                     birthday: doctor.birthday.toString().slice(0, 10),
+    //                 };
+    //                 CreateDoctor(newDoctor);
+    //                 console.log(newDoctor);
+    //             } else {
+    //                 const newDoctor = {
+    //                     doctor_id: doctor.doctor_id,
+    //                     user_id: doctor.user_id,
+    //                     full_name: inputNameRef.current?.input?.value,
+    //                     clinic_id: doctor.clinic_id,
+    //                     major_id: doctor.major_id,
+    //                     summary: doctor.summary,
+    //                     image: fileList[0].url ?? '',
+    //                     email: inputEmailRef.current?.input?.value,
+    //                     phone: inputPhoneRef.current?.input?.value,
+    //                     address: inputAddressRef.current?.input?.value,
+    //                     gender: doctor.gender,
+    //                     title: inputTitleRef.current?.input?.value,
+    //                     fee: inputFeeRef.current?.input?.value,
+    //                     examination_object:
+    //                         inputExamninationObjectRef.current?.input?.value,
+    //                     introduction: doctor.introduction,
+    //                     birthday: doctor.birthday.toString().slice(0, 10),
+    //                 };
+    //                 UpdateDoctor(newDoctor);
+    //                 console.log(newDoctor);
+    //             }
+    //         }
+    //     }
+    // };
 
     const CreateDoctor = async (newDoctor: any) => {
         try {
@@ -220,7 +260,7 @@ export const DoctorModal = ({
         } catch (err: any) {
             console.log(err.message);
             openNotificationWithIcon(
-                'success',
+                'error',
                 'Thông báo!',
                 'Thêm bác sĩ không thành công!'
             );
@@ -262,13 +302,9 @@ export const DoctorModal = ({
         }
     }, []);
 
-    useEffect(() => {
-        console.log('doctor', dayjs(doctor.birthday));
-    }, [doctor]);
-
     return (
         <Modal
-            className="w-50"
+            className="w-50 input-doctor-modal"
             title={'Thêm bác sĩ'}
             open={showDoctorModal}
             maskClosable={false}
@@ -318,7 +354,11 @@ export const DoctorModal = ({
                         />
                     )}
                 </div> */}
-                <Form.Item label="Ảnh bác sĩ" valuePropName="fileList">
+                <Form.Item
+                    label="Ảnh bác sĩ"
+                    valuePropName="fileList"
+                    className="upload-doctor-image"
+                >
                     <Upload
                         customRequest={UploadDoctorImage}
                         listType="picture-circle"
@@ -343,135 +383,254 @@ export const DoctorModal = ({
                         />
                     )}
                 </Form.Item>
-                <Form.Item
-                    label="Cơ sở y tế"
-                    name="clinic_id"
-                    rules={[
-                        {
-                            required: true,
-                            message: 'Vui lòng chọn cơ sở y tế!',
-                        },
-                    ]}
-                >
-                    <Select
-                        placeholder="Chọn cơ sở y tế"
-                        allowClear
-                        onFocus={() =>
-                            setErrors({ ...errors, clinicMsg: null })
-                        }
-                    >
-                        {clinics.map((clinic: Clinic) => (
-                            <Select.Option key={clinic.id} value={clinic.id}>
-                                {clinic.name}
-                            </Select.Option>
-                        ))}
-                    </Select>
-                </Form.Item>
+                <Row gutter={24}>
+                    <Col span={12}>
+                        <Form.Item
+                            label="Cơ sở y tế"
+                            name="clinic_id"
+                            rules={[
+                                {
+                                    required: true,
+                                    message: 'Vui lòng chọn cơ sở y tế!',
+                                },
+                            ]}
+                        >
+                            <Select
+                                placeholder="Chọn cơ sở y tế"
+                                allowClear
+                                showSearch
+                                optionFilterProp="children"
+                            >
+                                {clinics.map((clinic: Clinic) => (
+                                    <Select.Option
+                                        key={clinic.id}
+                                        value={clinic.id}
+                                    >
+                                        {clinic.name}
+                                    </Select.Option>
+                                ))}
+                            </Select>
+                        </Form.Item>
+                    </Col>
+                    <Col span={12}>
+                        <Form.Item
+                            label="Chuyên ngành"
+                            name="major_id"
+                            rules={[
+                                {
+                                    required: true,
+                                    message: 'Vui lòng chọn chuyên ngành!',
+                                },
+                            ]}
+                        >
+                            <Select
+                                placeholder="Chọn chuyên ngành"
+                                allowClear
+                                showSearch
+                                optionFilterProp="children"
+                            >
+                                {majors.map((major: Major) => (
+                                    <Select.Option
+                                        key={major.id}
+                                        value={major.id}
+                                    >
+                                        {major.name}
+                                    </Select.Option>
+                                ))}
+                            </Select>
+                        </Form.Item>
+                    </Col>
+                </Row>
+                <Row gutter={24}>
+                    {/*
+                        Tên bệnh nhân không được để trống.
+                        Tên chỉ chứa ký tự chữ cái (hỗ trợ Unicode, cho phép tiếng Việt).
+                        Độ dài tối thiểu và tối đa (ví dụ: từ 3 đến 50 ký tự).
+                        Không được chứa ký tự số hoặc ký tự đặc biệt.
+                    */}
+                    <Col span={12}>
+                        <Form.Item
+                            label="Họ và tên"
+                            name="full_name"
+                            rules={[
+                                {
+                                    required: true,
+                                    message:
+                                        'Vui lòng nhập đầy đủ họ và tên bệnh nhân',
+                                },
+                                {
+                                    pattern: /^[\p{L} ]+$/u,
+                                    message:
+                                        'Tên chỉ được chứa ký tự chữ cái và khoảng trắng',
+                                },
+                                {
+                                    min: 3,
+                                    message: 'Tên phải có ít nhất 3 ký tự',
+                                },
+                                {
+                                    max: 50,
+                                    message: 'Tên không được dài quá 50 ký tự',
+                                },
+                            ]}
+                        >
+                            <Input placeholder="Nhập họ và tên ..." />
+                        </Form.Item>
+                    </Col>
+                    <Col span={12}>
+                        <Form.Item
+                            label="Giới tính"
+                            name="gender"
+                            rules={[
+                                {
+                                    required: true,
+                                    message: 'Vui lòng chọn giới tính!',
+                                },
+                            ]}
+                        >
+                            <Select placeholder="Chọn giới tính">
+                                <Select.Option value="1">Nam</Select.Option>
+                                <Select.Option value="2">Nữ</Select.Option>
+                            </Select>
+                        </Form.Item>
+                    </Col>
+                </Row>
+                <Row gutter={24}>
+                    <Col span={12}>
+                        <Form.Item
+                            label="Số điện thoại"
+                            name="phone"
+                            rules={[
+                                {
+                                    required: true,
+                                    message: 'Vui lòng nhập số điện thoại!',
+                                },
+                                {
+                                    pattern: /^[0-9]+$/,
+                                    message:
+                                        'Số điện thoại chỉ được chứa các ký tự số!',
+                                },
+                                {
+                                    pattern: /^0[0-9]{9}$/,
+                                    message:
+                                        'Số điện thoại không hợp lệ! Số hợp lệ phải bắt đầu bằng 0 và gồm 10 chữ số.',
+                                },
+                            ]}
+                        >
+                            <Input placeholder="Nhập số điện thoại ..." />
+                        </Form.Item>
+                    </Col>
+                    <Col span={12}>
+                        <Form.Item
+                            label="Email"
+                            name="email"
+                            rules={[
+                                {
+                                    required: true,
+                                    message: 'Vui lòng nhập email!',
+                                },
+                                {
+                                    type: 'email',
+                                    message: 'Email không hợp lệ!',
+                                },
+                            ]}
+                        >
+                            <Input placeholder="Nhập email ..." />
+                        </Form.Item>
+                    </Col>
+                </Row>
+                <Row gutter={24}>
+                    <Col span={12}>
+                        <Form.Item
+                            label="Địa chỉ"
+                            name="address"
+                            rules={[
+                                {
+                                    required: true,
+                                    message: 'Vui lòng nhập địa chỉ',
+                                },
+                            ]}
+                        >
+                            <Input placeholder="Nhập địa chỉ ..." />
+                        </Form.Item>
+                    </Col>
+                    <Col span={12}>
+                        <Form.Item label="Học vấn" name="title">
+                            <Input placeholder="Nhập học vấn ..." />
+                        </Form.Item>
+                    </Col>
+                </Row>
+                <Row gutter={24}>
+                    <Col span={12}>
+                        <Form.Item
+                            label="Dịch vụ"
+                            name="service_id"
+                            rules={[
+                                {
+                                    required: true,
+                                    message:
+                                        'Vui lòng nhập chọn dịch vụ mà bác sĩ cung cấp!',
+                                },
+                            ]}
+                        >
+                            <Select
+                                placeholder="Chọn dịch vụ"
+                                allowClear
+                                showSearch
+                            >
+                                {doctorServices?.map(
+                                    (service: DoctorService) => {
+                                        return (
+                                            <Select.Option
+                                                key={service.id}
+                                                value={service.id}
+                                            >
+                                                {service.name}
+                                            </Select.Option>
+                                        );
+                                    }
+                                )}
+                            </Select>
+                        </Form.Item>
+                    </Col>
+                    <Col span={12}>
+                        <ConfigProvider locale={viVN}>
+                            <Form.Item
+                                label="Ngày sinh"
+                                name="birthday"
+                                rules={[
+                                    {
+                                        required: true,
+                                        message: 'Vui lòng chọn ngày sinh',
+                                    },
+                                ]}
+                            >
+                                <DatePicker
+                                    onFocus={() => {
+                                        setBirthDayError('');
+                                    }}
+                                    className="d-block"
+                                    format="YYYY-MM-DD"
+                                    placeholder="Chọn ngày sinh"
+                                />
+                                {birthDayError !== '' && (
+                                    <p className="text-danger mt-2">
+                                        {birthDayError}
+                                    </p>
+                                )}
+                            </Form.Item>
+                        </ConfigProvider>
+                    </Col>
+                </Row>
 
-                <Form.Item
-                    label="Chuyên ngành"
-                    name="major_id"
-                    rules={[
-                        {
-                            required: true,
-                            message: 'Vui lòng chọn chuyên ngành!',
-                        },
-                    ]}
-                >
-                    <Select
-                        placeholder="Chọn chuyên ngành"
-                        allowClear
-                        onFocus={() => setErrors({ ...errors, majorMsg: null })}
-                    >
-                        {majors.map((major: Major) => (
-                            <Select.Option key={major.id} value={major.id}>
-                                {major.name}
-                            </Select.Option>
-                        ))}
-                    </Select>
-                </Form.Item>
-
-                <Form.Item
-                    label="Họ và tên"
-                    name="full_name"
-                    rules={[
-                        { required: true, message: 'Vui lòng nhập họ và tên!' },
-                    ]}
-                >
-                    <Input placeholder="Nhập họ và tên ..." />
-                </Form.Item>
-
-                <Form.Item
-                    label="Giới tính"
-                    name="gender"
-                    rules={[
-                        { required: true, message: 'Vui lòng chọn giới tính!' },
-                    ]}
-                >
-                    <Select placeholder="Chọn giới tính">
-                        <Select.Option value="1">Nam</Select.Option>
-                        <Select.Option value="2">Nữ</Select.Option>
-                    </Select>
-                </Form.Item>
-
-                <Form.Item
-                    label="Số điện thoại"
-                    name="phone"
-                    rules={[
-                        {
-                            required: true,
-                            message: 'Vui lòng nhập số điện thoại!',
-                        },
-                    ]}
-                >
-                    <Input placeholder="Nhập số điện thoại ..." />
-                </Form.Item>
-
-                <Form.Item
-                    label="Email"
-                    name="email"
-                    rules={[
-                        { required: true, message: 'Vui lòng nhập email!' },
-                        { type: 'email', message: 'Email không hợp lệ!' },
-                    ]}
-                >
-                    <Input placeholder="Nhập email ..." />
-                </Form.Item>
-
-                <Form.Item label="Địa chỉ" name="address">
-                    <Input placeholder="Nhập địa chỉ ..." />
-                </Form.Item>
-
-                <Form.Item label="Học vấn" name="title">
-                    <Input placeholder="Nhập học vấn ..." />
-                </Form.Item>
-
-                <Form.Item
-                    label="Chi phí khám"
-                    name="fee"
-                    rules={[
-                        {
-                            required: true,
-                            message: 'Vui lòng nhập chi phí khám!',
-                        },
-                    ]}
-                >
-                    <Input placeholder="Nhập giá khám ..." />
-                </Form.Item>
-
-                <Form.Item label="Ngày sinh" name="birthday">
-                    <DatePicker
-                        format="YYYY-MM-DD"
-                        placeholder="Chọn ngày sinh"
+                <Form.Item label="Mô tả nhanh" name="summary">
+                    <SummaryEditor
+                        doctor={doctor}
+                        handleChangeSummaryEditor={handleChangeSummaryEditor}
                     />
                 </Form.Item>
 
-                <Form.Item label="Mô tả nhanh" name="summary">
-                    <TextArea placeholder="Nhập mô tả nhanh ..." />
-                </Form.Item>
-
-                <Form.Item label="Chi tiết" name="details">
-                    <DoctorEditor
+                <Form.Item label="Giới thiệu" name="details">
+                    <DescriptionEditor
                         handleChangeDoctorEditor={handleChangeDoctorEditor}
                         doctor={doctor}
                     />

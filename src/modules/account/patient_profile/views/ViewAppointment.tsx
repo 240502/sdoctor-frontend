@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { PatientProfileLayout } from '../components/PatientProfileLayout';
 import { useRecoilValue } from 'recoil';
 import { patientProfileValue } from '../../../../stores/patientAtom';
@@ -9,6 +9,7 @@ import {
 import { AppointmentService } from '../../../../services/appointmentService';
 import {
     Button,
+    Flex,
     Input,
     InputRef,
     Pagination,
@@ -53,6 +54,7 @@ const ViewAppointment = () => {
     const [appointmentStatuses, setAppointmentStatuses] = useState<
         AppointmentStatus[]
     >([]);
+    const [options, setOptions] = useState<any>({ statusId: 1 });
     const [appointments, setAppointments] = useState<
         AppointmentViewForPatient[]
     >([]);
@@ -302,7 +304,7 @@ const ViewAppointment = () => {
             pageIndex: pageIndex,
             pageSize: pageSize,
             phone: patientProfile.patient_phone,
-            statusId: null,
+            statusId: options.statusId,
         };
         try {
             const res = await AppointmentService.viewAppointmentForPatient(
@@ -313,6 +315,8 @@ const ViewAppointment = () => {
             setPageCount(res.pageCount);
         } catch (err: any) {
             console.log(err.message);
+            setAppointments([]);
+            setPageCount(0);
         }
     };
     const handleCancelModal = () => {
@@ -334,13 +338,36 @@ const ViewAppointment = () => {
 
     useEffect(() => {
         getAppointmentByPatientPhone();
-    }, [pageIndex, pageSize]);
+    }, [pageIndex, pageSize, options]);
     useEffect(() => {
         window.scrollTo(0, 0);
         getAllAppointmentStatus();
     }, []);
     return (
         <PatientProfileLayout breadcrumb={'Lịch hẹn'}>
+            <Flex className="mb-3">
+                <div className="col-4">
+                    <Select
+                        className="w-50"
+                        value={options.statusId}
+                        onChange={(value) => {
+                            setOptions({ ...options, statusId: value });
+                        }}
+                    >
+                        {appointmentStatuses.map((status) => {
+                            return (
+                                <Option
+                                    key={status.id}
+                                    value={status.id}
+                                    label={status.name}
+                                >
+                                    {status.name}
+                                </Option>
+                            );
+                        })}
+                    </Select>
+                </div>
+            </Flex>
             {appointments?.length > 0 ? (
                 <>
                     {contextHolder}{' '}
