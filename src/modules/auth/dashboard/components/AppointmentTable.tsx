@@ -19,7 +19,6 @@ type DataIndex = keyof AppointmentViewForPatient;
 const AppointmentTable = ({
     data,
     onPageChange,
-    pageCount,
     pageIndex,
     pageSize,
     setPageSize,
@@ -52,7 +51,7 @@ const AppointmentTable = ({
                 'Thông báo!',
                 'Xác nhận lịch hẹn thành công!'
             );
-            fetchData();
+            fetchData();    
             handleCancelModalConfirm();
         } catch (err: any) {
             console.log(err.message);
@@ -324,17 +323,7 @@ const AppointmentTable = ({
                 dataSource={data}
                 pagination={false}
             />
-            <Pagination
-                align="center"
-                className="mt-3"
-                current={pageIndex}
-                pageSize={pageSize}
-                total={pageCount * pageSize}
-                onChange={onPageChange}
-                showSizeChanger
-                pageSizeOptions={['5', '10', '20', '50']}
-                onShowSizeChange={(current, size) => setPageSize(size)}
-            />
+
             {openModalConfirm && (
                 <ConfirmAppointmentModal
                     type={type}

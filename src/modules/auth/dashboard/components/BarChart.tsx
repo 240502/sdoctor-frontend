@@ -9,6 +9,7 @@ import {
 import { AppointmentService } from '../../../../services/appointmentService';
 import { useRecoilValue } from 'recoil';
 import { userValue } from '../../../../stores/userAtom';
+import { invoicesService } from '../../../../services/invoicesService';
 
 // Register the components of Chart.js that are needed
 Chart.register(BarController, BarElement, CategoryScale, LinearScale);
@@ -47,15 +48,16 @@ const BarChart = ({ type }: any) => {
 
     const getTotalPriceAppointmentByWeek = async (data: any, config: any) => {
         try {
-            const res = await AppointmentService.getTotalPriceAppointmentByWeek(
+            const res = await invoicesService.getTotalRevenueByDateInNowWeek(
                 data,
                 config
             );
+            console.log(res);
             const weekDays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
             const pricesMap = new Map<string, number>();
 
             res.forEach((item: any) => {
-                const date = new Date(item.appointment_date);
+                const date = new Date(item.created_at);
                 const day =
                     weekDays[date.getDay() === 0 ? 6 : date.getDay() - 1];
                 pricesMap.set(day, Number(item.totalPrice));

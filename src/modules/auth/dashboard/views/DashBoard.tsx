@@ -1,4 +1,4 @@
-import { Card, Flex, notification } from 'antd';
+import { Button, Card, Flex, notification } from 'antd';
 import SummaryCards from '../components/SummaryCards';
 import AppointmentTable from '../components/AppointmentTable';
 import { useRecoilState, useRecoilValue } from 'recoil';
@@ -11,6 +11,7 @@ import { appointmentListInDayState } from '../../../../stores/appointmentAtom';
 import { WeeklyOverview } from '../components/WeeklyOverview';
 import { RecentPatientCard } from '../components/RecentPatientCard';
 import { RecentInvoicesTable } from '../components/RecentInvoicesTable';
+import { useNavigate } from 'react-router-dom';
 type NotificationType = 'success' | 'error';
 
 const DashBoard = () => {
@@ -19,7 +20,7 @@ const DashBoard = () => {
         appointmentListInDayState
     );
     const config = useRecoilValue(configValue);
-
+    const naviage = useNavigate();
     const [appointment, setAppointment] = useState<Appointment>();
     const [pageIndex, setPageIndex] = useState<number>(1);
     const [pageSize, setPageSize] = useState<number>(10);
@@ -27,12 +28,8 @@ const DashBoard = () => {
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
     const [isOpenModalConfirm, setIsOpenModalConfirm] =
         useState<boolean>(false);
-    const {
-        totalPatientInDay,
-        totalPatientExaminedInDay,
-        pageCount,
-        fetchData,
-    } = useAppointments(config, pageIndex, pageSize, user.doctor_id);
+    const { totalPatientInDay, totalPatientExaminedInDay, fetchData } =
+        useAppointments(config, pageIndex, pageSize, user.doctor_id);
 
     const handleCancelModal = () => {
         setIsModalOpen(false);
@@ -77,11 +74,25 @@ const DashBoard = () => {
                     />
                 </div>
                 <div className="col-9">
-                    <Card title="Lịch hẹn hôm nay" className="rounded shadow">
+                    <Card
+                        title={
+                            <Flex className="justify-content-between align-items-center">
+                                <h6>Lịch hẹn hôm nay</h6>
+                                <Button
+                                    className="border-top-0 border-start-0 border-end-0 text-primary fw-bold"
+                                    onClick={() =>
+                                        naviage('/admin/appointment')
+                                    }
+                                >
+                                    Xem thêm
+                                </Button>
+                            </Flex>
+                        }
+                        className="rounded shadow"
+                    >
                         <AppointmentTable
                             data={appointments}
                             onPageChange={onPageChange}
-                            pageCount={pageCount}
                             pageIndex={pageIndex}
                             pageSize={pageSize}
                             setPageSize={setPageSize}

@@ -15,7 +15,6 @@ export const useAppointments = (
     const [totalPatientInDay, setTotalPatientInDay] = useState<number>(0);
     const [totalPatientExaminedInDay, setTotalPatientExaminedInDay] =
         useState<number>(0);
-    const [pageCount, setPageCount] = useState<number>(0);
     const fetchData = async () => {
         try {
             try {
@@ -41,15 +40,10 @@ export const useAppointments = (
 
             try {
                 const appointmentData =
-                    await AppointmentService.getAppointmentInDay(
-                        { pageIndex, pageSize, doctorId: doctor_id },
-                        config
-                    );
-                setAppointmentListInDay(appointmentData.data);
-                setPageCount(appointmentData.pageCount);
+                    await AppointmentService.getAppointmentInDay(doctor_id);
+                setAppointmentListInDay(appointmentData);
             } catch (err) {
                 setAppointmentListInDay([]);
-                setPageCount(0);
                 console.error('Error fetching appointment data:', err);
             }
         } catch (err) {
@@ -63,7 +57,6 @@ export const useAppointments = (
     return {
         totalPatientInDay,
         totalPatientExaminedInDay,
-        pageCount,
         fetchData,
     };
 };

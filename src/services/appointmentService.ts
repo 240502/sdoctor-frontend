@@ -7,11 +7,9 @@ export const AppointmentService = {
         return res.data;
     },
 
-    async getAppointmentInDay(data: any, config: any): Promise<any> {
-        const res = await apiClient.post(
-            'api/appointment/get-appointment-in-day',
-            data,
-            config
+    async getAppointmentInDay(doctorId: any): Promise<any> {
+        const res = await apiClient.get(
+            'api/appointment/get-appointment-in-day/' + doctorId
         );
         return res.data;
     },
@@ -28,14 +26,6 @@ export const AppointmentService = {
     async getTotalPatientInDay(doctorId: number, config: any): Promise<any> {
         const res = await apiClient.get(
             'api/appointment/get-total-patient-in-day/' + doctorId,
-            config
-        );
-        return res.data;
-    },
-    async getTotalPriceAppointmentByWeek(data: any, config: any): Promise<any> {
-        const res = await apiClient.post(
-            'api/appointment/get-total-price-by-week',
-            data,
             config
         );
         return res.data;

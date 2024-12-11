@@ -21,6 +21,7 @@ import { doctorScheduleDetailService } from '../../../../services/doctorSchedule
 import socket from '../../../../socket';
 import { NotificationService } from '../../../../services/notificationService';
 import { newAppointmentState } from '../../../../stores/appointmentAtom';
+import { invoicesService } from '../../../../services/invoicesService';
 type NotificationType = 'success' | 'error';
 
 const BookingAppointment = () => {
@@ -149,10 +150,25 @@ const BookingAppointment = () => {
             console.log(err);
         }
     };
+    const CreateInvoice = async (data: any) => {
+        try {
+            const res = await invoicesService.createInvoice(data);
+            console.log(res.message);
+        } catch (err: any) {
+            console.log(err.message);
+        }
+    };
     useEffect(() => {
         socket.on('newAppointment', (newAppointment) => {
             console.log('newAppointmentSocket', newAppointment);
             setNewAppointment(newAppointment);
+            const newInvoice = {
+                appointment_id: newAppointment.id,
+                doctor_id: newAppointment.doctor_id,
+                service_id: newAppointment.service_id,
+                amount: newAppointment.price,
+            };
+            CreateInvoice(newInvoice);
             const scheduleDetail = schedule?.listScheduleDetails?.find(
                 (scheduleDetail: DoctorScheduleDetail) => {
                     return scheduleDetail.time_id === newAppointment.time_id;
