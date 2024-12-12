@@ -1,4 +1,4 @@
-import { Button, Card, Flex, notification } from 'antd';
+import { Button, Card, Col, Flex, notification, Row } from 'antd';
 import SummaryCards from '../components/SummaryCards';
 import AppointmentTable from '../components/AppointmentTable';
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
@@ -17,20 +17,11 @@ type NotificationType = 'success' | 'error';
 
 const DashBoard = () => {
     const user = useRecoilValue(userValue);
-    const setUser = useSetRecoilState(userState);
     const [appointments, setAppointments] = useRecoilState(
         appointmentListInDayState
     );
-    const getDoctorByUserId = async (userId: number) => {
-        try {
-            const res = await doctorService.getDoctorByUserId(userId);
-            setUser({ ...user, doctor_id: res.doctor_id });
-        } catch (err: any) {
-            console.log(err.message);
-        }
-    };
     const config = useRecoilValue(configValue);
-    const naviage = useNavigate();
+    const navigate = useNavigate();
     const [appointment, setAppointment] = useState<Appointment>();
     const [pageIndex, setPageIndex] = useState<number>(1);
     const [pageSize, setPageSize] = useState<number>(10);
@@ -44,9 +35,7 @@ const DashBoard = () => {
     const handleCancelModal = () => {
         setIsModalOpen(false);
     };
-    const handleCancelModalConfirm = () => {
-        setIsOpenModalConfirm(false);
-    };
+
     const openNotificationWithIcon = (
         type: NotificationType,
         title: string,
@@ -72,7 +61,6 @@ const DashBoard = () => {
     };
     useEffect(() => {
         window.scrollTo(0, 0);
-        getDoctorByUserId(user.user_id);
     }, []);
     return (
         <div className="pe-3">
@@ -92,7 +80,7 @@ const DashBoard = () => {
                                 <Button
                                     className="border-top-0 border-start-0 border-end-0 text-primary fw-bold"
                                     onClick={() =>
-                                        naviage('/admin/appointment')
+                                        navigate('/admin/appointment')
                                     }
                                 >
                                     Xem thêm
@@ -116,19 +104,16 @@ const DashBoard = () => {
                 </div>
             </Flex>
             <div className="mt-5">
-                <Flex gap="middle">
-                    <div className="col-4">
+                <Row gutter={24}>
+                    <Col span={10}>
                         <div>
                             <WeeklyOverview />
                         </div>
-                        {/* <div className="mt-5">
-                            <RecentPatientCard />
-                        </div> */}
-                    </div>
-                    <div className="col-8">
+                    </Col>
+                    <Col span={14}>
                         <RecentInvoicesTable />
-                    </div>
-                </Flex>
+                    </Col>
+                </Row>
             </div>
 
             {isModalOpen && (

@@ -14,6 +14,7 @@ import { userState, userValue } from '../../../../stores/userAtom';
 import { notificationsValue } from '../../../../stores/notification';
 import { Notifications } from '../../../../models/notification';
 import NotificationList from './NotificationList';
+import { Link } from 'react-router-dom';
 export const HeaderLayout = ({ collapsed, setCollapsed }: any) => {
     const navigate = useNavigate();
     const setUser = useSetRecoilState(userState);
@@ -25,7 +26,14 @@ export const HeaderLayout = ({ collapsed, setCollapsed }: any) => {
 
     const userMenu = (
         <Menu>
-            <Menu.Item key="1">Hồ sơ</Menu.Item>
+            <Menu.Item key="1">
+                <Link
+                    to="/admin/profile"
+                    className="text-decoration-none text-dark"
+                >
+                    Hồ sơ
+                </Link>
+            </Menu.Item>
             <Menu.Item
                 key="2"
                 onClick={() => {

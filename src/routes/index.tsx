@@ -43,6 +43,7 @@ import {
     BOOKING_APPOINTMENT_PATH,
     BOOKING_SUCCESS_PATH,
     INVOICE_MANAGEMENT_PATH,
+    PROFILE_PATH,
 } from './path';
 import { ScheduleManagement } from '../modules/auth/schedule';
 import {
@@ -57,6 +58,7 @@ import { UserManagement } from '../modules/auth/user';
 import BookingAppointment from '../modules/account/appointment';
 import { BookingSuccess } from '../components/BookingSuccess';
 import { InvoiceManagement } from '../modules/auth/invoice';
+import { Profile } from '../modules/auth/profile';
 
 export const publicRoutes = [
     {
@@ -79,7 +81,6 @@ export const publicRoutes = [
         component: ViewDoctor,
         layout: AppLayout,
     },
-
     {
         path: VIEW_DETAIL_DOCTOR_PATH,
         component: ViewDetailDoctor,
@@ -191,6 +192,11 @@ export const privateRoutes = [
     {
         path: INVOICE_MANAGEMENT_PATH,
         component: InvoiceManagement,
+        layout: AdminLayout,
+    },
+    {
+        path: PROFILE_PATH,
+        component: Profile,
         layout: AdminLayout,
     },
 ];

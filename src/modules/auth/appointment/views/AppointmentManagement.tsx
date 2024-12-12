@@ -9,11 +9,15 @@ import { userValue } from '../../../../stores/userAtom';
 const { Option } = Select;
 import { AppointmentStatus } from '../../../../models/appointment_status';
 import { AppointmentStatusService } from '../../../../services/appointment_statusService';
+import { ModalViewAppointment } from '../../../../components';
 type NotificationType = 'success' | 'warning' | 'error';
 const AppointmentManagement = () => {
     const user = useRecoilValue(userValue);
     const [api, contextHoler] = notification.useNotification();
     const [appointments, setAppointments] = useState<Appointment[]>([]);
+    const [appointment, setAppointment] = useState<Appointment>(
+        {} as Appointment
+    );
     const [options, setOptions] = useState<any>({ statusId: 1 });
     const [pageIndex, setPageIndex] = useState<number>(1);
     const [pageSize, setPageSize] = useState<number>(5);
@@ -21,6 +25,8 @@ const AppointmentManagement = () => {
     const [appointmentStatuses, setAppointmentStatuses] = useState<
         AppointmentStatus[]
     >([]);
+    const [openViewAppointmentModal, setOpenViewAppointmentModal] =
+        useState<boolean>(false);
     const openNotificationWithIcon = (
         type: NotificationType,
         title: string,
@@ -64,6 +70,14 @@ const AppointmentManagement = () => {
         } else {
             setPageIndex(current);
         }
+    };
+    const onClickViewButton = (appointment: Appointment) => {
+        setAppointment(appointment);
+        setOpenViewAppointmentModal(true);
+    };
+    const cancelViewAppointmentModal = () => {
+        setAppointment({} as Appointment);
+        setOpenViewAppointmentModal(false);
     };
     useEffect(() => {
         getAllAppointmentStatus();
@@ -119,11 +133,19 @@ const AppointmentManagement = () => {
                     onPageChange={onPageChange}
                     pageCount={pageCount}
                     pageSize={pageSize}
+                    pageIndex={pageIndex}
                     openNotificationWithIcon={openNotificationWithIcon}
                     getAppointmentByStatusId={getAppointmentByStatusId}
-                    appointmentStatuses={appointmentStatuses}
+                    handleClickViewDetail={onClickViewButton}
                 />
             </div>
+            {openViewAppointmentModal && (
+                <ModalViewAppointment
+                    handleCancelModal={cancelViewAppointmentModal}
+                    isModalOpen={openViewAppointmentModal}
+                    appointment={appointment}
+                />
+            )}
         </div>
     );
 };

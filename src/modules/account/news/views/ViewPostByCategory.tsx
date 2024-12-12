@@ -67,6 +67,7 @@ const ViewPostByCategory = () => {
     useEffect(() => {
         setSearchOptions({ ...searchOptions, categoryId: Number(categoryId) });
         getAllPostCategory();
+        window.scrollTo(0, 0);
     }, []);
     useEffect(() => {
         getPostByCategory();

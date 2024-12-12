@@ -36,6 +36,7 @@ const BarChart = ({ type }: any) => {
         endOfWeek.setDate(endOfWeek.getDate() + diff);
         return endOfWeek;
     };
+
     const findMaxFigure = (figures: number[]): number => {
         let max = figures[0];
         figures.forEach((fig) => {
@@ -46,6 +47,18 @@ const BarChart = ({ type }: any) => {
         return max;
     };
 
+    function nextEvenWithStep(number: number, step: number) {
+        // Làm tròn số ban đầu lên bội số gần nhất của step
+        let nextMultiple = Math.ceil(number / step) * step;
+
+        // Kiểm tra nếu nextMultiple là số chẵn, nếu không cộng thêm step
+        if (nextMultiple % 2 !== 0) {
+            nextMultiple += step;
+        }
+
+        return nextMultiple;
+    }
+
     const getTotalPriceAppointmentByWeek = async (data: any, config: any) => {
         try {
             const res = await invoicesService.getTotalRevenueByDateInNowWeek(
@@ -53,11 +66,11 @@ const BarChart = ({ type }: any) => {
                 config
             );
             console.log(res);
-            const weekDays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+            const weekDays = ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'];
             const pricesMap = new Map<string, number>();
 
             res.forEach((item: any) => {
-                const date = new Date(item.created_at);
+                const date = new Date(item.appointment_date);
                 const day =
                     weekDays[date.getDay() === 0 ? 6 : date.getDay() - 1];
                 pricesMap.set(day, Number(item.totalPrice));
@@ -69,13 +82,14 @@ const BarChart = ({ type }: any) => {
             console.error(err.message);
         }
     };
+
     const getTotalAppointmentByWeek = async (data: any, config: any) => {
         try {
             const res = await AppointmentService.getTotalAppointmentByWeek(
                 data,
                 config
             );
-            const weekDays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+            const weekDays = ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'];
             const pricesMap = new Map<string, number>();
 
             res.forEach((item: any) => {
@@ -108,12 +122,20 @@ const BarChart = ({ type }: any) => {
             getTotalPriceAppointmentByWeek(data, header);
         }
     }, []);
-    useEffect(() => {}, [figures]);
+
+    useEffect(() => {
+        console.log('Figures:', figures);
+    }, [figures]);
 
     useEffect(() => {
         let maxYValue: number = 0;
         if (figures.length > 0) {
-            maxYValue = findMaxFigure(figures);
+            if (type === 'appointment') {
+                maxYValue = findMaxFigure(figures);
+            } else {
+                maxYValue = findMaxFigure(figures);
+                maxYValue = nextEvenWithStep(maxYValue, 500000);
+            }
         }
         const ctx = canvasRef.current?.getContext('2d');
         if (ctx) {
@@ -121,17 +143,25 @@ const BarChart = ({ type }: any) => {
             if (chartRef.current) {
                 chartRef.current.destroy();
             }
+            // Tạo gradient
+            const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+            gradient.addColorStop(0, 'rgba(75, 192, 192, 0.8)');
+            gradient.addColorStop(1, 'rgba(75, 192, 192, 0.2)');
 
             // Tạo biểu đồ mới
             chartRef.current = new Chart(ctx, {
                 type: 'bar',
                 data: {
-                    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                    labels: ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'],
                     datasets: [
                         {
-                            label: 'Revenue',
+                            label: `${
+                                type === 'appointment'
+                                    ? 'Lịch hẹn'
+                                    : 'Doanh thu'
+                            }`,
                             data: figures,
-                            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                            backgroundColor: gradient,
                             borderColor: 'rgba(75, 192, 192, 1)',
                             borderWidth: 1,
                         },
@@ -140,30 +170,44 @@ const BarChart = ({ type }: any) => {
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    scales: {
-                        y: {
-                            min: 0, // Đặt giá trị tối thiểu là 0
-                            max:
-                                type !== 'appointment'
-                                    ? maxYValue + 200000
-                                    : maxYValue + 2,
-                            ticks: {
-                                stepSize: type !== 'appointment' ? 100000 : 1,
-                                callback: function (value) {
-                                    if (type !== 'appointment') {
-                                        if (typeof value === 'number') {
-                                            return (
-                                                value.toLocaleString() + ' VND'
-                                            );
-                                        }
+                    plugins: {
+                        tooltip: {
+                            enabled: true,
+                            callbacks: {
+                                label: function (context) {
+                                    const value = context.raw;
+                                    if (value === 0) {
+                                        return ''; // Không hiển thị tooltip nếu giá trị là 0
                                     }
-                                    return value;
+                                    return type === 'appointment'
+                                        ? `${value} Lịch hẹn`
+                                        : `${value?.toLocaleString()} VND`;
                                 },
                             },
-                            // title: {
-                            //     display: true,
-                            //     text: 'Revenue (VND)',
-                            // },
+                        },
+                    },
+                    events: [
+                        'mousemove',
+                        'mouseout',
+                        'click',
+                        'touchstart',
+                        'touchmove',
+                    ],
+                    scales: {
+                        y: {
+                            min: 0,
+                            max:
+                                type === 'appointment'
+                                    ? maxYValue + 5
+                                    : maxYValue + 500000,
+                            ticks: {
+                                stepSize: type === 'appointment' ? 1 : 500000,
+                                callback: (value: any) => {
+                                    return type === 'appointment'
+                                        ? value
+                                        : `${value.toLocaleString()} VND`;
+                                },
+                            },
                         },
                     },
                 },
@@ -174,7 +218,7 @@ const BarChart = ({ type }: any) => {
     return (
         <div>
             <canvas
-                style={{ maxHeight: '250px' }}
+                style={{ maxHeight: '250px', pointerEvents: 'auto' }}
                 height={200}
                 ref={canvasRef}
             ></canvas>

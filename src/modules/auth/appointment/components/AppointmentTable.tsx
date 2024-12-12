@@ -32,14 +32,10 @@ const AppointmentTable = ({
     onPageChange,
     pageCount,
     pageSize,
+    pageIndex,
     openNotificationWithIcon,
     getAppointmentByStatusId,
-    appointmentStatuses,
-    pageIndex,
-    setPageSize,
     handleClickViewDetail,
-    handleClickRejectBtn,
-    fetchData,
 }: any) => {
     const [searchText, setSearchText] = useState('');
     const [searchedColumn, setSearchedColumn] = useState('');
@@ -66,11 +62,6 @@ const AppointmentTable = ({
             );
             handleCancelModalConfirm();
             getAppointmentByStatusId();
-            openNotificationWithIcon(
-                'error',
-                'Thông báo!',
-                'Cập nhập trạng thái thành công!'
-            );
         } catch (err: any) {
             console.log(err.message);
             openNotificationWithIcon(

@@ -49,7 +49,11 @@ export const BlockCommonPost = () => {
         <div className="row mt-5 mb-5">
             <div className="block__header d-flex justify-content-between align-items-center">
                 <h3 className="block__title fs-4 fw-bold">Bài phổ biến</h3>
-                <Button className="btn__more pt-3 pb-3 fs-5">Xem thêm</Button>
+                <Button className="btn__more pt-3 pb-3 fs-5">
+                    <Link to="/list/post" className="text-decoration-none">
+                        Xem thêm
+                    </Link>
+                </Button>
             </div>
             <div className="block__list mt-4 position-relative posts">
                 <Slider {...settings}>
