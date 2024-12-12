@@ -34,6 +34,7 @@ export const InputAppointmentModal = ({
     openNotification,
     setPatientProfileCopy,
     patientProfile,
+    setPaymentMethod,
 }: any) => {
     const [provinces, setProvinces] = useState<ProvinceType[]>([]);
     const [districts, setDistricts] = useState<DistrictType[]>([]);
@@ -51,6 +52,8 @@ export const InputAppointmentModal = ({
         setSaveProfile(checked);
     };
     const onFinish = (values: any) => {
+        console.log(values);
+        setPaymentMethod(values.payment_method);
         const newAppointment = {
             doctor_id: doctor?.doctor_id,
             appointment_date: date,
@@ -324,6 +327,7 @@ export const InputAppointmentModal = ({
                             patientProvince: patientProfileCopy.province,
                             patientDistrict: patientProfileCopy?.district,
                             patientCommune: patientProfileCopy?.commune,
+                            payment_method: 1,
                         }}
                     >
                         {/* Tên bệnh nhân */}
@@ -571,6 +575,16 @@ export const InputAppointmentModal = ({
                         {/* Reason */}
                         <Form.Item label="Lý do khám" name="reason">
                             <TextArea placeholder="Nhập lý do khám..." />
+                        </Form.Item>
+                        <Form.Item
+                            label="Phương thức thanh toán"
+                            name="payment_method"
+                        >
+                            <Radio.Group>
+                                <Radio value={1}>
+                                    Thanh toán tại cơ sở y tế{' '}
+                                </Radio>
+                            </Radio.Group>
                         </Form.Item>
                         {different && (
                             <Form.Item>

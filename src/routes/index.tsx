@@ -42,6 +42,7 @@ import {
     USER_MANAGEMENT_PATH,
     BOOKING_APPOINTMENT_PATH,
     BOOKING_SUCCESS_PATH,
+    INVOICE_MANAGEMENT_PATH,
 } from './path';
 import { ScheduleManagement } from '../modules/auth/schedule';
 import {
@@ -55,6 +56,7 @@ import { ViewMajor } from '../modules/account/major';
 import { UserManagement } from '../modules/auth/user';
 import BookingAppointment from '../modules/account/appointment';
 import { BookingSuccess } from '../components/BookingSuccess';
+import { InvoiceManagement } from '../modules/auth/invoice';
 
 export const publicRoutes = [
     {
@@ -184,6 +186,11 @@ export const privateRoutes = [
     {
         path: USER_MANAGEMENT_PATH,
         component: UserManagement,
+        layout: AdminLayout,
+    },
+    {
+        path: INVOICE_MANAGEMENT_PATH,
+        component: InvoiceManagement,
         layout: AdminLayout,
     },
 ];

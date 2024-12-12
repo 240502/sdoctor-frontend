@@ -1,14 +1,16 @@
-import { Avatar, Button, Card, Flex, List } from 'antd';
-import { Space, Table, Tag } from 'antd';
+import { Button, Card, Flex, Table, Tag } from 'antd';
 import type { TableProps } from 'antd';
 import { invoicesService } from '../../../../services/invoicesService';
 import { useEffect, useState } from 'react';
-import dayjs from 'dayjs';
 import { Invoices } from '../../../../models/invoices';
 import { EyeOutlined } from '@ant-design/icons';
+import { ViewInvoiceModal } from './ViewInvoiceModal';
 
 export const RecentInvoicesTable = () => {
     const [recentInvoices, setRecentInvoices] = useState<Invoices[]>([]);
+    const [openViewInvoiceModal, setOpenViewInvoiceModal] =
+        useState<boolean>(false);
+    const [invoice, setInvoice] = useState<Invoices>({} as Invoices);
     const getRecentInvoices = async () => {
         try {
             const res = await invoicesService.getRecentInvoice();
@@ -18,14 +20,25 @@ export const RecentInvoicesTable = () => {
             console.log(err.message);
         }
     };
+    const cancelViewInvoiceModal = () => {
+        setInvoice({} as Invoices);
+        setOpenViewInvoiceModal(false);
+    };
     useEffect(() => {
         getRecentInvoices();
+        console.log(openViewInvoiceModal);
     }, []);
     const columns: TableProps<Invoices>['columns'] = [
         {
             title: 'Tên bệnh nhân',
             dataIndex: 'patient_name',
             key: 'patient_name',
+            render: (text) => <a>{text}</a>,
+        },
+        {
+            title: 'Dịch vụ',
+            dataIndex: 'service_name',
+            key: 'service_name',
             render: (text) => <a>{text}</a>,
         },
         {
@@ -40,29 +53,25 @@ export const RecentInvoicesTable = () => {
             dataIndex: 'status',
             render: (text) => (
                 <>
-                    <Tag color="success" key={text}>
+                    <Tag
+                        color={text === 'Đã thanh toán' ? 'success' : 'blue'}
+                        key={text}
+                    >
                         {text.toUpperCase()}
                     </Tag>
                 </>
             ),
         },
         {
-            title: 'Ngày thanh toán',
-            key: 'updated_at',
-            dataIndex: 'updated_at',
-            render: (text) => {
-                const date = new Date(text.split('Z')[0]);
-                const dateRender = `${date.getDate()}-${
-                    date.getMonth() + 1
-                }-${date.getFullYear()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
-                return <>{dateRender}</>;
-            },
-        },
-        {
             title: '',
             key: 'action',
             render: (_, record) => (
-                <Button>
+                <Button
+                    onClick={() => {
+                        setInvoice(record);
+                        setOpenViewInvoiceModal(true);
+                    }}
+                >
                     <EyeOutlined />
                 </Button>
             ),
@@ -81,7 +90,19 @@ export const RecentInvoicesTable = () => {
                 </Flex>
             }
         >
-            <Table dataSource={recentInvoices} columns={columns} bordered />
+            <Table
+                pagination={false}
+                dataSource={recentInvoices}
+                columns={columns}
+                bordered
+            />
+            {openViewInvoiceModal && (
+                <ViewInvoiceModal
+                    openViewInvoiceModal={openViewInvoiceModal}
+                    invoice={invoice}
+                    cancelViewInvoiceModal={cancelViewInvoiceModal}
+                />
+            )}
         </Card>
     );
 };

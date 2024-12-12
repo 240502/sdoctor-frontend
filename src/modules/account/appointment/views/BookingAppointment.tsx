@@ -41,7 +41,7 @@ const BookingAppointment = () => {
     const [time, setTime] = useState<Time>({} as Time);
     const setNewAppointment = useSetRecoilState(newAppointmentState);
     const [openInputModal, setOpenInputModal] = useState<boolean>(false);
-
+    const [paymentMethod, setPaymentMethod] = useState<number>(1);
     const openNotification = (
         type: NotificationType,
         title: string,
@@ -167,6 +167,7 @@ const BookingAppointment = () => {
                 doctor_id: newAppointment.doctor_id,
                 service_id: newAppointment.service_id,
                 amount: newAppointment.price,
+                payment_method: paymentMethod,
             };
             CreateInvoice(newInvoice);
             const scheduleDetail = schedule?.listScheduleDetails?.find(
@@ -285,6 +286,7 @@ const BookingAppointment = () => {
                     openNotification={openNotification}
                     setPatientProfileCopy={setPatientProfileCopy}
                     patientProfile={patientProfile}
+                    setPaymentMethod={setPaymentMethod}
                 />
             )}
         </div>

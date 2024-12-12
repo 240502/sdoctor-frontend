@@ -609,7 +609,7 @@ export const DoctorModal = ({
                                         setBirthDayError('');
                                     }}
                                     className="d-block"
-                                    format="YYYY-MM-DD"
+                                    format={'DD-MM-YYYY'}
                                     placeholder="Chọn ngày sinh"
                                 />
                                 {birthDayError !== '' && (

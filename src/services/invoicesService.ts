@@ -25,4 +25,16 @@ export const invoicesService = {
         );
         return res.data;
     },
+    async viewInvoice(data: any): Promise<any> {
+        const res = await apiClient.post('/api/invoice/view', data);
+        return res.data;
+    },
+    async updateInvoiceStatus(data: any, config: any): Promise<any> {
+        const res = await apiClient.put(
+            '/api/invoice/update-status',
+            data,
+            config
+        );
+        return res;
+    },
 };

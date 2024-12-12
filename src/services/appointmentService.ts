@@ -2,6 +2,10 @@ import axios from 'axios';
 import { apiClient, baseURL } from '../constants/api';
 
 export const AppointmentService = {
+    async getAppointmentById(id: number): Promise<any> {
+        const res = await apiClient.get('api/appointment/get-by-id/' + id);
+        return res.data;
+    },
     async getAppointmentByType(data: any): Promise<any> {
         const res = await apiClient.post('api/appointment/get-by-type', data);
         return res.data;
