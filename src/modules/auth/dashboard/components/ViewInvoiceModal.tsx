@@ -71,7 +71,7 @@ export const ViewInvoiceModal = ({
             <div id="invoice-content" ref={ref}>
                 <Row gutter={24}>
                     <Col span={12}>
-                        <h1 className="fw-bold ">SDOCTOR</h1>
+                        <h1 className="fw-bold text-primary">SDOCTOR</h1>
                     </Col>
                     <Col span={12} className="invoice-id">
                         <p className="text-end">
@@ -112,7 +112,7 @@ export const ViewInvoiceModal = ({
                 <div className="description mt-3">
                     <Row gutter={24}>
                         <Col span={24} className="header">
-                            <Row gutter={24} className="">
+                            <Row gutter={24} className="bg-light pt-2 pb-2">
                                 <Col
                                     span={8}
                                     className="fw-bold fs-6 text-center"

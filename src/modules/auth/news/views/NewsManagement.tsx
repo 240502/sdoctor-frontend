@@ -74,7 +74,7 @@ const NewsManagement = () => {
             const data = {
                 pageIndex: pageIndex,
                 pageSize: pageSize,
-                authorId: user.user_id,
+                authorId: user?.role_id === 2 ? user.user_id : null,
                 ...searchOptions,
             };
             const res = await PostService.viewPostAdmin(data, config);

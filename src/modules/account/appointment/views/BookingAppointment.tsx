@@ -193,7 +193,7 @@ const BookingAppointment = () => {
         setPatientProfileCopy(patientProfile);
     }, []);
     useEffect(() => {
-        console.log('date changed');
+        console.log('doctor', doctor);
         getDoctorSchedule();
     }, [date]);
     useEffect(() => {

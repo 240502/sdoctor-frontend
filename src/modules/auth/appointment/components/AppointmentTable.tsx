@@ -240,9 +240,16 @@ const AppointmentTable = ({
         {
             title: 'Ngày hẹn',
             dataIndex: 'appointment_date',
-            render: (_, record) => (
-                <>{record.appointment_date.toString().slice(0, 10)}</>
-            ),
+            render: (_, record) => {
+                const appointmentDate = new Date(
+                    record.appointment_date.toString().slice(0, 10)
+                );
+                return (
+                    <>{`${appointmentDate.getDate()}-${
+                        appointmentDate.getMonth() + 1
+                    }-${appointmentDate.getFullYear()}`}</>
+                );
+            },
         },
         {
             title: 'Giờ hẹn',

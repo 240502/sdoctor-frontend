@@ -44,4 +44,8 @@ export const PostService = {
         const res = await apiClient.post('/api/post/get-related', data);
         return res?.data;
     },
+    async confirmPost(id: number, config: any): Promise<any> {
+        const res = await apiClient.put('/api/post/confirm/' + id, config);
+        return res;
+    },
 };

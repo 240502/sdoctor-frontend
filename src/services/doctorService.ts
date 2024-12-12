@@ -1,6 +1,13 @@
 import { apiClient } from '../constants/api';
 
 export const doctorService = {
+    async getDoctorByUserId(userId: number): Promise<any> {
+        console.log();
+        const res: any = await apiClient.get(
+            '/api/doctor/get-by-user-id/' + userId
+        );
+        return res?.data;
+    },
     async getCommonDoctor(data: any): Promise<any> {
         const res: any = await apiClient.post(
             '/api/doctor/get-common-doctor',

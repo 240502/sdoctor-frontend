@@ -51,7 +51,7 @@ const AppointmentTable = ({
                 'Thông báo!',
                 'Xác nhận lịch hẹn thành công!'
             );
-            fetchData();    
+            fetchData();
             handleCancelModalConfirm();
         } catch (err: any) {
             console.log(err.message);
@@ -266,6 +266,7 @@ const AppointmentTable = ({
                             <Button
                                 className="border-success me-2"
                                 onClick={() => {
+                                    console.log(record);
                                     setOpenModalConfirm(true);
                                     setType('confirm');
 
@@ -336,7 +337,7 @@ const AppointmentTable = ({
             )}
         </>
     ) : (
-        <p className="text-center">Chưa có lịch hẹn!</p>
+        <p className="text-center">Tất cả lịch hẹn đã được xác nhận!</p>
     );
 };
 

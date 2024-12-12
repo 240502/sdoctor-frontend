@@ -1,9 +1,9 @@
 import { Button, Card, Flex, notification } from 'antd';
 import SummaryCards from '../components/SummaryCards';
 import AppointmentTable from '../components/AppointmentTable';
-import { useRecoilState, useRecoilValue } from 'recoil';
+import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import { useEffect, useState } from 'react';
-import { configValue, userValue } from '../../../../stores/userAtom';
+import { configValue, userState, userValue } from '../../../../stores/userAtom';
 import { useAppointments } from '../../../../hooks/useAppointments';
 import { ModalViewAppointment } from '../components/ModalViewAppointment';
 import { Appointment } from '../../../../models/appointment';
@@ -12,13 +12,23 @@ import { WeeklyOverview } from '../components/WeeklyOverview';
 import { RecentPatientCard } from '../components/RecentPatientCard';
 import { RecentInvoicesTable } from '../components/RecentInvoicesTable';
 import { useNavigate } from 'react-router-dom';
+import { doctorService } from '../../../../services/doctorService';
 type NotificationType = 'success' | 'error';
 
 const DashBoard = () => {
     const user = useRecoilValue(userValue);
+    const setUser = useSetRecoilState(userState);
     const [appointments, setAppointments] = useRecoilState(
         appointmentListInDayState
     );
+    const getDoctorByUserId = async (userId: number) => {
+        try {
+            const res = await doctorService.getDoctorByUserId(userId);
+            setUser({ ...user, doctor_id: res.doctor_id });
+        } catch (err: any) {
+            console.log(err.message);
+        }
+    };
     const config = useRecoilValue(configValue);
     const naviage = useNavigate();
     const [appointment, setAppointment] = useState<Appointment>();
@@ -62,6 +72,7 @@ const DashBoard = () => {
     };
     useEffect(() => {
         window.scrollTo(0, 0);
+        getDoctorByUserId(user.user_id);
     }, []);
     return (
         <div className="pe-3">
@@ -77,7 +88,7 @@ const DashBoard = () => {
                     <Card
                         title={
                             <Flex className="justify-content-between align-items-center">
-                                <h6>Lịch hẹn hôm nay</h6>
+                                <h6>Lịch hẹn chờ xác nhận hôm nay</h6>
                                 <Button
                                     className="border-top-0 border-start-0 border-end-0 text-primary fw-bold"
                                     onClick={() =>
@@ -110,9 +121,9 @@ const DashBoard = () => {
                         <div>
                             <WeeklyOverview />
                         </div>
-                        <div className="mt-5">
+                        {/* <div className="mt-5">
                             <RecentPatientCard />
-                        </div>
+                        </div> */}
                     </div>
                     <div className="col-8">
                         <RecentInvoicesTable />

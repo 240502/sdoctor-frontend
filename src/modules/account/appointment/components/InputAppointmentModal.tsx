@@ -74,6 +74,7 @@ export const InputAppointmentModal = ({
             service_id: doctor.service_id,
             service_name: doctor.service_name,
         };
+        console.log(doctor);
         console.log('newAppointment', newAppointment);
         CreateAppointment(newAppointment);
         if (saveProfile) {

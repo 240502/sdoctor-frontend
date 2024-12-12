@@ -151,7 +151,6 @@ export const ModalAddNews = ({
         }
     };
     const handleOk = async () => {
-        console.log('ok', isUpdate);
         if (isUpdate) {
             handleUpdate();
         } else {
@@ -163,6 +162,27 @@ export const ModalAddNews = ({
         setIsShowModal(false);
         setPost({});
         setIsUpdate(false);
+    };
+    const confirmPost = async () => {
+        try {
+            const res = await PostService.confirmPost(post.id, config);
+            console.log(res);
+            openNotificationWithIcon(
+                'success',
+                'Thông báo',
+                'Đã đăng bài viết!'
+            );
+            loadData();
+            setIsShowModal(false);
+            setPost({});
+        } catch (err: any) {
+            console.log(err.message);
+            openNotificationWithIcon(
+                'error',
+                'Thông báo',
+                'Duyệt đăng không thành công!'
+            );
+        }
     };
     const changeCategoryPost = (value: number) => {
         if (value !== 0) {
@@ -190,24 +210,38 @@ export const ModalAddNews = ({
             onOk={handleOk}
             maskClosable={false}
             footer={[
-                <Button
-                    key={'submit'}
-                    type="primary"
-                    className="bg-success"
-                    onClick={handleOk}
-                >
-                    Lưu
-                </Button>,
+                <>
+                    {user.role_id === 2 && (
+                        <Button
+                            key={'submit'}
+                            type="primary"
+                            className="bg-success"
+                            onClick={handleOk}
+                        >
+                            Lưu
+                        </Button>
+                    )}
+                </>,
+                <>
+                    {user.role_id === 1 && (
+                        <Button
+                            key={'submit'}
+                            type="primary"
+                            className="bg-success"
+                            onClick={confirmPost}
+                        >
+                            Duyệt đăng
+                        </Button>
+                    )}
+                </>,
                 <Button key={'back'} onClick={handleCancel}>
                     Đóng
                 </Button>,
             ]}
         >
-            <h5 className="title">
-                {isUpdate ? 'Sửa bài viết' : 'Thêm bài viết'}
-            </h5>
+            <h5 className="title">Chi tiết bài viết</h5>
             <Divider />
-            <Form>
+            <Form className={`${user.role_id === 2 ? '' : 'pe-none'}`}>
                 <div className="form__group mb-2">
                     <label className="mb-2">Danh mục bài viết</label>
                     <Select

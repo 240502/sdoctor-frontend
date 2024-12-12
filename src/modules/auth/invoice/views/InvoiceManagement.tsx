@@ -21,7 +21,7 @@ const InvoiceManagement = () => {
     const [invoices, setInvoices] = useState<Invoices[]>([]);
     const [status, setStatus] = useState<string>('Chưa thanh toán');
     const [openConfirmModal, setOpenConfirmModal] = useState<boolean>(false);
-
+    const [update, setUpdate] = useState<boolean>(false);
     const getInvoices = async () => {
         try {
             const data = {
@@ -46,6 +46,7 @@ const InvoiceManagement = () => {
     const onClickUpdateButton = (invoice: Invoices) => {
         setInvoice(invoice);
         setOpenInvoiceModal(true);
+        setUpdate(true);
     };
     const onClickDeleteButton = (invoice: Invoices) => {
         setInvoice(invoice);
@@ -117,7 +118,7 @@ const InvoiceManagement = () => {
                 <h5>Danh sách hóa đơn</h5>
                 <Button
                     className="border-0 text-white bg-primary"
-                    //onClick={handleShowDoctorModal}
+                    onClick={() => setOpenInvoiceModal(true)}
                 >
                     <PlusOutlined /> Thêm mới
                 </Button>
@@ -155,6 +156,7 @@ const InvoiceManagement = () => {
                     setInvoice={setInvoice}
                     getInvoices={getInvoices}
                     openNotification={openNotification}
+                    update={update}
                 />
             )}
             {openConfirmModal && (

@@ -76,4 +76,11 @@ export const AppointmentService = {
         );
         return res;
     },
+    async getAppointmentAtInvoice(data: any): Promise<any> {
+        const res = await apiClient.post(
+            'api/appointment/get-appointment-at-invoice',
+            data
+        );
+        return res?.data;
+    },
 };

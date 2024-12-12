@@ -15,4 +15,5 @@ export interface Invoices {
     payment_method: number;
     payment_name: string;
     service_name: string;
+    patient_phone: string;
 }

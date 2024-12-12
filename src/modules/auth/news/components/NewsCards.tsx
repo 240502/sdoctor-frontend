@@ -4,8 +4,11 @@ import {
     ClockCircleOutlined,
     EditOutlined,
     DeleteOutlined,
+    EyeOutlined,
 } from '@ant-design/icons';
 import { Post } from '../../../../models/post';
+import { useRecoilValue } from 'recoil';
+import { userValue } from '../../../../stores/userAtom';
 
 export const NewsCards = ({
     posts,
@@ -14,6 +17,7 @@ export const NewsCards = ({
     setIsUpdate,
     setIsShowModalConfirm,
 }: any) => {
+    const user = useRecoilValue(userValue);
     return (
         <Flex wrap>
             {posts?.length > 0 ? (
@@ -66,7 +70,15 @@ export const NewsCards = ({
                                             setIsUpdate(true);
                                         }}
                                     >
-                                        <EditOutlined /> Sửa
+                                        {user.role_id === 2 ? (
+                                            <>
+                                                <EditOutlined /> Sửa
+                                            </>
+                                        ) : (
+                                            <>
+                                                <EyeOutlined /> Xem
+                                            </>
+                                        )}
                                     </Button>
                                     <Button
                                         className="border-0 p-0"
