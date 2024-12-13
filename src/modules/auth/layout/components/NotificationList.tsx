@@ -48,63 +48,59 @@ const NotificationList = () => {
     };
     const menu = (
         <>
-            {notificationSelector.notifications?.length > 0 ? (
-                <div
-                    style={{ width: 300 }}
-                    className="bg-light shadow notification-list"
-                >
-                    <List
-                        header={
-                            <div className="p-3">
-                                <strong>Thông báo</strong>
-                                <span
-                                    style={{
-                                        float: 'right',
-                                        cursor: 'pointer',
-                                        color: '#1890ff',
-                                    }}
-                                    onClick={markAllAsRead}
-                                >
-                                    Đánh dấu đã đọc
+            <div
+                style={{ width: 300 }}
+                className="bg-light shadow notification-list"
+            >
+                <List
+                    header={
+                        <div className="p-3">
+                            <strong>Thông báo</strong>
+                            <span
+                                style={{
+                                    float: 'right',
+                                    cursor: 'pointer',
+                                    color: '#1890ff',
+                                }}
+                                onClick={markAllAsRead}
+                            >
+                                Đánh dấu đã đọc
+                            </span>
+                        </div>
+                    }
+                    dataSource={notificationSelector.notifications}
+                    renderItem={(item) => (
+                        <List.Item
+                            className={`${
+                                item?.is_read === 0
+                                    ? 'notification-unread'
+                                    : 'notification-read'
+                            } notification p-3`}
+                        >
+                            <div>
+                                {item?.message}{' '}
+                                <span className="d-block fw-normal text-secondary">
+                                    {dayjs(
+                                        new Date(
+                                            item.created_at
+                                                .toString()
+                                                .split('Z')[0]
+                                        )
+                                    ).fromNow()}
                                 </span>
                             </div>
-                        }
-                        dataSource={notificationSelector.notifications}
-                        renderItem={(item) => (
-                            <List.Item
-                                className={`${
-                                    item?.is_read === 0
-                                        ? 'notification-unread'
-                                        : 'notification-read'
-                                } notification p-3`}
+                            <Button
+                                className="delete-button border-0 bg-transparent"
+                                onClick={() => {
+                                    deleteNotification(item?.id);
+                                }}
                             >
-                                <div>
-                                    {item?.message}{' '}
-                                    <span className="d-block fw-normal text-secondary">
-                                        {dayjs(
-                                            new Date(
-                                                item.created_at
-                                                    .toString()
-                                                    .split('Z')[0]
-                                            )
-                                        ).fromNow()}
-                                    </span>
-                                </div>
-                                <Button
-                                    className="delete-button border-0 bg-transparent"
-                                    onClick={() => {
-                                        deleteNotification(item?.id);
-                                    }}
-                                >
-                                    <CloseOutlined />
-                                </Button>
-                            </List.Item>
-                        )}
-                    />
-                </div>
-            ) : (
-                <></>
-            )}
+                                <CloseOutlined />
+                            </Button>
+                        </List.Item>
+                    )}
+                />
+            </div>
         </>
     );
     const getNotificationByUserId = async () => {

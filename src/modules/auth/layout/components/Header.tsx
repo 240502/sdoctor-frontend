@@ -1,4 +1,4 @@
-import { Button, theme, Dropdown, Menu, Avatar } from 'antd';
+import { Button, theme, Dropdown, Menu, Avatar, Divider } from 'antd';
 import { Header } from 'antd/es/layout/layout';
 import {
     MenuFoldOutlined,
@@ -25,7 +25,7 @@ export const HeaderLayout = ({ collapsed, setCollapsed }: any) => {
     } = theme.useToken();
 
     const userMenu = (
-        <Menu>
+        <Menu className="">
             <Menu.Item key="1">
                 <Link
                     to="/admin/profile"
@@ -34,8 +34,20 @@ export const HeaderLayout = ({ collapsed, setCollapsed }: any) => {
                     Hồ sơ
                 </Link>
             </Menu.Item>
+            <Divider className="mt-1 mb-1"></Divider>
+            <Menu.Item key="2">
+                <Link
+                    to="/admin/profile"
+                    className="text-decoration-none text-dark"
+                >
+                    Đổi mật khẩu
+                </Link>
+            </Menu.Item>
+            <Divider className="mt-1 mb-1"></Divider>
+
             <Menu.Item
-                key="2"
+                key="3"
+                className="bg-danger text-light"
                 onClick={() => {
                     setUser({} as User);
                     sessionStorage.removeItem('user');

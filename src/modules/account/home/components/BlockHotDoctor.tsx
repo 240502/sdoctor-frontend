@@ -43,7 +43,7 @@ export const BlockHotDoctor = (): JSX.Element => {
                 <h3 className="block__title fs-4 fw-bold">Bác sĩ nổi bật</h3>
             </div>
             <Row className="block-container mt-4" gutter={16}>
-                {commonDoctors.length > 0 ? (
+                {commonDoctors?.length > 0 ? (
                     commonDoctors?.map((doctor: Doctor) => {
                         return (
                             <Col className=" mb-3" span={6}>

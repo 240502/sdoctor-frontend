@@ -18,14 +18,6 @@ import DescriptionEditor from './DescriptionEditor';
 import { useEffect, useRef, useState } from 'react';
 import { Clinic } from '../../../../models/clinic';
 import { Major } from '../../../../models/major';
-import {
-    handleFocusInput,
-    isEmpty,
-    validateEmail,
-    validateName,
-    validatePhone,
-    validatePhoneLength,
-} from '../../../../utils/global';
 const { Option } = Select;
 import { PlusOutlined } from '@ant-design/icons';
 import type { DatePickerProps, GetProp, UploadFile, UploadProps } from 'antd';
@@ -38,11 +30,11 @@ import SummaryEditor from './SummaryEditor';
 import { DoctorService } from '../../../../models/doctorService';
 import viVN from 'antd/lib/locale/vi_VN';
 import 'dayjs/locale/vi';
-
+import { ProvinceType, DistrictType, WardType } from '../../../../models/other';
+import axios from 'axios';
 dayjs.locale('vi');
 dayjs.extend(customParseFormat);
 
-const dateFormat = 'YYYY-MM-DD';
 export const DoctorModal = ({
     showDoctorModal,
     handleCloseDoctorModal,
@@ -59,19 +51,14 @@ export const DoctorModal = ({
     const [previewOpen, setPreviewOpen] = useState(false);
     const [previewImage, setPreviewImage] = useState('');
     const [fileList, setFileList] = useState<UploadFile[]>([]);
-    const inputNameRef = useRef<InputRef>(null);
-    const inputPhoneRef = useRef<InputRef>(null);
-    const inputEmailRef = useRef<InputRef>(null);
-    const inputAddressRef = useRef<InputRef>(null);
-    const inputTitleRef = useRef<InputRef>(null);
-    const inputFeeRef = useRef<InputRef>(null);
-    const inputExamninationObjectRef = useRef<InputRef>(null);
     const [form] = Form.useForm();
     const [birthDayError, setBirthDayError] = useState<any>('');
-    const onChange: DatePickerProps['onChange'] = (date, dateString) => {
-        console.log(date, dateString);
-        setDoctor({ ...doctor, birthday: dateString });
-    };
+    const [provinces, setProvinces] = useState<ProvinceType[]>([]);
+    const [districts, setDistricts] = useState<DistrictType[]>([]);
+    const [wards, setWards] = useState<WardType[]>([]);
+    const [district, setDistrict] = useState<DistrictType>({} as DistrictType);
+    const [province, setProvince] = useState<ProvinceType>({} as ProvinceType);
+    const [ward, setWard] = useState<WardType>({} as WardType);
     const getBase64 = (file: FileType): Promise<string> =>
         new Promise((resolve, reject) => {
             const reader = new FileReader();
@@ -104,7 +91,27 @@ export const DoctorModal = ({
     const handleChangeSummaryEditor = (data: any) => {
         setDoctor({ ...doctor, summary: data });
     };
+    const getWards = async (districtId: any) => {
+        try {
+            const res = await axios.get(
+                `https://vapi.vnappmob.com//api/province/ward/${districtId}`
+            );
+            setWards(res.data.results);
+        } catch (err) {
+            console.log(err);
+        }
+    };
+    const getListDistrict = async (provinceId: any) => {
+        try {
+            const res = await axios.get(
+                `https://vapi.vnappmob.com//api/province/district/${provinceId}`
+            );
 
+            setDistricts(res.data.results);
+        } catch (err) {
+            console.log(err);
+        }
+    };
     const UploadDoctorImage = async ({ file, onSuccess, onError }: any) => {
         try {
             const formData = new FormData();
@@ -141,6 +148,9 @@ export const DoctorModal = ({
                 title: values.title,
                 service_id: values.service_id,
                 introduction: doctor.introduction,
+                city: values.city,
+                district: values.district,
+                commune: values.commune,
                 birthday: dayjs(values.birthday)
                     .format()
                     .toString()
@@ -163,6 +173,9 @@ export const DoctorModal = ({
                 title: values.title,
                 service_id: values.service_id,
                 introduction: doctor.introduction,
+                city: values.city,
+                district: values.district,
+                commune: values.commune,
                 birthday: dayjs(values.birthday)
                     .format()
                     .toString()
@@ -170,81 +183,7 @@ export const DoctorModal = ({
             };
             CreateDoctor(newDoctor);
         }
-
-        // handleData(values); // Gửi dữ liệu từ form
     };
-    // const handleData = () => {
-    //     let errorMsg: any = {};
-
-    //     setError(errorMsg);
-    //     if (
-    //         !isEmptyName &&
-    //         !isEmptyPhone &&
-    //         !isEmptyEmail &&
-    //         !isEmptyAddress &&
-    //         !isEmptyFee &&
-    //         !isEmptyClinic &&
-    //         !isEmptyMajor &&
-    //         !isEmptyGender
-    //     ) {
-    //         const isNameError = validateName(inputNameRef.current?.input);
-    //         const isEmailError = validateEmail(inputEmailRef.current?.input);
-    //         const isPhoneError = validatePhone(inputPhoneRef.current?.input);
-    //         const isErrorPhoneLength = validatePhoneLength(
-    //             inputPhoneRef.current?.input
-    //         );
-    //         if (
-    //             !isNameError &&
-    //             !isErrorPhoneLength &&
-    //             !isPhoneError &&
-    //             !isEmailError
-    //         ) {
-    //             if (!isUpdate) {
-    //                 const newDoctor = {
-    //                     full_name: inputNameRef.current?.input?.value,
-    //                     clinic_id: doctor.clinic_id,
-    //                     major_id: doctor.major_id,
-    //                     summary: doctor.summary,
-    //                     image: fileList[0].url ?? '',
-    //                     email: inputEmailRef.current?.input?.value,
-    //                     phone: inputPhoneRef.current?.input?.value,
-    //                     address: inputAddressRef.current?.input?.value,
-    //                     gender: doctor.gender,
-    //                     title: inputTitleRef.current?.input?.value,
-    //                     fee: inputFeeRef.current?.input?.value,
-    //                     examination_object:
-    //                         inputExamninationObjectRef.current?.input?.value,
-    //                     introduction: doctor.introduction,
-    //                     birthday: doctor.birthday.toString().slice(0, 10),
-    //                 };
-    //                 CreateDoctor(newDoctor);
-    //                 console.log(newDoctor);
-    //             } else {
-    //                 const newDoctor = {
-    //                     doctor_id: doctor.doctor_id,
-    //                     user_id: doctor.user_id,
-    //                     full_name: inputNameRef.current?.input?.value,
-    //                     clinic_id: doctor.clinic_id,
-    //                     major_id: doctor.major_id,
-    //                     summary: doctor.summary,
-    //                     image: fileList[0].url ?? '',
-    //                     email: inputEmailRef.current?.input?.value,
-    //                     phone: inputPhoneRef.current?.input?.value,
-    //                     address: inputAddressRef.current?.input?.value,
-    //                     gender: doctor.gender,
-    //                     title: inputTitleRef.current?.input?.value,
-    //                     fee: inputFeeRef.current?.input?.value,
-    //                     examination_object:
-    //                         inputExamninationObjectRef.current?.input?.value,
-    //                     introduction: doctor.introduction,
-    //                     birthday: doctor.birthday.toString().slice(0, 10),
-    //                 };
-    //                 UpdateDoctor(newDoctor);
-    //                 console.log(newDoctor);
-    //             }
-    //         }
-    //     }
-    // };
 
     const CreateDoctor = async (newDoctor: any) => {
         try {
@@ -287,7 +226,79 @@ export const DoctorModal = ({
             );
         }
     };
+    //find province when patient had a profile
+    useEffect(() => {
+        const getProvince = () => {
+            const province: any = provinces.find(
+                (item) => item?.province_name === doctor?.city
+            );
+            if (province) {
+                setProvince(province);
+            }
+        };
+        if (provinces.length > 1) {
+            getProvince();
+        }
+    }, [provinces.length]);
 
+    //find district when patient had a profile
+    useEffect(() => {
+        const getDistrict = () => {
+            const district: any = districts.find(
+                (item) => item.district_name === doctor?.district
+            );
+            if (district) {
+                setDistrict(district);
+            }
+        };
+        if (districts.length > 1) {
+            getDistrict();
+        }
+    }, [districts.length]);
+    //find ward when patient had a profile
+    useEffect(() => {
+        const getWards = () => {
+            const ward = wards.find(
+                (item) => item.ward_name === doctor?.commune
+            );
+            if (ward) {
+                setWard(ward);
+            }
+        };
+        if (wards.length > 1) {
+            getWards();
+        }
+    }, [wards.length]);
+
+    //get list district of province when change province
+    useEffect(() => {
+        if (province.province_id !== 0) {
+            getListDistrict(province.province_id);
+        }
+    }, [province.province_id]);
+
+    //get list ward of district when change district
+    useEffect(() => {
+        if (districts.length > 1) {
+            if (district !== undefined) {
+                getWards(district.district_id);
+            }
+        }
+    }, [district.district_id]);
+    //find province when patient had a profile
+    useEffect(() => {
+        const getProvince = () => {
+            const province: any = provinces.find(
+                (item) => item?.province_name === doctor?.province
+            );
+            if (province) {
+                setProvince(province);
+            }
+        };
+        if (provinces.length > 1) {
+            getProvince();
+        }
+    }, [provinces.length]);
     useEffect(() => {
         if (doctor?.image && doctor?.image?.includes('cloudinary')) {
             const file: UploadFile[] = [
@@ -300,7 +311,21 @@ export const DoctorModal = ({
             ];
             setFileList(file);
         }
+        const getProvinces = async () => {
+            try {
+                const res = await axios.get(
+                    'https://vapi.vnappmob.com/api/province'
+                );
+                setProvinces(res.data.results);
+            } catch (err) {
+                console.log(err);
+            }
+        };
+        getProvinces();
     }, []);
+    useEffect(() => {
+        console.log('doctor', doctor);
+    }, [doctor]);
 
     return (
         <Modal
@@ -329,31 +354,6 @@ export const DoctorModal = ({
                     birthday: doctor?.birthday ? dayjs(doctor?.birthday) : null,
                 }}
             >
-                {/* <div>
-                    <Upload
-                        customRequest={UploadDoctorImage}
-                        listType="picture-circle"
-                        fileList={fileList}
-                        onPreview={handlePreview}
-                        onChange={handleChange}
-                        maxCount={1}
-                    >
-                        {fileList.length === 0 && uploadButton}
-                    </Upload>
-                    {previewImage && (
-                        <Image
-                            wrapperStyle={{ display: 'none' }}
-                            preview={{
-                                visible: previewOpen,
-                                onVisibleChange: (visible) =>
-                                    setPreviewOpen(visible),
-                                afterOpenChange: (visible) =>
-                                    !visible && setPreviewImage(''),
-                            }}
-                            src={previewImage}
-                        />
-                    )}
-                </div> */}
                 <Form.Item
                     label="Ảnh bác sĩ"
                     valuePropName="fileList"
@@ -542,7 +542,7 @@ export const DoctorModal = ({
                     <Col span={12}>
                         <Form.Item
                             label="Địa chỉ"
-                            name="address"
+                            name="city"
                             rules={[
                                 {
                                     required: true,
@@ -550,7 +550,110 @@ export const DoctorModal = ({
                                 },
                             ]}
                         >
-                            <Input placeholder="Nhập địa chỉ ..." />
+                            <Select
+                                className="w-100"
+                                placeholder="Chọn tỉnh/thành"
+                                showSearch
+                                optionFilterProp="children"
+                                allowClear
+                                onChange={(e) => {
+                                    const pro: any = provinces.find(
+                                        (province: any) => {
+                                            return province.province_name === e;
+                                        }
+                                    );
+                                    setProvince(pro);
+                                    form.setFieldValue('patientDistrict', null);
+                                    form.setFieldValue('patientCommune', null);
+                                }}
+                            >
+                                {provinces.map((province: ProvinceType) => {
+                                    return (
+                                        <Select.Option
+                                            value={province.province_name}
+                                            key={province.province_id}
+                                        >
+                                            {province.province_name}
+                                        </Select.Option>
+                                    );
+                                })}
+                            </Select>
+                        </Form.Item>
+                    </Col>
+                    <Col span={12}>
+                        <Form.Item
+                            label="Quận/Huyện"
+                            name="district"
+                            rules={[
+                                {
+                                    required: true,
+                                    message: 'Vui lòng chọn quận/huyện',
+                                },
+                            ]}
+                        >
+                            <Select
+                                placeholder="Chọn quân/huyện"
+                                showSearch
+                                className="w-100"
+                                allowClear
+                                optionFilterProp="children"
+                                onChange={(e) => {
+                                    const dis: any = districts.find(
+                                        (item: any) => {
+                                            return item.district_name === e;
+                                        }
+                                    );
+
+                                    setDistrict(dis);
+                                    form.setFieldValue('commune', null);
+                                }}
+                            >
+                                {districts.map((district: DistrictType) => {
+                                    return (
+                                        <Select.Option
+                                            key={district.district_id}
+                                            value={district.district_name}
+                                        >
+                                            {district.district_name}
+                                        </Select.Option>
+                                    );
+                                })}
+                            </Select>
+                        </Form.Item>
+                    </Col>
+                    <Col span={12}>
+                        {/* Xã phường */}
+                        <Form.Item
+                            label="Xã/Phường"
+                            name="commune"
+                            className="w-100"
+                            rules={[
+                                {
+                                    required: true,
+                                    message: 'Vui lòng chọn xã/phường',
+                                },
+                            ]}
+                        >
+                            <Select
+                                placeholder="Chọn xã/phường"
+                                showSearch
+                                allowClear
+                                optionFilterProp="children"
+                                onChange={(e) => {
+                                    console.log(e);
+                                }}
+                            >
+                                {wards.map((ward: WardType) => {
+                                    return (
+                                        <Select.Option
+                                            key={ward.ward_id}
+                                            value={ward.ward_name}
+                                        >
+                                            {ward.ward_name}
+                                        </Select.Option>
+                                    );
+                                })}
+                            </Select>
                         </Form.Item>
                     </Col>
                     <Col span={12}>
@@ -635,283 +738,6 @@ export const DoctorModal = ({
                         doctor={doctor}
                     />
                 </Form.Item>
-                {/* <Flex className="justify-content-between mb-3">
-                    <div className="col-6  pe-2">
-                        <label htmlFor="" className="d-flex mb-2">
-                            Cơ sở y tế
-                        </label>
-                        <Select
-                            value={doctor?.clinic_id}
-                            className="d-block"
-                            placeholder="Chọn cơ sở y tế"
-                            optionFilterProp="children"
-                            allowClear
-                            onChange={(e) => {
-                                setDoctor({ ...doctor, clinic_id: e });
-                            }}
-                            onFocus={() =>
-                                setErrors({ ...errors, clinicMsg: null })
-                            }
-                        >
-                            {clinics.map((clinic: Clinic) => (
-                                <Option
-                                    key={clinic.id}
-                                    value={clinic.id}
-                                    label={clinic.name}
-                                >
-                                    {clinic.name}
-                                </Option>
-                            ))}
-                        </Select>
-                        {errors?.clinicMsg && (
-                            <div
-                                className="error_message mt-3"
-                                style={{ color: 'red' }}
-                            >
-                                {errors.clinicMsg}
-                            </div>
-                        )}
-                    </div>
-                    <div className="col-6 ps-2">
-                        <label htmlFor="" className="d-flex mb-2">
-                            Chuyên ngành
-                        </label>
-                        <Select
-                            value={doctor?.major_id}
-                            className="d-block"
-                            placeholder="Chọn chuyên ngành"
-                            allowClear
-                            optionFilterProp="children"
-                            onChange={(e) => {
-                                setDoctor({ ...doctor, major_id: e });
-                            }}
-                            onFocus={() =>
-                                setErrors({ ...errors, majorMsg: null })
-                            }
-                        >
-                            {majors.map((major: Major) => (
-                                <Option
-                                    key={major.id}
-                                    value={major.id}
-                                    label={major.name}
-                                >
-                                    {major.name}
-                                </Option>
-                            ))}
-                        </Select>
-                        {errors?.majorMsg && (
-                            <div
-                                className="error_message mt-3"
-                                style={{ color: 'red' }}
-                            >
-                                {errors.majorMsg}
-                            </div>
-                        )}
-                    </div>
-                </Flex>
-                <Flex className="justify-content-between mb-3">
-                    <div className="col-6  pe-2">
-                        <label htmlFor="" className="mb-2">
-                            Họ và tên
-                        </label>
-                        <Input
-                            onFocus={(e: any) => {
-                                handleFocusInput(e.target);
-                            }}
-                            value={doctor?.full_name}
-                            ref={inputNameRef}
-                            placeholder="Nhập họ và tên ..."
-                            onChange={(e) => {
-                                setDoctor({
-                                    ...doctor,
-                                    full_name: e.target.value,
-                                });
-                            }}
-                        />
-                        <div
-                            className="error_message mt-3"
-                            style={{ color: 'red' }}
-                        ></div>
-                    </div>
-                    <div className="col-6 ps-2">
-                        <label htmlFor="" className="mb-2">
-                            Giới tính
-                        </label>
-                        <Select
-                            value={doctor?.gender}
-                            className="d-block mt-0 p-0"
-                            placeholder="Chọn giới tính"
-                            onChange={(value: number) => {
-                                console.log(value);
-                                setDoctor({ ...doctor, gender: value });
-                            }}
-                            onFocus={() =>
-                                setErrors({ ...errors, genderMsg: null })
-                            }
-                        >
-                            <Select.Option value={'1'}> Nam</Select.Option>
-                            <Select.Option value={'2'}> Nữ</Select.Option>
-                        </Select>
-                        {errors?.genderMsg && (
-                            <div
-                                className="error_message mt-3"
-                                style={{ color: 'red' }}
-                            >
-                                {errors.genderMsg}
-                            </div>
-                        )}
-                    </div>
-                </Flex>
-                <Flex className="justify-content-between mb-3">
-                    <div className="col-6  pe-2">
-                        <label htmlFor="" className="mb-2">
-                            Số điện thoại
-                        </label>
-                        <Input
-                            onFocus={(e: any) => {
-                                handleFocusInput(e.target);
-                            }}
-                            value={doctor?.phone}
-                            ref={inputPhoneRef}
-                            placeholder="Nhập số điện thoại ..."
-                            onChange={(e) => {
-                                setDoctor({ ...doctor, phone: e.target.value });
-                            }}
-                        />
-                        <div
-                            className="error_message mt-3"
-                            style={{ color: 'red' }}
-                        ></div>
-                    </div>
-                    <div className="col-6 ps-2">
-                        <label htmlFor="" className="mb-2">
-                            Email
-                        </label>
-                        <Input
-                            onFocus={(e: any) => {
-                                handleFocusInput(e.target);
-                            }}
-                            value={doctor?.email}
-                            ref={inputEmailRef}
-                            placeholder="Nhập email ..."
-                            onChange={(e) => {
-                                setDoctor({ ...doctor, email: e.target.value });
-                            }}
-                        />
-                        <div
-                            className="error_message mt-3"
-                            style={{ color: 'red' }}
-                        ></div>
-                    </div>
-                </Flex>
-                <Flex className="justify-content-between mb-3">
-                    <div className="col-6  pe-2">
-                        <label htmlFor="" className="mb-2">
-                            Địa chỉ
-                        </label>
-                        <Input
-                            onFocus={(e: any) => {
-                                handleFocusInput(e.target);
-                            }}
-                            value={doctor?.address}
-                            ref={inputAddressRef}
-                            placeholder="Nhập địa chỉ ..."
-                            onChange={(e) => {
-                                setDoctor({
-                                    ...doctor,
-                                    address: e.target.value,
-                                });
-                            }}
-                        />
-                        <div
-                            className="error_message mt-3"
-                            style={{ color: 'red' }}
-                        ></div>
-                    </div>
-                    <div className="col-6 ps-2">
-                        <label htmlFor="" className="mb-2">
-                            Học vấn
-                        </label>
-                        <Input
-                            value={doctor?.title}
-                            ref={inputTitleRef}
-                            placeholder="Nhập học vấn ..."
-                            onChange={(e) => {
-                                setDoctor({ ...doctor, title: e.target.value });
-                            }}
-                        />
-                    </div>
-                </Flex>
-                <Flex className="justify-content-between mb-3">
-                    <div className="col-6  pe-2">
-                        <label htmlFor="" className="mb-2">
-                            Chi giá khám
-                        </label>
-                        <Input
-                            onFocus={(e: any) => {
-                                handleFocusInput(e.target);
-                            }}
-                            value={doctor?.fee}
-                            ref={inputFeeRef}
-                            placeholder="Nhập giá khám..."
-                            onChange={(e) => {
-                                setDoctor({ ...doctor, fee: e.target.value });
-                            }}
-                        />
-                        <div
-                            className="error_message mt-3"
-                            style={{ color: 'red' }}
-                        ></div>
-                    </div>
-                    <div className="col-6  pe-2">
-                        <label htmlFor="" className="form-label">
-                            Ngày/ Tháng/ Năm Sinh
-                        </label>
-                        <DatePicker
-                            className="d-block"
-                            format="YYYY-MM-DD"
-                            defaultValue={
-                                doctor?.birthday
-                                    ? dayjs(doctor?.birthday, dateFormat)
-                                    : null
-                            }
-                            onChange={onChange} // Hàm xử lý khi thay đổi ngày
-                            placeholder="Chọn ngày sinh"
-                        />
-
-                        {errors?.birthdayMsg && (
-                            <div
-                                className="error_message mt-3"
-                                style={{ color: 'red' }}
-                            >
-                                {errors.birthdayMsg}
-                            </div>
-                        )}
-                    </div>
-                </Flex>
-                <div className="mb-3">
-                    <label htmlFor="" className="mb-2">
-                        Mô tả nhanh
-                    </label>
-                    <TextArea
-                        value={doctor?.summary}
-                        onChange={(e) => {
-                            setDoctor({ ...doctor, summary: e.target.value });
-                        }}
-                        placeholder="Nhập mô tả nhanh ..."
-                    />
-                    <div
-                        className="error_message mt-3"
-                        style={{ color: 'red' }}
-                    ></div>
-                </div>
-                <div className="mb-3">
-                    <label htmlFor="">Chi tiết</label>
-                    <DoctorEditor
-                        handleChangeDoctorEditor={handleChangeDoctorEditor}
-                        doctor={doctor}
-                    />
-                </div> */}
             </Form>
         </Modal>
     );

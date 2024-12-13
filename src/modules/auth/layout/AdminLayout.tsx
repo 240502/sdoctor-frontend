@@ -52,12 +52,15 @@ const AdminLayout: React.FC = ({ children }: any) => {
         <Layout style={{ minHeight: '100vh' }}>
             {contextHolder}
             <Sider trigger={null} collapsible collapsed={collapsed}>
-                <div className="mb-3">
-                    <h3 className="fs-3 fw-bold text-white p-3 text-center">
+                <div className="mb-3 text-wrap">
+                    <h3
+                        className="fs-3 fw-bold text-white p-3 text-center text-wrap"
+                        style={{ overflow: 'hidden' }}
+                    >
                         <Link
                             style={{ color: '#0d6efd' }}
                             to={'/'}
-                            className="text-decoration-none "
+                            className="text-decoration-none d-inline-block w-100 "
                         >
                             SDOCTOR
                         </Link>

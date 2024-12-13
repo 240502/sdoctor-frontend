@@ -215,7 +215,9 @@ const ViewDetailDoctor = () => {
                                                 </Tag>
                                                 <p>
                                                     <EnvironmentOutlined />{' '}
-                                                    {doctor?.address}
+                                                    {doctor?.city}-
+                                                    {doctor?.district}-
+                                                    {doctor.commune}
                                                 </p>
                                             </div>
                                         </Flex>

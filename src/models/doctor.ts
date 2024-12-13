@@ -13,7 +13,9 @@ export interface Doctor {
     password: string;
     created_at: Date;
     updated_at: Date;
-    address: string;
+    city: string;
+    district: string;
+    commune: string;
     gender: number;
     title: string;
     price: number;

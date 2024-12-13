@@ -249,9 +249,7 @@ export const InputAppointmentModal = ({
             setDifferent(false);
         }
     }, [patientProfileCopy]);
-    useEffect(() => {
-        console.log('different', different);
-    }, [different]);
+
     return (
         <Modal
             title={
