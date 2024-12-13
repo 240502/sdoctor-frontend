@@ -62,7 +62,7 @@ export const DoctorCard = ({ doctors, handleUpdateViewsDoctor }: any) => {
 
                                 <p>
                                     <EnvironmentOutlined></EnvironmentOutlined>{' '}
-                                    {doctor.address}
+                                    {doctor.location}
                                 </p>
                                 <div className="button text-center">
                                     <Button

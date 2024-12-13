@@ -1,5 +1,4 @@
 import {
-    Divider,
     Row,
     Col,
     Image,
@@ -11,10 +10,11 @@ import {
     DatePicker,
     notification,
     Button,
+    Flex,
 } from 'antd';
 import dayjs from 'dayjs';
-import type { GetProp, UploadProps, UploadFile } from 'antd';
-import { LoadingOutlined, PlusOutlined } from '@ant-design/icons';
+import type { GetProp, UploadProps, UploadFile, TabsProps } from 'antd';
+import { PlusOutlined } from '@ant-design/icons';
 import { useEffect, useState } from 'react';
 import { Doctor } from '../../../../models/doctor';
 import { useRecoilValue } from 'recoil';
@@ -33,7 +33,9 @@ import { ClinicService } from '../../../../services/clinicService';
 import { DoctorServiceService } from '../../../../services/doctorServiceService';
 import { MajorService } from '../../../../services/majorService';
 import { openNotification } from '../../../../utils/notification';
-import { UserService } from '../../../../services/userService';
+import { DistrictType, ProvinceType, WardType } from '../../../../models/other';
+import axios from 'axios';
+import { ChangePasswordModal } from '../components/ChangePassword';
 dayjs.locale('vi');
 dayjs.extend(customParseFormat);
 const Profile = () => {
@@ -48,7 +50,21 @@ const Profile = () => {
     const [doctorServices, setDoctorServices] = useState<DoctorService[]>([]);
     const [doctor, setDoctor] = useState<Doctor>({} as Doctor);
     const user = useRecoilValue(userValue);
+    const [activeButton, setActiveButton] = useState<string>('profile');
     const [fileList, setFileList] = useState<UploadFile[]>([]);
+    const [provinces, setProvinces] = useState<ProvinceType[]>([]);
+    const [districts, setDistricts] = useState<DistrictType[]>([]);
+    const [wards, setWards] = useState<WardType[]>([]);
+    const [district, setDistrict] = useState<DistrictType>({} as DistrictType);
+    const [province, setProvince] = useState<ProvinceType>({} as ProvinceType);
+    const [ward, setWard] = useState<WardType>({} as WardType);
+
+    const [openChangePasswordModal, setOpenChangePasswordModal] =
+        useState<boolean>(false);
+
+    const cancelChangePasswordModal = () => {
+        setOpenChangePasswordModal(false);
+    };
 
     const getBase64 = (file: FileType): Promise<string> =>
         new Promise((resolve, reject) => {
@@ -184,6 +200,98 @@ const Profile = () => {
             );
         }
     };
+    const getWards = async (districtId: any) => {
+        try {
+            const res = await axios.get(
+                `https://vapi.vnappmob.com//api/province/ward/${districtId}`
+            );
+            setWards(res.data.results);
+        } catch (err) {
+            console.log(err);
+        }
+    };
+    const getListDistrict = async (provinceId: any) => {
+        try {
+            const res = await axios.get(
+                `https://vapi.vnappmob.com//api/province/district/${provinceId}`
+            );
+
+            setDistricts(res.data.results);
+        } catch (err) {
+            console.log(err);
+        }
+    };
+    //find province when patient had a profile
+    useEffect(() => {
+        const getProvince = () => {
+            const province: any = provinces.find(
+                (item) => item?.province_name === doctor?.city
+            );
+            if (province) {
+                setProvince(province);
+            }
+        };
+        if (provinces.length > 1) {
+            getProvince();
+        }
+    }, [provinces.length]);
+
+    //find district when patient had a profile
+    useEffect(() => {
+        const getDistrict = () => {
+            const district: any = districts.find(
+                (item) => item.district_name === doctor?.district
+            );
+            if (district) {
+                setDistrict(district);
+            }
+        };
+        if (districts.length > 1) {
+            getDistrict();
+        }
+    }, [districts.length]);
+    //find ward when patient had a profile
+    useEffect(() => {
+        const getWards = () => {
+            const ward = wards.find((item) => item.ward_name === user?.commune);
+            if (ward) {
+                setWard(ward);
+            }
+        };
+        if (wards.length > 1) {
+            getWards();
+        }
+    }, [wards.length]);
+
+    //get list district of province when change province
+    useEffect(() => {
+        if (province.province_id !== 0) {
+            getListDistrict(province.province_id);
+        }
+    }, [province.province_id]);
+
+    //get list ward of district when change district
+    useEffect(() => {
+        if (districts.length > 1) {
+            if (district !== undefined) {
+                getWards(district.district_id);
+            }
+        }
+    }, [district.district_id]);
+    //find province when patient had a profile
+    useEffect(() => {
+        const getProvince = () => {
+            const province: any = provinces.find(
+                (item) => item?.province_name === user?.city
+            );
+            if (province) {
+                setProvince(province);
+            }
+        };
+        if (provinces.length > 1) {
+            getProvince();
+        }
+    }, [provinces.length]);
 
     useEffect(() => {
         if (user?.role_id === 2) {
@@ -198,23 +306,50 @@ const Profile = () => {
             });
         }
         window.scrollTo(0, 0);
+        const getProvinces = async () => {
+            try {
+                const res = await axios.get(
+                    'https://vapi.vnappmob.com/api/province'
+                );
+                setProvinces(res.data.results);
+            } catch (err) {
+                console.log(err);
+            }
+        };
+        getProvinces();
     }, []);
 
     return (
-        <>
+        <div className="profile-container">
             {contextHolder}
-            <h3>Hồ sơ cá nhân</h3>
-            <Divider />
-            <Row gutter={24}>
-                <Col span={4}>
-                    <Upload></Upload>
-                </Col>
-            </Row>
-            <Row className="border p-3">
-                <Image src={user.image}></Image>
-            </Row>
-            {/* <Row gutter={24}>
-                <Col span={24}>
+            <Flex className="justify-content-between">
+                <div className="col-5">
+                    {' '}
+                    <h5>Hồ sơ cá nhân</h5>
+                </div>
+                <div className="col-5 text-end">
+                    <Button
+                        onClick={() => {
+                            setOpenChangePasswordModal(true);
+                            console.log('oge');
+                        }}
+                    >
+                        Đổi mật khẩu
+                    </Button>
+                </div>
+            </Flex>
+
+            <Row
+                gutter={24}
+                className="border rounded shadow mt-3 pane-container"
+            >
+                <Col
+                    span={24}
+                    id="tab-profile"
+                    className={`tab-pane ${
+                        activeButton === 'profile' ? 'active' : ''
+                    }`}
+                >
                     <Form form={form} layout="vertical" onFinish={onFinish}>
                         <Form.Item
                             valuePropName="fileList"
@@ -351,10 +486,10 @@ const Profile = () => {
                                     ]}
                                 >
                                     <Select placeholder="Chọn giới tính">
-                                        <Select.Option value="1">
+                                        <Select.Option value={1}>
                                             Nam
                                         </Select.Option>
-                                        <Select.Option value="2">
+                                        <Select.Option value={2}>
                                             Nữ
                                         </Select.Option>
                                     </Select>
@@ -409,8 +544,8 @@ const Profile = () => {
                         <Row gutter={24}>
                             <Col span={12}>
                                 <Form.Item
-                                    label="Địa chỉ"
-                                    name="address"
+                                    label="Tỉnh/Thành phố"
+                                    name="city"
                                     rules={[
                                         {
                                             required: true,
@@ -418,10 +553,135 @@ const Profile = () => {
                                         },
                                     ]}
                                 >
-                                    <Input placeholder="Nhập địa chỉ ..." />
+                                    <Select
+                                        className="w-100"
+                                        placeholder="Chọn tỉnh/thành"
+                                        showSearch
+                                        optionFilterProp="children"
+                                        allowClear
+                                        onChange={(e) => {
+                                            const pro: any = provinces.find(
+                                                (province: any) => {
+                                                    return (
+                                                        province.province_name ===
+                                                        e
+                                                    );
+                                                }
+                                            );
+                                            setProvince(pro);
+                                            form.setFieldValue(
+                                                'patientDistrict',
+                                                null
+                                            );
+                                            form.setFieldValue(
+                                                'patientCommune',
+                                                null
+                                            );
+                                        }}
+                                    >
+                                        {provinces.map(
+                                            (province: ProvinceType) => {
+                                                return (
+                                                    <Select.Option
+                                                        value={
+                                                            province.province_name
+                                                        }
+                                                        key={
+                                                            province.province_id
+                                                        }
+                                                    >
+                                                        {province.province_name}
+                                                    </Select.Option>
+                                                );
+                                            }
+                                        )}
+                                    </Select>
                                 </Form.Item>
                             </Col>
+                            <Col span={12}>
+                                <Form.Item
+                                    label="Quận/Huyện"
+                                    name="district"
+                                    rules={[
+                                        {
+                                            required: true,
+                                            message: 'Vui lòng chọn quận/huyện',
+                                        },
+                                    ]}
+                                >
+                                    <Select
+                                        placeholder="Chọn quân/huyện"
+                                        showSearch
+                                        className="w-100"
+                                        allowClear
+                                        optionFilterProp="children"
+                                        onChange={(e) => {
+                                            const dis: any = districts.find(
+                                                (item: any) => {
+                                                    return (
+                                                        item.district_name === e
+                                                    );
+                                                }
+                                            );
 
+                                            setDistrict(dis);
+                                            form.setFieldValue('commune', null);
+                                        }}
+                                    >
+                                        {districts.map(
+                                            (district: DistrictType) => {
+                                                return (
+                                                    <Select.Option
+                                                        key={
+                                                            district.district_id
+                                                        }
+                                                        value={
+                                                            district.district_name
+                                                        }
+                                                    >
+                                                        {district.district_name}
+                                                    </Select.Option>
+                                                );
+                                            }
+                                        )}
+                                    </Select>
+                                </Form.Item>
+                            </Col>
+                            <Col span={12}>
+                                {/* Xã phường */}
+                                <Form.Item
+                                    label="Xã/Phường"
+                                    name="commune"
+                                    className="w-100"
+                                    rules={[
+                                        {
+                                            required: true,
+                                            message: 'Vui lòng chọn xã/phường',
+                                        },
+                                    ]}
+                                >
+                                    <Select
+                                        placeholder="Chọn xã/phường"
+                                        showSearch
+                                        allowClear
+                                        optionFilterProp="children"
+                                        onChange={(e) => {
+                                            console.log(e);
+                                        }}
+                                    >
+                                        {wards.map((ward: WardType) => {
+                                            return (
+                                                <Select.Option
+                                                    key={ward.ward_id}
+                                                    value={ward.ward_name}
+                                                >
+                                                    {ward.ward_name}
+                                                </Select.Option>
+                                            );
+                                        })}
+                                    </Select>
+                                </Form.Item>
+                            </Col>
                             <Col span={12}>
                                 <ConfigProvider locale={viVN}>
                                     <Form.Item
@@ -528,8 +788,15 @@ const Profile = () => {
                         </Form.Item>
                     </Form>
                 </Col>
-            </Row> */}
-        </>
+            </Row>
+            {openChangePasswordModal && (
+                <ChangePasswordModal
+                    apiNotification={api}
+                    openChangePasswordModal={openChangePasswordModal}
+                    cancelChangePasswordModal={cancelChangePasswordModal}
+                />
+            )}
+        </div>
     );
 };
 

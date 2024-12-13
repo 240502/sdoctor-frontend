@@ -541,7 +541,7 @@ export const DoctorModal = ({
                 <Row gutter={24}>
                     <Col span={12}>
                         <Form.Item
-                            label="Địa chỉ"
+                            label="Tỉnh/Thành phố"
                             name="city"
                             rules={[
                                 {

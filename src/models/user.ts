@@ -6,13 +6,14 @@ export interface User {
     image: string;
     phone: string;
     gender: string;
-    address: string;
+    city: string;
+    district: string;
+    commune: string;
     email: string;
     password: string;
     role_id: number;
     created_at: Date;
     updated_at: Date;
-    created_by_user_id: Number;
     birthday: Date;
     token: string;
     functions: Functions[];

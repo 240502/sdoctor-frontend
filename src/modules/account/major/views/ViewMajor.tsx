@@ -4,15 +4,18 @@ import { Breadcrumb } from 'antd';
 import { HomeOutlined } from '@ant-design/icons';
 import { MajorCards } from '../components/MajorCards';
 import { Major } from '../../../../models/major';
-import { useSetRecoilState } from 'recoil';
+import { useRecoilState, useSetRecoilState } from 'recoil';
 import { majorIdState } from '../../../../stores/majorAtom';
+import { searchDoctorOptionsGlobal } from '../../../../stores/doctorAtom';
 
 const ViewMajor = () => {
     const [pageIndex, setPageIndex] = useState<number>(1);
     const [pageSize, setPageSize] = useState<number>(10);
     const [pageCount, setPageCount] = useState<number>(0);
     const [majors, setMajors] = useState<Major[]>([]);
-    const setMajorId = useSetRecoilState(majorIdState);
+    const [optionsGlobal, setOptionsGlobal] = useRecoilState(
+        searchDoctorOptionsGlobal
+    );
     const getMajors = async () => {
         try {
             const data = { pageIndex: pageIndex, pageSize: pageSize };
@@ -57,7 +60,8 @@ const ViewMajor = () => {
                     pageIndex={pageIndex}
                     pageSize={pageSize}
                     changePage={changePage}
-                    setMajorId={setMajorId}
+                    setOptionsGlobal={setOptionsGlobal}
+                    optionsGlobal={optionsGlobal}
                 />
             </div>
         </div>

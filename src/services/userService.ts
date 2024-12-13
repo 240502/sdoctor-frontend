@@ -49,4 +49,12 @@ export const UserService = {
         const res = await apiClient.get('/api/user/getById/' + id);
         return res?.data;
     },
+    async changePassword(data: any, config: any): Promise<any> {
+        const res = await apiClient.put(
+            '/api/user/change-password',
+            data,
+            config
+        );
+        return res;
+    },
 };

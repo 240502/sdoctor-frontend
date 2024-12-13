@@ -9,7 +9,8 @@ export const MajorCards = ({
     pageIndex,
     pageSize,
     changePage,
-    setMajorId,
+    setOptionsGlobal,
+    optionsGlobal,
 }: any) => {
     const navigate = useNavigate();
     return (
@@ -27,7 +28,10 @@ export const MajorCards = ({
                                                 style={{ cursor: 'pointer' }}
                                                 onClick={() => {
                                                     navigate('/list/doctor');
-                                                    setMajorId(major.id);
+                                                    setOptionsGlobal({
+                                                        ...optionsGlobal,
+                                                        majorId: major.id,
+                                                    });
                                                 }}
                                                 src={baseURL + major?.image}
                                             ></img>
@@ -36,7 +40,10 @@ export const MajorCards = ({
                                         <h6
                                             onClick={() => {
                                                 navigate('/list/doctor');
-                                                setMajorId(major.id);
+                                                setOptionsGlobal({
+                                                    ...optionsGlobal,
+                                                    majorId: major.id,
+                                                });
                                             }}
                                             style={{
                                                 height: '50px',

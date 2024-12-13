@@ -107,6 +107,7 @@ const ViewDoctor = () => {
             });
         };
     }, []);
+
     return (
         <div className="container doctor-list mt-4 mb-4">
             <Breadcrumb
