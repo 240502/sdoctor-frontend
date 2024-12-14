@@ -1,6 +1,5 @@
 import { HomeOutlined } from '@ant-design/icons';
 import '@/assets/scss/clinic.scss';
-
 import {
     Breadcrumb,
     Divider,

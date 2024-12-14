@@ -25,7 +25,6 @@ const BlockDoctor = ({ clinicId, clinic }: any) => {
     const [pageIndex, setPageIndex] = useState<number>(1);
     const [pageSize, setPageSize] = useState<number>(10);
     const [pageCount, setPageCount] = useState<number>(0);
-
     const [majorId, setMajorId] = useState<number | null>(0);
     const doctors = useRecoilValue(doctorListValue);
     const setDoctors = useSetRecoilState(doctorListState);
@@ -185,8 +184,9 @@ const BlockDoctor = ({ clinicId, clinic }: any) => {
                                                         String(doctor.summary)
                                                     )}
                                                     <p>
-                                                        <EnvironmentOutlined className="fs-6 " />
-                                                        {doctor.address}
+                                                        <EnvironmentOutlined className="fs-6 " />{' '}
+                                                        {''}
+                                                        {doctor.location}
                                                     </p>
                                                 </div>
                                             </div>

@@ -232,54 +232,52 @@ main {
     }
 }
 
-//doctor
-.doctor-list {
-    .card-item {
-        display: flex;
-        flex: 1 0 25%;
-        box-sizing: border-box;
-        cursor: pointer;
-        padding: 12px 8px 8px 8px;
-    }
+//card-doctor
+.card-item {
+    display: flex;
+    flex: 1 0 25%;
+    box-sizing: border-box;
+    cursor: pointer;
+    padding: 12px 8px 8px 8px;
+}
 
+.card-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+    padding: 16px;
+    background: #fff;
+    border-radius: 8px;
+}
+
+.cards .card-item .ant-card-body {
+    padding: 10px;
+}
+.cards .clinic-info p:first-child {
+    max-height: 40px;
+}
+.cards .card-item .clinic-info {
+    border-radius: 8px;
+    background: rgb(248, 249, 252);
+    padding: 8px;
+    max-height: 128px;
+    font-size: 13px;
+}
+.cards .card-item .booking-btn {
+    transition: all 0.2s linear;
+}
+.cards .card-item:hover {
     .card-container {
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        height: 100%;
-        padding: 16px;
-        background: #fff;
-        border-radius: 8px;
+        border: 1px solid rgb(145, 202, 255) !important;
+        box-shadow: rgba(0, 0, 0, 0.1) 0px 8px 40px 0px;
     }
-
-    .cards .card-item .ant-card-body {
-        padding: 10px;
+    .booking-btn {
+        background-color: #0e82fd;
+        color: #fff;
     }
-    .cards .clinic-info p:first-child {
-        max-height: 40px;
-    }
-    .cards .card-item .clinic-info {
-        border-radius: 8px;
-        background: rgb(248, 249, 252);
-        padding: 8px;
-        max-height: 128px;
-        font-size: 13px;
-    }
-    .cards .card-item .booking-btn {
-        transition: all 0.2s linear;
-    }
-    .cards .card-item:hover {
-        .card-container {
-            border: 1px solid rgb(145, 202, 255) !important;
-            box-shadow: rgba(0, 0, 0, 0.1) 0px 8px 40px 0px;
-        }
-        .booking-btn {
-            background-color: #0e82fd;
-            color: #fff;
-        }
-        .clinic-info {
-            background: rgb(227, 242, 255);
-        }
+    .clinic-info {
+        background: rgb(227, 242, 255);
     }
 }
 
