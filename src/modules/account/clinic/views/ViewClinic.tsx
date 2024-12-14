@@ -1,16 +1,6 @@
-import { HomeOutlined } from '@ant-design/icons';
+import { EnvironmentOutlined, HomeOutlined } from '@ant-design/icons';
 import '@/assets/scss/clinic.scss';
-import {
-    Breadcrumb,
-    Divider,
-    Flex,
-    Image,
-    Input,
-    Pagination,
-    Row,
-    Select,
-    Col,
-} from 'antd';
+import { Breadcrumb, Divider, Flex, Input, Pagination, Select } from 'antd';
 import { Link } from 'react-router-dom';
 import { ClinicService } from '../../../../services/clinicService';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
@@ -24,6 +14,7 @@ import { Clinic } from '../../../../models/clinic';
 import { baseURL } from '../../../../constants/api';
 import axios from 'axios';
 import { addWatchedClinic } from '../../../../utils/clinic';
+import { ClinicCard } from '../components/ClinicCard';
 const { Search } = Input;
 const ViewClinic = () => {
     const [optionsFilter, setOptionsFilter] = useState<any>({
@@ -31,7 +22,7 @@ const ViewClinic = () => {
         name: null,
     });
     const [pageIndex, setPageIndex] = useState<number>(1);
-    const [pageSize, setPageSize] = useState<number>(5);
+    const [pageSize, setPageSize] = useState<number>(4);
     const [provinces, setProvinces] = useState([
         { province_id: 0, province_name: '' },
     ]);
@@ -56,17 +47,23 @@ const ViewClinic = () => {
         setOptionsFilter(newOptions);
     };
     const handleChangeLocation = (value: string) => {
+        console.log('value', value);
         let province: string = '';
         const cityStr = 'thành phố';
         const provinceStr = 'tỉnh';
-        if (value.toLowerCase().includes('thành phố')) {
-            province = value.slice(cityStr.length, value.length);
+        if (value) {
+            if (value.toLowerCase().includes('thành phố')) {
+                province = value.slice(cityStr.length, value.length);
+            }
+            if (value.toLowerCase().includes('tỉnh')) {
+                province = value.slice(provinceStr.length, value.length);
+            }
+            const newOptions = { ...optionsFilter, location: province };
+            setOptionsFilter(newOptions);
+        } else {
+            const newOptions = { ...optionsFilter, location: null };
+            setOptionsFilter(newOptions);
         }
-        if (value.toLowerCase().includes('tỉnh')) {
-            province = value.slice(provinceStr.length, value.length);
-        }
-        const newOptions = { ...optionsFilter, location: province };
-        setOptionsFilter(newOptions);
     };
     const changePage = (current: number, size: number) => {
         if (size !== pageSize) {
@@ -100,12 +97,11 @@ const ViewClinic = () => {
             pageSize: pageSize,
             ...optionsFilter,
         };
-        console.log(data);
         viewClinic(data);
         window.scrollTo(0, 0);
     }, [pageIndex, pageSize, optionsFilter]);
     return (
-        <div className="container mt-5 mb-5">
+        <div className="container view-clinic-container mt-5 mb-5">
             <Breadcrumb
                 items={[
                     {
@@ -129,13 +125,10 @@ const ViewClinic = () => {
                         style={{ width: '48%' }}
                         onChange={handleChangeLocation}
                         showSearch
-                        placeholder="Chọn tỉnh"
+                        placeholder="Chọn tỉnh thành"
                         optionFilterProp="children"
-                        defaultValue={'0'}
+                        allowClear
                     >
-                        <Select.Option value={'0'}>
-                            Chọn tỉnh thành
-                        </Select.Option>
                         {provinces?.map((province: any) => {
                             return (
                                 <Select.Option
@@ -157,87 +150,27 @@ const ViewClinic = () => {
                     />
                 </Flex>
             </Flex>
-            {clinics ? (
+            {clinics?.length > 0 ? (
                 <>
-                    <div className="block-clinics">
-                        <Row className="clinic_list mt-3" gutter={[24, 24]}>
-                            {clinics?.map((clinic: Clinic) => {
-                                return (
-                                    <Col
-                                        className="clinic-item  text-center"
-                                        span={6}
-                                    >
-                                        <Link
-                                            to={'/clinic/detail/' + clinic.id}
-                                            className="d-inline-block clinic-img-container"
-                                            onClick={() => {
-                                                handleUpdateViewsClinic(
-                                                    Number(clinic.id)
-                                                );
-                                                addWatchedClinic(clinic);
-                                            }}
-                                            style={{ width: '100%' }}
-                                        >
-                                            <Image
-                                                preview={false}
-                                                style={{
-                                                    width: '265px',
-                                                    height: '147px',
-                                                    objectFit: 'contain',
-                                                }}
-                                                className="border rounded ps-2 pt-4 pb-4 pe-2"
-                                                src={
-                                                    clinic.avatar.includes(
-                                                        'cloudinary'
-                                                    )
-                                                        ? clinic.avatar
-                                                        : baseURL +
-                                                          clinic.avatar
-                                                }
-                                            ></Image>
-                                        </Link>
-                                        <Link
-                                            onClick={() => {
-                                                handleUpdateViewsClinic(
-                                                    Number(clinic.id)
-                                                );
-                                                addWatchedClinic(clinic);
-                                            }}
-                                            to={'/clinic/detail/' + clinic.id}
-                                            className="text-decoration-none text-reset"
-                                        >
-                                            <h6 className="mt-3 clinic-name">
-                                                {clinic.name}
-                                            </h6>
-                                        </Link>
-                                    </Col>
-                                );
-                            })}
-                        </Row>
-                    </div>
-                    <section className="page d-flex justify-content-center align-items-center">
-                        {pageCount > 1 ? (
-                            <Pagination
-                                showSizeChanger
-                                defaultCurrent={1}
-                                align="center"
-                                current={pageIndex}
-                                pageSize={pageSize}
-                                total={pageCount * pageSize}
-                                pageSizeOptions={['5', '10', '20', '30']}
-                                onChange={(current: number, size: number) => {
-                                    changePage(current, size);
-                                }}
-                            />
-                        ) : (
-                            <></>
-                        )}
-                    </section>
+                    <ClinicCard
+                        clinics={clinics}
+                        handleUpdateViewsClinic={handleUpdateViewsClinic}
+                    />
+                    {pageCount > 1 && (
+                        <Pagination
+                            current={pageIndex}
+                            pageSize={pageSize}
+                            showSizeChanger
+                            pageSizeOptions={['4', '8', '12', '16', '20']}
+                            onChange={changePage}
+                            align="center"
+                            className="mt-3"
+                            total={pageCount * pageSize}
+                        ></Pagination>
+                    )}
                 </>
             ) : (
-                <p className="text-center fs-6 fw-bold">
-                    Không tồn tại cơ sở y tế nào
-                </p>
+                <>Không có cơ sở y tế nào!</>
             )}
         </div>
     );

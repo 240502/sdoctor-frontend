@@ -2,6 +2,13 @@
     display: flex;
     justify-content: center;
 }
+.view-clinic-container {
+    .clinic-image img {
+        max-width: 70%;
+        width: 200px;
+        object-fit: contain;
+    }
+}
 .clinic-detail {
     .clinic-image img {
         min-width: 100%;
