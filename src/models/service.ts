@@ -9,4 +9,7 @@ export interface Service {
     preparation_process: string;
     views: number;
     service_detail: string;
+    category_name: string;
+    location: string;
+    clinic_name: string;
 }

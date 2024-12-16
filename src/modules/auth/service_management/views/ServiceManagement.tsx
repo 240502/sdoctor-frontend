@@ -19,11 +19,14 @@ import { Clinic } from '../../../../models/clinic';
 import { ServiceCategory } from '../../../../models/category_services';
 import { ServiceCategoryService } from '../../../../services/serviceCategoryService';
 import { serviceListState } from '../../../../stores/servicesAtom';
+import ServiceCard from '../components/ServiceCard';
+import { ConfirmModal } from '../../../../components';
+import { openNotification } from '../../../../utils/notification';
 type NotificationType = 'success' | 'error';
 
 const ServiceManagement = () => {
     const config = useRecoilValue(configValue);
-    const [pageIndex, setPageIndex] = useState<number>(0);
+    const [pageIndex, setPageIndex] = useState<number>(1);
     const [pageSize, setPageSize] = useState<number>(8);
     const [pageCount, setPageCount] = useState<number>(0);
     const [filterOptions, setFilterOptions] = useState<any>({
@@ -37,6 +40,8 @@ const ServiceManagement = () => {
     const [categories, setCategories] = useState<ServiceCategory[]>([]);
     const [isUpdate, setIsUpdate] = useState<boolean>(false);
     const [services, setServices] = useRecoilState(serviceListState);
+    const [openConfirmModal, setOpenConfirmModal] = useState<boolean>(false);
+
     const getServices = async () => {
         try {
             const data = {
@@ -46,6 +51,8 @@ const ServiceManagement = () => {
                 categoryId: filterOptions.categoryId,
             };
             const res = await ServiceService.viewService(data);
+            console.log('services', res);
+            console.log('call api');
             setPageCount(res.pageCount);
             setServices(res.data);
         } catch (err: any) {
@@ -65,15 +72,24 @@ const ServiceManagement = () => {
     const onClickEditButton = (service: Service) => {
         setOpenInputModal(true);
         setService(service);
+        setIsUpdate(true);
+    };
+    const onClickDeleteButton = (service: Service) => {
+        setOpenConfirmModal(true);
+        setService(service);
     };
     const cancelModal = () => {
         setService({} as Service);
         setOpenInputModal(false);
+        setIsUpdate(true);
+    };
+    const cancelConfirmModal = () => {
+        setService({} as Service);
+        setOpenConfirmModal(false);
     };
     const getAllClinic = async () => {
         try {
             const res = await ClinicService.viewClinic({});
-            console.log('clinic', res);
             setClinics(res.data);
         } catch (err: any) {
             console.log(err.message);
@@ -83,18 +99,40 @@ const ServiceManagement = () => {
     const getAllServiceCategory = async () => {
         try {
             const res = await ServiceCategoryService.getAll();
-            console.log('categories', res);
             setCategories(res);
         } catch (err: any) {
             console.log(err.message);
             setCategories([]);
         }
     };
+    const DeleteService = async () => {
+        try {
+            openNotification(api, 'success', 'Thông báo', 'Xóa thành công!');
+            const res = await ServiceService.deleteService(service?.id, config);
+            cancelConfirmModal();
+            setServices((prvServices: Service[]) =>
+                prvServices.filter(
+                    (prvService: Service) => service.id !== prvService.id
+                )
+            );
+        } catch (err: any) {
+            openNotification(
+                api,
+                'error',
+                'Thông báo',
+                'Xóa không thành công!'
+            );
+
+            console.log(err.message);
+        }
+    };
+    useEffect(() => {
+        getServices();
+    }, [pageIndex, pageSize, filterOptions]);
     useEffect(() => {
         getAllClinic();
         getAllServiceCategory();
-        getServices();
-    }, [pageIndex, pageSize, filterOptions]);
+    }, []);
     useEffect(() => {
         console.log('services', services);
     }, [services]);
@@ -122,6 +160,17 @@ const ServiceManagement = () => {
                 </Col>
             </Row>
             <Divider></Divider>
+            <div className="block-services">
+                {services?.length > 0 ? (
+                    <ServiceCard
+                        services={services}
+                        onClickEditButton={onClickEditButton}
+                        onClickDeleteButton={onClickDeleteButton}
+                    />
+                ) : (
+                    <p>Không có gói khám nào!</p>
+                )}
+            </div>
             {openInputModal && (
                 <InputServiceModal
                     openInputModal={openInputModal}
@@ -134,6 +183,14 @@ const ServiceManagement = () => {
                     config={config}
                     notificationApi={api}
                     setServices={setServices}
+                />
+            )}
+            {openConfirmModal && (
+                <ConfirmModal
+                    message="Bạn chắc chắn muốn xóa gói khám này"
+                    openModal={openConfirmModal}
+                    handleCancelModal={cancelConfirmModal}
+                    handleOk={DeleteService}
                 />
             )}
         </>

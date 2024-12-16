@@ -246,9 +246,11 @@ main {
     flex-direction: column;
     justify-content: space-between;
     height: 100%;
-    padding: 16px;
     background: #fff;
     border-radius: 8px;
+    .card-body {
+        padding: 16px;
+    }
 }
 
 .cards .card-item .ant-card-body {
@@ -261,7 +263,7 @@ main {
     border-radius: 8px;
     background: rgb(248, 249, 252);
     padding: 8px;
-    max-height: 128px;
+    max-height: 200px;
     font-size: 13px;
 }
 .cards .card-item .booking-btn {

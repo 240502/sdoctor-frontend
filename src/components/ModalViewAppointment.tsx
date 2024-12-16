@@ -76,7 +76,7 @@ const ModalViewAppointment = ({
                     <div className="location mt-3">
                         <span>
                             {' '}
-                            <strong>Địa điểm:</strong> {doctor.address}
+                            <strong>Địa điểm:</strong> {doctor.location}
                         </span>
                     </div>
                     <div className="fee mt-3">

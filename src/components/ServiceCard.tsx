@@ -1,4 +1,5 @@
 import { Col, Row, Image, Button, Tag, Card, Flex } from 'antd';
+import { Service } from '../models/service';
 import { useNavigate } from 'react-router-dom';
 import {
     DeleteOutlined,
@@ -6,13 +7,8 @@ import {
     EditOutlined,
     EnvironmentOutlined,
 } from '@ant-design/icons';
-import { Service } from '../../../../models/service';
 
-const ServiceCard = ({
-    services,
-    onClickEditButton,
-    onClickDeleteButton,
-}: any) => {
+const ServiceCard = ({ services }: any) => {
     const navigate = useNavigate();
     return (
         <Row gutter={[24, 24]} className="cards">
@@ -67,18 +63,10 @@ const ServiceCard = ({
                                 </div>
                             </div>
                             <Flex className="group-button justify-content-between pb-3">
-                                <Button
-                                    className="border-0 text-success"
-                                    onClick={() => {
-                                        onClickEditButton(service);
-                                    }}
-                                >
+                                <Button className="border-0 text-success">
                                     <EditOutlined /> Sửa
                                 </Button>
-                                <Button
-                                    className="border-0 text-danger"
-                                    onClick={() => onClickDeleteButton(service)}
-                                >
+                                <Button className="border-0 text-danger">
                                     <DeleteOutlined /> Xóa
                                 </Button>
                             </Flex>

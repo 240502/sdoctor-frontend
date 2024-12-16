@@ -20,6 +20,7 @@ import { Clinic } from '../../../../models/clinic';
 import { ServiceDetailEditor } from './ServiceDetailEditor';
 import { ServiceService } from '../../../../services/serviceService';
 import { Service } from '../../../../models/service';
+import { openNotification } from '../../../../utils/notification';
 export const InputServiceModal = ({
     openInputModal,
     cancelModal,
@@ -75,6 +76,7 @@ export const InputServiceModal = ({
         }
     };
     const handleChangeSummaryEditor = (data: any) => {
+        console.log('set data');
         setService({ ...service, summary: data });
     };
     const handleChangeProcessEditor = (data: any) => {
@@ -86,6 +88,7 @@ export const InputServiceModal = ({
     const onFinish = (values: any) => {
         console.log('values', values);
         const newService = {
+            id: service?.id,
             name: values?.name,
             summary: service?.summary,
             price: values?.price,
@@ -95,9 +98,12 @@ export const InputServiceModal = ({
             preparation_process: service?.preparation_process,
             service_detail: service?.service_detail,
         };
-        console.log('newService', newService);
-        CreateService(newService);
-        console.log(config);
+        if (isUpdate) {
+            console.log('newService', newService);
+            UpdateService(newService);
+        } else {
+            CreateService(newService);
+        }
     };
     const CreateService = async (data: any) => {
         try {
@@ -107,10 +113,72 @@ export const InputServiceModal = ({
                 ...prvServices,
                 res.data.result[0],
             ]);
+            openNotification(
+                notificationApi,
+                'success',
+                'Thông báo',
+                'Thêm thành công!'
+            );
+            cancelModal();
         } catch (err: any) {
+            console.log(err.message);
+            openNotification(
+                notificationApi,
+                'error',
+                'Thông báo',
+                'Thêm không thành công!'
+            );
+        }
+    };
+    const UpdateService = async (data: any) => {
+        try {
+            const res = await ServiceService.updateService(data, config);
+            setServices((prvServices: Service[]) => {
+                return prvServices.map((service: Service) => {
+                    return service.id === data?.id
+                        ? {
+                              ...data,
+                              clinic_name: service.clinic_name,
+                              category_name: service.clinic_name,
+                              location: service.location,
+                          }
+                        : service;
+                });
+            });
+            openNotification(
+                notificationApi,
+                'success',
+                'Thông báo',
+                'Sửa thành công!'
+            );
+            cancelModal();
+        } catch (err: any) {
+            openNotification(
+                notificationApi,
+                'success',
+                'Thông báo',
+                'Sửa không thành công!'
+            );
             console.log(err.message);
         }
     };
+    useEffect(() => {
+        if (service?.id) {
+            const file: UploadFile[] = [
+                {
+                    uid: '-1',
+                    name: 'image.png',
+                    status: 'done',
+                    url: service?.image,
+                },
+            ];
+            setFileList(file);
+        }
+        console.log('service', service);
+    }, []);
+    useEffect(() => {
+        console.log('service', service);
+    }, [service]);
     return (
         <Modal
             open={openInputModal}
@@ -226,6 +294,7 @@ export const InputServiceModal = ({
                                 handleChangeSummaryEditor={
                                     handleChangeSummaryEditor
                                 }
+                                service={service}
                             ></SummaryEditor>
                         </Form.Item>
                     </Col>
@@ -235,6 +304,7 @@ export const InputServiceModal = ({
                                 handleChangeProcessEditor={
                                     handleChangeProcessEditor
                                 }
+                                service={service}
                             ></PreparationProcessEditor>
                         </Form.Item>
                     </Col>
@@ -244,6 +314,7 @@ export const InputServiceModal = ({
                                 handleChangeDetailEditor={
                                     handleChangeDetailEditor
                                 }
+                                service={service}
                             />
                         </Form.Item>
                     </Col>
