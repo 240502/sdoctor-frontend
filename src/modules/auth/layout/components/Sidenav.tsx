@@ -1,5 +1,5 @@
 import { Menu } from 'antd';
-import React from 'react';
+import React, { useEffect } from 'react';
 import parse from 'html-react-parser';
 
 import { Functions } from '../../../../models/functions';
@@ -9,9 +9,12 @@ import { userValue } from '../../../../stores/userAtom';
 
 export const Sidenav = ({ current }: any) => {
     const user = useRecoilValue(userValue);
+    useEffect(() => {
+        console.log('user', user);
+    }, []);
     return (
         <Menu theme="dark" selectedKeys={[current]} mode="inline">
-            {user?.functions.map((item: Functions, index: number) => {
+            {user?.functions?.map((item: Functions, index: number) => {
                 return (
                     <Menu.Item key={index}>
                         <Link

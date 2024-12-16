@@ -24,6 +24,7 @@ import { ModalComment } from '../components/ModalComment';
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import {
     commonDoctorsState,
+    commonDoctorValue,
     doctorListValue,
     doctorState,
 } from '../../../../stores/doctorAtom';
@@ -82,7 +83,6 @@ const ViewDetailDoctor = () => {
                 setDoctor(res);
             } else {
                 const res = await doctorService.getDoctorById(id);
-                console.log(res);
                 setDoctor(res);
             }
         } catch (err: any) {

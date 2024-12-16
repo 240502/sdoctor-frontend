@@ -3,12 +3,8 @@ import { Button, Card, Flex, Row, Col, Image, Tag } from 'antd';
 import { Link, useNavigate } from 'react-router-dom';
 import { doctorService } from '../../../../services/doctorService';
 import { Doctor } from '../../../../models/doctor';
-import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
-import {
-    commonDoctorsState,
-    doctorListValue,
-    doctorState,
-} from '../../../../stores/doctorAtom';
+import { useRecoilState, useSetRecoilState } from 'recoil';
+import { commonDoctorsState, doctorState } from '../../../../stores/doctorAtom';
 import { EnvironmentOutlined } from '@ant-design/icons';
 export const BlockHotDoctor = (): JSX.Element => {
     const navigate = useNavigate();
@@ -26,7 +22,6 @@ export const BlockHotDoctor = (): JSX.Element => {
         try {
             const data = {};
             const res = await doctorService.getCommonDoctor(data);
-            console.log(res.data);
             setCommonDoctors(res.data);
         } catch (err: any) {
             console.log(err.message);

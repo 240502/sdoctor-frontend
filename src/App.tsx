@@ -13,19 +13,19 @@ function App() {
     const setUser = useSetRecoilState(userState);
     const setPatientProfile = useSetRecoilState(patientProfileState);
     const handleWindowLoad = (user: User) => {
-        console.log('Window fully loaded');
         console.log('user', user);
-        socket.emit('join', user?.user_id);
+        if (user?.user_id) {
+            socket.emit('join', user?.user_id);
+        }
     };
     const getUser = async () => {
         try {
             const user = await JSON.parse(
                 sessionStorage.getItem('user') || '{}'
             );
-            console.log('get user');
-            console.log(user);
             if (user?.user_id) {
                 setUser(user);
+                console.log('get user', user);
                 handleWindowLoad(user);
             }
         } catch (e: any) {

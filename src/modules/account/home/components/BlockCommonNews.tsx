@@ -28,7 +28,6 @@ export const BlockCommonPost = () => {
     const getCommonNews = async () => {
         try {
             const res = await PostService.getCommonPost();
-            console.log(res);
             setPosts(res);
         } catch (err: any) {
             console.log(err.message);
@@ -37,7 +36,6 @@ export const BlockCommonPost = () => {
     const updateViewPost = async (id: number) => {
         try {
             const res = await PostService.updateViewPost(id);
-            console.log(res);
         } catch (err: any) {
             console.log(err.message);
         }

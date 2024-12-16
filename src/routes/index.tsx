@@ -44,6 +44,7 @@ import {
     BOOKING_SUCCESS_PATH,
     INVOICE_MANAGEMENT_PATH,
     PROFILE_PATH,
+    SERVICE_MANAGEMENT_PATH,
 } from './path';
 import { ScheduleManagement } from '../modules/auth/schedule';
 import {
@@ -59,6 +60,7 @@ import BookingAppointment from '../modules/account/appointment';
 import { BookingSuccess } from '../components/BookingSuccess';
 import { InvoiceManagement } from '../modules/auth/invoice';
 import { Profile } from '../modules/auth/profile';
+import { ServiceManagement } from '../modules/auth/service_management';
 
 export const publicRoutes = [
     {
@@ -197,6 +199,11 @@ export const privateRoutes = [
     {
         path: PROFILE_PATH,
         component: Profile,
+        layout: AdminLayout,
+    },
+    {
+        path: SERVICE_MANAGEMENT_PATH,
+        component: ServiceManagement,
         layout: AdminLayout,
     },
 ];

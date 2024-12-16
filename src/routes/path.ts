@@ -28,7 +28,9 @@ const BOOKING_APPOINTMENT_PATH = '/booking-appointment';
 const BOOKING_SUCCESS_PATH = '/booking-success';
 const INVOICE_MANAGEMENT_PATH = '/admin/invoice';
 const PROFILE_PATH = '/admin/profile';
+const SERVICE_MANAGEMENT_PATH = '/admin/service';
 export {
+    SERVICE_MANAGEMENT_PATH,
     PROFILE_PATH,
     INVOICE_MANAGEMENT_PATH,
     BOOKING_SUCCESS_PATH,

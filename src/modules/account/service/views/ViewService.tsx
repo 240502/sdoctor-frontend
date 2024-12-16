@@ -5,213 +5,211 @@ import parse from 'html-react-parser';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 import { EnvironmentOutlined, RetweetOutlined } from '@ant-design/icons';
-import { ServicesService } from '../../../../services/servicesService';
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import {
     serviceListState,
     serviceListValue,
 } from '../../../../stores/servicesAtom';
-import { Services } from '../../../../models/services';
 import { baseURL } from '../../../../constants/api';
 import { BlockSchedule } from '../components/BlockScheudle';
 import { Time } from '../../../../models/time';
 import { ModalOrderAppointment } from '../components/ModalOrderAppointment';
-import { CategoryService } from '../../../../models/category_services';
+// import { CategoryService } from '../../../../models/category_services';
 import { Clinic } from '../../../../models/clinic';
-import { CategoryServicesService } from '../../../../services/category_servicesService';
+import { CategoryServicesService } from '../../../../services/serviceCategoryService';
 import { ClinicService } from '../../../../services/clinicService';
 import { addWatchedService } from '../../../../utils/service';
 type NotificationType = 'success' | 'error';
 
 const ViewService = () => {
-    const [api, contextHolder] = notification.useNotification();
+    // const [api, contextHolder] = notification.useNotification();
 
-    const [pageIndex, setPageIndex] = useState<number>(1);
-    const [pageSize, setPageSize] = useState<number>(10);
-    const [pageCount, setPageCount] = useState<number>(0);
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [service, setService] = useState<Services>();
-    const [time, setTime] = useState<Time>();
-    const [appointmentDate, setAppointmentDate] = useState<string>();
-    const [categoryServices, setCategoryServices] = useState<CategoryService[]>(
-        []
-    );
-    const [valueSearch, setValueSearch] = useState<string>('');
-    const [clinics, setClinics] = useState<Clinic[]>([]);
-    const setServices = useSetRecoilState(serviceListState);
-    const services = useRecoilValue(serviceListValue);
-    const inputSearchRef = useRef<InputRef>(null);
-    const [optionsFilter, setOptionsFilter] = useState<any>({
-        location: null,
-        name: null,
-        categoryId: null,
-        startPrice: null,
-        endPrice: null,
-        clinicId: null,
-        priceId: null,
-    });
-    const dataCategoryPrice = [
-        {
-            id: 1,
-            value: 'Dưới 1.000.000 đ',
-            endPrice: 1000000,
-            startPrice: null,
-        },
-        {
-            id: 2,
-            value: 'Từ 1.000.000 đ đến 5.000.000 đ',
-            endPrice: 5000000,
-            startPrice: 1000000,
-        },
-        {
-            id: 3,
-            value: 'Từ 5.000.000 đ đến 10.000.000 đ',
-            endPrice: 10000000,
-            startPrice: 5000000,
-        },
-        {
-            id: 4,
-            value: 'Trên 10.000.000 đ',
-            endPrice: null,
-            startPrice: 10000000,
-        },
-    ];
-    const openNotificationWithIcon = (
-        type: NotificationType,
-        title: string,
-        des: string
-    ) => {
-        api[type]({
-            message: title,
-            description: des,
-        });
-    };
+    // const [pageIndex, setPageIndex] = useState<number>(1);
+    // const [pageSize, setPageSize] = useState<number>(10);
+    // const [pageCount, setPageCount] = useState<number>(0);
+    // const [isModalOpen, setIsModalOpen] = useState(false);
+    // const [service, setService] = useState<Services>();
+    // const [time, setTime] = useState<Time>();
+    // const [appointmentDate, setAppointmentDate] = useState<string>();
+    // const [categoryServices, setCategoryServices] = useState<CategoryService[]>(
+    //     []
+    // );
+    // const [valueSearch, setValueSearch] = useState<string>('');
+    // const [clinics, setClinics] = useState<Clinic[]>([]);
+    // const setServices = useSetRecoilState(serviceListState);
+    // const services = useRecoilValue(serviceListValue);
+    // const inputSearchRef = useRef<InputRef>(null);
+    // const [optionsFilter, setOptionsFilter] = useState<any>({
+    //     location: null,
+    //     name: null,
+    //     categoryId: null,
+    //     startPrice: null,
+    //     endPrice: null,
+    //     clinicId: null,
+    //     priceId: null,
+    // });
+    // const dataCategoryPrice = [
+    //     {
+    //         id: 1,
+    //         value: 'Dưới 1.000.000 đ',
+    //         endPrice: 1000000,
+    //         startPrice: null,
+    //     },
+    //     {
+    //         id: 2,
+    //         value: 'Từ 1.000.000 đ đến 5.000.000 đ',
+    //         endPrice: 5000000,
+    //         startPrice: 1000000,
+    //     },
+    //     {
+    //         id: 3,
+    //         value: 'Từ 5.000.000 đ đến 10.000.000 đ',
+    //         endPrice: 10000000,
+    //         startPrice: 5000000,
+    //     },
+    //     {
+    //         id: 4,
+    //         value: 'Trên 10.000.000 đ',
+    //         endPrice: null,
+    //         startPrice: 10000000,
+    //     },
+    // ];
+    // const openNotificationWithIcon = (
+    //     type: NotificationType,
+    //     title: string,
+    //     des: string
+    // ) => {
+    //     api[type]({
+    //         message: title,
+    //         description: des,
+    //     });
+    // };
 
-    const [provinces, setProvinces] = useState([
-        { province_id: 0, province_name: '' },
-    ]);
-    const handleChangeLocation = (value: string) => {
-        let province: string = '';
-        const cityStr = 'thành phố';
-        const provinceStr = 'tỉnh';
-        if (value.toLowerCase().includes('thành phố')) {
-            province = value.slice(cityStr.length, value.length);
-        }
-        if (value.toLowerCase().includes('tỉnh')) {
-            province = value.slice(provinceStr.length, value.length);
-        }
-        const newOptions = { ...optionsFilter, location: province.trim() };
+    // const [provinces, setProvinces] = useState([
+    //     { province_id: 0, province_name: '' },
+    // ]);
+    // const handleChangeLocation = (value: string) => {
+    //     let province: string = '';
+    //     const cityStr = 'thành phố';
+    //     const provinceStr = 'tỉnh';
+    //     if (value.toLowerCase().includes('thành phố')) {
+    //         province = value.slice(cityStr.length, value.length);
+    //     }
+    //     if (value.toLowerCase().includes('tỉnh')) {
+    //         province = value.slice(provinceStr.length, value.length);
+    //     }
+    //     const newOptions = { ...optionsFilter, location: province.trim() };
 
-        setOptionsFilter(newOptions);
-    };
-    const handleUpdateViewsService = async (id: number): Promise<any> => {
-        try {
-            const res = await ServicesService.updateViewsService(id);
-            console.log(res);
-        } catch (err: any) {
-            console.log(err.message);
-        }
-    };
-    const handleChangeCategory = (value: any) => {
-        const newOptions = {
-            ...optionsFilter,
-            categoryId: value !== '0' ? Number(value) : null,
-        };
-        setOptionsFilter(newOptions);
-    };
-    const handleChangePrice = (value: any) => {
-        if (value !== '0') {
-            const price = dataCategoryPrice.find(
-                (item: any) => item.id === Number(value)
-            );
-            const newOptions = {
-                ...optionsFilter,
-                startPrice: price?.startPrice,
-                endPrice: price?.endPrice,
-                priceId: price?.id,
-            };
-            console.log(newOptions);
-            setOptionsFilter(newOptions);
-        } else {
-            const newOptions = {
-                ...optionsFilter,
-                startPrice: null,
-                endPrice: null,
-                priceId: null,
-            };
-            console.log(newOptions);
-            setOptionsFilter(newOptions);
-        }
-    };
-    const handleChangeClinic = (value: any) => {
-        const newOptions = {
-            ...optionsFilter,
-            clinicId: value !== '0' ? Number(value) : null,
-        };
+    //     setOptionsFilter(newOptions);
+    // };
+    // const handleUpdateViewsService = async (id: number): Promise<any> => {
+    //     try {
+    //         const res = await ServicesService.updateViewsService(id);
+    //         console.log(res);
+    //     } catch (err: any) {
+    //         console.log(err.message);
+    //     }
+    // };
+    // const handleChangeCategory = (value: any) => {
+    //     const newOptions = {
+    //         ...optionsFilter,
+    //         categoryId: value !== '0' ? Number(value) : null,
+    //     };
+    //     setOptionsFilter(newOptions);
+    // };
+    // const handleChangePrice = (value: any) => {
+    //     if (value !== '0') {
+    //         const price = dataCategoryPrice.find(
+    //             (item: any) => item.id === Number(value)
+    //         );
+    //         const newOptions = {
+    //             ...optionsFilter,
+    //             startPrice: price?.startPrice,
+    //             endPrice: price?.endPrice,
+    //             priceId: price?.id,
+    //         };
+    //         console.log(newOptions);
+    //         setOptionsFilter(newOptions);
+    //     } else {
+    //         const newOptions = {
+    //             ...optionsFilter,
+    //             startPrice: null,
+    //             endPrice: null,
+    //             priceId: null,
+    //         };
+    //         console.log(newOptions);
+    //         setOptionsFilter(newOptions);
+    //     }
+    // };
+    // const handleChangeClinic = (value: any) => {
+    //     const newOptions = {
+    //         ...optionsFilter,
+    //         clinicId: value !== '0' ? Number(value) : null,
+    //     };
 
-        setOptionsFilter(newOptions);
-    };
-    const getAllCategoryServices = async () => {
-        try {
-            const res = await CategoryServicesService.getAllCategoryServices();
-            setCategoryServices(res);
-        } catch (err: any) {
-            console.log(err.message);
-        }
-    };
-    const getAllClinic = async () => {
-        try {
-            const data = {
-                pageIndex: 0,
-                pageSize: 0,
-            };
-            const res = await ClinicService.viewClinic(data);
-            console.log(res);
-            setClinics(res.data);
-        } catch (err: any) {
-            console.log(err.message);
-        }
-    };
+    //     setOptionsFilter(newOptions);
+    // };
+    // const getAllCategoryServices = async () => {
+    //     try {
+    //         const res = await CategoryServicesService.getAllCategoryServices();
+    //         setCategoryServices(res);
+    //     } catch (err: any) {
+    //         console.log(err.message);
+    //     }
+    // };
+    // const getAllClinic = async () => {
+    //     try {
+    //         const data = {
+    //             pageIndex: 0,
+    //             pageSize: 0,
+    //         };
+    //         const res = await ClinicService.viewClinic(data);
+    //         console.log(res);
+    //         setClinics(res.data);
+    //     } catch (err: any) {
+    //         console.log(err.message);
+    //     }
+    // };
 
-    const loadData = async () => {
-        try {
-            const data = {
-                pageIndex: 1,
-                pageSize: 10,
-                ...optionsFilter,
-            };
-            const res = await ServicesService.getServiceView(data);
-            console.log(res);
-            setPageCount(res.pageCount);
-            setServices(res.data);
-        } catch (err: any) {
-            console.log(err.message);
-            setServices([]);
-        }
-    };
+    // const loadData = async () => {
+    //     try {
+    //         const data = {
+    //             pageIndex: 1,
+    //             pageSize: 10,
+    //             ...optionsFilter,
+    //         };
+    //         const res = await ServicesService.getServiceView(data);
+    //         console.log(res);
+    //         setPageCount(res.pageCount);
+    //         setServices(res.data);
+    //     } catch (err: any) {
+    //         console.log(err.message);
+    //         setServices([]);
+    //     }
+    // };
 
-    useEffect(() => {
-        const getProvinces = async () => {
-            try {
-                const res = await axios.get(
-                    'https://vapi.vnappmob.com/api/province'
-                );
-                setProvinces(res.data.results);
-            } catch (err) {
-                console.log(err);
-            }
-        };
-        getAllCategoryServices();
-        getAllClinic();
-        getProvinces();
-        window.scrollTo(0, 0);
-    }, []);
-    useEffect(() => {
-        loadData();
-    }, [optionsFilter]);
+    // useEffect(() => {
+    //     const getProvinces = async () => {
+    //         try {
+    //             const res = await axios.get(
+    //                 'https://vapi.vnappmob.com/api/province'
+    //             );
+    //             setProvinces(res.data.results);
+    //         } catch (err) {
+    //             console.log(err);
+    //         }
+    //     };
+    //     getAllCategoryServices();
+    //     getAllClinic();
+    //     getProvinces();
+    //     window.scrollTo(0, 0);
+    // }, []);
+    // useEffect(() => {
+    //     loadData();
+    // }, [optionsFilter]);
     return (
         <>
-            {contextHolder}
+            {/* {contextHolder}
             <div className="position-relative ">
                 <div className="banner">
                     <Image
@@ -566,7 +564,7 @@ const ViewService = () => {
                     date={appointmentDate}
                     openNotificationWithIcon={openNotificationWithIcon}
                 />
-            )}
+            )} */}
         </>
     );
 };

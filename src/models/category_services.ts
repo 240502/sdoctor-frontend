@@ -1,4 +1,4 @@
-export interface CategoryService {
-    id: Number;
+export interface ServiceCategory {
+    id: number;
     name: string;
 }

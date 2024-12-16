@@ -1,9 +1,9 @@
 import { atom, selector } from 'recoil';
-import { Services } from '../models/services';
+import { Service } from '../models/service';
 
 export const serviceListState = atom({
     key: 'serviceListState',
-    default: [] as Services[],
+    default: [] as Service[],
 });
 export const serviceListValue = selector({
     key: 'serviceListValue',

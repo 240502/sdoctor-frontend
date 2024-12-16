@@ -3,7 +3,6 @@ import { Button, Input, Flex, InputRef, Form } from 'antd';
 import { useRef } from 'react';
 import { useRecoilState } from 'recoil';
 import { searchDoctorOptionsGlobal } from '../../../../stores/doctorAtom';
-import { doctorService } from '../../../../services/doctorService';
 import { useNavigate } from 'react-router-dom';
 
 export const BlockSearchDoctor = () => {
