@@ -1,12 +1,7 @@
-import { Col, Row, Image, Button, Tag, Card, Flex } from 'antd';
+import { Col, Row, Image, Button, Flex } from 'antd';
 import { Service } from '../models/service';
 import { useNavigate } from 'react-router-dom';
-import {
-    DeleteOutlined,
-    DollarOutlined,
-    EditOutlined,
-    EnvironmentOutlined,
-} from '@ant-design/icons';
+import { DollarOutlined, EnvironmentOutlined } from '@ant-design/icons';
 
 const ServiceCard = ({ services }: any) => {
     const navigate = useNavigate();
@@ -18,6 +13,11 @@ const ServiceCard = ({ services }: any) => {
                         <div className="card-container rounded border border-1 ">
                             <div className="service-image">
                                 <Image
+                                    onClick={() =>
+                                        navigate(
+                                            '/service/detail/' + service?.id
+                                        )
+                                    }
                                     preview={false}
                                     src={service.image}
                                     className="rounded"

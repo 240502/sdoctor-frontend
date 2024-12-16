@@ -1,4 +1,14 @@
-import { Col, Divider, Image, Input, Menu, Row, Select, Tabs } from 'antd';
+import {
+    Breadcrumb,
+    Col,
+    Divider,
+    Image,
+    Input,
+    Menu,
+    Row,
+    Select,
+    Tabs,
+} from 'antd';
 import { useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useRecoilValue } from 'recoil';
@@ -12,7 +22,11 @@ import { DoctorCard } from '../../../../components';
 import { Doctor } from '../../../../models/doctor';
 import { doctorService } from '../../../../services/doctorService';
 import { ClinicCards } from '../../../auth/clinic/components/ClinicCards';
-import { EnvironmentOutlined, SearchOutlined } from '@ant-design/icons';
+import {
+    EnvironmentOutlined,
+    HomeOutlined,
+    SearchOutlined,
+} from '@ant-design/icons';
 import { BlockDescription } from '../components/BlockDescription';
 import { MajorService } from '../../../../services/majorService';
 import { Major } from '../../../../models/major';
@@ -107,9 +121,15 @@ export const ViewClinicDetail = () => {
 
     return (
         <div className=" clinic-detail ">
-            <div className="position-relative container">
+            <div className="position-relative container mt-4 mb-4">
+                <Breadcrumb
+                    items={[
+                        { href: '/', title: <HomeOutlined /> },
+                        { title: 'Chi tiết cơ sở y tế' },
+                    ]}
+                />
                 <div
-                    className="image-cover position-relative overflow-hidden"
+                    className="image-cover position-relative overflow-hidden mt-3"
                     style={{ maxHeight: '400px' }}
                 >
                     <img

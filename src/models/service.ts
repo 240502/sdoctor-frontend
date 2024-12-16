@@ -12,4 +12,5 @@ export interface Service {
     category_name: string;
     location: string;
     clinic_name: string;
+    cover_image: string;
 }
