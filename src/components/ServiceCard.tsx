@@ -62,12 +62,9 @@ const ServiceCard = ({ services }: any) => {
                                     </p>
                                 </div>
                             </div>
-                            <Flex className="group-button justify-content-between pb-3">
-                                <Button className="border-0 text-success">
-                                    <EditOutlined /> Sửa
-                                </Button>
-                                <Button className="border-0 text-danger">
-                                    <DeleteOutlined /> Xóa
+                            <Flex className="group-button justify-content-center mt-3">
+                                <Button className="booking-btn">
+                                    Đặt lịch hẹn
                                 </Button>
                             </Flex>
                         </div>

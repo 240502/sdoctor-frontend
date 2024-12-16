@@ -6,6 +6,7 @@ import {
     Row,
     Col,
     Button,
+    Pagination,
 } from 'antd';
 import { HomeOutlined, PlusOutlined } from '@ant-design/icons';
 import { ServiceService } from '../../../../services/serviceService';
@@ -22,7 +23,6 @@ import { serviceListState } from '../../../../stores/servicesAtom';
 import ServiceCard from '../components/ServiceCard';
 import { ConfirmModal } from '../../../../components';
 import { openNotification } from '../../../../utils/notification';
-type NotificationType = 'success' | 'error';
 
 const ServiceManagement = () => {
     const config = useRecoilValue(configValue);
@@ -162,11 +162,23 @@ const ServiceManagement = () => {
             <Divider></Divider>
             <div className="block-services">
                 {services?.length > 0 ? (
-                    <ServiceCard
-                        services={services}
-                        onClickEditButton={onClickEditButton}
-                        onClickDeleteButton={onClickDeleteButton}
-                    />
+                    <>
+                        <ServiceCard
+                            services={services}
+                            onClickEditButton={onClickEditButton}
+                            onClickDeleteButton={onClickDeleteButton}
+                        />
+                        {pageCount > 1 && (
+                            <Pagination
+                                current={pageIndex}
+                                pageSize={pageSize}
+                                total={pageCount * pageSize}
+                                onChange={changePage}
+                                showSizeChanger
+                                pageSizeOptions={['4', '8', '12', '16', '20']}
+                            />
+                        )}
+                    </>
                 ) : (
                     <p>Không có gói khám nào!</p>
                 )}
