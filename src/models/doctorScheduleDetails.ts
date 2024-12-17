@@ -1,7 +1,9 @@
 export interface DoctorScheduleDetail {
-    id: number;
+    id: number | null;
     schedule_id: number | null;
-    time_id: number;
+    start_time: string;
+    end_time: string;
     available: number | null;
     action: number | null;
+    appointment_duration: string;
 }

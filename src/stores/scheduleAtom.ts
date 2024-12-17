@@ -1,9 +1,9 @@
 import { atom, selector } from 'recoil';
-import { Schedule } from '../models/doctorSchedule';
+import { DoctorSchedule } from '../models/doctorSchedule';
 
 export const scheduleListState = atom({
     key: 'scheduleListState',
-    default: [] as Schedule[],
+    default: [] as DoctorSchedule[],
 });
 
 export const scheduleListValue = selector({

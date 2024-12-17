@@ -1,0 +1,17 @@
+.schedule-management {
+    .time-slots {
+        button {
+            background: #f1f5f9;
+            transition: all 0.3s linear;
+            font-size: 15px;
+            font-weight: 600;
+            color: #334155;
+            min-width: 120px;
+            padding: 20px;
+        }
+        button:hover {
+            background: #0f172a !important;
+            color: #ffffff !important;
+        }
+    }
+}
