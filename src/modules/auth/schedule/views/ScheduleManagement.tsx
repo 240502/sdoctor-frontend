@@ -3,9 +3,7 @@ import {
     Breadcrumb,
     Button,
     Card,
-    Col,
     Flex,
-    Row,
     Select,
     TabsProps,
     notification,
@@ -21,11 +19,7 @@ import { DoctorSchedule } from '../../../../models/doctorSchedule';
 import { handleGetDateByActiveDay } from '../../../../utils/schedule_management';
 type NotificationType = 'success' | 'error';
 import '@/assets/scss/schedule_management.scss';
-import { AddSlotModal } from '../components/AddSlotModal';
-import {
-    scheduleDetailsState,
-    scheduleDetailsValue,
-} from '../../../../stores/scheduleDetailAtom';
+import { scheduleDetailsState } from '../../../../stores/scheduleDetailAtom';
 const tabs: TabsProps['items'] = [
     {
         key: '1',
@@ -57,13 +51,16 @@ const tabs: TabsProps['items'] = [
     },
 ];
 const ScheduleManagement = () => {
+    const now = new Date();
     const user = useRecoilValue(userValue);
     const config = useRecoilValue(configValue);
     const [api, contextHolder] = notification.useNotification();
-    const [activeDay, setActiveDay] = useState<string>('1');
+    const [activeDay, setActiveDay] = useState<string>(String(now.getDay()));
     const [schedule, setSchedule] = useState<DoctorSchedule>(
         {} as DoctorSchedule
     );
+    const [intervalTime, setIntervalTime] = useState<number>(30);
+
     const [doctorScheduleDetails, setDoctorScheduleDetails] =
         useRecoilState(scheduleDetailsState);
     const [isVisibleButtonSave, setIsVisibleButtonSave] =
@@ -81,9 +78,6 @@ const ScheduleManagement = () => {
         });
     };
 
-    const cancelAddSlotsModal = () => {
-        setOpenAddSlotsModal(false);
-    };
     const handleGetScheduleBySubscriberAndDate = () => {
         const dateOfWeek = handleGetDateByActiveDay(Number(activeDay));
         const data = {
@@ -98,9 +92,8 @@ const ScheduleManagement = () => {
     const GetScheduleBySubscriberIdAndDate = async (data: any) => {
         try {
             const res = await scheduleService.viewScheduleForDoctor(data);
-            console.log('call api');
             setSchedule(res.data);
-            setDoctorScheduleDetails(res?.data?.listScheduleDetails);
+            //setDoctorScheduleDetails(res?.data?.listScheduleDetails);
             // let timeAvailable: any = [];
             // res.data.listScheduleDetails.forEach(
             //     (item: DoctorScheduleDetail) => {
@@ -120,177 +113,121 @@ const ScheduleManagement = () => {
             // setSelectedTimeKeys([]);
         }
     };
-    const handleOnClickSave = () => {
-        // if (schedule?.id || isUpdate) {
-        //     let isDiff = false;
-        //     if (
-        //         schedule.listScheduleDetails.length === selectedTimeKeys.length
-        //     ) {
-        //         const existsTimeKeys = schedule.listScheduleDetails.map(
-        //             (detail: DoctorScheduleDetail) => detail.time_id
-        //         );
-        //         const combined = [
-        //             ...new Set([...existsTimeKeys, ...selectedTimeKeys]),
-        //         ];
 
-        //         if (combined.length > schedule.listScheduleDetails.length) {
-        //             isDiff = true;
+    const handleUpdateSchedule = () => {
+        let deletedDetails: DoctorScheduleDetail[] = [];
+        console.log(doctorScheduleDetails.length);
+        let newTimes: Time[] = [];
+        if (
+            doctorScheduleDetails.length > schedule.listScheduleDetails.length
+        ) {
+            const newDetails = doctorScheduleDetails.map(
+                (detail: DoctorScheduleDetail) => {
+                    if (!schedule.listScheduleDetails.includes(detail)) {
+                        return { ...detail, action: 1 };
+                    } else return detail;
+                }
+            );
+            console.log('add new time', newDetails);
+
+            updateSchedule(Number(schedule.id), newDetails);
+            // newTimes = doctorScheduleDetails.filter((time: Time) => {
+            //     const exist = schedule.listScheduleDetails.find(
+            //         (detail: DoctorScheduleDetail) => detail.time_id === time.id
+            //     );
+            //     if (!exist) {
+            //         return time;
+            //     }
+            // });
+            // deletedDetails = schedule.listScheduleDetails.filter(
+            //     (detail: DoctorScheduleDetail) => {
+            //         if (!selectedTimeKeys.includes(detail.time_id)) {
+            //             return detail;
+            //         }
+            //     }
+            // );
+        }
+        // if (selectedTimes.length <= schedule.listScheduleDetails.length) {
+        //     console.log('delete time');
+        //     deletedDetails = schedule.listScheduleDetails.filter(
+        //         (detail: DoctorScheduleDetail) => {
+        //             if (!selectedTimeKeys.includes(detail.time_id)) {
+        //                 return detail;
+        //             }
         //         }
-        //     } else {
-        //         isDiff = true;
-        //     }
-        //     if (isDiff) {
-        //         handleUpdateSchedule();
-        //     }
-        // } else {
-        handleCreateSchedule();
+        //     );
+        //     newTimes = selectedTimes.filter((time: Time) => {
+        //         const exist = schedule.listScheduleDetails.find(
+        //             (detail: DoctorScheduleDetail) => detail.time_id === time.id
+        //         );
+        //         if (!exist) {
+        //             return time;
+        //         }
+        //     });
+        // }
+        // let scheduleDetailsAvailable = schedule.listScheduleDetails;
+        // if (newTimes.length > 0) {
+        //     const scheduleDetails: DoctorScheduleDetail[] = [];
+        //     newTimes.forEach((time: Time) => {
+        //         const scheduleDetail: DoctorScheduleDetail = {
+        //             id: 0,
+        //             time_id: time.id,
+        //             schedule_id: null,
+        //             available: 1,
+        //             action: 1,
+        //         };
+        //         scheduleDetails.push(scheduleDetail);
+        //     });
+        //     scheduleDetailsAvailable = [
+        //         ...scheduleDetailsAvailable,
+        //         ...scheduleDetails,
+        //     ];
+        // }
+        // console.log('deleted', deletedDetails);
+        // if (deletedDetails.length > 0) {
+        //     scheduleDetailsAvailable = scheduleDetailsAvailable.map(
+        //         (detail: DoctorScheduleDetail) => {
+        //             if (deletedDetails.includes(detail)) {
+        //                 return { ...detail, action: 3 };
+        //             } else {
+        //                 return detail;
+        //             }
+        //         }
+        //     );
         // }
     };
-    // const handleUpdateSchedule = () => {
-    //     let deletedDetails: DoctorScheduleDetail[] = [];
-    //     let newTimes: Time[] = [];
-    //     if (selectedTimes.length > schedule.listScheduleDetails.length) {
-    //         console.log('add new time');
-    //         newTimes = selectedTimes.filter((time: Time) => {
-    //             const exist = schedule.listScheduleDetails.find(
-    //                 (detail: DoctorScheduleDetail) => detail.time_id === time.id
-    //             );
-    //             if (!exist) {
-    //                 return time;
-    //             }
-    //         });
-    //         deletedDetails = schedule.listScheduleDetails.filter(
-    //             (detail: DoctorScheduleDetail) => {
-    //                 if (!selectedTimeKeys.includes(detail.time_id)) {
-    //                     return detail;
-    //                 }
-    //             }
-    //         );
-    //     }
-    //     if (selectedTimes.length <= schedule.listScheduleDetails.length) {
-    //         console.log('delete time');
-    //         deletedDetails = schedule.listScheduleDetails.filter(
-    //             (detail: DoctorScheduleDetail) => {
-    //                 if (!selectedTimeKeys.includes(detail.time_id)) {
-    //                     return detail;
-    //                 }
-    //             }
-    //         );
-    //         newTimes = selectedTimes.filter((time: Time) => {
-    //             const exist = schedule.listScheduleDetails.find(
-    //                 (detail: DoctorScheduleDetail) => detail.time_id === time.id
-    //             );
-    //             if (!exist) {
-    //                 return time;
-    //             }
-    //         });
-    //     }
-    //     let scheduleDetailsAvailable = schedule.listScheduleDetails;
-    //     if (newTimes.length > 0) {
-    //         const scheduleDetails: DoctorScheduleDetail[] = [];
-    //         newTimes.forEach((time: Time) => {
-    //             const scheduleDetail: DoctorScheduleDetail = {
-    //                 id: 0,
-    //                 time_id: time.id,
-    //                 schedule_id: null,
-    //                 available: 1,
-    //                 action: 1,
-    //             };
-    //             scheduleDetails.push(scheduleDetail);
-    //         });
-    //         scheduleDetailsAvailable = [
-    //             ...scheduleDetailsAvailable,
-    //             ...scheduleDetails,
-    //         ];
-    //     }
-    //     console.log('deleted', deletedDetails);
-    //     if (deletedDetails.length > 0) {
-    //         scheduleDetailsAvailable = scheduleDetailsAvailable.map(
-    //             (detail: DoctorScheduleDetail) => {
-    //                 if (deletedDetails.includes(detail)) {
-    //                     return { ...detail, action: 3 };
-    //                 } else {
-    //                     return detail;
-    //                 }
-    //             }
-    //         );
-    //     }
-    //     updateSchedule(Number(schedule.id), scheduleDetailsAvailable);
-    // };
-    // const updateSchedule = async (
-    //     id: number,
-    //     scheduleDetails: DoctorScheduleDetail[]
-    // ) => {
-    //     try {
-    //         const data = {
-    //             id: id,
-    //             scheduleDetails: scheduleDetails.filter(
-    //                 (detail: DoctorScheduleDetail) => detail?.action
-    //             ),
-    //         };
-
-    //         const res = await scheduleService.updateSchedule(data, config);
-    //         handleGetScheduleBySubscriberAndDate();
-    //         openNotification(
-    //             'success',
-    //             'Thông báo !',
-    //             'Cập nhập thời gian thành công!'
-    //         );
-    //     } catch (err: any) {
-    //         console.log(err.message);
-    //         openNotification(
-    //             'error',
-    //             'Thông báo !',
-    //             'Cập nhập thời gian không thành công!'
-    //         );
-    //     }
-    // };
-    const handleCreateSchedule = () => {
-        const now = new Date();
-        let dateOfWeek;
-        if (now.getDay() === Number(activeDay)) {
-            dateOfWeek = now;
-        } else {
-            dateOfWeek = handleGetDateByActiveDay(Number(activeDay));
-        }
-        const schedule = {
-            doctor_id: user.doctor_id,
-            date: `${dateOfWeek.getFullYear()}-${
-                dateOfWeek.getMonth() + 1
-            }-${dateOfWeek.getDate()}`,
-            listScheduleDetails: doctorScheduleDetails,
-        };
-        CreateSchedule(schedule);
-    };
-    const CreateSchedule = async (data: any) => {
+    const updateSchedule = async (
+        id: number,
+        scheduleDetails: DoctorScheduleDetail[]
+    ) => {
         try {
-            console.log(data);
-            const res = await scheduleService.createSchedule(data, config);
-            setSchedule(res?.data.result);
-            setDoctorScheduleDetails(res?.data?.result.listScheduleDetails);
+            const data = {
+                id: id,
+                scheduleDetails: scheduleDetails.filter(
+                    (detail: DoctorScheduleDetail) => detail?.action
+                ),
+            };
+
+            const res = await scheduleService.updateSchedule(data, config);
+            handleGetScheduleBySubscriberAndDate();
             openNotification(
                 'success',
                 'Thông báo !',
-                'Đăng ký lịch thành công'
+                'Cập nhập thời gian thành công!'
             );
-            setIsUpdate(true);
-            handleGetScheduleBySubscriberAndDate();
         } catch (err: any) {
             console.log(err.message);
             openNotification(
                 'error',
                 'Thông báo !',
-                'Đăng ký lịch không thành công'
+                'Cập nhập thời gian không thành công!'
             );
         }
     };
-
-    useEffect(() => handleGetScheduleBySubscriberAndDate(), [activeDay]);
-
     useEffect(() => {
-        const now = new Date();
-        setActiveDay(String(now.getDay()));
-    }, []);
+        console.log('call api');
+        handleGetScheduleBySubscriberAndDate();
+    }, [activeDay]);
 
     return (
         <div className="schedule-management">
@@ -330,6 +267,19 @@ const ScheduleManagement = () => {
                         );
                     })}
                 </div>
+                <div className="w-25 mt-3 mb-3">
+                    <Select
+                        className="w-100"
+                        value={intervalTime}
+                        placeholder="Chọn loại thời gian"
+                        onChange={(value: number) => {
+                            setIntervalTime(value);
+                        }}
+                    >
+                        <Select.Option value={30}>30 phút</Select.Option>
+                        <Select.Option value={60}>60 phút</Select.Option>
+                    </Select>
+                </div>
                 <Card
                     className="card-time mt-3"
                     title={
@@ -341,46 +291,23 @@ const ScheduleManagement = () => {
                                         : 6
                                 ].label
                             }
-                            <Flex className="group-button justify-content-between">
-                                <Button
-                                    className="border-0 text-primary fw-bold col-6"
-                                    onClick={() => {
-                                        setOpenAddSlotsModal(true);
-                                    }}
-                                >
-                                    Thêm thời gian
-                                </Button>
-                                <Button className="text-danger  border-0 fw-bold col-6">
-                                    Xóa tất cả
-                                </Button>
-                            </Flex>
                         </Flex>
                     }
                 >
                     <ListTime
                         activeDay={Number(activeDay)}
                         schedule={schedule}
+                        user={user}
+                        config={config}
+                        setSchedule={setSchedule}
+                        openNotification={openNotification}
+                        handleGetScheduleBySubscriberAndDate={
+                            handleGetScheduleBySubscriberAndDate
+                        }
+                        interval={intervalTime}
                     />
                 </Card>
             </div>
-            <div className="group__btn text-center mt-3">
-                <Button
-                    onClick={() => {
-                        handleOnClickSave();
-                    }}
-                    // disabled={!isVisibleButtonSave}
-                    type="primary"
-                    className="text-white bg-success p-3 fs-6"
-                >
-                    Lưu
-                </Button>
-            </div>
-            {
-                <AddSlotModal
-                    openModal={openAddSlotsModal}
-                    cancelAddSlotsModal={cancelAddSlotsModal}
-                />
-            }
         </div>
     );
 };

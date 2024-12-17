@@ -1,7 +1,7 @@
 import { Modal, Button, TimePicker, Col, Form, Select, Row } from 'antd';
 import type { TimePickerProps } from 'antd';
 import dayjs, { Dayjs } from 'dayjs';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRecoilState, useSetRecoilState } from 'recoil';
 import { scheduleDetailsState } from '../../../../stores/scheduleDetailAtom';
 import { DoctorScheduleDetail } from '../../../../models/doctorScheduleDetails';
@@ -13,7 +13,8 @@ export const AddSlotModal = ({ openModal, cancelAddSlotsModal }: any) => {
         { label: '30 phút', value: 30 },
         { label: '60 phút', value: 60 },
     ];
-    const setScheduleDetails = useSetRecoilState(scheduleDetailsState);
+    const [doctorScheduleDetails, setDoctorScheduleDetails] =
+        useRecoilState(scheduleDetailsState);
 
     const [duration, setDuration] = useState<number>(0);
     const [form] = Form.useForm();
@@ -27,7 +28,6 @@ export const AddSlotModal = ({ openModal, cancelAddSlotsModal }: any) => {
     };
 
     const handleStartTimeChange: TimePickerProps['onChange'] = (time) => {
-        form.setFieldsValue({ start_time: time }); // Cập nhật giá trị start_time trong form
         if (time && duration) {
             const newEndTime = time.add(duration, 'minute');
 
@@ -48,13 +48,26 @@ export const AddSlotModal = ({ openModal, cancelAddSlotsModal }: any) => {
             appointment_duration: String(durationOption?.label),
         };
         console.log('newDetail', newDetail);
-        setScheduleDetails((prevDetail: DoctorScheduleDetail[]) => [
+        setDoctorScheduleDetails((prevDetail: DoctorScheduleDetail[]) => [
             ...prevDetail,
             newDetail,
         ]);
         cancelAddSlotsModal();
-        setDuration(0);
+        form.resetFields();
     };
+    useEffect(() => {
+        if (doctorScheduleDetails?.length > 0 && openModal) {
+            console.log('set value');
+            form.setFieldValue(
+                'start_time',
+                dayjs(
+                    doctorScheduleDetails[doctorScheduleDetails.length - 1]
+                        .end_time,
+                    'HH:mm'
+                )
+            );
+        }
+    }, [doctorScheduleDetails, openModal]);
     return (
         <Modal
             title="Thêm thời gian"
@@ -62,7 +75,7 @@ export const AddSlotModal = ({ openModal, cancelAddSlotsModal }: any) => {
             className="w-50"
             onCancel={() => {
                 cancelAddSlotsModal();
-                setDuration(0);
+                form.resetFields();
             }}
             footer={[
                 <Button
@@ -76,6 +89,7 @@ export const AddSlotModal = ({ openModal, cancelAddSlotsModal }: any) => {
                 <Button
                     onClick={() => {
                         cancelAddSlotsModal();
+                        form.resetFields();
                     }}
                 >
                     Đóng
