@@ -27,7 +27,6 @@ import { patientProfileState } from '../../../../stores/patientAtom';
 export const InputAppointmentModal = ({
     openModal,
     cancelModal,
-    time,
     date,
     doctor,
     patientProfileCopy,
@@ -35,6 +34,7 @@ export const InputAppointmentModal = ({
     setPatientProfileCopy,
     patientProfile,
     setPaymentMethod,
+    scheduleDetail,
 }: any) => {
     const [provinces, setProvinces] = useState<ProvinceType[]>([]);
     const [districts, setDistricts] = useState<DistrictType[]>([]);
@@ -68,8 +68,8 @@ export const InputAppointmentModal = ({
             examination_reason: values.reason,
             doctor_name: doctor?.full_name,
             location: doctor.location,
-            time_value: time.value,
-            time_id: time.id,
+            time_value: `${scheduleDetail.start_time} - ${scheduleDetail.end_time}`,
+            time_id: scheduleDetail.time_id,
             price: doctor.price,
             service_id: doctor.service_id,
             service_name: doctor.service_name,
@@ -282,12 +282,14 @@ export const InputAppointmentModal = ({
                     </div>
                     <div className="time">
                         <p className="">
-                            <strong>Thời gian: </strong> {time.value}
+                            <strong>Thời gian: </strong>{' '}
+                            {scheduleDetail.start_time} -{' '}
+                            {scheduleDetail.end_time}
                         </p>
                         <p>
                             {' '}
                             <strong>Ngày khám: </strong>
-                            {date}
+                            {dayjs(date).format('DD-MM-YYYY')}
                         </p>
                     </div>
                     <div className="location ">

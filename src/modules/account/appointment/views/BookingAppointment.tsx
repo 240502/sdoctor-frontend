@@ -3,7 +3,7 @@ import {
     ClockCircleOutlined,
     HomeOutlined,
 } from '@ant-design/icons';
-import { Breadcrumb, Col, notification, Row } from 'antd';
+import { Breadcrumb, Col, notification, Row, Button } from 'antd';
 import 'dayjs/locale/vi';
 import { useEffect, useState } from 'react';
 import { scheduleService } from '../../../../services/doctorScheduleService';
@@ -11,7 +11,6 @@ import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { doctorValue } from '../../../../stores/doctorAtom';
 import { DoctorSchedule } from '../../../../models/doctorSchedule';
 import { BlockCalendar } from '../components/BlockCalendar';
-import { TimeButton } from '../components/TimeButton';
 import { Time } from '../../../../models/time';
 import { DoctorScheduleDetail } from '../../../../models/doctorScheduleDetails';
 import { InputAppointmentModal } from '../components/InputAppointmentModal';
@@ -29,16 +28,17 @@ const BookingAppointment = () => {
     const doctor = useRecoilValue(doctorValue);
     const now = new Date();
     const [date, setDate] = useState<string>(
-        `${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()}`
+        `${now.getDate()}-${now.getMonth() + 1}-${now.getFullYear()}`
     );
     const [schedule, setSchedule] = useState<DoctorSchedule>(
         {} as DoctorSchedule
     );
+    const [scheduleDetail, setScheduleDetail] = useState<DoctorScheduleDetail>(
+        {} as DoctorScheduleDetail
+    );
     const patientProfile = useRecoilValue(patientProfileValue);
     const [patientProfileCopy, setPatientProfileCopy] =
         useState<PatientProfile>({} as PatientProfile);
-    const [times, setTimes] = useState<Time[]>([]);
-    const [time, setTime] = useState<Time>({} as Time);
     const setNewAppointment = useSetRecoilState(newAppointmentState);
     const [openInputModal, setOpenInputModal] = useState<boolean>(false);
     const [paymentMethod, setPaymentMethod] = useState<number>(1);
@@ -53,12 +53,11 @@ const BookingAppointment = () => {
         });
     };
 
-    const handleClickTimeButton = (time: Time) => {
-        setTime(time);
+    const handleClickTimeButton = (scheduleDetail: DoctorScheduleDetail) => {
         setOpenInputModal(true);
+        setScheduleDetail(scheduleDetail);
     };
     const cancelInputModal = () => {
-        setTime({} as Time);
         setOpenInputModal(false);
     };
 
@@ -82,40 +81,26 @@ const BookingAppointment = () => {
                 subscriberId: doctor.doctor_id,
             };
             const result = await scheduleService.viewScheduleForClient(data);
+            console.log(result);
             setSchedule(result.data);
         } catch (err: any) {
             setSchedule({} as DoctorSchedule);
         }
     };
     const handleTimeOverRealTime = () => {
-        const intervalId = setInterval(() => {
-            times.forEach((time: Time) => {
+        schedule.listScheduleDetails.forEach((detail: DoctorScheduleDetail) => {
+            if (detail.available === 1) {
                 const now = new Date();
                 const hours = now.getHours();
                 const minutes = now.getMinutes();
-                const listTime: any = time?.value.split('-');
-                let startMinute = listTime[0].split('.')[1];
-                let startHour = listTime[0].split('.')[0];
-                const doctorScheduleDetail: any =
-                    schedule.listScheduleDetails.find(
-                        (detail: DoctorScheduleDetail) =>
-                            detail.time_id === time?.id
-                    );
-
+                let startMinute = detail?.start_time?.split(':')[1];
+                let startHour = detail?.start_time?.split(':')[0];
                 if (Number(startHour) === Number(hours)) {
                     if (Number(startMinute) === 0) {
-                        const newTimes = times.filter(
-                            (item: Time) => item.id !== time?.id
-                        );
-                        setTimes(newTimes);
-                        updateAvailableScheduleDetail(doctorScheduleDetail?.id);
+                        updateAvailableScheduleDetail(Number(detail?.id));
                     }
                     if (Math.abs(Number(startHour) - Number(minutes)) >= 20) {
-                        const newTimes = times.filter(
-                            (item: Time) => item.id !== time?.id
-                        );
-                        setTimes(newTimes);
-                        updateAvailableScheduleDetail(doctorScheduleDetail?.id);
+                        updateAvailableScheduleDetail(Number(detail?.id));
                     }
                 }
 
@@ -124,24 +109,16 @@ const BookingAppointment = () => {
                     Math.abs(Number(startHour) - Number(hours)) === 1
                 ) {
                     if (Math.abs(60 - Number(minutes)) <= 20) {
-                        const newTimes = times.filter(
-                            (item: Time) => item.id !== time?.id
-                        );
-                        setTimes(newTimes);
-                        updateAvailableScheduleDetail(doctorScheduleDetail?.id);
+                        updateAvailableScheduleDetail(Number(detail?.id));
                     }
                 }
                 if (Number(startHour) < Number(hours)) {
-                    const newTimes = times.filter(
-                        (item: Time) => item.id !== time?.id
-                    );
-                    setTimes(newTimes);
-                    updateAvailableScheduleDetail(doctorScheduleDetail?.id);
+                    updateAvailableScheduleDetail(Number(detail?.id));
                 }
-            });
-        }, 1000);
-        return intervalId;
+            }
+        });
     };
+
     const CreateNotification = async (data: any) => {
         try {
             const res = await NotificationService.createNotification(data);
@@ -198,18 +175,21 @@ const BookingAppointment = () => {
     }, [date]);
     useEffect(() => {
         let intervalId: any;
-        if (times.length > 0) {
+        if (schedule?.listScheduleDetails?.length > 0) {
             const newDate = new Date(date);
             const now = new Date();
             if (newDate.getDate() === now.getDate()) {
-                intervalId = handleTimeOverRealTime();
+                intervalId = setInterval(() => {
+                    handleTimeOverRealTime();
+                }, 1000);
             }
         }
+
         return () => {
             clearInterval(intervalId);
             console.log('clear:' + intervalId);
         };
-    }, [times.length]);
+    }, [schedule?.listScheduleDetails?.length]);
 
     return (
         <div className="container mt-4 mb-4">
@@ -239,8 +219,6 @@ const BookingAppointment = () => {
                                 doctor={doctor}
                                 setDate={setDate}
                                 setSchedule={setSchedule}
-                                setTimes={setTimes}
-                                times={times}
                             />
                         </div>
                     </Col>
@@ -254,16 +232,21 @@ const BookingAppointment = () => {
                                 <Row gutter={[24, 24]}>
                                     {schedule.listScheduleDetails.map(
                                         (detail: DoctorScheduleDetail) => {
-                                            return (
+                                            return detail.available === 1 ? (
                                                 <Col span={6}>
-                                                    <TimeButton
-                                                        setTimes={setTimes}
-                                                        handleClickTimeButton={
-                                                            handleClickTimeButton
-                                                        }
-                                                        timeId={detail.time_id}
-                                                    />
+                                                    <Button
+                                                        onClick={() => {
+                                                            handleClickTimeButton(
+                                                                detail
+                                                            );
+                                                        }}
+                                                    >
+                                                        {detail.start_time} -{' '}
+                                                        {detail.end_time}
+                                                    </Button>
                                                 </Col>
+                                            ) : (
+                                                <></>
                                             );
                                         }
                                     )}
@@ -279,7 +262,6 @@ const BookingAppointment = () => {
                 <InputAppointmentModal
                     openModal={openInputModal}
                     cancelModal={cancelInputModal}
-                    time={time}
                     date={date}
                     doctor={doctor}
                     patientProfileCopy={patientProfileCopy}
@@ -287,6 +269,7 @@ const BookingAppointment = () => {
                     setPatientProfileCopy={setPatientProfileCopy}
                     patientProfile={patientProfile}
                     setPaymentMethod={setPaymentMethod}
+                    scheduleDetail={scheduleDetail}
                 />
             )}
         </div>

@@ -3,6 +3,7 @@ import type { CalendarProps } from 'antd';
 import type { Dayjs } from 'dayjs';
 import 'dayjs/locale/vi';
 import { useEffect } from 'react';
+import dayjs from 'dayjs';
 export const BlockCalendar = ({ setDate, setSchedule, setTimes }: any) => {
     const currentDate = new Date();
 
@@ -69,8 +70,9 @@ export const BlockCalendar = ({ setDate, setSchedule, setTimes }: any) => {
         setTimes([]);
     };
     useEffect(() => {
-        const today = new Date();
-        const formattedDate = today.toISOString().split('T')[0];
+        const today = dayjs();
+        const formattedDate = today.format('YYYY-MM-DD');
+        console.log(formattedDate); // Ví dụ: 22 04 2024
         setDate(formattedDate);
     }, []);
     return (
