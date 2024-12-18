@@ -1,18 +1,16 @@
 import { Button, Card, Col, Flex, notification, Row } from 'antd';
 import SummaryCards from '../components/SummaryCards';
 import AppointmentTable from '../components/AppointmentTable';
-import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
+import { useRecoilState, useRecoilValue } from 'recoil';
 import { useEffect, useState } from 'react';
-import { configValue, userState, userValue } from '../../../../stores/userAtom';
+import { configValue, userValue } from '../../../../stores/userAtom';
 import { useAppointments } from '../../../../hooks/useAppointments';
 import { ModalViewAppointment } from '../components/ModalViewAppointment';
 import { Appointment } from '../../../../models/appointment';
 import { appointmentListInDayState } from '../../../../stores/appointmentAtom';
 import { WeeklyOverview } from '../components/WeeklyOverview';
-import { RecentPatientCard } from '../components/RecentPatientCard';
 import { RecentInvoicesTable } from '../components/RecentInvoicesTable';
 import { useNavigate } from 'react-router-dom';
-import { doctorService } from '../../../../services/doctorService';
 type NotificationType = 'success' | 'error';
 
 const DashBoard = () => {

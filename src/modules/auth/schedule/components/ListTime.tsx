@@ -8,8 +8,9 @@ import { CloseOutlined, PlusOutlined } from '@ant-design/icons';
 import { handleGetDateByActiveDay } from '../../../../utils/schedule_management';
 import { scheduleService } from '../../../../services/doctorScheduleService';
 import { DoctorScheduleDetail } from '../../../../models/doctorScheduleDetails';
+import { handleTimeOverRealTime } from '../../../../utils/schedule';
 
-type MessageType = 'success' | 'error';
+type MessageType = 'success' | 'error' | 'warning';
 export const ListTime = ({
     activeDay,
     schedule,
@@ -19,28 +20,42 @@ export const ListTime = ({
     openNotification,
     handleGetScheduleBySubscriberAndDate,
     interval,
+    selectedTimes,
+    setSelectedTimes,
 }: any) => {
-    const [isVisible, setIsVisible] = useState<boolean>(false);
+    const [disableSaveButton, setDisableSaveButton] = useState<boolean>(false);
     const [doctorScheduleDetails, setDoctorScheduleDetails] =
         useRecoilState(scheduleDetailsState);
     const [times, setTimes] = useState<Time[]>([]);
-    const [selectedTimes, setSelectedTimes] = useState<Time[]>([]);
     const [deleteDetails, setDeletedDetails] = useState<DoctorScheduleDetail[]>(
         []
     );
-    const [isUpdate, setIsUpdate] = useState<boolean>(false);
     const [messageApi, contextHolder] = message.useMessage();
     const handleOverTime = (day: number) => {
         const now = new Date();
         if (day < now.getDay() && day !== 0) {
-            setIsVisible(true);
-        } else setIsVisible(false);
+            setDisableSaveButton(true);
+        } else setDisableSaveButton(false);
     };
     const getTimeByType = async () => {
         try {
             const data = { timeType: interval };
             const res = await TimeService.getTimeByTimeType(data);
-            setTimes(res);
+            const now = new Date();
+            if (activeDay === now.getDay()) {
+                const newTimes = handleTimeOverRealTime(res);
+                setTimes(newTimes);
+            }
+            if (activeDay !== 0 && activeDay < now.getDay()) {
+                const newTimes = res.map((time: Time) => {
+                    return { ...time, disable: true };
+                });
+                setTimes(newTimes);
+            }
+            if (activeDay === 0 || activeDay > now.getDay()) {
+                setTimes(res);
+            }
+            console.log('times', res);
         } catch (err: any) {
             console.log(err.message);
             setTimes([]);
@@ -79,7 +94,6 @@ export const ListTime = ({
             }-${dateOfWeek.getDate()}`,
             listScheduleDetails: newDoctorScheduleDetail,
         };
-        console.log(schedule);
         CreateSchedule(schedule);
     };
     const CreateSchedule = async (data: any) => {
@@ -102,75 +116,6 @@ export const ListTime = ({
             );
         }
     };
-
-    // const handleTimeOverRealTime = (times: any) => {
-    //     const now = new Date();
-    //     const hours = String(now.getHours()).padStart(2, '0');
-    //     const minutes = String(now.getMinutes()).padStart(2, '0');
-    //     let newTimes: any = [];
-    //     newTimes = times.map((time: Time) => {
-    //         const listTime: any = time?.value.split('-');
-    //         const startMinute = listTime[0].split('.')[1];
-
-    //         const startHour = listTime[0].split('.')[0];
-    //         if (Number(hours) === Number(startHour)) {
-    //             if (Number(startMinute) - Number(minutes) <= 15) {
-    //                 return { ...time, disable: true };
-    //             } else {
-    //                 return { ...time, disable: false };
-    //             }
-    //         }
-    //         if (Number(hours) > Number(startHour)) {
-    //             return { ...time, disable: true };
-    //         }
-    //         if (Number(hours) < Number(startHour)) {
-    //             return { ...time, disable: false };
-    //         }
-    //     });
-    //     //setTimes(newTimes);
-    // };
-
-    // const handleSelectTimeAvailable = (time: Time) => {
-    //     if (selectedTimes.length > 0) {
-    //         const existsTime = selectedTimes.find(
-    //             (selectedTime: Time) => selectedTime.id === time.id
-    //         );
-
-    //         if (existsTime) {
-    //             const newListSelectedTime = selectedTimes.filter(
-    //                 (selectedTime: Time) => selectedTime.id !== time.id
-    //             );
-    //             setSelectedTimes(newListSelectedTime);
-    //         } else {
-    //             const newList = [...selectedTimes, time];
-    //             newList.sort((firstTime: Time, secondTime: Time) => {
-    //                 return Number(firstTime.id) - Number(secondTime.id);
-    //             });
-    //             setSelectedTimes(newList);
-    //         }
-    //     } else {
-    //         setSelectedTimes([...selectedTimes, time]);
-    //     }
-    // };
-    // const handleSelectedKeys = (timeKey: number) => {
-    //     if (selectedTimeKeys.length > 0) {
-    //         const existsKey = selectedTimeKeys.find(
-    //             (key: any) => key === timeKey
-    //         );
-
-    //         if (existsKey) {
-    //             const newListSelectedTimeKeys: any = selectedTimeKeys.filter(
-    //                 (key: any) => key !== timeKey
-    //             );
-    //             setSelectedTimeKeys(newListSelectedTimeKeys);
-    //         } else {
-    //             const newList: any = [...selectedTimeKeys, timeKey];
-    //             setSelectedTimeKeys(newList);
-    //         }
-    //     } else {
-    //         setSelectedTimeKeys([...selectedTimeKeys, timeKey]);
-    //     }
-    // };
 
     const openMessage = (type: MessageType, message: string) => {
         messageApi.open({ type: type, content: message });
@@ -223,10 +168,15 @@ export const ListTime = ({
                 }
             );
         }
-        updateSchedule(schedule?.id, [
-            ...newDeletedDetails,
-            ...newScheduleDetails,
-        ]);
+        if (newDeletedDetails?.length > 0 || newScheduleDetails?.length > 0) {
+            updateSchedule(schedule?.id, [
+                ...newDeletedDetails,
+                ...newScheduleDetails,
+            ]);
+        } else {
+            console.log('no update');
+            openMessage('warning', 'Không có gì thay đổi !');
+        }
     };
     const updateSchedule = async (
         id: number,
@@ -256,7 +206,9 @@ export const ListTime = ({
     };
     const handleAddTime = (time: Time) => {
         const existTime = selectedTimes.find(
-            (selectedTine: Time) => time.id === selectedTine.id
+            (selectedTime: Time) =>
+                time.id === selectedTime.id ||
+                selectedTime.start_time === time.start_time
         );
         if (existTime) {
             openMessage(
@@ -293,11 +245,18 @@ export const ListTime = ({
         }
     };
     const handleSelectAllTime = () => {
-        setSelectedTimes(times);
+        if (selectedTimes.length > 0) {
+            const notAddedTimes = times.filter(
+                (time: Time) => !selectedTimes.includes(time)
+            );
+            setSelectedTimes([...selectedTimes, ...notAddedTimes]);
+        } else {
+            setSelectedTimes([...times]);
+        }
     };
     const handleRemoveTime = (index: number) => {
         const updatedTimes = selectedTimes.filter(
-            (_, i: number) => i !== index
+            (time: Time, i: number) => i !== index
         );
         setSelectedTimes(updatedTimes);
         const existDetail = schedule.listScheduleDetails.find(
@@ -306,40 +265,18 @@ export const ListTime = ({
         );
         if (existDetail) {
             const newDeletedDetails = [...deleteDetails, existDetail];
-            console.log('newDeletedDetails', newDeletedDetails);
             setDeletedDetails(newDeletedDetails);
         }
     };
     const handleRemoveAllTimes = () => {
         setSelectedTimes([]);
         const newDeletedDetails = [...schedule.listScheduleDetails];
-        console.log('newDeletedDetails', newDeletedDetails);
         setDeletedDetails(newDeletedDetails);
     };
-    useEffect(() => {
-        if (schedule?.listScheduleDetails?.length > 0) {
-            setIsUpdate(true);
-            let selectedTimes: Time[] = [];
-            schedule?.listScheduleDetails?.forEach(
-                (detail: DoctorScheduleDetail) => {
-                    const time: Time = {
-                        id: detail.time_id,
-                        start_time: detail.start_time,
-                        end_time: detail.end_time,
-                        interval: null,
-                        disable: null,
-                    };
-                    if (selectedTimes.length > 0) {
-                        selectedTimes.push(time);
-                    } else {
-                        selectedTimes = [time];
-                    }
-                }
-            );
-            setSelectedTimes(selectedTimes);
-        }
-    }, [schedule]);
 
+    useEffect(() => {
+        console.log('selected times', selectedTimes);
+    }, [selectedTimes]);
     useEffect(() => {
         handleOverTime(activeDay);
         getTimeByType();
@@ -361,22 +298,51 @@ export const ListTime = ({
                         </Button>
                     </Col>
                     {times.map((time: Time) => {
-                        const existTime = selectedTimes.find(
-                            (selectedTine: Time) => time.id === selectedTine.id
-                        );
-                        return (
-                            <Col span={6} className="time-item" key={time?.id}>
-                                <Button
+                        if (selectedTimes?.length > 0) {
+                            const existTime = selectedTimes?.find(
+                                (selectedTine: Time) =>
+                                    time?.id === selectedTine?.id
+                            );
+                            return (
+                                <Col
+                                    span={6}
+                                    className="time-item"
                                     key={time?.id}
-                                    onClick={() => handleAddTime(time)}
-                                    className=""
-                                    type={existTime ? 'primary' : 'default'}
                                 >
-                                    {time.start_time}
-                                    <PlusOutlined />
-                                </Button>
-                            </Col>
-                        );
+                                    <Button
+                                        className={`${
+                                            time?.disable ? 'pe-none' : ''
+                                        }`}
+                                        key={time?.id}
+                                        onClick={() => handleAddTime(time)}
+                                        type={existTime ? 'primary' : 'default'}
+                                    >
+                                        {time.start_time}
+                                        <PlusOutlined />
+                                    </Button>
+                                </Col>
+                            );
+                        } else {
+                            return (
+                                <Col
+                                    span={6}
+                                    className="time-item"
+                                    key={time?.id}
+                                >
+                                    <Button
+                                        className={`${
+                                            time?.disable ? 'pe-none' : ''
+                                        }`}
+                                        key={time?.id}
+                                        onClick={() => handleAddTime(time)}
+                                        type={'default'}
+                                    >
+                                        {time.start_time}
+                                        <PlusOutlined />
+                                    </Button>
+                                </Col>
+                            );
+                        }
                     })}
                 </Row>
             </Col>
@@ -386,43 +352,51 @@ export const ListTime = ({
                     gutter={[24, 24]}
                     className="border border-top-0 border-start-0 border-end-0 pb-2"
                 >
-                    {selectedTimes.map((time: Time, index: number) => {
-                        return (
-                            <Col
-                                span={6}
-                                className="select-time"
-                                key={time?.id}
-                            >
-                                <Button
+                    {selectedTimes?.length > 0 ? (
+                        selectedTimes?.map((time: Time, index: number) => {
+                            return (
+                                <Col
+                                    span={6}
+                                    className="select-time"
                                     key={time?.id}
-                                    className=""
-                                    type="primary"
-                                    onClick={() => {
-                                        handleRemoveTime(index);
-                                    }}
                                 >
-                                    {time.start_time}
-                                    <CloseOutlined />
-                                </Button>
-                            </Col>
-                        );
-                    })}
+                                    <Button
+                                        key={time?.id}
+                                        className={`${
+                                            time?.disable ? 'pe-none' : ''
+                                        }`}
+                                        type="primary"
+                                        onClick={() => {
+                                            handleRemoveTime(index);
+                                        }}
+                                    >
+                                        {time.start_time}
+                                        <CloseOutlined />
+                                    </Button>
+                                </Col>
+                            );
+                        })
+                    ) : (
+                        <></>
+                    )}
                 </Row>
                 <Row gutter={24} className="p-3 justify-content-between">
                     <Button
-                        className="bg-dark text-light"
+                        className={`bg-dark text-light `}
+                        disabled={selectedTimes?.length > 0 ? false : true}
                         onClick={() => {
-                            if (isUpdate) {
+                            if (schedule?.listScheduleDetails?.length > 0) {
                                 handleUpdateSchedule();
                             } else {
-                                //handleCreateSchedule()
+                                handleCreateSchedule();
                             }
                         }}
                     >
                         Lưu
                     </Button>
                     <Button
-                        className="border-danger text-danger"
+                        className={`border-danger text-danger `}
+                        disabled={disableSaveButton}
                         onClick={handleRemoveAllTimes}
                     >
                         Xóa tất cả <CloseOutlined></CloseOutlined>

@@ -58,7 +58,10 @@ export const BlockCommonPost = () => {
                     {posts?.length > 0 ? (
                         posts.map((post: Post) => {
                             return (
-                                <div className="slide__container  col-3 ps-3 pe-3">
+                                <div
+                                    className="slide__container  col-3 ps-3 pe-3"
+                                    key={post.id}
+                                >
                                     <div className="item border border-1 rounded p-3 text-center   ">
                                         <Link
                                             onClick={() => {

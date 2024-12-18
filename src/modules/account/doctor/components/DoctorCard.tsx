@@ -13,7 +13,7 @@ export const DoctorCard = ({ doctors, handleUpdateViewsDoctor }: any) => {
         <Row gutter={[16, 16]} className="cards">
             {doctors.map((doctor: Doctor) => {
                 return (
-                    <Col span={6} className="card-item">
+                    <Col span={6} className="card-item" key={doctor?.doctor_id}>
                         <div className="card-container rounded border border-1 ">
                             <div className="doctor-image col-3 text-center m-auto">
                                 <Image

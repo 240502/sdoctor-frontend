@@ -24,7 +24,6 @@ import { ModalComment } from '../components/ModalComment';
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import {
     commonDoctorsState,
-    commonDoctorValue,
     doctorListValue,
     doctorState,
 } from '../../../../stores/doctorAtom';
@@ -181,6 +180,7 @@ const ViewDetailDoctor = () => {
                             if (doctor.doctor_id !== Number(id)) {
                                 return (
                                     <Col
+                                        key={doctor?.doctor_id}
                                         span={24}
                                         style={{ cursor: 'pointer' }}
                                     >
@@ -215,9 +215,7 @@ const ViewDetailDoctor = () => {
                                                 </Tag>
                                                 <p>
                                                     <EnvironmentOutlined />{' '}
-                                                    {doctor?.city}-
-                                                    {doctor?.district}-
-                                                    {doctor.commune}
+                                                    {doctor.location}
                                                 </p>
                                             </div>
                                         </Flex>

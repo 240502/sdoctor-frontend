@@ -16,7 +16,7 @@ export const RelatedPost = ({
             {relatedPosts.map((post: Post) => {
                 return (
                     <>
-                        <Flex className="align-items-center">
+                        <Flex className="align-items-center" key={post?.id}>
                             <div className="col-4 feature-img-container">
                                 <Link
                                     to={'/post/detail/' + post.id}

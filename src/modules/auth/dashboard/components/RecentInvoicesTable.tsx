@@ -4,8 +4,7 @@ import { invoicesService } from '../../../../services/invoicesService';
 import { useEffect, useState } from 'react';
 import { Invoices } from '../../../../models/invoices';
 import { EyeOutlined } from '@ant-design/icons';
-import { ViewInvoiceModal } from './ViewInvoiceModal';
-
+import { ViewInvoiceModal } from '../../../../components';
 export const RecentInvoicesTable = () => {
     const [recentInvoices, setRecentInvoices] = useState<Invoices[]>([]);
     const [openViewInvoiceModal, setOpenViewInvoiceModal] =

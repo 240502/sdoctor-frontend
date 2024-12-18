@@ -10,7 +10,7 @@ export const ClinicCard = ({ clinics, handleUpdateViewsClinic }: any) => {
         <Row gutter={[16, 16]} className="cards">
             {clinics.map((clinic: Clinic) => {
                 return (
-                    <Col span={6} className="card-item">
+                    <Col span={6} className="card-item" key={clinic.id}>
                         <div className="card-container rounded border border-1 ">
                             <div className="clinic-image text-center m-auto">
                                 <Image

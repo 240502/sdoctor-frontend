@@ -4,7 +4,6 @@ import {
     Divider,
     Image,
     Input,
-    Menu,
     Row,
     Select,
     Tabs,
@@ -21,7 +20,6 @@ import '@/assets/scss/clinic.scss';
 import { DoctorCard } from '../../../../components';
 import { Doctor } from '../../../../models/doctor';
 import { doctorService } from '../../../../services/doctorService';
-import { ClinicCards } from '../../../auth/clinic/components/ClinicCards';
 import {
     EnvironmentOutlined,
     HomeOutlined,

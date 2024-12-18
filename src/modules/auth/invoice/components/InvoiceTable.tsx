@@ -17,10 +17,13 @@ import { invoicesService } from '../../../../services/invoicesService';
 import {
     DeleteOutlined,
     EditOutlined,
+    EyeOutlined,
     SearchOutlined,
 } from '@ant-design/icons';
 import Highlighter from 'react-highlight-words';
 import { FilterDropdownProps } from 'antd/es/table/interface';
+import { ViewInvoiceModal } from '../../../../components';
+
 type DataIndex = keyof Invoices;
 
 export const InvoiceTable = ({
@@ -38,6 +41,9 @@ export const InvoiceTable = ({
     const [searchText, setSearchText] = useState('');
     const [searchedColumn, setSearchedColumn] = useState('');
     const searchInput = useRef<InputRef>(null);
+    const [openViewInvoiceModal, setOpenViewInvoiceModal] =
+        useState<boolean>(false);
+    const [invoice, setInvoice] = useState<Invoices>({} as Invoices);
     const handleSearch = (
         selectedKeys: string[],
         confirm: FilterDropdownProps['confirm'],
@@ -203,37 +209,58 @@ export const InvoiceTable = ({
             dataIndex: 'action',
             render(value, record, index) {
                 return (
-                    <Row gutter={18}>
-                        <Col span={9}>
-                            <Tooltip placement="top" title="Sửa">
+                    <Row gutter={24}>
+                        <Col span={8}>
+                            <Tooltip placement="top" title="Xem chi tiết">
                                 <Button
+                                    className="border-info text-info"
                                     onClick={() => {
-                                        onClickUpdateButton(record);
+                                        setInvoice(record);
+                                        setOpenViewInvoiceModal(true);
                                     }}
-                                    className="text-success border-success"
                                 >
-                                    <EditOutlined />
+                                    <EyeOutlined></EyeOutlined>
                                 </Button>
                             </Tooltip>
                         </Col>
-                        <Col span={9}>
-                            <Tooltip placement="top" title="Xóa">
-                                <Button
-                                    className="text-danger border-danger"
-                                    onClick={() => {
-                                        onClickDeleteButton(record);
-                                    }}
-                                >
-                                    <DeleteOutlined />
-                                </Button>
-                            </Tooltip>
-                        </Col>
+                        {record.status !== 'Đã thanh toán' && (
+                            <>
+                                {' '}
+                                <Col span={8}>
+                                    <Tooltip placement="top" title="Sửa">
+                                        <Button
+                                            onClick={() => {
+                                                onClickUpdateButton(record);
+                                            }}
+                                            className="text-success border-success"
+                                        >
+                                            <EditOutlined />
+                                        </Button>
+                                    </Tooltip>
+                                </Col>
+                                <Col span={8}>
+                                    <Tooltip placement="top" title="Xóa">
+                                        <Button
+                                            className="text-danger border-danger"
+                                            onClick={() => {
+                                                onClickDeleteButton(record);
+                                            }}
+                                        >
+                                            <DeleteOutlined />
+                                        </Button>
+                                    </Tooltip>
+                                </Col>
+                            </>
+                        )}
                     </Row>
                 );
             },
         },
     ];
-
+    const cancelViewInvoiceModal = () => {
+        setInvoice({} as Invoices);
+        setOpenViewInvoiceModal(false);
+    };
     const changeStatusInvoice = async (id: number, status: string) => {
         try {
             const data = {
@@ -276,6 +303,13 @@ export const InvoiceTable = ({
                     pageSize={pageSize}
                     total={pageCount * pageSize}
                     onChange={changePage}
+                />
+            )}
+            {openViewInvoiceModal && (
+                <ViewInvoiceModal
+                    openViewInvoiceModal={openViewInvoiceModal}
+                    invoice={invoice}
+                    cancelViewInvoiceModal={cancelViewInvoiceModal}
                 />
             )}
         </>

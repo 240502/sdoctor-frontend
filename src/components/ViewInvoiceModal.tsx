@@ -1,16 +1,11 @@
-import { Modal, Col, Row, List, Divider, Button } from 'antd';
-import React, { useEffect, useState } from 'react';
-import { Appointment } from '../../../../models/appointment';
-import { AppointmentService } from '../../../../services/appointmentService';
-import { Invoices } from '../../../../models/invoices';
+import { Modal, Col, Row, Divider, Button } from 'antd';
+import { useEffect, useState } from 'react';
+import { Appointment } from '../models/appointment';
+import { AppointmentService } from '../services/appointmentService';
 // import downloadInvoicePdf from '../../../../utils/dowloadPDF';
-import html2canvas from 'html2canvas';
-import jsPDF from 'jspdf';
-import html2pdf from 'html2pdf.js';
 import { useRef } from 'react';
-import ReactToPdf from 'react-to-pdf';
 
-export const ViewInvoiceModal = ({
+const ViewInvoiceModal = ({
     openViewInvoiceModal,
     invoice,
     cancelViewInvoiceModal,
@@ -54,7 +49,7 @@ export const ViewInvoiceModal = ({
     const generatePdf = () => {
         if (ref.current) {
             console.log('gendr');
-            ReactToPdf(ref, { filename: 'document.pdf' });
+            // ReactToPdf(ref, { filename: 'document.pdf' });
         }
     };
     return (
@@ -151,3 +146,4 @@ export const ViewInvoiceModal = ({
         </Modal>
     );
 };
+export default ViewInvoiceModal;

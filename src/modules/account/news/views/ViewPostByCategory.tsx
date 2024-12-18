@@ -2,31 +2,29 @@ import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { Post } from '../../../../models/post';
 import { PostService } from '../../../../services/postService';
-import { Breadcrumb, Flex, Select, Input } from 'antd';
+import { Breadcrumb, Flex, Select, Input, Pagination } from 'antd';
 import { HomeOutlined } from '@ant-design/icons';
 import { PostCategoryService } from '../../../../services/post_categorySerivce';
 import { PostCategory } from '../../../../models/post_category';
 import { SearchProps } from 'antd/es/input';
 import { PostCards } from '../components/PostCards';
+import { useRecoilState } from 'recoil';
+import { postCategoryState } from '../../../../stores/scheduleAtom';
 
 const { Option } = Select;
 const { Search } = Input;
-type DataParam = {
-    categoryId: string;
-};
+
 const ViewPostByCategory = () => {
     const [searchOptions, setSearchOptions] = useState<any>({
         searchContent: null,
         categoryId: null,
     });
-    const { categoryId } = useParams<DataParam>();
-
+    const [postCategory, setPostCategory] = useRecoilState(postCategoryState);
     const [pageIndex, setPageIndex] = useState<number>(1);
-    const [pageSize, setPageSize] = useState<number>(10);
+    const [pageSize, setPageSize] = useState<number>(5);
     const [pageCount, setPageCount] = useState<number>(0);
     const [posts, setPosts] = useState<Post[]>([]);
     const [postCategories, setPostCategories] = useState<PostCategory[]>([]);
-    const [category, setCategory] = useState<PostCategory>({} as PostCategory);
     const onSearch: SearchProps['onSearch'] = (value, _e, info) => {
         setSearchOptions({ ...searchOptions, searchContent: value });
     };
@@ -35,13 +33,6 @@ const ViewPostByCategory = () => {
         try {
             const res = await PostCategoryService.getAllPostCategory();
             setPostCategories(res);
-            const postCategory = res.find(
-                (item: PostCategory) =>
-                    item.post_category_id === Number(categoryId)
-            );
-            if (postCategory) {
-                setCategory(postCategory);
-            }
         } catch (err: any) {
             console.log(err.message);
             setPostCategories([]);
@@ -54,6 +45,10 @@ const ViewPostByCategory = () => {
                 pageIndex: pageIndex,
                 pageSize: pageSize,
                 ...searchOptions,
+                categoryId:
+                    searchOptions.categoryId !== null
+                        ? searchOptions.categoryId
+                        : postCategory.post_category_id,
             };
             const res = await PostService.viewPostClient(data);
             setPosts(res.data);
@@ -65,16 +60,13 @@ const ViewPostByCategory = () => {
         }
     };
     useEffect(() => {
-        setSearchOptions({ ...searchOptions, categoryId: Number(categoryId) });
         getAllPostCategory();
         window.scrollTo(0, 0);
     }, []);
     useEffect(() => {
         getPostByCategory();
-    }, [searchOptions]);
-    useEffect(() => {
-        console.log('post', pageCount);
-    });
+    }, [searchOptions, pageIndex, pageSize]);
+
     return (
         <div className="container">
             <Breadcrumb
@@ -89,7 +81,9 @@ const ViewPostByCategory = () => {
                     },
                     {
                         title: `${
-                            category?.post_category_id ? category.name : ''
+                            postCategory?.post_category_id
+                                ? postCategory.name
+                                : ''
                         }`,
                     },
                 ]}
@@ -98,15 +92,25 @@ const ViewPostByCategory = () => {
                 <div className="col-3">
                     <Select
                         className="w-75"
-                        value={searchOptions.categoryId}
+                        value={
+                            searchOptions.categoryId !== null
+                                ? searchOptions.categoryId
+                                : postCategory.post_category_id
+                        }
                         optionFilterProp="children"
                         allowClear
                         showSearch
                         onChange={(value: number) => {
+                            const category: any = postCategories.find(
+                                (item: PostCategory) =>
+                                    item.post_category_id === value
+                            );
                             setSearchOptions({
                                 ...searchOptions,
                                 categoryId: value,
                             });
+                            setPageIndex(1);
+                            setPostCategory(category);
                         }}
                         placeholder="Chọn loại bài viết"
                     >
@@ -131,6 +135,25 @@ const ViewPostByCategory = () => {
                 </div>
             </Flex>
             <PostCards posts={posts} />
+            {pageCount > 1 && (
+                <Pagination
+                    align="center"
+                    className="mt-3 mb-3"
+                    current={pageIndex}
+                    pageSize={pageSize}
+                    total={pageCount * pageSize}
+                    showSizeChanger
+                    pageSizeOptions={['5', '10', '15', '20']}
+                    onChange={(current: number, size: number) => {
+                        if (size !== pageSize) {
+                            setPageSize(size);
+                            setPageIndex(1);
+                        } else {
+                            setPageIndex(current);
+                        }
+                    }}
+                />
+            )}
         </div>
     );
 };

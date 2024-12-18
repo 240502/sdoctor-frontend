@@ -40,7 +40,7 @@ const ViewProfile = () => {
     const [profileCopy, setProfileCopy] = useState<PatientProfile>(
         {} as PatientProfile
     );
-    const dateFormat = 'YYYY-MM-DD';
+    const dateFormat = 'DD-MM-YYYY';
     const inputPatientNameRef = useRef<InputRef>(null);
     const inputPatientPhoneRef = useRef<InputRef>(null);
     const inputPatientEmailRef = useRef<InputRef>(null);
@@ -194,7 +194,7 @@ const ViewProfile = () => {
     const getWards = async (districtId: any) => {
         try {
             const res = await axios.get(
-                `https://vapi.vnappmob.com//api/province/ward/${districtId}`
+                `https://vapi.vnappmob.com//api/v2/province/ward/${districtId}`
             );
             setWards(res.data.results);
         } catch (err) {
@@ -204,7 +204,7 @@ const ViewProfile = () => {
     const getListDistrict = async (provinceId: any) => {
         try {
             const res = await axios.get(
-                `https://vapi.vnappmob.com//api/province/district/${provinceId}`
+                `https://vapi.vnappmob.com//api/v2/province/district/${provinceId}`
             );
 
             setDistricts(res.data.results);
@@ -282,7 +282,7 @@ const ViewProfile = () => {
         const getProvinces = async () => {
             try {
                 const res = await axios.get(
-                    'https://vapi.vnappmob.com/api/province'
+                    'https://vapi.vnappmob.com/api/v2/province'
                 );
                 setProvinces(res.data.results);
             } catch (err) {

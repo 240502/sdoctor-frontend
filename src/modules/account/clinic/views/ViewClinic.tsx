@@ -1,7 +1,6 @@
-import { EnvironmentOutlined, HomeOutlined } from '@ant-design/icons';
+import { HomeOutlined } from '@ant-design/icons';
 import '@/assets/scss/clinic.scss';
-import { Breadcrumb, Divider, Flex, Input, Pagination, Select } from 'antd';
-import { Link } from 'react-router-dom';
+import { Breadcrumb, Flex, Input, Pagination, Select } from 'antd';
 import { ClinicService } from '../../../../services/clinicService';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import {
@@ -10,10 +9,7 @@ import {
 } from '../../../../stores/clinicAtom';
 import { useEffect, useState } from 'react';
 import { SearchProps } from 'antd/es/input';
-import { Clinic } from '../../../../models/clinic';
-import { baseURL } from '../../../../constants/api';
 import axios from 'axios';
-import { addWatchedClinic } from '../../../../utils/clinic';
 import { ClinicCard } from '../components/ClinicCard';
 const { Search } = Input;
 const ViewClinic = () => {
@@ -84,7 +80,7 @@ const ViewClinic = () => {
         const getProvinces = async () => {
             try {
                 const res = await axios.get(
-                    'https://vapi.vnappmob.com/api/province'
+                    'https://vapi.vnappmob.com/api/v2/province'
                 );
                 setProvinces(res.data.results);
             } catch (err) {
@@ -114,11 +110,8 @@ const ViewClinic = () => {
                     },
                 ]}
             />
-            <div className="mt-3 d-flex">
-                <h3 className="fs-4 fw-bold col-6">Cơ sở y tế</h3>
-            </div>
-            <Divider />
-            <Flex className="group__search  d-flex justify-content-between align-items-center">
+
+            <Flex className="group__search  d-flex justify-content-between align-items-center shadow rounded p-3 mt-3">
                 <div className="col-5">
                     <Select
                         className=""

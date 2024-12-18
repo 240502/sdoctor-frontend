@@ -20,7 +20,10 @@ export const MajorCards = ({
                     <>
                         {majors?.map((major: Major) => {
                             return (
-                                <div className="col-3 ps-2 pe-2 mb-3">
+                                <div
+                                    className="col-3 ps-2 pe-2 mb-3"
+                                    key={major.id}
+                                >
                                     <Card
                                         className="shadow text-center"
                                         cover={
@@ -73,7 +76,7 @@ export const MajorCards = ({
                         current={pageIndex}
                         pageSize={pageSize}
                         total={pageCount * pageSize}
-                        pageSizeOptions={['5', '10', '20', '30']}
+                        pageSizeOptions={['4', '8', '12', '16']}
                         onChange={(current: number, size: number) => {
                             changePage(current, size);
                         }}

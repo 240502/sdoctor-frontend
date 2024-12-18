@@ -120,7 +120,7 @@ export const InputAppointmentModal = ({
     const getWards = async (districtId: any) => {
         try {
             const res = await axios.get(
-                `https://vapi.vnappmob.com//api/province/ward/${districtId}`
+                `https://vapi.vnappmob.com//api/v2/province/ward/${districtId}`
             );
             setWards(res.data.results);
         } catch (err) {
@@ -130,7 +130,7 @@ export const InputAppointmentModal = ({
     const getListDistrict = async (provinceId: any) => {
         try {
             const res = await axios.get(
-                `https://vapi.vnappmob.com//api/province/district/${provinceId}`
+                `https://vapi.vnappmob.com//api/v2/province/district/${provinceId}`
             );
 
             setDistricts(res.data.results);
@@ -221,7 +221,7 @@ export const InputAppointmentModal = ({
         const getProvinces = async () => {
             try {
                 const res = await axios.get(
-                    'https://vapi.vnappmob.com/api/province'
+                    'https://vapi.vnappmob.com/api/v2/province'
                 );
                 setProvinces(res.data.results);
             } catch (err) {

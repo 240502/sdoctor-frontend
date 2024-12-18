@@ -33,6 +33,7 @@ export const PostCards = ({ posts }: any) => {
                     return (
                         <>
                             <div
+                                key={post.id}
                                 className="mb-3  d-flex p-3 mb-3 rounded align-items-center border border-top-0 border-start-0 border-end-0"
                                 style={{
                                     maxHeight: '100px',

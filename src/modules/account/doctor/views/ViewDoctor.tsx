@@ -23,7 +23,7 @@ const ViewDoctor = () => {
     const doctors = useRecoilValue(doctorListValue);
     const [majors, setMajors] = useState<Major[]>([]);
     const [pageIndex, setPageIndex] = useState<number>(1);
-    const [pageSize, setPageSize] = useState<number>(10);
+    const [pageSize, setPageSize] = useState<number>(8);
     const [pageCount, setPageCount] = useState<number>(0);
     const [clinics, setClinics] = useState<Clinic[]>([]);
     const [options, setOptions] = useState<any>({
@@ -122,11 +122,11 @@ const ViewDoctor = () => {
                     },
                 ]}
             />
-            <h3 className="block__heading fs-5 fw-bold mt-4 mb-4">
-                Danh sách bác sĩ
-            </h3>
-            <div className="block__list__doctor">
-                <Flex gap={'middle'} className="mb-5 justify-content-between">
+            <div className="block__list__doctor mt-3">
+                <Flex
+                    gap={'middle'}
+                    className=" justify-content-between shadow p-3 rounded"
+                >
                     <Flex className="col-5" gap={'middle'}>
                         <div className="col">
                             <Select
@@ -209,7 +209,7 @@ const ViewDoctor = () => {
                                 current={pageIndex}
                                 pageSize={pageSize}
                                 showSizeChanger
-                                pageSizeOptions={['5', '10', '15', '20']}
+                                pageSizeOptions={['4', '8', '12', '16', '20']}
                                 onChange={changePage}
                                 total={pageCount * pageSize}
                             />

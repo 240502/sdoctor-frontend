@@ -56,7 +56,7 @@ export const BlockClinic = (): JSX.Element => {
                 <Slider {...settings}>
                     {clinics?.map((clinic: Clinic) => {
                         return (
-                            <div className="slide-container">
+                            <div className="slide-container" key={clinic.id}>
                                 <div className="item border border-1 rounded p-2 text-center  ">
                                     <Link
                                         onClick={() =>

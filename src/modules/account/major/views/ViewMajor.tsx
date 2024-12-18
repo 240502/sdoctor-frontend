@@ -10,7 +10,7 @@ import { searchDoctorOptionsGlobal } from '../../../../stores/doctorAtom';
 
 const ViewMajor = () => {
     const [pageIndex, setPageIndex] = useState<number>(1);
-    const [pageSize, setPageSize] = useState<number>(10);
+    const [pageSize, setPageSize] = useState<number>(8);
     const [pageCount, setPageCount] = useState<number>(0);
     const [majors, setMajors] = useState<Major[]>([]);
     const [optionsGlobal, setOptionsGlobal] = useRecoilState(

@@ -1,9 +1,9 @@
 import { Breadcrumb, Button, Divider, Flex, notification, Select } from 'antd';
 import { useRecoilValue } from 'recoil';
 import { configValue } from '../../../../stores/userAtom';
-import { HomeOutlined, PlusOutlined, SearchOutlined } from '@ant-design/icons';
+import { HomeOutlined, PlusOutlined } from '@ant-design/icons';
 import { InvoiceTable } from '../components/InvoiceTable';
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import { Invoices } from '../../../../models/invoices';
 import { InvoiceModal } from '../components/InvoviceModal';
 import { invoicesService } from '../../../../services/invoicesService';

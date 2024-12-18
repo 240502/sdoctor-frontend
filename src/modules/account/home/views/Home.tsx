@@ -8,6 +8,7 @@ import { BlockCommonPost } from '../components/BlockCommonNews';
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { BlockSearchDoctor } from '../components/BlockSearchDoctor';
+import { BlockCommonService } from '../components/BlockCommonService';
 
 export const Home = () => {
     useEffect(() => {
@@ -55,6 +56,7 @@ export const Home = () => {
                 <BlockSearchDoctor />
                 <BlockCategories />
                 <BlockHotDoctor />
+                <BlockCommonService />
                 <BlockCommonPost />
                 <BlockClinic />
             </div>

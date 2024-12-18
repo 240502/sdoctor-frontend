@@ -41,7 +41,11 @@ export const BlockHotDoctor = (): JSX.Element => {
                 {commonDoctors?.length > 0 ? (
                     commonDoctors?.map((doctor: Doctor) => {
                         return (
-                            <Col className=" mb-3" span={6}>
+                            <Col
+                                className=" mb-3"
+                                span={6}
+                                key={doctor.doctor_id}
+                            >
                                 <Card className="shadow" actions={[]}>
                                     <Image
                                         src={doctor.image}

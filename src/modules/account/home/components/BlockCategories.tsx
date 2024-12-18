@@ -27,6 +27,7 @@ export const BlockCategories = (): JSX.Element => {
                 {majors.map((major: Major) => {
                     return (
                         <Col
+                            key={major.id}
                             span={4}
                             onClick={() => {
                                 const newOptions = {

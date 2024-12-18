@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useRecoilValue } from 'recoil';
 import { newAppointmentValue } from '../stores/appointmentAtom';
 import { useEffect } from 'react';
-
+import dayjs from 'dayjs';
 const { Title, Text } = Typography;
 export const BookingSuccess = () => {
     const navigate = useNavigate();
@@ -43,9 +43,9 @@ export const BookingSuccess = () => {
                     <Text>{newAppointment.doctor_name}</Text> <br />
                     <Text strong>Ngày:</Text>{' '}
                     <Text>
-                        {newAppointment.appointment_date
-                            .toString()
-                            .slice(0, 10)}
+                        {dayjs(newAppointment.appointment_date).format(
+                            'DD-MM-YYYY'
+                        )}
                     </Text>{' '}
                     <br />
                     <Text strong>Giờ:</Text>{' '}

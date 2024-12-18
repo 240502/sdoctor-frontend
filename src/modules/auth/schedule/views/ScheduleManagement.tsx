@@ -1,4 +1,4 @@
-import { ClockCircleOutlined, HomeOutlined } from '@ant-design/icons';
+import { HomeOutlined } from '@ant-design/icons';
 import {
     Breadcrumb,
     Button,
@@ -20,6 +20,8 @@ import { handleGetDateByActiveDay } from '../../../../utils/schedule_management'
 type NotificationType = 'success' | 'error';
 import '@/assets/scss/schedule_management.scss';
 import { scheduleDetailsState } from '../../../../stores/scheduleDetailAtom';
+import { TimeService } from '../../../../services/timeService';
+import { handleTimeOverRealTime } from '../../../../utils/schedule';
 const tabs: TabsProps['items'] = [
     {
         key: '1',
@@ -59,6 +61,8 @@ const ScheduleManagement = () => {
     const [schedule, setSchedule] = useState<DoctorSchedule>(
         {} as DoctorSchedule
     );
+    const [selectedTimes, setSelectedTimes] = useState<Time[]>([]);
+
     const [intervalTime, setIntervalTime] = useState<number>(30);
 
     const [doctorScheduleDetails, setDoctorScheduleDetails] =
@@ -66,7 +70,6 @@ const ScheduleManagement = () => {
     const [isVisibleButtonSave, setIsVisibleButtonSave] =
         useState<boolean>(false);
     const [isUpdate, setIsUpdate] = useState<boolean>(false);
-    const [openAddSlotsModal, setOpenAddSlotsModal] = useState<boolean>(false);
     const openNotification = (
         type: NotificationType,
         title: string,
@@ -93,140 +96,55 @@ const ScheduleManagement = () => {
         try {
             const res = await scheduleService.viewScheduleForDoctor(data);
             setSchedule(res.data);
-            //setDoctorScheduleDetails(res?.data?.listScheduleDetails);
-            // let timeAvailable: any = [];
-            // res.data.listScheduleDetails.forEach(
-            //     (item: DoctorScheduleDetail) => {
-            //         if (timeAvailable.length > 0) {
-            //             if (!timeAvailable.includes(item.time_id)) {
-            //                 timeAvailable.push(item.time_id);
-            //             }
-            //         } else {
-            //             timeAvailable = [item.time_id];
-            //         }
-            //     }
-            // );
-            // setSelectedTimeKeys(timeAvailable);
+            getSelectedTimes(res?.data?.listScheduleDetails);
         } catch (err: any) {
             console.log(err.message);
             setSchedule({} as DoctorSchedule);
-            // setSelectedTimeKeys([]);
+            setSelectedTimes([]);
         }
     };
-
-    const handleUpdateSchedule = () => {
-        let deletedDetails: DoctorScheduleDetail[] = [];
-        console.log(doctorScheduleDetails.length);
-        let newTimes: Time[] = [];
-        if (
-            doctorScheduleDetails.length > schedule.listScheduleDetails.length
-        ) {
-            const newDetails = doctorScheduleDetails.map(
-                (detail: DoctorScheduleDetail) => {
-                    if (!schedule.listScheduleDetails.includes(detail)) {
-                        return { ...detail, action: 1 };
-                    } else return detail;
-                }
-            );
-            console.log('add new time', newDetails);
-
-            updateSchedule(Number(schedule.id), newDetails);
-            // newTimes = doctorScheduleDetails.filter((time: Time) => {
-            //     const exist = schedule.listScheduleDetails.find(
-            //         (detail: DoctorScheduleDetail) => detail.time_id === time.id
-            //     );
-            //     if (!exist) {
-            //         return time;
-            //     }
-            // });
-            // deletedDetails = schedule.listScheduleDetails.filter(
-            //     (detail: DoctorScheduleDetail) => {
-            //         if (!selectedTimeKeys.includes(detail.time_id)) {
-            //             return detail;
-            //         }
-            //     }
-            // );
-        }
-        // if (selectedTimes.length <= schedule.listScheduleDetails.length) {
-        //     console.log('delete time');
-        //     deletedDetails = schedule.listScheduleDetails.filter(
-        //         (detail: DoctorScheduleDetail) => {
-        //             if (!selectedTimeKeys.includes(detail.time_id)) {
-        //                 return detail;
-        //             }
-        //         }
-        //     );
-        //     newTimes = selectedTimes.filter((time: Time) => {
-        //         const exist = schedule.listScheduleDetails.find(
-        //             (detail: DoctorScheduleDetail) => detail.time_id === time.id
-        //         );
-        //         if (!exist) {
-        //             return time;
-        //         }
-        //     });
-        // }
-        // let scheduleDetailsAvailable = schedule.listScheduleDetails;
-        // if (newTimes.length > 0) {
-        //     const scheduleDetails: DoctorScheduleDetail[] = [];
-        //     newTimes.forEach((time: Time) => {
-        //         const scheduleDetail: DoctorScheduleDetail = {
-        //             id: 0,
-        //             time_id: time.id,
-        //             schedule_id: null,
-        //             available: 1,
-        //             action: 1,
-        //         };
-        //         scheduleDetails.push(scheduleDetail);
-        //     });
-        //     scheduleDetailsAvailable = [
-        //         ...scheduleDetailsAvailable,
-        //         ...scheduleDetails,
-        //     ];
-        // }
-        // console.log('deleted', deletedDetails);
-        // if (deletedDetails.length > 0) {
-        //     scheduleDetailsAvailable = scheduleDetailsAvailable.map(
-        //         (detail: DoctorScheduleDetail) => {
-        //             if (deletedDetails.includes(detail)) {
-        //                 return { ...detail, action: 3 };
-        //             } else {
-        //                 return detail;
-        //             }
-        //         }
-        //     );
-        // }
-    };
-    const updateSchedule = async (
-        id: number,
-        scheduleDetails: DoctorScheduleDetail[]
+    const getSelectedTimes = (
+        doctorScheduleDetails: DoctorScheduleDetail[]
     ) => {
-        try {
-            const data = {
-                id: id,
-                scheduleDetails: scheduleDetails.filter(
-                    (detail: DoctorScheduleDetail) => detail?.action
-                ),
+        const now = new Date();
+        let selectedTimes: Time[] = [];
+        doctorScheduleDetails?.forEach((detail: DoctorScheduleDetail) => {
+            const time: Time = {
+                id: detail.time_id,
+                start_time: detail.start_time,
+                end_time: detail.end_time,
+                interval: null,
+                disable: null,
             };
 
-            const res = await scheduleService.updateSchedule(data, config);
-            handleGetScheduleBySubscriberAndDate();
-            openNotification(
-                'success',
-                'Thông báo !',
-                'Cập nhập thời gian thành công!'
-            );
-        } catch (err: any) {
-            console.log(err.message);
-            openNotification(
-                'error',
-                'Thông báo !',
-                'Cập nhập thời gian không thành công!'
-            );
+            if (selectedTimes.length > 0) {
+                selectedTimes.push(time);
+            } else {
+                selectedTimes = [time];
+            }
+        });
+        if (Number(activeDay) === now.getDay()) {
+            console.log('handle1');
+
+            const newTimes = handleTimeOverRealTime(selectedTimes);
+            setSelectedTimes(newTimes);
+            console.log(newTimes);
+        }
+        if (Number(activeDay) !== 0 && Number(activeDay) < now.getDay()) {
+            const newTimes = selectedTimes.map((time: Time) => {
+                return { ...time, disable: true };
+            });
+            console.log('handle2');
+
+            setSelectedTimes(newTimes);
+        }
+        if (Number(activeDay) === 0 || Number(activeDay) > now.getDay()) {
+            setSelectedTimes(selectedTimes);
         }
     };
     useEffect(() => {
-        console.log('call api');
         handleGetScheduleBySubscriberAndDate();
+        setSelectedTimes([]);
     }, [activeDay]);
 
     return (
@@ -280,6 +198,11 @@ const ScheduleManagement = () => {
                         <Select.Option value={60}>60 phút</Select.Option>
                     </Select>
                 </div>
+                <p>
+                    Lưu ý: Để tránh xung đột thời gian, bạn nên chỉ 1 loại thời
+                    gian hoặc nếu chọn 2 loại thời gian khác nhau nên chú ý tới
+                    thời gian bắt đầu của nó để không bị trùng nhau
+                </p>
                 <Card
                     className="card-time mt-3"
                     title={
@@ -305,6 +228,8 @@ const ScheduleManagement = () => {
                             handleGetScheduleBySubscriberAndDate
                         }
                         interval={intervalTime}
+                        selectedTimes={selectedTimes}
+                        setSelectedTimes={setSelectedTimes}
                     />
                 </Card>
             </div>

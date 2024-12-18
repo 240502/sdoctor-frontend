@@ -11,7 +11,6 @@ import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { doctorValue } from '../../../../stores/doctorAtom';
 import { DoctorSchedule } from '../../../../models/doctorSchedule';
 import { BlockCalendar } from '../components/BlockCalendar';
-import { Time } from '../../../../models/time';
 import { DoctorScheduleDetail } from '../../../../models/doctorScheduleDetails';
 import { InputAppointmentModal } from '../components/InputAppointmentModal';
 import { patientProfileValue } from '../../../../stores/patientAtom';
@@ -81,7 +80,6 @@ const BookingAppointment = () => {
                 subscriberId: doctor.doctor_id,
             };
             const result = await scheduleService.viewScheduleForClient(data);
-            console.log(result);
             setSchedule(result.data);
         } catch (err: any) {
             setSchedule({} as DoctorSchedule);
@@ -122,7 +120,6 @@ const BookingAppointment = () => {
     const CreateNotification = async (data: any) => {
         try {
             const res = await NotificationService.createNotification(data);
-            console.log(res);
         } catch (err: any) {
             console.log(err);
         }
@@ -130,14 +127,12 @@ const BookingAppointment = () => {
     const CreateInvoice = async (data: any) => {
         try {
             const res = await invoicesService.createInvoice(data);
-            console.log(res.message);
         } catch (err: any) {
             console.log(err.message);
         }
     };
     useEffect(() => {
         socket.on('newAppointment', (newAppointment) => {
-            console.log('newAppointmentSocket', newAppointment);
             setNewAppointment(newAppointment);
             const newInvoice = {
                 appointment_id: newAppointment.id,
@@ -152,6 +147,7 @@ const BookingAppointment = () => {
                     return scheduleDetail.time_id === newAppointment.time_id;
                 }
             );
+            console.log(scheduleDetail);
             const newNotification = {
                 user_id: doctor.user_id,
                 message: 'Bạn có một lịch hẹn mới!',
@@ -170,7 +166,6 @@ const BookingAppointment = () => {
         setPatientProfileCopy(patientProfile);
     }, []);
     useEffect(() => {
-        console.log('doctor', doctor);
         getDoctorSchedule();
     }, [date]);
     useEffect(() => {
@@ -187,7 +182,6 @@ const BookingAppointment = () => {
 
         return () => {
             clearInterval(intervalId);
-            console.log('clear:' + intervalId);
         };
     }, [schedule?.listScheduleDetails?.length]);
 
