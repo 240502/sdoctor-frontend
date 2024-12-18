@@ -5,6 +5,7 @@ import { DollarOutlined, EnvironmentOutlined } from '@ant-design/icons';
 
 const ServiceCard = ({ services }: any) => {
     const navigate = useNavigate();
+    console.log('services', services);
     return (
         <Row gutter={[24, 24]} className="cards">
             {services?.map((service: Service) => {

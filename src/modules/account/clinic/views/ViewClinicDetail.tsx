@@ -4,6 +4,7 @@ import {
     Divider,
     Image,
     Input,
+    Pagination,
     Row,
     Select,
     Tabs,
@@ -17,7 +18,7 @@ import { baseURL } from '../../../../constants/api';
 import { ClinicService } from '../../../../services/clinicService';
 import parse from 'html-react-parser';
 import '@/assets/scss/clinic.scss';
-import { DoctorCard } from '../../../../components';
+import { DoctorCard, ServiceCard } from '../../../../components';
 import { Doctor } from '../../../../models/doctor';
 import { doctorService } from '../../../../services/doctorService';
 import {
@@ -28,20 +29,29 @@ import {
 import { BlockDescription } from '../components/BlockDescription';
 import { MajorService } from '../../../../services/majorService';
 import { Major } from '../../../../models/major';
+import { Service } from '../../../../models/service';
+import { ServiceService } from '../../../../services/serviceService';
+import { ServiceCategoryService } from '../../../../services/serviceCategoryService';
+import { ServiceCategory } from '../../../../models/category_services';
 
 export const ViewClinicDetail = () => {
     const { id } = useParams<any>();
     const clinics = useRecoilValue(clinicListValue);
     const [clinic, setClinic] = useState<Clinic>();
     const [current, setCurrent] = useState<string>('0');
-    const sectionDoctorRef = useRef<HTMLDivElement>(null);
-    const sectionDescriptionRef = useRef<HTMLDivElement>(null);
     const [doctors, setDoctors] = useState<Doctor[]>([]);
+    const [services, setServices] = useState<Service[]>([]);
+    const [filteredServices, setFilteredServices] = useState<Service[]>([]);
+    const [serviceCategories, setServiceCategories] = useState<
+        ServiceCategory[]
+    >([]);
     const [filteredDoctors, setFilteredDoctors] = useState<Doctor[]>([]);
     const [pageIndex, setPageIndex] = useState<number>(1);
     const [pageSize, setPageSize] = useState<number>(10);
     const [pageCount, setPageCount] = useState<number>(0);
     const [majorId, setMajorId] = useState<number>(0);
+    const [categoryId, setCategoryId] = useState<number | null>(null);
+
     const [searchContent, setSearchContent] = useState<string>('');
     const [majors, setMajors] = useState<Major[]>([]);
     const [selectedKey, setSelectedKey] = useState<string>('1');
@@ -92,6 +102,32 @@ export const ViewClinicDetail = () => {
             console.log(err.message);
         }
     };
+    const getService = async () => {
+        try {
+            const data = {
+                pageIndex: pageIndex,
+                pageSize: pageSize,
+                categoryId: categoryId,
+            };
+            const result = await ServiceService.viewService(data);
+            setServices(result?.data);
+            setPageCount(result?.pageCount);
+        } catch (err: any) {
+            setServices([]);
+            setPageCount(0);
+            console.log(err.message);
+        }
+    };
+    const handleFilterService = () => {
+        if (searchContent === '') {
+            setFilteredServices(services);
+        } else {
+            const filteredServices = services.filter((service: Service) =>
+                service.name.includes(searchContent)
+            );
+            setFilteredServices(filteredServices);
+        }
+    };
     const handleUpdateViewsDoctor = async (id: number) => {
         try {
             const res = await doctorService.updateViewsDoctor(id);
@@ -103,20 +139,42 @@ export const ViewClinicDetail = () => {
     const handleChangeMenu = (e: any) => {
         setCurrent(e.key);
     };
+    const getAllServiceCategory = async () => {
+        try {
+            const res = await ServiceCategoryService.getAll();
+            setServiceCategories(res);
+        } catch (err: any) {
+            setServiceCategories([]);
+
+            console.log(err.message);
+        }
+    };
     useEffect(() => {
         handleGetClinicById(Number(id));
         window.scrollTo(0, 0);
-        getAllMajor();
     }, [id]);
     useEffect(() => {
         handleFilterDoctor();
     }, [searchContent, doctors]);
     useEffect(() => {
+        handleFilterService();
+    }, [searchContent, services]);
+    useEffect(() => {
         if (Number(selectedKey) === 2) {
             getDoctors();
+            getAllMajor();
+        }
+        if (Number(selectedKey) === 3) {
+            getAllServiceCategory();
+            getService();
         }
     }, [majorId, selectedKey]);
-
+    useEffect(() => {
+        getService();
+    }, [categoryId]);
+    useEffect(() => {
+        getDoctors();
+    }, [majorId]);
     return (
         <div className=" clinic-detail ">
             <div className="position-relative container mt-4 mb-4">
@@ -189,7 +247,7 @@ export const ViewClinicDetail = () => {
                                 label: 'Bác sĩ',
                                 children: (
                                     <div className="mt-3 mb-3">
-                                        <Row className="group-filter-options justify-content-between mb-3">
+                                        <Row className="group-filter-options justify-content-between shadow p-3 rounded">
                                             <Col span={4}>
                                                 <Select
                                                     className="w-100"
@@ -243,6 +301,121 @@ export const ViewClinicDetail = () => {
                                                 handleUpdateViewsDoctor
                                             }
                                         />
+                                        {pageCount > 1 && (
+                                            <Pagination
+                                                current={pageIndex}
+                                                pageSize={pageSize}
+                                                total={pageSize * pageCount}
+                                                showSizeChanger
+                                                pageSizeOptions={[
+                                                    '4',
+                                                    '8',
+                                                    '12',
+                                                    '16',
+                                                    '20',
+                                                ]}
+                                                onChange={(
+                                                    current: number,
+                                                    size: number
+                                                ) => {
+                                                    if (pageSize === size) {
+                                                        setPageSize(size);
+                                                        setPageIndex(1);
+                                                    } else {
+                                                        setPageIndex(current);
+                                                    }
+                                                }}
+                                            />
+                                        )}
+                                    </div>
+                                ),
+                            },
+                            {
+                                key: '3',
+                                label: 'Dịch vụ',
+                                children: (
+                                    <div className="mt-3 mb-3">
+                                        <Row className="group-filter-options justify-content-between  shadow p-3 rounded">
+                                            <Col span={4}>
+                                                <Select
+                                                    className="w-100"
+                                                    placeholder="Chọn loại dịch vụ"
+                                                    optionFilterProp="children"
+                                                    showSearch
+                                                    allowClear
+                                                    onChange={(
+                                                        value: number
+                                                    ) => {
+                                                        setCategoryId(value);
+                                                    }}
+                                                >
+                                                    {serviceCategories.map(
+                                                        (
+                                                            category: ServiceCategory
+                                                        ) => {
+                                                            return (
+                                                                <Select.Option
+                                                                    key={
+                                                                        category.name
+                                                                    }
+                                                                    value={
+                                                                        category.id
+                                                                    }
+                                                                >
+                                                                    {' '}
+                                                                    {
+                                                                        category.name
+                                                                    }
+                                                                </Select.Option>
+                                                            );
+                                                        }
+                                                    )}
+                                                </Select>
+                                            </Col>
+                                            <Col
+                                                span={4}
+                                                className="position-relative group-search"
+                                            >
+                                                <Input
+                                                    placeholder="Tìm kiếm"
+                                                    onChange={(e: any) => {
+                                                        setSearchContent(
+                                                            e.target.value
+                                                        );
+                                                    }}
+                                                ></Input>
+                                                <SearchOutlined className="position-absolute search-icon"></SearchOutlined>
+                                            </Col>
+                                        </Row>
+                                        <ServiceCard
+                                            services={filteredServices}
+                                        />
+                                        {pageCount > 1 && (
+                                            <Pagination
+                                                current={pageIndex}
+                                                pageSize={pageSize}
+                                                total={pageSize * pageCount}
+                                                showSizeChanger
+                                                pageSizeOptions={[
+                                                    '4',
+                                                    '8',
+                                                    '12',
+                                                    '16',
+                                                    '20',
+                                                ]}
+                                                onChange={(
+                                                    current: number,
+                                                    size: number
+                                                ) => {
+                                                    if (pageSize === size) {
+                                                        setPageSize(size);
+                                                        setPageIndex(1);
+                                                    } else {
+                                                        setPageIndex(current);
+                                                    }
+                                                }}
+                                            />
+                                        )}
                                     </div>
                                 ),
                             },
