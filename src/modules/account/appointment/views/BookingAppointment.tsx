@@ -20,6 +20,8 @@ import socket from '../../../../socket';
 import { NotificationService } from '../../../../services/notificationService';
 import { newAppointmentState } from '../../../../stores/appointmentAtom';
 import { invoicesService } from '../../../../services/invoicesService';
+import { invoiceState } from '../../../../stores/invoice';
+
 type NotificationType = 'success' | 'error';
 
 const BookingAppointment = () => {
@@ -39,6 +41,7 @@ const BookingAppointment = () => {
     const [patientProfileCopy, setPatientProfileCopy] =
         useState<PatientProfile>({} as PatientProfile);
     const setNewAppointment = useSetRecoilState(newAppointmentState);
+    const setInvoice = useSetRecoilState(invoiceState);
     const [openInputModal, setOpenInputModal] = useState<boolean>(false);
     const [paymentMethod, setPaymentMethod] = useState<number>(1);
     const openNotification = (
@@ -107,11 +110,11 @@ const BookingAppointment = () => {
                     Math.abs(Number(startHour) - Number(hours)) === 1
                 ) {
                     if (Math.abs(60 - Number(minutes)) <= 20) {
-                        updateAvailableScheduleDetail(Number(detail?.id));
+                        //updateAvailableScheduleDetail(Number(detail?.id));
                     }
                 }
                 if (Number(startHour) < Number(hours)) {
-                    updateAvailableScheduleDetail(Number(detail?.id));
+                    //updateAvailableScheduleDetail(Number(detail?.id));
                 }
             }
         });
@@ -127,11 +130,15 @@ const BookingAppointment = () => {
     const CreateInvoice = async (data: any) => {
         try {
             const res = await invoicesService.createInvoice(data);
+            console.log(res?.data?.result[0][0]);
+            setInvoice(res?.data?.result[0][0]);
         } catch (err: any) {
             console.log(err.message);
         }
     };
+
     useEffect(() => {
+        console.log(paymentMethod);
         socket.on('newAppointment', (newAppointment) => {
             setNewAppointment(newAppointment);
             const newInvoice = {
@@ -140,27 +147,31 @@ const BookingAppointment = () => {
                 service_id: newAppointment.service_id,
                 amount: newAppointment.price,
                 payment_method: paymentMethod,
+                patient_name: newAppointment.patient_name,
+                patient_phone: newAppointment.patient_phone,
             };
+            console.log(newInvoice);
             CreateInvoice(newInvoice);
             const scheduleDetail = schedule?.listScheduleDetails?.find(
                 (scheduleDetail: DoctorScheduleDetail) => {
                     return scheduleDetail.time_id === newAppointment.time_id;
                 }
             );
-            console.log(scheduleDetail);
+
             const newNotification = {
                 user_id: doctor.user_id,
                 message: 'Bạn có một lịch hẹn mới!',
                 appointment_id: newAppointment.id,
             };
             CreateNotification(newNotification);
-            updateAvailableScheduleDetail(Number(scheduleDetail?.id));
+
+            //  updateAvailableScheduleDetail(Number(scheduleDetail?.id));
         });
 
         return () => {
             socket.off('newAppointment');
         };
-    }, [schedule]);
+    }, [schedule, paymentMethod]);
     useEffect(() => {
         window.scrollTo(0, 0);
         setPatientProfileCopy(patientProfile);

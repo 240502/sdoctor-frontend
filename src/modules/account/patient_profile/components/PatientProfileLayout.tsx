@@ -42,7 +42,7 @@ export const PatientProfileLayout = ({ children, breadcrumb }: any) => {
     ];
 
     return (
-        <div className="container mt-4 mb-4" ref={sectionTopRef}>
+        <div className="m-4 patient-profile-container" ref={sectionTopRef}>
             <Breadcrumb
                 items={[
                     {
@@ -56,7 +56,7 @@ export const PatientProfileLayout = ({ children, breadcrumb }: any) => {
                 ]}
             />
             <div className="row mt-3">
-                <div className="block__left col-3" style={{ height: '100vh' }}>
+                <div className="block__left col-2" style={{ height: '100vh' }}>
                     <Menu
                         style={{ height: '100vh' }}
                         mode="inline"
@@ -87,7 +87,7 @@ export const PatientProfileLayout = ({ children, breadcrumb }: any) => {
                         })}
                     </Menu>
                 </div>
-                <div className="block__right col-9">{children}</div>
+                <div className="block__right col-10">{children}</div>
             </div>
         </div>
     );

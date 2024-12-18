@@ -4,14 +4,25 @@ import { useNavigate } from 'react-router-dom';
 import { useRecoilValue } from 'recoil';
 import { newAppointmentValue } from '../stores/appointmentAtom';
 import { useEffect } from 'react';
-import dayjs from 'dayjs';
+import { paymentService } from '../services/paymentService';
+import { invoiceValue } from '../stores/invoice';
+import { Invoices } from '../models/invoices';
 const { Title, Text } = Typography;
+import dayjs from 'dayjs';
 export const BookingSuccess = () => {
     const navigate = useNavigate();
     const newAppointment = useRecoilValue(newAppointmentValue);
-    useEffect(() => {
-        console.log('new appointment booking success', newAppointment);
-    }, []);
+    const invoice = useRecoilValue(invoiceValue);
+    const handleCreateOnlinePayment = async (invoice: Invoices) => {
+        try {
+            const res = await paymentService.create(invoice);
+            console.log(res);
+            window.location.href = res?.data?.order_url;
+        } catch (err: any) {
+            console.log(err.message);
+        }
+    };
+    useEffect(() => {}, []);
     return (
         <div
             style={{
@@ -38,25 +49,24 @@ export const BookingSuccess = () => {
                     Đặt lịch thành công!
                 </Title>
                 <Text>Chúc mừng, bạn đã đặt lịch hẹn khám thành công.</Text>
-                <div style={{ marginTop: '24px', textAlign: 'left' }}>
-                    <Text strong>Bác sĩ:</Text>{' '}
-                    <Text>{newAppointment.doctor_name}</Text> <br />
-                    <Text strong>Ngày:</Text>{' '}
-                    <Text>
-                        {dayjs(newAppointment.appointment_date).format(
-                            'DD-MM-YYYY'
-                        )}
-                    </Text>{' '}
-                    <br />
-                    <Text strong>Giờ:</Text>{' '}
-                    <Text>{newAppointment.time_value}</Text> <br />
-                    <Text strong>Dịch vụ:</Text>{' '}
-                    <Text>{newAppointment.service_name}</Text>
-                </div>
+                <p>
+                    Bạn cần thanh toán hóa đơn phí khám trước
+                    <br></br>
+                    {dayjs(newAppointment.created_at.toString().split('Z')[0])
+                        .add(30, 'minute')
+                        .format('HH:mm:ss DD-MM-YYYY')}
+                </p>
                 <Space style={{ marginTop: '24px' }}>
-                    <Button type="primary" onClick={() => navigate('/')}>
-                        Về trang chính
-                    </Button>
+                    {invoice.payment_method === 2 && (
+                        <Button
+                            type="primary"
+                            onClick={() => {
+                                handleCreateOnlinePayment(invoice);
+                            }}
+                        >
+                            Thanh toán
+                        </Button>
+                    )}
                     <Button onClick={() => navigate('/patient/appointment')}>
                         Xem chi tiết
                     </Button>

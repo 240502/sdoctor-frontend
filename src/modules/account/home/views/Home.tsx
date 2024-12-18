@@ -1,4 +1,4 @@
-import { Button, Image, Input, Select } from 'antd';
+import { Button, Image } from 'antd';
 import { Carousel } from 'antd';
 import '@/assets/scss/home.scss';
 import { BlockCategories } from '../components/BlockCategories';
@@ -11,10 +11,10 @@ import { BlockSearchDoctor } from '../components/BlockSearchDoctor';
 import { BlockCommonService } from '../components/BlockCommonService';
 
 export const Home = () => {
+    const navigate = useNavigate();
     useEffect(() => {
         window.scrollTo(0, 0);
     }, []);
-    const navigate = useNavigate();
     return (
         <>
             <div className="slide__container  position-relative">

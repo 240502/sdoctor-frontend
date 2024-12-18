@@ -23,6 +23,7 @@ export interface Appointment {
     rejectionReason: string;
     service_id: number;
     service_name: string;
+    invoice_status: string;
 }
 export interface AppointmentViewForPatient extends Appointment {
     status_name: string;

@@ -24,6 +24,8 @@ import { DatePickerProps } from 'antd/lib';
 import { PatientProfileService } from '../../../../services/patient_profileService';
 import { useSetRecoilState } from 'recoil';
 import { patientProfileState } from '../../../../stores/patientAtom';
+import { PaymentMethod } from '../../../../models/paymentMethod';
+import { PaymentMethodService } from '../../../../services/paymentMethodSerrvice';
 export const InputAppointmentModal = ({
     openModal,
     cancelModal,
@@ -42,17 +44,28 @@ export const InputAppointmentModal = ({
     const [district, setDistrict] = useState<DistrictType>({} as DistrictType);
     const [province, setProvince] = useState<ProvinceType>({} as ProvinceType);
     const [ward, setWard] = useState<WardType>({} as WardType);
+    const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
     const [different, setDifferent] = useState<boolean>(false);
     const [saveProfile, setSaveProfile] = useState<boolean>(false);
     const [form] = Form.useForm();
     const setPatientProfile = useSetRecoilState(patientProfileState);
     const navigate = useNavigate();
     const onChangeSwitch = (checked: boolean) => {
-        console.log(`switch to ${checked}`);
         setSaveProfile(checked);
     };
+    const getAllPaymentMethod = async () => {
+        try {
+            const res = await PaymentMethodService.getAllPaymentMethod();
+            setPaymentMethods(res?.data);
+            console.log('res', res);
+        } catch (err: any) {
+            setPaymentMethods([]);
+
+            console.log(err.message);
+        }
+    };
+    useEffect(() => console.log(paymentMethods), [paymentMethods]);
     const onFinish = (values: any) => {
-        console.log(values);
         setPaymentMethod(values.payment_method);
         const newAppointment = {
             doctor_id: doctor?.doctor_id,
@@ -74,7 +87,7 @@ export const InputAppointmentModal = ({
             service_id: doctor.service_id,
             service_name: doctor.service_name,
         };
-        console.log(doctor);
+        console.log(values);
         console.log('newAppointment', newAppointment);
         CreateAppointment(newAppointment);
         if (saveProfile) {
@@ -229,10 +242,9 @@ export const InputAppointmentModal = ({
             }
         };
         getProvinces();
+        getAllPaymentMethod();
     }, []);
     useEffect(() => {
-        console.log(patientProfile);
-        console.log(patientProfileCopy);
         if (
             JSON.stringify({
                 ...patientProfile,
@@ -581,10 +593,20 @@ export const InputAppointmentModal = ({
                             label="Phương thức thanh toán"
                             name="payment_method"
                         >
-                            <Radio.Group>
-                                <Radio value={1}>
-                                    Thanh toán tại cơ sở y tế{' '}
-                                </Radio>
+                            <Radio.Group onChange={(e: any) => {}}>
+                                {paymentMethods?.map(
+                                    (paymentMethod: PaymentMethod) => {
+                                        return (
+                                            <Radio
+                                                value={paymentMethod.id}
+                                                key={paymentMethod.id}
+                                                className="w-100 mb-1"
+                                            >
+                                                {paymentMethod.name}
+                                            </Radio>
+                                        );
+                                    }
+                                )}
                             </Radio.Group>
                         </Form.Item>
                         {different && (

@@ -9,10 +9,12 @@ import {
 import { AppointmentService } from '../../../../services/appointmentService';
 import {
     Button,
+    Col,
     Flex,
     Input,
     InputRef,
     Pagination,
+    Row,
     Select,
     Space,
     Table,
@@ -21,7 +23,12 @@ import {
     notification,
 } from 'antd';
 import { TableColumnsType } from 'antd';
-import { CloseOutlined, EyeOutlined, RedoOutlined } from '@ant-design/icons';
+import {
+    CloseOutlined,
+    DollarOutlined,
+    EyeOutlined,
+    RedoOutlined,
+} from '@ant-design/icons';
 import { ModalViewAppointment } from '../components/ModalViewAppointment';
 import { ModalConfirmCancelAppointment } from '../components/ModalConfirmCancelAppointment';
 import { useNavigate } from 'react-router-dom';
@@ -31,7 +38,8 @@ type NotificationType = 'success' | 'error';
 import { FilterDropdownProps } from 'antd/es/table/interface';
 import { SearchOutlined } from '@ant-design/icons';
 import Highlighter from 'react-highlight-words';
-
+import '@/assets/scss/patient_profile.scss';
+import dayjs from 'dayjs';
 type DataIndex = keyof AppointmentViewForPatient;
 const { Option } = Select;
 const ViewAppointment = () => {
@@ -180,31 +188,15 @@ const ViewAppointment = () => {
     const columns: TableColumnsType<AppointmentViewForPatient> = [
         {
             title: 'Bác sĩ',
+            className: 'patient-name',
             dataIndex: 'doctor_name',
             ...getColumnSearchProps('doctor_name'),
-        },
-        {
-            title: 'Địa điểm khám',
-            dataIndex: 'location',
-            ...getColumnSearchProps('location'),
-            render: (text) => (
-                <p
-                    style={{
-                        maxWidth: '200px',
-                        whiteSpace: 'nowrap',
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                    }}
-                >
-                    {text}
-                </p>
-            ),
         },
         {
             title: 'Ngày hẹn',
             dataIndex: 'appointment_date',
             render: (_, record) => (
-                <>{record.appointment_date.toString().slice(0, 10)}</>
+                <>{dayjs(record.appointment_date).format('DD-MM-YYYY')}</>
             ),
         },
         {
@@ -212,7 +204,8 @@ const ViewAppointment = () => {
             dataIndex: 'time_value',
         },
         {
-            title: 'Trạng thái',
+            title: 'Trạng thái lịch hẹn',
+            className: 'status',
             dataIndex: 'status_name',
             render: (_, record) => (
                 <Tag
@@ -248,53 +241,91 @@ const ViewAppointment = () => {
                 record.status_name.indexOf(value as string) === 0,
         },
         {
+            title: 'Trạng thái hóa đơn',
+            className: 'status',
+
+            dataIndex: 'invoice_status',
+            render: (_, record) => (
+                <Tag
+                    color={
+                        record.invoice_status === 'Đã thanh toán'
+                            ? 'success'
+                            : 'blue'
+                    }
+                >
+                    {record.invoice_status.toUpperCase()}
+                </Tag>
+            ),
+        },
+        {
             title: 'Action',
             key: 'action',
             render: (text: string, record: Appointment) => (
-                <>
+                <Row gutter={24} className="">
                     {record.status_id === 4 && (
-                        <Tooltip placement="topLeft" title={'Đặt lại'}>
-                            <Button
-                                className="mb-2"
-                                onClick={() => {
-                                    navigate(
-                                        '/doctor/detail/' + record.doctor_id
-                                    );
-                                }}
-                            >
-                                <RedoOutlined />
-                            </Button>
-                        </Tooltip>
+                        <Col span={6}>
+                            <Tooltip placement="topLeft" title={'Đặt lại'}>
+                                <Button
+                                    className="mb-2"
+                                    onClick={() => {
+                                        navigate(
+                                            '/doctor/detail/' + record.doctor_id
+                                        );
+                                    }}
+                                >
+                                    <RedoOutlined />
+                                </Button>
+                            </Tooltip>
+                        </Col>
                     )}
-                    <Tooltip placement="topLeft" title={'Xem chi tiết'}>
-                        <Button
-                            className="mb-2 border border-info"
-                            onClick={() => {
-                                setIsModalOpen(true);
-                                setAppointment(record);
-                                setIsView(true);
-                                console.log('appointment', record);
-                            }}
-                        >
-                            <EyeOutlined className="text-info" />
-                        </Button>
-                    </Tooltip>
-                    {record.status_id === 1 && (
-                        <Tooltip placement="topLeft" title={'Hủy lịch hẹn'}>
+                    <Col span={6}>
+                        <Tooltip placement="topLeft" title={'Xem chi tiết'}>
                             <Button
-                                className=""
-                                danger
+                                className="mb-2 border border-info"
                                 onClick={() => {
-                                    console.log(record);
-                                    setIsOpenModalConfirm(true);
+                                    setIsModalOpen(true);
                                     setAppointment(record);
+                                    setIsView(true);
+                                    console.log('appointment', record);
                                 }}
                             >
-                                <CloseOutlined className="text-danger" />
+                                <EyeOutlined className="text-info" />
                             </Button>
                         </Tooltip>
+                    </Col>
+                    {record.status_id === 1 && (
+                        <Col span={6}>
+                            <Tooltip placement="topLeft" title={'Hủy lịch hẹn'}>
+                                <Button
+                                    className=""
+                                    danger
+                                    onClick={() => {
+                                        console.log(record);
+                                        setIsOpenModalConfirm(true);
+                                        setAppointment(record);
+                                    }}
+                                >
+                                    <CloseOutlined className="text-danger" />
+                                </Button>
+                            </Tooltip>
+                        </Col>
                     )}
-                </>
+                    {record.invoice_status === 'Chưa thanh toán' && (
+                        <Col span={6}>
+                            <Tooltip placement="topLeft" title={'Thanh toán'}>
+                                <Button
+                                    className=""
+                                    onClick={() => {
+                                        console.log(record);
+                                        setAppointment(record);
+                                    }}
+                                >
+                                    <DollarOutlined className="" />
+                                </Button>
+                            </Tooltip>
+                        </Col>
+                    )}
+                </Row>
             ),
         },
     ];
@@ -372,6 +403,7 @@ const ViewAppointment = () => {
                 <>
                     {contextHolder}{' '}
                     <Table<AppointmentViewForPatient>
+                        className="table-appointment"
                         bordered
                         columns={columns}
                         dataSource={appointments}
