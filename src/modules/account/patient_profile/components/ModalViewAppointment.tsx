@@ -8,12 +8,9 @@ import {
     Modal,
     Radio,
     Select,
-    notification,
-    Space,
 } from 'antd';
 import { useEffect, useRef, useState } from 'react';
 import { doctorService } from '../../../../services/doctorService';
-import { baseURL } from '../../../../constants/api';
 import { Doctor } from '../../../../models/doctor';
 import { Image } from 'antd';
 const { Option } = Select;

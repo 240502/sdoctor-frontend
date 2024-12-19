@@ -8,21 +8,14 @@ import {
     Radio,
     Select,
     notification,
+    Form,
+    Row,
+    Col,
+    message,
 } from 'antd';
-import {
-    handleFocusInput,
-    handleFocusSelect,
-    isEmpty,
-    isEmptyRadio,
-    isEmptySelect,
-    showSuccess,
-    validateBirthday,
-    validateEmail,
-    validateName,
-    validatePhone,
-    validatePhoneLength,
-} from '../../../../utils/global';
-import React, { useEffect, useRef, useState } from 'react';
+import { v4 as uuidv4 } from 'uuid';
+
+import { useEffect, useState } from 'react';
 import dayjs from 'dayjs';
 import axios from 'axios';
 import { useRecoilState } from 'recoil';
@@ -34,22 +27,17 @@ import { ModalConfirmDeletePatientProfile } from '../components/ModalConfirmDele
 import { PatientProfile } from '../../../../models/patient_profile';
 import { ProvinceType, DistrictType, WardType } from '../../../../models/other';
 type NotificationType = 'success' | 'error';
+type MessageType = 'success' | 'warning';
 const ViewProfile = () => {
+    const [messageApi, messageContextHolder] = message.useMessage();
     const [patientProfile, setPatientProfile] =
         useRecoilState(patientProfileState);
     const [profileCopy, setProfileCopy] = useState<PatientProfile>(
         {} as PatientProfile
     );
+    const [form] = Form.useForm();
     const dateFormat = 'DD-MM-YYYY';
-    const inputPatientNameRef = useRef<InputRef>(null);
-    const inputPatientPhoneRef = useRef<InputRef>(null);
-    const inputPatientEmailRef = useRef<InputRef>(null);
-    const radioGenderRef = useRef<any>(undefined);
-    const selectProvinceRef = useRef<any>(null);
-    const selectDistrictRef = useRef<any>(null);
-    const selectWardRef = useRef<any>(null);
-
-    const [isView, setIsView] = useState<boolean>(true);
+    const [isCreate, setIsCreate] = useState<boolean>(true);
     const [isOpenModalAddProfile, setIsOpenModalAddProfile] =
         useState<boolean>(false);
     const [isOpenModalConfirm, setIsOpenModalConfirm] =
@@ -79,96 +67,79 @@ const ViewProfile = () => {
         date,
         dateString
     ) => {
-        setPatientProfile({ ...patientProfile, birthday: String(dateString) });
+        setProfileCopy({
+            ...patientProfile,
+            birthday: dayjs(date).format('YYYY-MM-DD'),
+        });
     };
-    const handleUpdate = () => {
-        let errorMsg: any = {};
-        const isEmptyPatientName = isEmpty(inputPatientNameRef.current?.input);
-        const isEmptyPatientPhone = isEmpty(
-            inputPatientPhoneRef.current?.input
-        );
-        const isEmptyPatientEmail = isEmpty(
-            inputPatientEmailRef.current?.input
-        );
-
-        const isEmptyRadioGender =
-            patientProfile.gender === undefined ? true : false;
-        if (isEmptyRadioGender) {
-            errorMsg = {
-                ...errorMsg,
-                genderError: 'Không được để trống ô này!',
+    const handleUpdate = (values: any) => {
+        if (isCreate) {
+            const uuid = uuidv4();
+            const newProfile = {
+                patient_name: values.patient_name,
+                patient_phone: values.patient_phone,
+                patient_email: values.patient_email,
+                birthday: dayjs(values.birthday).format('YYYY-MM-DD'),
+                province: values.province,
+                district: values.district,
+                commune: values.commune,
+                gender: values.gender,
+                uuid: uuid,
             };
-        }
-
-        const provinceId = province.province_id;
-        const districtId = district.district_id;
-        const wardId = ward.ward_id;
-        const isEmptySelectProvince = isEmptySelect(
-            selectProvinceRef.current,
-            provinceId
-        );
-        const isEmptySelectDistrict = isEmptySelect(
-            selectDistrictRef.current,
-            districtId
-        );
-        const isEmptySelectWard = isEmptySelect(selectWardRef.current, wardId);
-        const isEmptyBirthday =
-            patientProfile?.birthday !== undefined ? false : true;
-        if (isEmptyBirthday) {
-            errorMsg = {
-                ...error,
-                birthdayError: 'Không được để trống ô này!',
-            };
-        }
-        setError(errorMsg);
-        if (
-            !isEmptyBirthday &&
-            !isEmptyPatientName &&
-            !isEmptyPatientPhone &&
-            !isEmptyPatientEmail &&
-            !isEmptyRadioGender &&
-            !isEmptySelectProvince &&
-            !isEmptySelectDistrict &&
-            !isEmptySelectWard
-        ) {
-            const isErrorPatientName = validateName(
-                inputPatientNameRef.current?.input
-            );
-            const isErrorPatientEmail = validateEmail(
-                inputPatientEmailRef.current?.input
-            );
-            const isErrorPatientPhone = validatePhone(
-                inputPatientPhoneRef.current?.input
-            );
-
-            const isErrorPhoneLength = validatePhoneLength(
-                inputPatientPhoneRef.current?.input
-            );
-            const isErrorBirthday = validateBirthday(
-                new Date(patientProfile.birthday),
-                setError
-            );
+            CreatePatientProfile(newProfile);
+        } else {
             if (
-                !isErrorPatientName &&
-                !isErrorPatientEmail &&
-                !isErrorPatientPhone &&
-                !isErrorPhoneLength &&
-                !isErrorBirthday
+                JSON.stringify({
+                    ...profileCopy,
+                    birthday: dayjs(profileCopy.birthday).format('YYYY-MM-DD'),
+                }) !==
+                JSON.stringify({
+                    ...patientProfile,
+                    birthday: dayjs(patientProfile.birthday).format(
+                        'YYYY-MM-DD'
+                    ),
+                })
             ) {
                 const newProfile = {
-                    patient_name: inputPatientNameRef.current?.input?.value,
-                    patient_phone: inputPatientPhoneRef.current?.input?.value,
-                    patient_email: inputPatientEmailRef.current?.input?.value,
-                    birthday: patientProfile.birthday.toString().slice(0, 10),
-                    province: province.province_name,
-                    district: district.district_name,
-                    commune: ward.ward_name,
-                    gender: patientProfile.gender,
+                    patient_name: values.patient_name,
+                    patient_phone: values.patient_phone,
+                    patient_email: values.patient_email,
+                    birthday: dayjs(values.birthday).format('YYYY-MM-DD'),
+                    province: values.province,
+                    district: values.district,
+                    commune: values.commune,
+                    gender: values.gender,
                     uuid: patientProfile.uuid,
                     id: patientProfile.id,
                 };
                 UpdateProfile(newProfile);
+            } else {
+                messageApi.open({
+                    type: 'warning',
+                    content: 'Không có gì thay đổi!',
+                    duration: 3000,
+                });
             }
+        }
+    };
+    const CreatePatientProfile = async (data: any) => {
+        try {
+            const res = await PatientProfileService.createPatientProfile(data);
+            localStorage.setItem('uuid', JSON.stringify(data.uuid));
+            openNotificationWithIcon(
+                'success',
+                'Thông báo',
+                'Thêm hồ sơ thành công'
+            );
+            setIsCreate(false);
+            setPatientProfile(data);
+        } catch (err: any) {
+            console.log(err.message);
+            openNotificationWithIcon(
+                'error',
+                'Thông báo',
+                'Thêm hồ sơ không thành công'
+            );
         }
     };
     const UpdateProfile = async (newProfile: any) => {
@@ -212,9 +183,7 @@ const ViewProfile = () => {
             console.log(err);
         }
     };
-    const handleCancelModal = () => {
-        setIsOpenModalAddProfile(false);
-    };
+
     const handleCancelModalConfirm = () => {
         setIsOpenModalConfirm(false);
     };
@@ -227,6 +196,7 @@ const ViewProfile = () => {
                 'Xóa thành công!'
             );
             localStorage.removeItem('uuid');
+            form.resetFields();
             setPatientProfile({} as PatientProfile);
             handleCancelModalConfirm();
             setProvinces([]);
@@ -261,8 +231,8 @@ const ViewProfile = () => {
             const res = await PatientProfileService.getProfileByPhoneOrEmail(
                 data
             );
-            console.log(res);
             localStorage.setItem('uuid', res.uuid);
+            setIsCreate(false);
             setPatientProfile(res);
         } catch (err: any) {
             console.log(err.message);
@@ -276,6 +246,7 @@ const ViewProfile = () => {
     useEffect(() => {
         if (patientProfile.uuid) {
             setProfileCopy(patientProfile);
+            setIsCreate(false);
         }
     }, []);
     useEffect(() => {
@@ -289,12 +260,9 @@ const ViewProfile = () => {
                 console.log(err);
             }
         };
-        if (patientProfile.uuid) {
-            console.log('get provinces');
-            getProvinces();
-        }
+        getProvinces();
         window.scrollTo(0, 0);
-    }, [patientProfile.uuid]);
+    }, []);
 
     useEffect(() => {
         if (province.province_id !== 0) {
@@ -353,334 +321,391 @@ const ViewProfile = () => {
     return (
         <>
             {contextHolder}
+            {messageContextHolder}
             <PatientProfileLayout breadcrumb="Hồ sơ">
-                {patientProfile?.uuid !== undefined ? (
-                    <Card title="Hồ sơ bệnh nhân" bordered={false}>
-                        <div className="info__item mb-3">
-                            <label htmlFor="">Họ và tên</label>
-                            <Input
-                                onFocus={(e) => handleFocusInput(e.target)}
-                                ref={inputPatientNameRef}
-                                className="mt-2"
-                                value={patientProfile.patient_name}
-                                onChange={(e: any) =>
-                                    setPatientProfile({
-                                        ...patientProfile,
-                                        patient_name: e.target.value,
-                                    })
-                                }
-                            />
-                            <div
-                                className="error_message mt-3"
-                                style={{ color: 'red' }}
-                            ></div>
-                        </div>
-                        <div className="info__item mb-3">
-                            <label htmlFor="">Số điện thoại</label>
-                            <Input
-                                onFocus={(e) => handleFocusInput(e.target)}
-                                ref={inputPatientPhoneRef}
-                                className="mt-2"
-                                value={patientProfile.patient_phone}
-                                onChange={(e) =>
-                                    setPatientProfile({
-                                        ...patientProfile,
-                                        patient_phone: e.target.value,
-                                    })
-                                }
-                            />
-                            <div
-                                className="error_message mt-3"
-                                style={{ color: 'red' }}
-                            ></div>
-                        </div>
-                        <div className="info__item mb-3">
-                            <label htmlFor="">Email</label>
-                            <Input
-                                onFocus={(e) => handleFocusInput(e.target)}
-                                ref={inputPatientEmailRef}
-                                className="mt-2"
-                                value={patientProfile.patient_email}
-                                onChange={(e) =>
-                                    setPatientProfile({
-                                        ...patientProfile,
-                                        patient_email: e.target.value,
-                                    })
-                                }
-                            />
-                            <div
-                                className="error_message mt-3"
-                                style={{ color: 'red' }}
-                            ></div>
-                        </div>
-                        <div className="info__item mb-3">
-                            <label htmlFor="">Giới tính</label>
-                            <Radio.Group
-                                onFocus={() => {
-                                    setError({ ...error, genderError: '' });
-                                }}
-                                className="ms-3 "
-                                value={Number(patientProfile.gender)}
-                                ref={radioGenderRef}
-                                onChange={(e) =>
-                                    setPatientProfile({
-                                        ...patientProfile,
-                                        gender: e.target.value,
-                                    })
-                                }
-                            >
-                                <Radio value={1}>Nam</Radio>
-                                <Radio value={2}>Nữ</Radio>
-                            </Radio.Group>
-                            {error?.genderError !== '' && (
-                                <div
-                                    className="error_message mt-3"
-                                    style={{ color: 'red' }}
-                                >
-                                    {error?.genderError}
-                                </div>
-                            )}
-                        </div>
-                        <div className="info__item mb-3">
-                            <label htmlFor="">Ngày sinh</label>
-                            <DatePicker
-                                onFocus={() => {
-                                    setError({
-                                        ...error,
-                                        birthdayError: '',
-                                    });
-                                }}
-                                onChange={onBirthDayChange}
-                                className="d-block mt-2"
-                                type="date"
-                                defaultValue={dayjs(
-                                    patientProfile.birthday
-                                        .toString()
-                                        .slice(0, 10),
-                                    dateFormat
-                                )}
-                                format={dateFormat}
-                            />
-                            {error?.birthdayError !== '' && (
-                                <div
-                                    className="error_message mt-3"
-                                    style={{ color: 'red' }}
-                                >
-                                    {error?.birthdayError}
-                                </div>
-                            )}
-                        </div>
-                        <div className="mb-3">
-                            <label htmlFor="" className="form-label fw-bold">
-                                Tỉnh/ Thành phố
-                            </label>
-                            <Select
-                                onFocus={(e) =>
-                                    handleFocusSelect(selectProvinceRef.current)
-                                }
-                                ref={selectProvinceRef}
-                                className="d-block"
-                                showSearch
-                                onChange={(e) => {
-                                    const province: any = provinces.find(
-                                        (province: any) => {
-                                            return province.province_id === e;
-                                        }
-                                    );
-                                    setProvince(province);
-                                    setPatientProfile({
-                                        ...patientProfile,
-                                        province: province.province_name,
-                                    });
-                                    setDistrict({} as DistrictType);
-                                    setWard({} as WardType);
-                                }}
-                                value={province.province_id}
-                                placeholder="Chọn tỉnh/ thành phố"
-                                optionFilterProp="children"
-                            >
-                                {provinces.map((item) => {
-                                    return (
-                                        <Select.Option
-                                            key={item.province_id}
-                                            value={item.province_id}
-                                        >
-                                            {item.province_name}
-                                        </Select.Option>
-                                    );
-                                })}
-                            </Select>
-                            <div
-                                className="error_message mt-3"
-                                style={{ color: 'red' }}
-                            ></div>
-                        </div>
-                        <div className="mb-3">
-                            <label htmlFor="" className="form-label fw-bold">
-                                Quận/ Huyện
-                            </label>
-                            <Select
-                                onFocus={(e) =>
-                                    handleFocusSelect(selectDistrictRef.current)
-                                }
-                                className="d-block"
-                                showSearch
-                                ref={selectDistrictRef}
-                                onChange={(e) => {
-                                    const district: any = districts.find(
-                                        (item: any) => {
-                                            return item.district_id === e;
-                                        }
-                                    );
-                                    setPatientProfile({
-                                        ...patientProfile,
-                                        district: district.district_name,
-                                    });
-                                    setDistrict(district);
-
-                                    setWard({} as WardType);
-                                }}
-                                value={district.district_id}
-                                placeholder="Chọn quận/ huyện/ thị xã"
-                                optionFilterProp="children"
-                            >
-                                {districts.map((item) => {
-                                    return (
-                                        <Select.Option
-                                            key={item.district_id}
-                                            value={item.district_id}
-                                        >
-                                            {item.district_name}
-                                        </Select.Option>
-                                    );
-                                })}
-                            </Select>
-                            <div
-                                className="error_message mt-3"
-                                style={{ color: 'red' }}
-                            ></div>
-                        </div>
-                        <div className="mb-3">
-                            <label htmlFor="" className="form-label fw-bold">
-                                Xã/ Phường
-                            </label>
-                            <Select
-                                onFocus={(e) =>
-                                    handleFocusSelect(selectWardRef.current)
-                                }
-                                className="d-block"
-                                showSearch
-                                ref={selectWardRef}
-                                onChange={(e) => {
-                                    const ward: any = wards.find((w: any) => {
-                                        return w.ward_id === e;
-                                    });
-                                    setPatientProfile({
-                                        ...patientProfile,
-                                        commune: ward.ward_name,
-                                    });
-                                    setWard(ward);
-                                }}
-                                placeholder="Chọn xã/ phường"
-                                value={ward.ward_id}
-                                optionFilterProp="children"
-                            >
-                                {wards.map((item) => {
-                                    return (
-                                        <Select.Option
-                                            key={item.ward_id}
-                                            value={item.ward_id}
-                                        >
-                                            {item.ward_name}
-                                        </Select.Option>
-                                    );
-                                })}
-                            </Select>
-                            <div
-                                className="error_message mt-3"
-                                style={{ color: 'red' }}
-                            ></div>
-                        </div>
-                        <div className="group__button d-flex justify-content-between">
-                            <Button
-                                className="bg-primary text-white "
-                                onClick={() => {
-                                    handleUpdate();
-                                }}
-                            >
-                                Lưu thông tin
-                            </Button>
-                            <Button
-                                className=" bg-danger text-white"
-                                onClick={() => {
-                                    setIsOpenModalConfirm(true);
-                                }}
-                            >
-                                Xóa hồ sơ
-                            </Button>
-                        </div>
-                    </Card>
-                ) : (
-                    <div className="container mt-5">
-                        <Card
-                            className="mx-auto shadow-lg"
-                            style={{ maxWidth: '500px' }}
+                <Card title="Hồ sơ bệnh nhân" bordered={false}>
+                    {patientProfile?.uuid !== undefined || isCreate ? (
+                        <Form
+                            form={form}
+                            layout="vertical"
+                            onFinish={handleUpdate}
+                            initialValues={{
+                                ...patientProfile,
+                                birthday: dayjs(patientProfile.birthday),
+                            }}
                         >
-                            <div className="mb-4">
-                                <label className="form-label">
-                                    Nhập số điện thoại hoặc email
-                                </label>
-                                <Input
-                                    onFocus={() => {
-                                        setError({});
-                                    }}
-                                    placeholder="Số điện thoại hoặc email"
-                                    value={searchValue}
-                                    onChange={(e) => {
-                                        setSearchValue(String(e.target.value));
-                                    }}
-                                />
-                                {error?.searchContentError && (
-                                    <div
-                                        className="error_message mt-3"
-                                        style={{ color: 'red' }}
+                            <Row gutter={24}>
+                                <Col span={12}>
+                                    <Form.Item
+                                        label="Họ và tên"
+                                        name="patient_name"
+                                        rules={[
+                                            {
+                                                required: true,
+                                                message:
+                                                    'Vui lòng nhập đầy đủ họ và tên bệnh nhân',
+                                            },
+                                            {
+                                                pattern: /^[\p{L} ]+$/u,
+                                                message:
+                                                    'Tên chỉ được chứa ký tự chữ cái và khoảng trắng',
+                                            },
+                                            {
+                                                min: 3,
+                                                message:
+                                                    'Tên phải có ít nhất 3 ký tự',
+                                            },
+                                            {
+                                                max: 50,
+                                                message:
+                                                    'Tên không được dài quá 50 ký tự',
+                                            },
+                                        ]}
                                     >
-                                        {error?.searchContentError}
-                                    </div>
-                                )}
+                                        <Input
+                                            onChange={(e: any) =>
+                                                setProfileCopy({
+                                                    ...patientProfile,
+                                                    patient_name:
+                                                        e.target.value,
+                                                })
+                                            }
+                                        />
+                                    </Form.Item>
+                                </Col>
+                                <Col span={12}>
+                                    <Form.Item
+                                        label="Số điện thoại"
+                                        name={'patient_phone'}
+                                        rules={[
+                                            {
+                                                required: true,
+                                                message:
+                                                    'Vui lòng nhập số điện thoại',
+                                            },
+                                            {
+                                                pattern:
+                                                    /^(03|05|07|08|09)\d{8}$/,
+                                                message:
+                                                    'Số điện thoại không hợp lệ. Phải là số di động 10 chữ số',
+                                            },
+                                        ]}
+                                    >
+                                        <Input
+                                            onChange={(e) =>
+                                                setProfileCopy({
+                                                    ...patientProfile,
+                                                    patient_phone:
+                                                        e.target.value,
+                                                })
+                                            }
+                                        />
+                                    </Form.Item>
+                                </Col>
+                                <Col span={12}>
+                                    <Form.Item
+                                        label="Email"
+                                        name={'patient_email'}
+                                        rules={[
+                                            {
+                                                required: true,
+                                                message: 'Vui lòng nhập email',
+                                            },
+                                            {
+                                                type: 'email',
+                                                message: 'Email không hợp lệ',
+                                            },
+                                        ]}
+                                    >
+                                        <Input
+                                            onChange={(e) =>
+                                                setProfileCopy({
+                                                    ...patientProfile,
+                                                    patient_email:
+                                                        e.target.value,
+                                                })
+                                            }
+                                        />
+                                    </Form.Item>
+                                </Col>
+                                <Col span={12}>
+                                    <Form.Item
+                                        label="Giới tính"
+                                        name={'gender'}
+                                        rules={[
+                                            {
+                                                required: true,
+                                                message:
+                                                    'Vui lòng chọn giới tính',
+                                            },
+                                        ]}
+                                    >
+                                        <Radio.Group
+                                            value={Number(
+                                                patientProfile.gender
+                                            )}
+                                            onChange={(e) =>
+                                                setProfileCopy({
+                                                    ...patientProfile,
+                                                    gender: e.target.value,
+                                                })
+                                            }
+                                        >
+                                            <Radio value={1}>Nam</Radio>
+                                            <Radio value={2}>Nữ</Radio>
+                                        </Radio.Group>
+                                    </Form.Item>
+                                </Col>
+                                <Col span={12}>
+                                    <Form.Item
+                                        label="Ngày sinh"
+                                        name={'birthday'}
+                                        rules={[
+                                            {
+                                                required: true,
+                                                message:
+                                                    'Không được để trống ô này',
+                                            },
+                                        ]}
+                                    >
+                                        <DatePicker
+                                            onChange={onBirthDayChange}
+                                            className="d-block"
+                                            type="date"
+                                            format={dateFormat}
+                                        />
+                                    </Form.Item>
+                                </Col>
+                                <Col span={12}>
+                                    <Form.Item
+                                        label="Tỉnh/Thành phố"
+                                        name={'province'}
+                                        rules={[
+                                            {
+                                                required: true,
+                                                message:
+                                                    'Vui lòng chọn tỉnh/thành',
+                                            },
+                                        ]}
+                                    >
+                                        <Select
+                                            className="d-block"
+                                            showSearch
+                                            onChange={(
+                                                province_name: string
+                                            ) => {
+                                                const pro: any = provinces.find(
+                                                    (province: any) => {
+                                                        return (
+                                                            province.province_name ===
+                                                            province_name
+                                                        );
+                                                    }
+                                                );
+                                                setProvince(pro);
+
+                                                setProfileCopy({
+                                                    ...patientProfile,
+                                                    province: province_name,
+                                                });
+                                                form.setFieldValue(
+                                                    'district',
+                                                    null
+                                                );
+                                                form.setFieldValue(
+                                                    'commune',
+                                                    null
+                                                );
+                                            }}
+                                            placeholder="Chọn tỉnh/ thành phố"
+                                            optionFilterProp="children"
+                                        >
+                                            {provinces.map(
+                                                (province: ProvinceType) => {
+                                                    return (
+                                                        <Select.Option
+                                                            value={
+                                                                province.province_name
+                                                            }
+                                                            key={
+                                                                province.province_id
+                                                            }
+                                                        >
+                                                            {
+                                                                province.province_name
+                                                            }
+                                                        </Select.Option>
+                                                    );
+                                                }
+                                            )}
+                                        </Select>
+                                    </Form.Item>
+                                </Col>
+                                <Col span={12}>
+                                    <Form.Item
+                                        label="Quận/Huyện"
+                                        name={'district'}
+                                        rules={[
+                                            {
+                                                required: true,
+                                                message:
+                                                    'Vui lòng chọn quận/huyện',
+                                            },
+                                        ]}
+                                    >
+                                        <Select
+                                            className="d-block"
+                                            showSearch
+                                            onChange={(value: string) => {
+                                                const dis: any = districts.find(
+                                                    (item: any) => {
+                                                        return (
+                                                            item.district_name ===
+                                                            value
+                                                        );
+                                                    }
+                                                );
+                                                setDistrict(dis);
+
+                                                setProfileCopy({
+                                                    ...patientProfile,
+                                                    district: value,
+                                                });
+                                                form.setFieldValue(
+                                                    'commune',
+                                                    null
+                                                );
+                                            }}
+                                            placeholder="Chọn quận/ huyện/ thị xã"
+                                            optionFilterProp="children"
+                                        >
+                                            {districts.map((item) => {
+                                                return (
+                                                    <Select.Option
+                                                        key={item.district_name}
+                                                        value={
+                                                            item.district_name
+                                                        }
+                                                    >
+                                                        {item.district_name}
+                                                    </Select.Option>
+                                                );
+                                            })}
+                                        </Select>
+                                    </Form.Item>
+                                </Col>
+                                <Col span={12}>
+                                    <Form.Item
+                                        label="Xã/Phường"
+                                        name={'commune'}
+                                        rules={[
+                                            {
+                                                required: true,
+                                                message:
+                                                    'Vui lòng chọn xã/phường',
+                                            },
+                                        ]}
+                                    >
+                                        <Select
+                                            className="d-block"
+                                            showSearch
+                                            onChange={(value: string) => {
+                                                setProfileCopy({
+                                                    ...patientProfile,
+                                                    commune: value,
+                                                });
+                                                setWard(ward);
+                                            }}
+                                            placeholder="Chọn xã/ phường"
+                                            optionFilterProp="children"
+                                        >
+                                            {wards.map((item) => {
+                                                return (
+                                                    <Select.Option
+                                                        key={item.ward_name}
+                                                        value={item.ward_name}
+                                                    >
+                                                        {item.ward_name}
+                                                    </Select.Option>
+                                                );
+                                            })}
+                                        </Select>
+                                    </Form.Item>
+                                </Col>
+                            </Row>
+                            <div className="group__button d-flex justify-content-between">
                                 <Button
-                                    type="primary"
-                                    block
-                                    className="mt-3"
-                                    onClick={handleGetProfileByPhoneOrEmail}
+                                    className="bg-primary text-white "
+                                    onClick={() => {
+                                        form.submit();
+                                    }}
                                 >
-                                    Tìm kiếm
+                                    Lưu thông tin
+                                </Button>
+                                <Button
+                                    className=" bg-danger text-white"
+                                    onClick={() => {
+                                        setIsOpenModalConfirm(true);
+                                    }}
+                                >
+                                    Xóa hồ sơ
                                 </Button>
                             </div>
-
-                            <Button
-                                type="default"
-                                block
-                                className="mt-4"
-                                onClick={() => {
-                                    setIsView(false);
-                                    setIsOpenModalAddProfile(true);
-                                }}
+                        </Form>
+                    ) : (
+                        <div className="container mt-5">
+                            <Card
+                                className="mx-auto shadow-lg"
+                                style={{ maxWidth: '500px' }}
                             >
-                                Thêm mới hồ sơ
-                            </Button>
-                        </Card>
-                    </div>
-                )}
-                {isOpenModalAddProfile && (
-                    <ModalViewAppointment
-                        handleCancelModal={handleCancelModal}
-                        isModalOpen={isOpenModalAddProfile}
-                        appointment={null}
-                        isView={isView}
-                        openNotificationWithIcon={openNotificationWithIcon}
-                    />
-                )}
+                                <div className="mb-4">
+                                    <label className="form-label">
+                                        Nhập số điện thoại hoặc email
+                                    </label>
+                                    <Input
+                                        onFocus={() => {
+                                            setError({});
+                                        }}
+                                        placeholder="Số điện thoại hoặc email"
+                                        value={searchValue}
+                                        onChange={(e) => {
+                                            setSearchValue(
+                                                String(e.target.value)
+                                            );
+                                        }}
+                                    />
+                                    {error?.searchContentError && (
+                                        <div
+                                            className="error_message mt-3"
+                                            style={{ color: 'red' }}
+                                        >
+                                            {error?.searchContentError}
+                                        </div>
+                                    )}
+                                    <Button
+                                        type="primary"
+                                        block
+                                        className="mt-3"
+                                        onClick={handleGetProfileByPhoneOrEmail}
+                                    >
+                                        Tìm kiếm
+                                    </Button>
+                                </div>
+
+                                <Button
+                                    type="default"
+                                    block
+                                    className="mt-4"
+                                    onClick={() => {
+                                        setIsCreate(true);
+                                    }}
+                                >
+                                    Thêm mới hồ sơ
+                                </Button>
+                            </Card>
+                        </div>
+                    )}
+                </Card>
                 {isOpenModalConfirm && (
                     <ModalConfirmDeletePatientProfile
                         handleCancelModalConfirm={handleCancelModalConfirm}

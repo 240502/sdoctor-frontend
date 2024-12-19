@@ -109,6 +109,7 @@ const ViewService = () => {
     useEffect(() => {
         getAllClinic();
         getAllServiceCategory();
+        window.scrollTo(0, 0);
     }, []);
     useEffect(() => {
         getServices();

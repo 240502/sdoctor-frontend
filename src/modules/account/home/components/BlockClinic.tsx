@@ -13,8 +13,8 @@ export const BlockClinic = (): JSX.Element => {
     var settings = {
         dots: false,
         infinite: true,
-        slidesToShow: 3,
-        slidesToScroll: 3,
+        slidesToShow: 4,
+        slidesToScroll: 4,
         autoplay: false,
         speed: 1000,
         autoplaySpeed: 1000,
@@ -68,7 +68,7 @@ export const BlockClinic = (): JSX.Element => {
                                         className=" text-decoration-none"
                                     >
                                         <Image
-                                            className="item__image"
+                                            className="item__image object-fit-contain"
                                             preview={false}
                                             src={
                                                 clinic.avatar.includes(

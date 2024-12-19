@@ -108,7 +108,8 @@ const BookingAppointment = () => {
 
                 if (
                     Number(startHour) > Number(hours) &&
-                    Math.abs(Number(startHour) - Number(hours)) === 1
+                    Math.abs(Number(startHour) - Number(hours)) === 1 &&
+                    Number(startMinute) === 0
                 ) {
                     if (Math.abs(60 - Number(minutes)) <= 20) {
                         updateAvailableScheduleDetail(Number(detail?.id));

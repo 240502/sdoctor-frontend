@@ -9,7 +9,7 @@ import {
     Select,
     Tabs,
 } from 'antd';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useRecoilValue } from 'recoil';
 import { clinicListValue } from '../../../../stores/clinicAtom';
@@ -69,7 +69,6 @@ export const ViewClinicDetail = () => {
         }
     };
     const handleFilterDoctor = () => {
-        console.log('filter');
         if (searchContent === '') {
             setFilteredDoctors(doctors);
         } else {
@@ -108,6 +107,7 @@ export const ViewClinicDetail = () => {
                 pageIndex: pageIndex,
                 pageSize: pageSize,
                 categoryId: categoryId,
+                clinicId: id,
             };
             const result = await ServiceService.viewService(data);
             setServices(result?.data);
@@ -387,9 +387,15 @@ export const ViewClinicDetail = () => {
                                                 <SearchOutlined className="position-absolute search-icon"></SearchOutlined>
                                             </Col>
                                         </Row>
-                                        <ServiceCard
-                                            services={filteredServices}
-                                        />
+                                        {services?.length > 0 ? (
+                                            <ServiceCard
+                                                services={filteredServices}
+                                            />
+                                        ) : (
+                                            <p className="mt-3 text-center fw-bold fs-6">
+                                                Chưa có dữ liệu!
+                                            </p>
+                                        )}
                                         {pageCount > 1 && (
                                             <Pagination
                                                 current={pageIndex}

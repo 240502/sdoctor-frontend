@@ -36,6 +36,15 @@ export const BlockHotDoctor = (): JSX.Element => {
         <div className="block-common-doctor row mt-5">
             <div className="block__header d-flex justify-content-between align-items-center">
                 <h3 className="block__title fs-4 fw-bold">Bác sĩ nổi bật</h3>
+                <Button
+                    className="pt-3 pb-3 fs-5"
+                    onClick={() => {
+                        navigate('/list/doctor');
+                    }}
+                >
+                    {' '}
+                    Xem thêm
+                </Button>
             </div>
             <Row className="block-container mt-4" gutter={16}>
                 {commonDoctors?.length > 0 ? (

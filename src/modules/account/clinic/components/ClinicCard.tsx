@@ -7,7 +7,7 @@ import { addWatchedClinic } from '../../../../utils/clinic';
 export const ClinicCard = ({ clinics, handleUpdateViewsClinic }: any) => {
     const navigate = useNavigate();
     return (
-        <Row gutter={[16, 16]} className="cards">
+        <Row gutter={24} className="cards">
             {clinics.map((clinic: Clinic) => {
                 return (
                     <Col span={6} className="card-item" key={clinic.id}>

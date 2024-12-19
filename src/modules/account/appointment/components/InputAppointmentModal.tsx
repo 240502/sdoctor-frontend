@@ -460,7 +460,7 @@ export const InputAppointmentModal = ({
                             <DatePicker
                                 onChange={onChange}
                                 className="d-block"
-                                format={'YYYY-MM-DD'}
+                                format={'DD-MM-YYYY'}
                             />
                         </Form.Item>
                         {/* Tỉnh thành */}
