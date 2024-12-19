@@ -37,4 +37,10 @@ export const invoicesService = {
         );
         return res;
     },
+    async getInvoiceByAppointmentId(appointmentId: number): Promise<any> {
+        const res = await apiClient.get(
+            '/api/invoice/get-by-appointment/' + appointmentId
+        );
+        return res?.data;
+    },
 };

@@ -22,7 +22,9 @@ export const BookingSuccess = () => {
             console.log(err.message);
         }
     };
-    useEffect(() => {}, []);
+    useEffect(() => {
+        console.log(invoice);
+    }, []);
     return (
         <div
             style={{
@@ -49,13 +51,18 @@ export const BookingSuccess = () => {
                     Đặt lịch thành công!
                 </Title>
                 <Text>Chúc mừng, bạn đã đặt lịch hẹn khám thành công.</Text>
-                <p>
-                    Bạn cần thanh toán hóa đơn phí khám trước
-                    <br></br>
-                    {dayjs(newAppointment.created_at.toString().split('Z')[0])
-                        .add(30, 'minute')
-                        .format('HH:mm:ss DD-MM-YYYY')}
-                </p>
+                {invoice.payment_method === 2 && (
+                    <p>
+                        Bạn cần thanh toán hóa đơn phí khám trước
+                        <br></br>
+                        {dayjs(
+                            newAppointment.created_at.toString().split('Z')[0]
+                        )
+                            .add(30, 'minute')
+                            .format('HH:mm:ss DD-MM-YYYY')}
+                    </p>
+                )}
+
                 <Space style={{ marginTop: '24px' }}>
                     {invoice.payment_method === 2 && (
                         <Button

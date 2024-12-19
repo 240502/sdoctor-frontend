@@ -65,6 +65,7 @@ const BookingAppointment = () => {
 
     const updateAvailableScheduleDetail = async (scheduleDetailId: number) => {
         try {
+            console.log('scheduleId', scheduleDetailId);
             const res =
                 await doctorScheduleDetailService.updateAvailableScheduleDetail(
                     scheduleDetailId
@@ -110,11 +111,11 @@ const BookingAppointment = () => {
                     Math.abs(Number(startHour) - Number(hours)) === 1
                 ) {
                     if (Math.abs(60 - Number(minutes)) <= 20) {
-                        //updateAvailableScheduleDetail(Number(detail?.id));
+                        updateAvailableScheduleDetail(Number(detail?.id));
                     }
                 }
                 if (Number(startHour) < Number(hours)) {
-                    //updateAvailableScheduleDetail(Number(detail?.id));
+                    updateAvailableScheduleDetail(Number(detail?.id));
                 }
             }
         });
@@ -150,7 +151,6 @@ const BookingAppointment = () => {
                 patient_name: newAppointment.patient_name,
                 patient_phone: newAppointment.patient_phone,
             };
-            console.log(newInvoice);
             CreateInvoice(newInvoice);
             const scheduleDetail = schedule?.listScheduleDetails?.find(
                 (scheduleDetail: DoctorScheduleDetail) => {
@@ -165,7 +165,7 @@ const BookingAppointment = () => {
             };
             CreateNotification(newNotification);
 
-            //  updateAvailableScheduleDetail(Number(scheduleDetail?.id));
+            updateAvailableScheduleDetail(Number(scheduleDetail?.id));
         });
 
         return () => {

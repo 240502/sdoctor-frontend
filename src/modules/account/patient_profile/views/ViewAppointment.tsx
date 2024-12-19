@@ -40,6 +40,9 @@ import { SearchOutlined } from '@ant-design/icons';
 import Highlighter from 'react-highlight-words';
 import '@/assets/scss/patient_profile.scss';
 import dayjs from 'dayjs';
+import { invoicesService } from '../../../../services/invoicesService';
+import { Invoices } from '../../../../models/invoices';
+import { paymentService } from '../../../../services/paymentService';
 type DataIndex = keyof AppointmentViewForPatient;
 const { Option } = Select;
 const ViewAppointment = () => {
@@ -185,6 +188,24 @@ const ViewAppointment = () => {
                 text
             ),
     });
+    const getInvoiceByAppointment = async (appointmentId: number) => {
+        try {
+            const res = await invoicesService.getInvoiceByAppointmentId(
+                appointmentId
+            );
+            console.log(res);
+            handleCreateOnlinePayment(res);
+        } catch (err: any) {}
+    };
+    const handleCreateOnlinePayment = async (invoice: Invoices) => {
+        try {
+            const res = await paymentService.create(invoice);
+            console.log(res);
+            window.location.href = res?.data?.order_url;
+        } catch (err: any) {
+            console.log(err.message);
+        }
+    };
     const columns: TableColumnsType<AppointmentViewForPatient> = [
         {
             title: 'Bác sĩ',
@@ -310,21 +331,25 @@ const ViewAppointment = () => {
                             </Tooltip>
                         </Col>
                     )}
-                    {record.invoice_status === 'Chưa thanh toán' && (
-                        <Col span={6}>
-                            <Tooltip placement="topLeft" title={'Thanh toán'}>
-                                <Button
-                                    className=""
-                                    onClick={() => {
-                                        console.log(record);
-                                        setAppointment(record);
-                                    }}
+                    {record.invoice_status === 'Chưa thanh toán' &&
+                        record.payment_method === 2 && (
+                            <Col span={6}>
+                                <Tooltip
+                                    placement="topLeft"
+                                    title={'Thanh toán'}
                                 >
-                                    <DollarOutlined className="" />
-                                </Button>
-                            </Tooltip>
-                        </Col>
-                    )}
+                                    <Button
+                                        className=""
+                                        onClick={() => {
+                                            console.log(record);
+                                            getInvoiceByAppointment(record.id);
+                                        }}
+                                    >
+                                        <DollarOutlined className="" />
+                                    </Button>
+                                </Tooltip>
+                            </Col>
+                        )}
                 </Row>
             ),
         },
