@@ -28,4 +28,5 @@ export interface Doctor {
     birthday: Date;
     service_id: number;
     service_name: string;
+    average_star: number;
 }

@@ -2,10 +2,19 @@ import { Col, Row, Image, Button, Flex } from 'antd';
 import { Service } from '../models/service';
 import { useNavigate } from 'react-router-dom';
 import { DollarOutlined, EnvironmentOutlined } from '@ant-design/icons';
+import { ServiceService } from '../services/serviceService';
+import { addWatchedService } from '../utils/service';
 
 const ServiceCard = ({ services }: any) => {
     const navigate = useNavigate();
     console.log('services', services);
+    const updateViewService = async (id: number) => {
+        try {
+            const res = await ServiceService.updateView(id);
+        } catch (err: any) {
+            console.log(err.message);
+        }
+    };
     return (
         <Row gutter={[24, 24]} className="cards">
             {services?.map((service: Service) => {
@@ -14,11 +23,12 @@ const ServiceCard = ({ services }: any) => {
                         <div className="card-container rounded border border-1 ">
                             <div className="service-image">
                                 <Image
-                                    onClick={() =>
+                                    onClick={() => {
                                         navigate(
                                             '/service/detail/' + service?.id
-                                        )
-                                    }
+                                        );
+                                        updateViewService(Number(service?.id));
+                                    }}
                                     preview={false}
                                     src={service.image}
                                     className="rounded"
@@ -31,10 +41,7 @@ const ServiceCard = ({ services }: any) => {
                                         navigate(
                                             '/service/detail/' + service?.id
                                         );
-                                        // handleUpdateViewsDoctor(
-                                        //     doctor?.doctor_id
-                                        // );
-                                        // addWatchedDoctor(doctor);
+                                        updateViewService(Number(service?.id));
                                     }}
                                 >
                                     {service.name}

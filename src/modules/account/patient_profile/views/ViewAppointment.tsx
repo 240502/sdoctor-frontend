@@ -61,7 +61,7 @@ const ViewAppointment = () => {
     const [isOpenModalConfirm, setIsOpenModalConfirm] =
         useState<boolean>(false);
     const [openInputCommentModal, setOpenInputCommentModal] =
-        useState<boolean>(true);
+        useState<boolean>(false);
     const patientProfile = useRecoilValue(patientProfileValue);
     const [appointment, setAppointment] = useState<Appointment>(
         {} as Appointment

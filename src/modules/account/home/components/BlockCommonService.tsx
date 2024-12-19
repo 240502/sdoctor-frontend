@@ -20,6 +20,7 @@ export const BlockCommonService = () => {
         };
         getCommonService();
     }, []);
+
     return (
         <div className="mt-5 mb-5">
             <div className="block__header d-flex justify-content-between align-items-center">

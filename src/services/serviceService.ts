@@ -25,4 +25,8 @@ export const ServiceService = {
         const res = await apiClient.get('/api/service/get-common-service');
         return res?.data;
     },
+    async updateView(id: any): Promise<any> {
+        const res = await apiClient.put('/api/service       /update-view/' + id);
+        return res;
+    },
 };

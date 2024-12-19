@@ -291,12 +291,12 @@ export const ListTime = ({
             >
                 <h6 className="mb-3">Chọn thời gian làm việc cho hôm nay</h6>
                 <Row gutter={[24, 24]}>
-                    <Col span={6}>
+                    {/* <Col span={6}>
                         <Button onClick={() => handleSelectAllTime()}>
                             Chọn tất cả
                             <PlusOutlined />
                         </Button>
-                    </Col>
+                    </Col> */}
                     {times.map((time: Time) => {
                         if (selectedTimes?.length > 0) {
                             const existTime = selectedTimes?.find(
