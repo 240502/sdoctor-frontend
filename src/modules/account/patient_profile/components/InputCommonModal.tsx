@@ -1,57 +1,57 @@
-import {
-    Button,
-    Input,
-    InputRef,
-    Modal,
-    DatePicker,
-    Form,
-    Row,
-    Col,
-    Rate,
-} from 'antd';
-import type { DatePickerProps } from 'antd';
-
-import { useRef, useState } from 'react';
-import {
-    handleFocusInput,
-    handleFocusSelect,
-    isEmpty,
-    validateName,
-    validatePhone,
-    validatePhoneLength,
-} from '../../../../utils/global';
-import {
-    isEmptyDatePicker,
-    validateDateBooking,
-} from '../../../../utils/comment';
+import { Button, Input, Modal, Form, Row, Col, Rate } from 'antd';
 import { CommentService } from '../../../../services/commentService';
 import { Comment } from '../../../../models/comment';
+import { Appointment } from '../../../../models/appointment';
 const { TextArea } = Input;
 
 export const InputCommentModal = ({
     openInputModal,
     handleCancelInputModal,
     appointment,
+    setAppointments,
     openNotificationWithIcon,
-    doctorId,
-    isModalCommentOpen,
-    setIsModalCommentOpen,
+    handleCancelModalInput,
 }: any) => {
     const [form] = Form.useForm();
 
     const createCommentForPatient = async (newComment: Comment) => {
         try {
-            const res = await CommentService.createComment(newComment);
+            const data = {
+                newComment: newComment,
+                appointmentId: appointment.id,
+            };
+            const res = await CommentService.createComment(data);
             console.log(res);
             openNotificationWithIcon(
                 'success',
                 'Thông báo',
                 'Thêm phản hồi thành công!'
             );
-            setIsModalCommentOpen(false);
+            handleUpdateIsEvaluateAppointment();
+            handleCancelModalInput();
         } catch (err: any) {
             console.log(err.message);
+            openNotificationWithIcon(
+                'errpr',
+                'Thông báo',
+                'Thêm phản hồi không thành công!'
+            );
         }
+    };
+    const handleUpdateIsEvaluateAppointment = () => {
+        setAppointments((prevAppointments: Appointment[]) => {
+            const updatedAppointments = [...prevAppointments];
+            const index = updatedAppointments.findIndex(
+                (app) => app.id === appointment.id
+            );
+            if (index !== -1) {
+                updatedAppointments[index] = {
+                    ...updatedAppointments[index],
+                    isEvaluate: 1,
+                };
+            }
+            return updatedAppointments;
+        });
     };
     const onFinish = (values: any) => {
         console.log(values);

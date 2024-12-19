@@ -25,6 +25,7 @@ export interface Appointment {
     service_name: string;
     invoice_status: string;
     payment_method: number;
+    isEvaluate: number;
 }
 export interface AppointmentViewForPatient extends Appointment {
     status_name: string;

@@ -27,7 +27,7 @@ export const BlockComment = ({ userId, setIsModalCommentOpen }: any) => {
     };
     const handleOnNewComment = () => {
         socket.on('newComment', (newComment: Comment) => {
-            getCommentByUserId(Number(newComment.user_id));
+            getCommentByUserId(Number(newComment.doctor_id));
         });
     };
     useEffect(() => {
@@ -69,16 +69,6 @@ export const BlockComment = ({ userId, setIsModalCommentOpen }: any) => {
                 ) : (
                     <p className="fs-6 fw-bold">Không có phản hồi nào!</p>
                 )}
-            </div>
-            <div className="group__button text-center mt-3">
-                <Button
-                    onClick={(e: any) => {
-                        setIsModalCommentOpen(true);
-                    }}
-                    className="pt-3 pb-3"
-                >
-                    Thêm phản hồi
-                </Button>
             </div>
         </>
     );

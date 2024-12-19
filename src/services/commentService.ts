@@ -1,7 +1,7 @@
 import { apiClient } from '../constants/api';
 import { Comment } from '../models/comment';
 export const CommentService = {
-    async createComment(data: Comment): Promise<any> {
+    async createComment(data: any): Promise<any> {
         const res = await apiClient.post('/api/comment/create', data);
         return res;
     },

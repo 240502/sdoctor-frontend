@@ -26,6 +26,7 @@ import { TableColumnsType } from 'antd';
 import {
     CloseOutlined,
     DollarOutlined,
+    EditOutlined,
     EyeOutlined,
     RedoOutlined,
 } from '@ant-design/icons';
@@ -337,7 +338,7 @@ const ViewAppointment = () => {
                             </Tooltip>
                         </Col>
                     )}
-                    {record.status_id === 4 && (
+                    {record.status_id === 4 && record.isEvaluate === 0 && (
                         <Tooltip title="Đánh giá" placement="top">
                             <Button
                                 onClick={() => {
@@ -345,7 +346,7 @@ const ViewAppointment = () => {
                                     setAppointment(record);
                                 }}
                             >
-                                Đánh giá
+                                <EditOutlined />
                             </Button>
                         </Tooltip>
                     )}
@@ -398,6 +399,11 @@ const ViewAppointment = () => {
     };
     const handleCancelModalConfirm = () => {
         setIsOpenModalConfirm(false);
+        setAppointment({} as Appointment);
+    };
+    const handleCancelModalInput = () => {
+        setOpenInputCommentModal(false);
+        setAppointment({} as Appointment);
     };
     const openNotificationWithIcon = (
         type: NotificationType,
@@ -417,6 +423,9 @@ const ViewAppointment = () => {
         window.scrollTo(0, 0);
         getAllAppointmentStatus();
     }, []);
+    useEffect(() => {
+        console.log('appointments', appointments);
+    }, [appointments]);
     return (
         <PatientProfileLayout breadcrumb={'Lịch hẹn'}>
             <Flex className="mb-3">
@@ -489,6 +498,9 @@ const ViewAppointment = () => {
                             openInputModal={openInputCommentModal}
                             handleCancelInputModal={handleCancelInputModal}
                             appointment={appointment}
+                            setAppointments={setAppointments}
+                            openNotificationWithIcon={openNotificationWithIcon}
+                            handleCancelModalInput={handleCancelModalInput}
                         />
                     )}
                 </>

@@ -104,6 +104,9 @@ const BookingAppointment = () => {
                     if (Math.abs(Number(startHour) - Number(minutes)) >= 20) {
                         updateAvailableScheduleDetail(Number(detail?.id));
                     }
+                    if (Number(minutes) >= Number(startHour)) {
+                        updateAvailableScheduleDetail(Number(detail?.id));
+                    }
                 }
 
                 if (

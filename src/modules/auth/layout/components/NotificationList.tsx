@@ -119,7 +119,7 @@ const NotificationList = () => {
     };
     useEffect(() => {
         getNotificationByUserId();
-    }, []);
+    }, [user]);
     return (
         <Dropdown overlay={menu} trigger={['click']}>
             <Badge count={notificationSelector.total}>
