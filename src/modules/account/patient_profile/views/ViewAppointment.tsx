@@ -43,6 +43,7 @@ import dayjs from 'dayjs';
 import { invoicesService } from '../../../../services/invoicesService';
 import { Invoices } from '../../../../models/invoices';
 import { paymentService } from '../../../../services/paymentService';
+import { InputCommentModal } from '../components/InputCommonModal';
 type DataIndex = keyof AppointmentViewForPatient;
 const { Option } = Select;
 const ViewAppointment = () => {
@@ -58,6 +59,8 @@ const ViewAppointment = () => {
     const [pageCount, setPageCount] = useState<number>(0);
     const [isOpenModalConfirm, setIsOpenModalConfirm] =
         useState<boolean>(false);
+    const [openInputCommentModal, setOpenInputCommentModal] =
+        useState<boolean>(true);
     const patientProfile = useRecoilValue(patientProfileValue);
     const [appointment, setAppointment] = useState<Appointment>(
         {} as Appointment
@@ -206,6 +209,9 @@ const ViewAppointment = () => {
             console.log(err.message);
         }
     };
+    const handleCancelInputModal = () => {
+        setOpenInputCommentModal(false);
+    };
     const columns: TableColumnsType<AppointmentViewForPatient> = [
         {
             title: 'Bác sĩ',
@@ -330,6 +336,18 @@ const ViewAppointment = () => {
                                 </Button>
                             </Tooltip>
                         </Col>
+                    )}
+                    {record.status_id === 4 && (
+                        <Tooltip title="Đánh giá" placement="top">
+                            <Button
+                                onClick={() => {
+                                    setOpenInputCommentModal(true);
+                                    setAppointment(record);
+                                }}
+                            >
+                                Đánh giá
+                            </Button>
+                        </Tooltip>
                     )}
                     {record.invoice_status === 'Chưa thanh toán' &&
                         record.payment_method === 2 && (
@@ -464,6 +482,13 @@ const ViewAppointment = () => {
                             getAppointmentByPatientPhone={
                                 getAppointmentByPatientPhone
                             }
+                        />
+                    )}
+                    {openInputCommentModal && (
+                        <InputCommentModal
+                            openInputModal={openInputCommentModal}
+                            handleCancelInputModal={handleCancelInputModal}
+                            appointment={appointment}
                         />
                     )}
                 </>
