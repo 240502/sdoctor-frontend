@@ -1,5 +1,5 @@
 import { Col, Row, Image, Button, Card, Tag } from 'antd';
-import { StarOutlined } from '@ant-design/icons';
+import { StarFilled, StarOutlined } from '@ant-design/icons';
 import { Doctor } from '../../../../models/doctor';
 import { EnvironmentOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
@@ -18,7 +18,7 @@ export const DoctorCard = ({ doctors, handleUpdateViewsDoctor }: any) => {
                         <div className="card-container rounded border border-1 position-relative">
                             {doctor?.average_star && (
                                 <div className="star text-end ">
-                                    <StarOutlined className="text-warning " />
+                                    <StarFilled className="text-warning " />
                                     <span className="score d-inline-block ms-2">
                                         {doctor?.average_star
                                             ?.toString()

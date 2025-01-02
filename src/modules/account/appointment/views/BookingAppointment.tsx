@@ -21,7 +21,7 @@ import { NotificationService } from '../../../../services/notificationService';
 import { newAppointmentState } from '../../../../stores/appointmentAtom';
 import { invoicesService } from '../../../../services/invoicesService';
 import { invoiceState } from '../../../../stores/invoice';
-
+import { MailerService } from '../../../../services/mailerService';
 type NotificationType = 'success' | 'error';
 
 const BookingAppointment = () => {

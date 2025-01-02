@@ -170,7 +170,6 @@ const DoctorManagement = () => {
                 />
                 <Divider />
             </div>
-
             <Flex className="justify-content-between ps-2 pe-2 mb-3">
                 <h5>Danh sách bác sĩ</h5>
                 <Button

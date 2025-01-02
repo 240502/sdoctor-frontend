@@ -54,7 +54,7 @@ export const FormLogin = () => {
                 console.log('user', res);
                 sessionStorage.setItem('user', JSON.stringify(res));
                 setUser(res);
-                socket.emit('join', res.user_id);
+                socket.emit('joinRoom', { userId: 5 });
                 setEmail('');
                 setPassword('');
                 navigate('/admin/dashboard');

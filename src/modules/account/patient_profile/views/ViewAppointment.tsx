@@ -382,9 +382,7 @@ const ViewAppointment = () => {
             statusId: options.statusId,
         };
         try {
-            const res = await AppointmentService.viewAppointmentForPatient(
-                data
-            );
+            const res = await AppointmentService.viewAppointment(data);
             console.log(res);
             setAppointments(res.data);
             setPageCount(res.pageCount);

@@ -12,7 +12,7 @@ import {
     Select,
     Switch,
 } from 'antd';
-import dayjs, { Dayjs } from 'dayjs';
+import dayjs from 'dayjs';
 import TextArea from 'antd/es/input/TextArea';
 import { useEffect, useState } from 'react';
 import { ProvinceType, DistrictType, WardType } from '../../../../models/other';
@@ -26,6 +26,7 @@ import { useSetRecoilState } from 'recoil';
 import { patientProfileState } from '../../../../stores/patientAtom';
 import { PaymentMethod } from '../../../../models/paymentMethod';
 import { PaymentMethodService } from '../../../../services/paymentMethodSerrvice';
+import { MailerService } from '../../../../services/mailerService';
 export const InputAppointmentModal = ({
     openModal,
     cancelModal,
@@ -68,24 +69,24 @@ export const InputAppointmentModal = ({
     const onFinish = (values: any) => {
         setPaymentMethod(values.payment_method);
         const newAppointment = {
-            doctor_id: doctor?.doctor_id,
-            appointment_date: date,
-            patient_name: values.patientName,
-            patient_phone: values.phone,
-            patient_email: values.email,
+            doctorId: doctor?.doctor_id,
+            appointmentDate: date,
+            patientName: values.patientName,
+            patientPhone: values.phone,
+            patientEmail: values.email,
             birthday: dayjs(values.birthday).format('YYYY-MM-DD'),
             province: values.patientProvince,
             district: values.patientDistrict,
             commune: values.patientCommune,
             gender: values.gender,
-            examination_reason: values.reason,
-            doctor_name: doctor?.full_name,
+            examinationReason: values.reason,
+            doctorName: doctor?.full_name,
             location: doctor.location,
-            time_value: `${scheduleDetail.start_time} - ${scheduleDetail.end_time}`,
-            time_id: scheduleDetail.time_id,
+            timeValue: `${scheduleDetail.start_time} - ${scheduleDetail.end_time}`,
+            timeId: scheduleDetail.time_id,
             price: doctor.price,
-            service_id: doctor.service_id,
-            service_name: doctor.service_name,
+            serviceId: doctor.service_id,
+            serviceName: doctor.service_name,
         };
         console.log(values);
         console.log('newAppointment', newAppointment);
@@ -112,6 +113,19 @@ export const InputAppointmentModal = ({
             const res: any = await AppointmentService.createAppointment(
                 newAppointment
             );
+            console.log(res);
+            const data = {
+                patientName: newAppointment.patientName,
+                email: newAppointment.patientEmail,
+                doctorName: newAppointment.doctorName,
+                time: newAppointment.timeValue,
+                date: newAppointment.appointmentDate,
+                location: newAppointment.location,
+                status: 'Chờ xác nhận',
+                fee: newAppointment.price,
+                serviceName: newAppointment.serviceName,
+            };
+            sendBookingSuccessMail(data);
             openNotification(
                 'success',
                 'Thông báo',
@@ -120,14 +134,21 @@ export const InputAppointmentModal = ({
             cancelModal();
             navigate('/booking-success');
 
-            socket.emit('addApp', newAppointment);
+            //socket.emit('addApp', newAppointment);
         } catch (err: any) {
-            console.log(err.message);
+            console.log('book appointment error', err.message);
             openNotification(
                 'error',
                 'Thông báo',
                 'Đặt lịch hẹn không thành công!'
             );
+        }
+    };
+    const sendBookingSuccessMail = async (data: any) => {
+        try {
+            const res = await MailerService.sendBookingSuccessMail(data);
+        } catch (err: any) {
+            console.log(err.message);
         }
     };
     const getWards = async (districtId: any) => {

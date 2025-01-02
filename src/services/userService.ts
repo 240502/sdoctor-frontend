@@ -1,8 +1,8 @@
-import { apiClient } from '../constants/api';
+import { apiClient, nestApi } from '../constants/api';
 
 export const UserService = {
     async login(data: any): Promise<any> {
-        const res = await apiClient.post('/api/user/login', data);
+        const res = await nestApi.post('/auth/signin', data);
         return res?.data;
     },
     async createUser(data: any, config: any): Promise<any> {

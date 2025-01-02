@@ -1,9 +1,8 @@
-import axios from 'axios';
-import { apiClient, baseURL } from '../constants/api';
+import { apiClient, nestApi } from '../constants/api';
 
 export const AppointmentService = {
     async getAppointmentById(id: number): Promise<any> {
-        const res = await apiClient.get('api/appointment/get-by-id/' + id);
+        const res = await nestApi.get('/appointment/get-by-id/' + id);
         return res.data;
     },
     async getAppointmentByType(data: any): Promise<any> {
@@ -12,8 +11,8 @@ export const AppointmentService = {
     },
 
     async getAppointmentInDay(doctorId: any): Promise<any> {
-        const res = await apiClient.get(
-            'api/appointment/get-appointment-in-day/' + doctorId
+        const res = await nestApi.get(
+            '/appointment/get-appointment-in-day/' + doctorId
         );
         return res.data;
     },
@@ -59,14 +58,11 @@ export const AppointmentService = {
     },
 
     async createAppointment(data: any): Promise<any> {
-        const res = await apiClient.post('api/appointment/create', data);
+        const res = await nestApi.post('/appointment/create', data);
         return res;
     },
-    async viewAppointmentForPatient(data: any): Promise<any> {
-        const res = await apiClient.post(
-            'api/appointment/viewForPatient',
-            data
-        );
+    async viewAppointment(data: any): Promise<any> {
+        const res = await nestApi.post('/appointment/view', data);
         return res.data;
     },
     async updateAppointmentStatus(data: any): Promise<any> {
@@ -77,8 +73,8 @@ export const AppointmentService = {
         return res;
     },
     async getAppointmentAtInvoice(data: any): Promise<any> {
-        const res = await apiClient.post(
-            'api/appointment/get-appointment-at-invoice',
+        const res = await nestApi.post(
+            '/appointment/get-appointment-at-invoice',
             data
         );
         return res?.data;
