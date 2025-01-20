@@ -10,12 +10,16 @@ export const doctorService = {
         const res: any = await nestApi.post('/doctor/get-common-doctor', data);
         return res.data;
     },
-    async viewDoctor(data: any): Promise<any> {
-        const res: any = await nestApi.post('/doctor/view', data);
+    async viewDoctorForClient(data: any): Promise<any> {
+        const res: any = await nestApi.post('/doctor/view-for-client', data);
+        return res?.data;
+    },
+    async viewDoctorForAdmin(data: any): Promise<any> {
+        const res: any = await nestApi.post('/doctor/view-for-admin', data);
         return res?.data;
     },
     async getDoctorById(id: number): Promise<any> {
-        const res: any = await nestApi.get('/doctor/getById/' + id);
+        const res: any = await nestApi.get('/doctor/get-by-id/' + id);
         return res?.data;
     },
     async updateViewsDoctor(id: number): Promise<any> {
@@ -24,7 +28,7 @@ export const doctorService = {
     },
 
     async createDoctor(data: any, config: any): Promise<any> {
-        const res = await nestApi.post('/api/doctor/create', data, config);
+        const res = await nestApi.post('/doctor/create', data, config);
         return res;
     },
     async updateDoctor(data: any, config: any): Promise<any> {

@@ -4,7 +4,7 @@ export const addWatchedDoctor = (doctor: Doctor) => {
     let doctors = JSON.parse(localStorage.getItem('watchedDoctors') || '[]');
     if (doctors.length > 0) {
         const existDoctor = doctors.find(
-            (item: any) => item.doctor_id === doctor.doctor_id
+            (item: any) => item.doctorId === doctor.doctorId
         );
         if (!existDoctor) {
             doctors.push(doctor);

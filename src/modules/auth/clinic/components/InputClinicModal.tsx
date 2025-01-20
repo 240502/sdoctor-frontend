@@ -146,10 +146,7 @@ export const InputClinicModal = ({
             ];
             setAvtFiles(file);
         }
-        if (
-            clinic?.cover_image &&
-            clinic?.cover_image?.includes('cloudinary')
-        ) {
+        if (clinic?.coverImage && clinic?.coverImage?.includes('cloudinary')) {
             const file: UploadFile[] = [
                 {
                     uid: '-1',

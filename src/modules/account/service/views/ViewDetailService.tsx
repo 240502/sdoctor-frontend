@@ -1,9 +1,5 @@
-import {
-    DollarOutlined,
-    EnvironmentOutlined,
-    HomeOutlined,
-} from '@ant-design/icons';
-import { Breadcrumb, notification, Image, Row, Col, Divider, Tabs } from 'antd';
+import { DollarOutlined, HomeOutlined } from '@ant-design/icons';
+import { Breadcrumb, Image, Row, Col, Divider, Tabs } from 'antd';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useRecoilValue } from 'recoil';
@@ -29,6 +25,7 @@ const ViewDetailService = () => {
         } else {
             try {
                 const res = await ServiceService.getServiceById(id);
+                console.log('service', res);
                 setService(res);
             } catch (err: any) {
                 console.log(err.message);
@@ -60,7 +57,7 @@ const ViewDetailService = () => {
                             width: '100%',
                         }}
                         // className="position-absolute start-0 end-0 bottom-0"
-                        src={service?.cover_image}
+                        src={service?.coverImage}
                     />
                 </div>
                 <Row className="clinic-info align-items-center" gutter={24}>

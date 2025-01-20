@@ -55,7 +55,6 @@ export const ListTime = ({
             if (activeDay === 0 || activeDay > now.getDay()) {
                 setTimes(res);
             }
-            console.log('times', res);
         } catch (err: any) {
             console.log(err.message);
             setTimes([]);
@@ -74,12 +73,12 @@ export const ListTime = ({
         selectedTimes.forEach((time: Time) => {
             const detail: DoctorScheduleDetail = {
                 id: 0,
-                time_id: time.id,
-                schedule_id: null,
+                timeId: time.id,
+                scheduleId: null,
                 available: 1,
                 action: 1,
-                start_time: null,
-                end_time: null,
+                startTime: null,
+                endTime: null,
             };
             if (newDoctorScheduleDetail.length > 0) {
                 newDoctorScheduleDetail.push(detail);
@@ -88,11 +87,11 @@ export const ListTime = ({
             }
         });
         const schedule = {
-            doctor_id: user.doctor_id,
+            doctorId: user.doctorId,
             date: `${dateOfWeek.getFullYear()}-${
                 dateOfWeek.getMonth() + 1
             }-${dateOfWeek.getDate()}`,
-            listScheduleDetails: newDoctorScheduleDetail,
+            doctorScheduleDetails: newDoctorScheduleDetail,
         };
         CreateSchedule(schedule);
     };
@@ -126,7 +125,7 @@ export const ListTime = ({
             newTimes = selectedTimes.filter((time: Time) => {
                 const exist = schedule.listScheduleDetails.find(
                     (detail: DoctorScheduleDetail) => {
-                        return detail.time_id === time.id;
+                        return detail.timeId === time.id;
                     }
                 );
                 if (!exist) {
@@ -137,7 +136,7 @@ export const ListTime = ({
             newTimes = selectedTimes.filter((time: Time) => {
                 const exist = schedule.listScheduleDetails.find(
                     (detail: DoctorScheduleDetail) => {
-                        return detail.time_id === time.id;
+                        return detail.timeId === time.id;
                     }
                 );
                 if (!exist) {
@@ -151,12 +150,12 @@ export const ListTime = ({
             newTimes.forEach((time: Time) => {
                 const newScheduleDetail: DoctorScheduleDetail = {
                     id: null,
-                    schedule_id: schedule?.id,
-                    start_time: time.start_time,
-                    end_time: time.end_time,
+                    scheduleId: schedule?.id,
+                    startTime: time.startTime,
+                    endTime: time.endTime,
                     available: 1,
                     action: 1,
-                    time_id: time?.id,
+                    timeId: time?.id,
                 };
                 newScheduleDetails.push(newScheduleDetail);
             });
@@ -208,7 +207,7 @@ export const ListTime = ({
         const existTime = selectedTimes.find(
             (selectedTime: Time) =>
                 time.id === selectedTime.id ||
-                selectedTime.start_time === time.start_time
+                selectedTime.startTime === time.startTime
         );
         if (existTime) {
             openMessage(
@@ -221,16 +220,16 @@ export const ListTime = ({
                 const sortedTimes = newSelectTimes.sort(
                     (timeA: Time, timeB: Time) => {
                         const startHourTimeA = Number(
-                            timeA?.start_time?.split(':')[0]
+                            timeA?.startTime?.split(':')[0]
                         );
                         const startHourTimeB = Number(
-                            timeB?.start_time?.split(':')[0]
+                            timeB?.startTime?.split(':')[0]
                         );
                         const startMinuteTimeA = Number(
-                            timeA?.start_time?.split(':')[1]
+                            timeA?.startTime?.split(':')[1]
                         );
                         const startMinuteTimeB = Number(
-                            timeB?.start_time?.split(':')[1]
+                            timeB?.startTime?.split(':')[1]
                         );
                         return (
                             startHourTimeA - startHourTimeB ||
@@ -244,16 +243,16 @@ export const ListTime = ({
             }
         }
     };
-    const handleSelectAllTime = () => {
-        if (selectedTimes.length > 0) {
-            const notAddedTimes = times.filter(
-                (time: Time) => !selectedTimes.includes(time)
-            );
-            setSelectedTimes([...selectedTimes, ...notAddedTimes]);
-        } else {
-            setSelectedTimes([...times]);
-        }
-    };
+    // const handleSelectAllTime = () => {
+    //     if (selectedTimes.length > 0) {
+    //         const notAddedTimes = times.filter(
+    //             (time: Time) => !selectedTimes.includes(time)
+    //         );
+    //         setSelectedTimes([...selectedTimes, ...notAddedTimes]);
+    //     } else {
+    //         setSelectedTimes([...times]);
+    //     }
+    // };
     const handleRemoveTime = (index: number) => {
         const updatedTimes = selectedTimes.filter(
             (time: Time, i: number) => i !== index
@@ -261,7 +260,7 @@ export const ListTime = ({
         setSelectedTimes(updatedTimes);
         const existDetail = schedule.listScheduleDetails.find(
             (detail: DoctorScheduleDetail) =>
-                detail.time_id === selectedTimes[index].id
+                detail.timeId === selectedTimes[index].id
         );
         if (existDetail) {
             const newDeletedDetails = [...deleteDetails, existDetail];
@@ -273,10 +272,6 @@ export const ListTime = ({
         const newDeletedDetails = [...schedule.listScheduleDetails];
         setDeletedDetails(newDeletedDetails);
     };
-
-    useEffect(() => {
-        console.log('selected times', selectedTimes);
-    }, [selectedTimes]);
     useEffect(() => {
         handleOverTime(activeDay);
         getTimeByType();
@@ -300,8 +295,8 @@ export const ListTime = ({
                     {times.map((time: Time) => {
                         if (selectedTimes?.length > 0) {
                             const existTime = selectedTimes?.find(
-                                (selectedTine: Time) =>
-                                    time?.id === selectedTine?.id
+                                (selectedTime: Time) =>
+                                    time?.id === selectedTime?.id
                             );
                             return (
                                 <Col
@@ -317,7 +312,7 @@ export const ListTime = ({
                                         onClick={() => handleAddTime(time)}
                                         type={existTime ? 'primary' : 'default'}
                                     >
-                                        {time.start_time}
+                                        {time.startTime}
                                         <PlusOutlined />
                                     </Button>
                                 </Col>
@@ -337,7 +332,7 @@ export const ListTime = ({
                                         onClick={() => handleAddTime(time)}
                                         type={'default'}
                                     >
-                                        {time.start_time}
+                                        {time?.startTime}
                                         <PlusOutlined />
                                     </Button>
                                 </Col>
@@ -370,7 +365,7 @@ export const ListTime = ({
                                             handleRemoveTime(index);
                                         }}
                                     >
-                                        {time.start_time}
+                                        {time?.startTime}
                                         <CloseOutlined />
                                     </Button>
                                 </Col>

@@ -2,6 +2,7 @@ import { CalendarOutlined } from '@ant-design/icons';
 import { Flex, Image, Pagination } from 'antd';
 import { Link } from 'react-router-dom';
 import { Post } from '../../../../models/post';
+import dayjs from 'dayjs';
 export const RelatedPost = ({
     relatedPosts,
     pageIndex,
@@ -28,7 +29,7 @@ export const RelatedPost = ({
                                 >
                                     <Image
                                         className="feature-img object-fit-cover rounded"
-                                        src={post.featured_image}
+                                        src={post.featuredImage}
                                         preview={false}
                                     />
                                 </Link>
@@ -49,7 +50,9 @@ export const RelatedPost = ({
                                 </p>
                                 <p className="ms-2">
                                     <CalendarOutlined className="me-2" />
-                                    {post.public_date?.toString().slice(0, 10)}
+                                    {dayjs(post.publicDate).format(
+                                        'DD-MM-YYYY'
+                                    )}
                                 </p>
                             </div>
                         </Flex>

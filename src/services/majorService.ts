@@ -6,15 +6,15 @@ export const MajorService = {
         return res?.data;
     },
     async getAllMajor(): Promise<any> {
-        const res: any = await nestApi.get('/api/major/get-all-major');
+        const res: any = await nestApi.get('/major/get-all');
         return res?.data;
     },
     async getMajorById(id: number): Promise<any> {
-        const res: any = await nestApi.get('/api/major/get-by-id/' + id);
+        const res: any = await nestApi.get('/major/get-by-id/' + id);
         return res?.data;
     },
     async viewMajor(data: any): Promise<any> {
-        const res: any = await nestApi.post('/api/major/view', data);
+        const res: any = await nestApi.post('/major/view', data);
         return res?.data;
     },
 };

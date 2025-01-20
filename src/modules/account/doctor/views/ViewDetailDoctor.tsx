@@ -1,4 +1,8 @@
-import { EnvironmentOutlined, HomeOutlined } from '@ant-design/icons';
+import {
+    EnvironmentOutlined,
+    HomeOutlined,
+    StarFilled,
+} from '@ant-design/icons';
 import {
     Breadcrumb,
     Image,
@@ -20,7 +24,6 @@ import { doctorService } from '../../../../services/doctorService';
 import { baseURL } from '../../../../constants/api';
 import parse from 'html-react-parser';
 import { BlockComment } from '../components/BlockComment';
-import { ModalComment } from '../components/ModalComment';
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import {
     commonDoctorsState,
@@ -28,7 +31,9 @@ import {
     doctorState,
 } from '../../../../stores/doctorAtom';
 import { useNavigate } from 'react-router-dom';
-type NotificationType = 'success' | 'error';
+import { CommentService } from '../../../../services/commentService';
+import socket from '../../../../socket';
+import { Comment } from '../../../../models/comment';
 
 type DataParams = {
     id: string;
@@ -36,25 +41,23 @@ type DataParams = {
 const ViewDetailDoctor = () => {
     const navigate = useNavigate();
     const doctors = useRecoilValue(doctorListValue);
-    const [isModalCommentOpen, setIsModalCommentOpen] = useState(false);
     const { id } = useParams<DataParams>();
     const [doctor, setDoctor] = useState<Doctor>({} as Doctor);
     const [commonDoctors, setCommonDoctors] =
         useRecoilState(commonDoctorsState);
-    const [api, contextHolder] = notification.useNotification();
     const [pageSize, setPageSize] = useState<number>(4);
     const [pageIndex, setPageIndex] = useState<number>(1);
     const [pageCount, setPageCount] = useState<number>(0);
+    const [totalComment, setTotalComment] = useState<number>(0);
     const setDoctorGlobal = useSetRecoilState(doctorState);
-    const openNotificationWithIcon = (
-        type: NotificationType,
-        title: string,
-        des: string
-    ) => {
-        api[type]({
-            message: title,
-            description: des,
-        });
+    const [comments, setComments] = useState<Comment[]>([]);
+    const [pageComment, setPageComment] = useState<number>(1);
+    const [pageCommentSize, setPageCommentSize] = useState<number>(4);
+    const [pageCommentCount, setPageCommentCount] = useState<number>(0);
+    const onButtonMoreClick = () => {
+        if (pageComment < pageCommentCount) {
+            setPageComment(pageComment + 1);
+        }
     };
     const items: TabsProps['items'] = [
         {
@@ -67,8 +70,11 @@ const ViewDetailDoctor = () => {
             label: 'Đánh giá',
             children: (
                 <BlockComment
-                    userId={id}
-                    setIsModalCommentOpen={setIsModalCommentOpen}
+                    comments={comments}
+                    totalItems={totalComment}
+                    onButtonMoreClick={onButtonMoreClick}
+                    pageCount={pageCommentCount}
+                    pageIndex={pageComment}
                 />
             ),
         },
@@ -77,7 +83,7 @@ const ViewDetailDoctor = () => {
         try {
             if (doctors.length > 0) {
                 const res: any = doctors.find((doctor: Doctor) => {
-                    if (doctor.doctor_id === Number(id)) return doctor;
+                    if (doctor.doctorId === Number(id)) return doctor;
                 });
                 setDoctor(res);
             } else {
@@ -100,16 +106,53 @@ const ViewDetailDoctor = () => {
             setPageCount(0);
         }
     };
+
+    const getCommentByDoctorId = async (doctorId: number) => {
+        try {
+            const data = {
+                pageIndex: pageComment,
+                pageSize: pageCommentSize,
+                doctorId: doctorId,
+            };
+            const res = await CommentService.getCommentByUserId(data);
+            if (comments.length > 0) {
+                const newComments = [...comments, ...res.data];
+
+                setComments(newComments);
+            } else {
+                setTotalComment(res.totalItems);
+                setPageCommentCount(res.pageCount);
+                setComments(res.data);
+            }
+        } catch (err: any) {
+            console.log(err);
+            setTotalComment(0);
+            setComments([]);
+            setTotalComment(0);
+        }
+    };
+
+    const handleOnNewComment = () => {
+        socket?.on('newComment', (newComment: Comment) => {
+            getCommentByDoctorId(Number(newComment.doctorId));
+        });
+    };
+    useEffect(() => {
+        handleOnNewComment();
+    }, []);
     useEffect(() => {
         getDoctorById(Number(id));
         window.scrollTo(0, 0);
+        getCommentByDoctorId(Number(id));
     }, [id]);
     useEffect(() => {
         getCommonDoctor();
     }, [pageIndex, pageSize]);
+    useEffect(() => {
+        getCommentByDoctorId(Number(id));
+    }, [pageComment, pageCommentSize]);
     return (
         <div className="container doctor-detail mt-4 mb-4">
-            {contextHolder}
             <Breadcrumb
                 items={[
                     {
@@ -123,40 +166,61 @@ const ViewDetailDoctor = () => {
             ></Breadcrumb>
             <Row className="mt-4 justify-content-between" gutter={24}>
                 <Col span={16} className="doctor-info border rounded p-3">
-                    <Flex className="">
-                        <div className="doctor-image col-2">
-                            <Image
-                                style={{ width: '80%' }}
-                                preview={false}
-                                className="rounded-circle"
-                                src={
-                                    doctor?.image?.includes('cloudinary')
-                                        ? String(doctor.image)
-                                        : baseURL + doctor?.image
-                                }
-                            ></Image>
-                        </div>
-                        <div className="info ms-3">
-                            <h5 className="doctor-name">
-                                {doctor?.title} {doctor?.full_name}
-                            </h5>
-                            <Tag color="blue">{doctor?.major_name}</Tag>
-                            <p className="doctor-location mt-2">
-                                <EnvironmentOutlined className="me-2"></EnvironmentOutlined>
-                                {doctor?.location}
-                            </p>
-
-                            <div className="mt-3">
-                                <Button
-                                    className="border-primary text-primary button-booking-now"
-                                    onClick={() => {
-                                        navigate('/booking-appointment');
-                                        setDoctorGlobal(doctor);
-                                    }}
-                                >
-                                    Đặt lịch khám
-                                </Button>
+                    <Flex className="flex-row">
+                        <Flex className="col-9">
+                            <div className="doctor-image col-2">
+                                <Image
+                                    style={{ width: '80%' }}
+                                    preview={false}
+                                    className="rounded-circle"
+                                    src={
+                                        doctor?.image?.includes('cloudinary')
+                                            ? String(doctor.image)
+                                            : baseURL + doctor?.image
+                                    }
+                                ></Image>
                             </div>
+                            <div className="info ms-3">
+                                <h5 className="doctor-name">
+                                    {doctor?.title} {doctor?.fullName}
+                                </h5>
+                                <Tag color="blue">{doctor?.majorName}</Tag>
+                                <p className="doctor-location mt-2">
+                                    <EnvironmentOutlined className="me-2"></EnvironmentOutlined>
+                                    {doctor?.location}
+                                </p>
+
+                                <div className="mt-3">
+                                    <Button
+                                        className="border-primary text-primary button-booking-now"
+                                        onClick={() => {
+                                            navigate('/booking-appointment');
+                                            setDoctorGlobal(doctor);
+                                        }}
+                                    >
+                                        Đặt lịch khám
+                                    </Button>
+                                </div>
+                            </div>
+                        </Flex>
+                        <div className="col-3 text-end">
+                            {doctor?.averageStar !== null && (
+                                <Tag
+                                    color="default"
+                                    className="fs-6 rounded border-0 p-32d-inline-block"
+                                >
+                                    <StarFilled className="text-warning" />
+                                    <span className="fw-bold">
+                                        {doctor?.averageStar
+                                            ?.toString()
+                                            ?.slice(0, 3)}
+                                        /5
+                                    </span>
+                                </Tag>
+                            )}
+                            <span className="text-decoration-underline fs-6">
+                                {totalComment} đánh giá
+                            </span>
                         </div>
                     </Flex>
                     <Divider className="mt-3" />
@@ -177,10 +241,10 @@ const ViewDetailDoctor = () => {
                     <Divider></Divider>
                     <Row gutter={24}>
                         {commonDoctors?.map((doctor: Doctor) => {
-                            if (doctor.doctor_id !== Number(id)) {
+                            if (doctor.doctorId !== Number(id)) {
                                 return (
                                     <Col
-                                        key={doctor?.doctor_id}
+                                        key={doctor?.doctorId}
                                         span={24}
                                         style={{ cursor: 'pointer' }}
                                     >
@@ -190,7 +254,7 @@ const ViewDetailDoctor = () => {
                                                     onClick={() => {
                                                         navigate(
                                                             '/doctor/detail/' +
-                                                                doctor.doctor_id
+                                                                doctor.doctorId
                                                         );
                                                     }}
                                                     className="rounded-circle"
@@ -204,14 +268,18 @@ const ViewDetailDoctor = () => {
                                                     onClick={() => {
                                                         navigate(
                                                             '/doctor/detail/' +
-                                                                doctor.doctor_id
+                                                                doctor.doctorId
                                                         );
                                                     }}
                                                 >
-                                                    {doctor?.full_name}
+                                                    {doctor.title}{' '}
+                                                    {doctor?.fullName}
                                                 </p>
-                                                <Tag color="blue">
-                                                    {doctor.major_name}
+                                                <Tag
+                                                    color="blue"
+                                                    className="mb-2"
+                                                >
+                                                    {doctor.majorName}
                                                 </Tag>
                                                 <p>
                                                     <EnvironmentOutlined />{' '}
@@ -252,15 +320,6 @@ const ViewDetailDoctor = () => {
                     </Row>
                 </Col>
             </Row>
-
-            {isModalCommentOpen && (
-                <ModalComment
-                    openNotificationWithIcon={openNotificationWithIcon}
-                    doctorId={id}
-                    isModalCommentOpen={isModalCommentOpen}
-                    setIsModalCommentOpen={setIsModalCommentOpen}
-                />
-            )}
         </div>
     );
 };

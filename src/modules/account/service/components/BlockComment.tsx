@@ -26,8 +26,8 @@ export const BlockComment = ({ userId, setIsModalCommentOpen }: any) => {
         }
     };
     const handleOnNewComment = () => {
-        socket.on('newComment', (newComment: Comment) => {
-            getCommentByUserId(Number(newComment.user_id));
+        socket?.on('newComment', (newComment: Comment) => {
+            getCommentByUserId(Number(newComment.doctorId));
         });
     };
     useEffect(() => {
@@ -46,16 +46,13 @@ export const BlockComment = ({ userId, setIsModalCommentOpen }: any) => {
                             <div className="comment mt-4 border border-start-0 border-end-0 border-top-0">
                                 <div className="d-flex">
                                     <h6 className="patient__name">
-                                        {comment.full_name}
+                                        {comment.fullName}
                                     </h6>
                                     <span className="appointment__date  ms-2 text-primary">
                                         <CheckCircleOutlined />
                                         <span className="ms-1">
                                             đã khám ngày{' '}
-                                            {comment?.date_booking?.slice(
-                                                0,
-                                                10
-                                            )}
+                                            {comment?.dateBooking?.slice(0, 10)}
                                         </span>
                                     </span>
                                 </div>

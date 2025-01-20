@@ -28,7 +28,7 @@ const DashBoard = () => {
     const [isOpenModalConfirm, setIsOpenModalConfirm] =
         useState<boolean>(false);
     const { totalPatientInDay, totalPatientExaminedInDay, fetchData } =
-        useAppointments(config, pageIndex, pageSize, user.doctor_id);
+        useAppointments(config, pageIndex, pageSize, user.doctorId);
 
     const handleCancelModal = () => {
         setIsModalOpen(false);
@@ -109,7 +109,7 @@ const DashBoard = () => {
                         </div>
                     </Col>
                     <Col span={14}>
-                        <RecentInvoicesTable />
+                        <RecentInvoicesTable user={user} />
                     </Col>
                 </Row>
             </div>

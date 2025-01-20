@@ -30,7 +30,6 @@ import {
     EyeOutlined,
     RedoOutlined,
 } from '@ant-design/icons';
-import { ModalViewAppointment } from '../components/ModalViewAppointment';
 import { ModalConfirmCancelAppointment } from '../components/ModalConfirmCancelAppointment';
 import { useNavigate } from 'react-router-dom';
 import { AppointmentStatus } from '../../../../models/appointment_status';
@@ -44,7 +43,8 @@ import dayjs from 'dayjs';
 import { invoicesService } from '../../../../services/invoicesService';
 import { Invoices } from '../../../../models/invoices';
 import { paymentService } from '../../../../services/paymentService';
-import { InputCommentModal } from '../components/InputCommonModal';
+import { InputCommentModal } from '../components/InputCommentModal';
+import { ViewAppointmentModal } from '../../../../components';
 type DataIndex = keyof AppointmentViewForPatient;
 const { Option } = Select;
 const ViewAppointment = () => {
@@ -217,37 +217,37 @@ const ViewAppointment = () => {
         {
             title: 'Bác sĩ',
             className: 'patient-name',
-            dataIndex: 'doctor_name',
-            ...getColumnSearchProps('doctor_name'),
+            dataIndex: 'doctorName',
+            ...getColumnSearchProps('doctorName'),
         },
         {
             title: 'Ngày hẹn',
-            dataIndex: 'appointment_date',
+            dataIndex: 'appointmentDate',
             render: (_, record) => (
-                <>{dayjs(record.appointment_date).format('DD-MM-YYYY')}</>
+                <>{dayjs(record.appointmentDate).format('DD-MM-YYYY')}</>
             ),
         },
         {
             title: 'Thời gian',
-            dataIndex: 'time_value',
+            dataIndex: 'timeValue',
         },
         {
             title: 'Trạng thái lịch hẹn',
             className: 'status',
-            dataIndex: 'status_name',
+            dataIndex: 'statusName',
             render: (_, record) => (
                 <Tag
                     color={
-                        record.status_id === 1
+                        record.statusId === 1
                             ? 'geekblue'
-                            : record.status_id === 2
+                            : record.statusId === 2
                             ? 'green'
-                            : record.status_id === 3
+                            : record.statusId === 3
                             ? 'error'
                             : 'cyan'
                     }
                 >
-                    {record.status_name.toUpperCase()}
+                    {record?.statusName?.toUpperCase()}
                 </Tag>
             ),
 
@@ -266,7 +266,7 @@ const ViewAppointment = () => {
                 },
             ],
             onFilter: (value, record) =>
-                record.status_name.indexOf(value as string) === 0,
+                record.statusName.indexOf(value as string) === 0,
         },
         {
             title: 'Trạng thái hóa đơn',
@@ -276,12 +276,12 @@ const ViewAppointment = () => {
             render: (_, record) => (
                 <Tag
                     color={
-                        record.invoice_status === 'Đã thanh toán'
+                        record.invoiceStatus === 'Đã thanh toán'
                             ? 'success'
                             : 'blue'
                     }
                 >
-                    {record.invoice_status.toUpperCase()}
+                    {record.invoiceStatus.toUpperCase()}
                 </Tag>
             ),
         },
@@ -290,14 +290,14 @@ const ViewAppointment = () => {
             key: 'action',
             render: (text: string, record: Appointment) => (
                 <Row gutter={24} className="">
-                    {record.status_id === 4 && (
-                        <Col span={6}>
+                    {record.statusId === 4 && (
+                        <Col span={6} className="text-center">
                             <Tooltip placement="topLeft" title={'Đặt lại'}>
                                 <Button
                                     className="mb-2"
                                     onClick={() => {
                                         navigate(
-                                            '/doctor/detail/' + record.doctor_id
+                                            '/doctor/detail/' + record.doctorId
                                         );
                                     }}
                                 >
@@ -321,7 +321,7 @@ const ViewAppointment = () => {
                             </Button>
                         </Tooltip>
                     </Col>
-                    {record.status_id === 1 && (
+                    {record.statusId === 1 && (
                         <Col span={6}>
                             <Tooltip placement="topLeft" title={'Hủy lịch hẹn'}>
                                 <Button
@@ -338,7 +338,7 @@ const ViewAppointment = () => {
                             </Tooltip>
                         </Col>
                     )}
-                    {record.status_id === 4 && record.isEvaluate === 0 && (
+                    {record.statusId === 4 && record.isEvaluate === 0 && (
                         <Tooltip title="Đánh giá" placement="top">
                             <Button
                                 onClick={() => {
@@ -350,8 +350,8 @@ const ViewAppointment = () => {
                             </Button>
                         </Tooltip>
                     )}
-                    {record.invoice_status === 'Chưa thanh toán' &&
-                        record.payment_method === 2 && (
+                    {record.invoiceStatus === 'Chưa thanh toán' &&
+                        record.paymentMethod === 2 && (
                             <Col span={6}>
                                 <Tooltip
                                     placement="topLeft"
@@ -378,7 +378,7 @@ const ViewAppointment = () => {
         const data = {
             pageIndex: pageIndex,
             pageSize: pageSize,
-            phone: patientProfile.patient_phone,
+            phone: patientProfile.patientPhone,
             statusId: options.statusId,
         };
         try {
@@ -472,11 +472,10 @@ const ViewAppointment = () => {
                         />
                     )}
                     {isModalOpen && (
-                        <ModalViewAppointment
+                        <ViewAppointmentModal
                             handleCancelModal={handleCancelModal}
                             isModalOpen
                             appointment={appointment}
-                            isView={isView}
                         />
                     )}
                     {isOpenModalConfirm && (

@@ -1,4 +1,4 @@
-import { Col, Row, Image, Button, Tag, Card, Flex } from 'antd';
+import { Col, Row, Image, Button, Flex } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import {
     DeleteOutlined,
@@ -43,7 +43,7 @@ const ServiceCard = ({
                                     {service.name}
                                 </h6>
                                 <p className="mb-0 opacity-75 text-center mb-3">
-                                    {service.category_name}
+                                    {service.categoryName}
                                 </p>
                                 <div className="clinic-info">
                                     <p className="mb-1">
@@ -57,7 +57,7 @@ const ServiceCard = ({
                                     </p>
                                     <p className="mb-1">
                                         <i className="fa-regular fa-hospital me-1"></i>
-                                        {service.clinic_name}
+                                        {service.clinicName}
                                     </p>
 
                                     <p>

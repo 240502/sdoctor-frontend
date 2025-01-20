@@ -26,7 +26,7 @@ export const ServiceService = {
         return res?.data;
     },
     async updateView(id: any): Promise<any> {
-        const res = await nestApi.put('/service/update-view/' + id);
+        const res = await nestApi.put('/service/update-views/' + id);
         return res;
     },
 };

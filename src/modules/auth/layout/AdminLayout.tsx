@@ -27,7 +27,7 @@ const AdminLayout: React.FC = ({ children }: any) => {
         setRequestConfig(config);
     }, [user]);
     useEffect(() => {
-        socket.on('newNotification', (newNotification) => {
+        socket?.on('newNotification', (newNotification) => {
             messageApi.info('Có thông báo mới');
             console.log('newNotification', newNotification);
             const newNotifications = [
@@ -41,7 +41,7 @@ const AdminLayout: React.FC = ({ children }: any) => {
         });
 
         return () => {
-            socket.off('newNotification');
+            socket?.off('newNotification');
         };
     }, []);
     const {

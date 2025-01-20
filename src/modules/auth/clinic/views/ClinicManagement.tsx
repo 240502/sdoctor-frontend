@@ -140,7 +140,7 @@ const ClinicManagement = () => {
         getProvinces();
     }, []);
     return (
-        <div className="container">
+        <div className="">
             {contextHolder}
             <div>
                 <Breadcrumb

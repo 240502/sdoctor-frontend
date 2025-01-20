@@ -1,6 +1,6 @@
 import ConfirmAppointmentModal from './ConfirmAppointmentModal';
 import ConfirmModal from './ConfirmModal';
-import ModalViewAppointment from './ModalViewAppointment';
+import ViewAppointmentModal from './ViewAppointmentModal';
 import SummaryEditor from './SummaryEditor';
 import DescriptionEditor from './DescriptionEditor';
 import DoctorCard from './DoctorCard';
@@ -11,7 +11,7 @@ export {
     DescriptionEditor,
     ConfirmAppointmentModal,
     ConfirmModal,
-    ModalViewAppointment,
+    ViewAppointmentModal,
     SummaryEditor,
     ServiceCard,
     ViewInvoiceModal,

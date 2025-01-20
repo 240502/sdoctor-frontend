@@ -1,10 +1,18 @@
 export interface Comment {
     id: number;
     content: number;
-    date_booking: string | undefined;
-    doctor_id: number;
-    star: number;
+    dateBooking: string | undefined;
+    doctorId: number;
+    starCount: number;
     phone: string;
-    full_name: string;
+    fullName: string;
     type: string;
+}
+
+export interface CommentCreate {
+    doctorId: number;
+    content: string;
+    fullName: string;
+    starCount: number;
+    dateBooking: string;
 }

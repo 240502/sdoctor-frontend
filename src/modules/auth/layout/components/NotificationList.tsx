@@ -1,10 +1,10 @@
-import { List, Dropdown, Badge, Button, notification } from 'antd';
-import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
+import { List, Dropdown, Badge, Button } from 'antd';
+import { useRecoilValue, useSetRecoilState } from 'recoil';
 import {
     notificationsState,
     notificationsValue,
 } from '../../../../stores/notification';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { BellOutlined, CloseOutlined } from '@ant-design/icons';
 import { NotificationService } from '../../../../services/notificationService';
 import { userValue } from '../../../../stores/userAtom';
@@ -40,7 +40,7 @@ const NotificationList = () => {
     };
     const markAllAsRead = async () => {
         try {
-            const res = await NotificationService.markAllRead(user.user_id);
+            const res = await NotificationService.markAllRead(user.userId);
             getNotificationByUserId();
         } catch (e: any) {
             console.log(e.message);
@@ -72,7 +72,7 @@ const NotificationList = () => {
                     renderItem={(item) => (
                         <List.Item
                             className={`${
-                                item?.is_read === 0
+                                item?.isRead === 0
                                     ? 'notification-unread'
                                     : 'notification-read'
                             } notification p-3`}
@@ -82,7 +82,7 @@ const NotificationList = () => {
                                 <span className="d-block fw-normal text-secondary">
                                     {dayjs(
                                         new Date(
-                                            item.created_at
+                                            item?.createdAt
                                                 .toString()
                                                 .split('Z')[0]
                                         )
@@ -106,15 +106,13 @@ const NotificationList = () => {
     const getNotificationByUserId = async () => {
         try {
             const res = await NotificationService.getNotificationByUserId(
-                user?.user_id
+                user?.userId
             );
 
-            setNotifications(res.data);
-            //setUnreadCount(res.totalItems);
+            setNotifications(res);
         } catch (err: any) {
             console.log(err.message);
             setNotifications([]);
-            // setUnreadCount(0);
         }
     };
     useEffect(() => {
@@ -122,7 +120,7 @@ const NotificationList = () => {
     }, [user]);
     return (
         <Dropdown overlay={menu} trigger={['click']}>
-            <Badge count={notificationSelector.total}>
+            <Badge count={notificationSelector?.notifications?.length}>
                 <BellOutlined style={{ fontSize: '24px', cursor: 'pointer' }} />
             </Badge>
         </Dropdown>

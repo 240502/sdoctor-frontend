@@ -18,7 +18,7 @@ const DoctorCard = ({ doctors, handleUpdateViewsDoctor }: any) => {
                         <Col
                             span={6}
                             className="card-item"
-                            key={doctor?.full_name}
+                            key={doctor?.fullName}
                         >
                             <div className="card-container rounded border border-1 ">
                                 <div className="doctor-image col-3 text-center m-auto">
@@ -26,10 +26,10 @@ const DoctorCard = ({ doctors, handleUpdateViewsDoctor }: any) => {
                                         onClick={() => {
                                             navigate(
                                                 '/doctor/detail/' +
-                                                    doctor?.doctor_id
+                                                    doctor?.doctorId
                                             );
                                             handleUpdateViewsDoctor(
-                                                doctor?.doctor_id
+                                                doctor?.doctorId
                                             );
                                             addWatchedDoctor(doctor);
                                         }}
@@ -42,19 +42,18 @@ const DoctorCard = ({ doctors, handleUpdateViewsDoctor }: any) => {
                                     className="doctor-name text-center mt-3"
                                     onClick={() => {
                                         navigate(
-                                            '/doctor/detail/' +
-                                                doctor?.doctor_id
+                                            '/doctor/detail/' + doctor?.doctorId
                                         );
                                         handleUpdateViewsDoctor(
-                                            doctor?.doctor_id
+                                            doctor?.doctorId
                                         );
                                         addWatchedDoctor(doctor);
                                     }}
                                 >
-                                    {doctor.full_name}
+                                    {doctor.fullName}
                                 </h6>
                                 <p className="mb-0 opacity-75 text-center mb-3">
-                                    {doctor.major_name}
+                                    {doctor.majorName}
                                 </p>
                                 <div className="text-center mb-5">
                                     <Tag color="blue" title="Tư vấn trực tiêp">
@@ -65,7 +64,7 @@ const DoctorCard = ({ doctors, handleUpdateViewsDoctor }: any) => {
                                 <div className="clinic-info">
                                     <p className="mb-1">
                                         <i className="fa-regular fa-hospital me-2"></i>
-                                        {doctor.clinic_name}
+                                        {doctor.clinicName}
                                     </p>
 
                                     <p>

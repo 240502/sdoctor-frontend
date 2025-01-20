@@ -1,9 +1,16 @@
 export interface Notifications {
     id: number;
-    user_id: number;
+    userId: number | null;
+    message: string | null;
+    isRead: number | null;
+    createdAt: Date;
+    appointmentId: number | null;
+    timeAgo: string | null;
+    recordCount: number | null;
+}
+
+export interface NotificationCreate {
+    userId: number;
     message: string;
-    is_read: number;
-    created_at: Date;
-    appointment_id: number;
-    timeAgo: string;
+    appointmentId: number | null;
 }

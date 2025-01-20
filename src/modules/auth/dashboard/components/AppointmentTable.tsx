@@ -15,6 +15,12 @@ import {
 } from '@ant-design/icons';
 import { AppointmentService } from '../../../../services/appointmentService';
 import { ConfirmAppointmentModal } from '../../../../components';
+import {
+    sendConfirmingSuccessMail,
+    sendRejectionMail,
+} from '../../../../utils/mail';
+import { useRecoilValue } from 'recoil';
+import { configValue } from '../../../../stores/userAtom';
 type DataIndex = keyof AppointmentViewForPatient;
 const AppointmentTable = ({
     data,
@@ -23,10 +29,11 @@ const AppointmentTable = ({
     pageSize,
     setPageSize,
     handleClickViewDetail,
-    handleClickRejectBtn,
     openNotificationWithIcon,
     fetchData,
 }: any) => {
+    const config = useRecoilValue(configValue);
+
     const [searchText, setSearchText] = useState('');
     const [searchedColumn, setSearchedColumn] = useState('');
     const searchInput = useRef<InputRef>(null);
@@ -44,7 +51,10 @@ const AppointmentTable = ({
 
     const ChangeAppointmentStatus = async (data: any) => {
         try {
-            const res = await AppointmentService.updateAppointmentStatus(data);
+            const res = await AppointmentService.updateAppointmentStatus(
+                data,
+                config
+            );
             console.log(data);
             openNotificationWithIcon(
                 'success',
@@ -53,6 +63,31 @@ const AppointmentTable = ({
             );
             fetchData();
             handleCancelModalConfirm();
+            if (data?.reason) {
+                const mailBody = {
+                    email: appointment.patientEmail,
+                    doctorName: appointment.doctorName,
+                    patientName: appointment.patientName,
+                    time: appointment.timeValue,
+                    date: appointment.appointmentDate,
+                    rejectionReason: data?.reason,
+                    requirementObject: 'Bác sĩ',
+                };
+                sendRejectionMail(mailBody);
+            } else {
+                const mailBody = {
+                    patientName: appointment.patientName,
+                    email: appointment.patientEmail,
+                    doctorName: appointment.doctorName,
+                    time: appointment.timeValue,
+                    date: appointment.appointmentDate,
+                    location: appointment.location,
+                    status: 'Chờ khám',
+                    fee: appointment.price,
+                    serviceName: appointment.serviceName,
+                };
+                sendConfirmingSuccessMail(mailBody);
+            }
         } catch (err: any) {
             console.log(err.message);
             openNotificationWithIcon(
@@ -63,24 +98,20 @@ const AppointmentTable = ({
             handleCancelModalConfirm();
         }
     };
+
     const handleOk = () => {
         if (type === 'delete') {
             const data = {
-                appointment: {
-                    ...appointment,
-
-                    rejectionReason:
-                        rejectionReasonInputRef.current?.resizableTextArea
-                            ?.textArea.value,
-                },
-                requirementObject: 'bác sĩ',
+                id: appointment.id,
+                status: appointment.statusId,
+                reason: rejectionReasonInputRef.current?.resizableTextArea
+                    ?.textArea.value,
             };
             ChangeAppointmentStatus(data);
         } else {
             const data = {
-                appointment: {
-                    ...appointment,
-                },
+                id: appointment.id,
+                status: appointment.statusId,
             };
             ChangeAppointmentStatus(data);
         }
@@ -188,13 +219,13 @@ const AppointmentTable = ({
     const columns: ColumnsType<AppointmentViewForPatient> = [
         {
             title: 'Họ và tên',
-            dataIndex: 'patient_name',
-            ...getColumnSearchProps('patient_name'),
+            dataIndex: 'patientName',
+            ...getColumnSearchProps('patientName'),
         },
         {
             title: 'Số điện thoại',
-            dataIndex: 'patient_phone',
-            ...getColumnSearchProps('patient_phone'),
+            dataIndex: 'patientPhone',
+            ...getColumnSearchProps('patientPhone'),
         },
         {
             title: 'Tuổi',
@@ -220,10 +251,10 @@ const AppointmentTable = ({
         },
         {
             title: 'Trạng thái',
-            dataIndex: 'status_name',
+            dataIndex: 'statusName',
             render: (_, record) => (
-                <Tag color={record.status_id === 1 ? 'geekblue' : 'green'}>
-                    {record.status_name.toUpperCase()}
+                <Tag color={record.statusId === 1 ? 'geekblue' : 'green'}>
+                    {record.statusName.toUpperCase()}
                 </Tag>
             ),
             filters: [
@@ -237,7 +268,7 @@ const AppointmentTable = ({
                 },
             ],
             onFilter: (value, record) =>
-                record.status_name.indexOf(value as string) === 0,
+                record.statusName.indexOf(value as string) === 0,
         },
         {
             title: 'Chức năng',
@@ -254,11 +285,11 @@ const AppointmentTable = ({
                             <EyeOutlined className="text-info" />
                         </Button>
                     </Tooltip>
-                    {(record.status_id === 2 || record.status_id === 1) && (
+                    {(record.statusId === 2 || record.statusId === 1) && (
                         <Tooltip
                             placement="top"
                             title={
-                                record.status_id === 1
+                                record.statusId === 1
                                     ? 'Xác nhận'
                                     : 'Hoàn thành'
                             }
@@ -270,10 +301,10 @@ const AppointmentTable = ({
                                     setOpenModalConfirm(true);
                                     setType('confirm');
 
-                                    if (record.status_id === 2) {
+                                    if (record.statusId === 2) {
                                         setAppointment({
                                             ...record,
-                                            status_id: 4,
+                                            statusId: 4,
                                         });
                                         setMessage(
                                             'Bạn chắc chắn muốn đánh dấu lịch hẹn đã hoàn thành này!'
@@ -281,7 +312,7 @@ const AppointmentTable = ({
                                     } else {
                                         setAppointment({
                                             ...record,
-                                            status_id: 2,
+                                            statusId: 2,
                                         });
                                         setMessage(
                                             'Bạn chắc chắn xác nhận lịch hẹn này!'
@@ -293,14 +324,14 @@ const AppointmentTable = ({
                             </Button>
                         </Tooltip>
                     )}
-                    {(record.status_id === 2 || record.status_id === 1) && (
+                    {(record.statusId === 2 || record.statusId === 1) && (
                         <Tooltip placement="top" title="Từ chối">
                             <Button
                                 danger
                                 onClick={() => {
                                     setOpenModalConfirm(true);
                                     //handleConfirmAppointment(record);
-                                    setAppointment({ ...record, status_id: 3 });
+                                    setAppointment({ ...record, statusId: 3 });
                                     setMessage(
                                         'Bạn chắc chắn hủy lịch hẹn này!'
                                     );

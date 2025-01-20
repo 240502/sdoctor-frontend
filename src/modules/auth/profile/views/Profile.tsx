@@ -294,8 +294,8 @@ const Profile = () => {
     }, [provinces.length]);
 
     useEffect(() => {
-        if (user?.role_id === 2) {
-            getDoctorById(user.doctor_id);
+        if (user?.roleId === 2) {
+            getDoctorById(user.doctorId);
             getAllClinic();
             getAllMajor();
             getAllService();

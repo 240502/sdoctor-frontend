@@ -1,20 +1,13 @@
 import { Button, Divider, Form, Input, InputRef, Modal, Select } from 'antd';
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import MyEditor from './MyEditor';
 import { useRecoilValue } from 'recoil';
 import { userValue } from '../../../../stores/userAtom';
-import NewsManagement from '../views/NewsManagement';
 import { PostService } from '../../../../services/postService';
 import * as cheerio from 'cheerio';
 import { PostCategory } from '../../../../models/post_category';
-import { PostCategoryService } from '../../../../services/post_categorySerivce';
-import {
-    handleFocusInput,
-    handleFocusSelect,
-    isEmpty,
-    isEmptyEditor,
-    isEmptySelect,
-} from '../../../../utils/global';
+import { PostCategoryService } from '../../../../services/post_categoryService';
+import { isEmptyEditor } from '../../../../utils/global';
 export const ModalAddNews = ({
     isShowModal,
     setIsShowModal,
@@ -27,13 +20,9 @@ export const ModalAddNews = ({
     config,
 }: any): JSX.Element => {
     const [editorData, setEditorData] = useState('');
-    const inputTitleRef = useRef<InputRef>(null);
-    const selectCategoryRef = useRef<any>(null);
     const user = useRecoilValue(userValue);
     const labelContentRef = useRef<any>(null);
-    const [postCategory, setPostCategory] = useState<PostCategory>(
-        {} as PostCategory
-    );
+    const [form] = Form.useForm();
     const [postCategories, setPostCategories] = useState<PostCategory[]>([]);
     const getAllPostCategories = async () => {
         try {
@@ -43,49 +32,38 @@ export const ModalAddNews = ({
             console.log(err.message);
         }
     };
-    const handleGetPostCategory = (categoryId: number) => {
-        const cate = postCategories.find((item: PostCategory) => {
-            return item.post_category_id === categoryId;
-        });
-        return cate;
-    };
+
     useEffect(() => {
         if (isUpdate) {
-            const postCate: any = handleGetPostCategory(post.category_id);
-            setPostCategory(postCate);
             setEditorData(post.content);
         }
         getAllPostCategories();
     }, []);
-    const handleCreatePost = () => {
-        const isEmptySelectCategory = isEmptySelect(
-            selectCategoryRef.current,
-            post?.category_id
-        );
-        const isEmptyInputTitle = isEmpty(inputTitleRef.current?.input);
+    const handleCreatePost = (values: any) => {
         const isEmptyCKEditor = isEmptyEditor(
             labelContentRef.current,
             editorData
         );
 
-        if (!isEmptySelectCategory && !isEmptyInputTitle && !isEmptyCKEditor) {
+        if (!isEmptyCKEditor) {
             const $ = cheerio.load(editorData);
             // Lấy ảnh đầu tiên
             const firstImageSrc = $('img').first().attr('src');
             const data = {
-                title: inputTitleRef?.current?.input?.value,
+                title: values.title,
                 content: editorData,
-                author_id: user.user_id,
-                category_id: post.category_id,
-                featured_image: firstImageSrc,
+                authorId: user.userId,
+                categoryId: values.categoryId,
+                featuredImage: firstImageSrc ?? null,
             };
+            console.log('data create', data);
+
             CreatePost(data);
         }
     };
     const CreatePost = async (data: any) => {
         try {
             const res = await PostService.createPost(data, config);
-            console.log(res);
             openNotificationWithIcon(
                 'success',
                 'Thông báo!',
@@ -97,40 +75,35 @@ export const ModalAddNews = ({
         } catch (err: any) {
             console.log(err.message);
             openNotificationWithIcon(
-                'danger',
+                'error',
                 'Thông báo!',
                 'Thêm bài viết không thành công'
             );
         }
     };
-    const handleUpdate = () => {
-        const isEmptySelectCategory = isEmptySelect(
-            selectCategoryRef.current,
-            postCategory?.post_category_id ?? postCategory.post_category_id
-        );
-        const isEmptyInputTitle = isEmpty(inputTitleRef.current?.input);
+    const handleUpdate = (values: any) => {
         const isEmptyCKEditor = isEmptyEditor(
             labelContentRef.current,
             editorData
         );
-        if (!isEmptySelectCategory && !isEmptyInputTitle && !isEmptyCKEditor) {
+        if (!isEmptyCKEditor) {
             const $ = cheerio.load(editorData);
             // Lấy ảnh đầu tiên
             const firstImageSrc = $('img').first().attr('src');
             const data = {
                 id: post.id,
-                title: inputTitleRef?.current?.input?.value,
+                title: values.title,
                 content: post.content,
-                author_id: user.user_id,
-                category_id: post.category_id,
-                featured_image: firstImageSrc,
+                authorId: user.userId,
+                categoryId: values.categoryId,
+                featuredImage: firstImageSrc,
             };
             UpdatePost(data);
         }
     };
     const UpdatePost = async (data: any) => {
         try {
-            console.log(data);
+            console.log('data update', data);
             const res = await PostService.updatePost(data, config);
             console.log(res);
             openNotificationWithIcon(
@@ -144,17 +117,19 @@ export const ModalAddNews = ({
         } catch (err: any) {
             console.log(err.message);
             openNotificationWithIcon(
-                'danger',
+                'error',
                 'Thông báo!',
                 'Sửa bài viết không thành công'
             );
         }
     };
-    const handleOk = async () => {
-        if (isUpdate) {
-            handleUpdate();
-        } else {
-            handleCreatePost();
+    const onFinish = async (values: any) => {
+        if (user.roleId === 2) {
+            if (isUpdate) {
+                handleUpdate(values);
+            } else {
+                handleCreatePost(values);
+            }
         }
     };
 
@@ -184,89 +159,49 @@ export const ModalAddNews = ({
             );
         }
     };
-    const changeCategoryPost = (value: number) => {
-        if (value !== 0) {
-            const category: any = postCategories.find(
-                (item: PostCategory) => item.post_category_id === value
-            );
-            setPostCategory(category);
-        } else
-            setPostCategory({
-                post_category_id: 0,
-                name: '',
-                description: '',
-                image: '',
-            });
-    };
     useEffect(() => {
-        console.log(post);
-    }, [post]);
-
+        console.log('news', post);
+    }, []);
     return (
         <Modal
             style={{ minWidth: '60%' }}
             open={isShowModal}
             onCancel={handleCancel}
-            onOk={handleOk}
             maskClosable={false}
-            footer={[
-                <>
-                    {user.role_id === 2 && (
-                        <Button
-                            key={'submit'}
-                            type="primary"
-                            className="bg-success"
-                            onClick={handleOk}
-                        >
-                            Lưu
-                        </Button>
-                    )}
-                </>,
-                <>
-                    {user.role_id === 1 && (
-                        <Button
-                            key={'submit'}
-                            type="primary"
-                            className="bg-success"
-                            onClick={confirmPost}
-                        >
-                            Duyệt đăng
-                        </Button>
-                    )}
-                </>,
-                <Button key={'back'} onClick={handleCancel}>
-                    Đóng
-                </Button>,
-            ]}
+            footer={[]}
         >
             <h5 className="title">Chi tiết bài viết</h5>
             <Divider />
-            <Form className={`${user.role_id === 2 ? '' : 'pe-none'}`}>
-                <div className="form__group mb-2">
-                    <label className="mb-2">Danh mục bài viết</label>
+            <Form
+                layout="vertical"
+                form={form}
+                onFinish={onFinish}
+                initialValues={{
+                    categoryId: post.categoryId,
+                    title: post.title,
+                }}
+            >
+                <Form.Item
+                    className="form__group mb-2"
+                    label="Danh mục bài viết"
+                    name={'categoryId'}
+                    rules={[
+                        {
+                            required: true,
+                            message: 'Vui lòng chọn danh mục bài viết!',
+                        },
+                    ]}
+                >
                     <Select
-                        ref={selectCategoryRef}
                         className="d-flex"
                         showSearch
                         optionFilterProp="children"
-                        value={post.category_id}
-                        onFocus={() =>
-                            handleFocusSelect(selectCategoryRef.current)
-                        }
-                        onChange={(value: number) =>
-                            setPost({
-                                ...post,
-                                category_id: value !== 0 ? value : null,
-                            })
-                        }
                         placeholder="Chọn danh mục bài viết"
                     >
                         {postCategories.length > 0 ? (
                             postCategories.map((item: PostCategory) => {
                                 return (
-                                    <Select.Option
-                                        value={item.post_category_id}
-                                    >
+                                    <Select.Option value={item.postCategoryId}>
                                         {item.name}
                                     </Select.Option>
                                 );
@@ -275,35 +210,21 @@ export const ModalAddNews = ({
                             <></>
                         )}
                     </Select>
-                    <div
-                        className="error_message mt-3"
-                        style={{ color: 'red' }}
-                    ></div>
-                </div>
-                <div className="form__group mb-2">
-                    <label className="mb-2">Tiêu đề bài viết</label>
-                    <Input
-                        value={post.title}
-                        ref={inputTitleRef}
-                        type="text"
-                        className="title"
-                        onChange={(e) => {
-                            console.log(e.target.value);
-                            setPost({ ...post, title: e.target.value });
-                        }}
-                        onFocus={() =>
-                            handleFocusInput(inputTitleRef.current?.input)
-                        }
-                    />
-                    <div
-                        className="error_message mt-3"
-                        style={{ color: 'red' }}
-                    ></div>
-                </div>
-                <div className="form__group mb-2">
-                    <label ref={labelContentRef} className="mb-2">
-                        Nội dung
-                    </label>
+                </Form.Item>
+                <Form.Item
+                    className=" mb-2"
+                    label="Tiêu đề"
+                    name={'title'}
+                    rules={[
+                        {
+                            required: true,
+                            message: 'Vui lòng nhập tiêu đề bài viết!',
+                        },
+                    ]}
+                >
+                    <Input type="text" className="title" />
+                </Form.Item>
+                <Form.Item label="Nội dung" className=" mb-2">
                     <MyEditor
                         setEditorData={setEditorData}
                         labelContentRef={labelContentRef}
@@ -311,11 +232,33 @@ export const ModalAddNews = ({
                         setPost={setPost}
                         isUpdate={isUpdate}
                     />
-                    <div
-                        className="error_message mt-3"
-                        style={{ color: 'red' }}
-                    ></div>
-                </div>
+                </Form.Item>
+                <Form.Item className="text-end">
+                    {user.roleId === 2 && (
+                        <Button
+                            key={'submit'}
+                            type="primary"
+                            htmlType="submit"
+                            className="bg-success me-3"
+                        >
+                            Lưu
+                        </Button>
+                    )}
+                    {user.roleId === 1 && post.status !== 'Đã đăng' && (
+                        <Button
+                            key={'submit'}
+                            type="primary"
+                            htmlType="submit"
+                            className="bg-success me-3 "
+                            onClick={confirmPost}
+                        >
+                            Duyệt đăng
+                        </Button>
+                    )}
+                    <Button key={'back'} onClick={handleCancel}>
+                        Đóng
+                    </Button>
+                </Form.Item>
             </Form>
         </Modal>
     );

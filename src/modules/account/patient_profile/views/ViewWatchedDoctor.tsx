@@ -3,7 +3,11 @@ import { Doctor } from '../../../../models/doctor';
 import { Button, Card, Row, Col, Image, Tag, Select, Input } from 'antd';
 import { Link, useNavigate } from 'react-router-dom';
 import { PatientProfileLayout } from '../components/PatientProfileLayout';
-import { EnvironmentOutlined, SearchOutlined } from '@ant-design/icons';
+import {
+    EnvironmentOutlined,
+    SearchOutlined,
+    StarFilled,
+} from '@ant-design/icons';
 import { useSetRecoilState } from 'recoil';
 import { doctorState } from '../../../../stores/doctorAtom';
 import { doctorService } from '../../../../services/doctorService';
@@ -69,24 +73,19 @@ const ViewWatchedDoctor = () => {
                 ) {
                     if (filterOptions.clinicId) {
                         doctorsCopy = doctorsCopy.filter((doctor: Doctor) => {
-                            return doctor.clinic_id === filterOptions.clinicId;
+                            return doctor.clinicId === filterOptions.clinicId;
                         });
                     }
                     if (filterOptions.majorId) {
                         doctorsCopy = doctorsCopy.filter((doctor: Doctor) => {
-                            return doctor.major_id === filterOptions.majorId;
+                            return doctor.majorId === filterOptions.majorId;
                         });
                     }
                     if (filterOptions.name && filterOptions.name?.length > 0) {
                         doctorsCopy = doctorsCopy.filter((doctor: Doctor) => {
-                            return doctor.full_name.includes(
-                                filterOptions.name
-                            );
+                            return doctor.fullName.includes(filterOptions.name);
                         });
                     }
-                    console.log(filterOptions);
-                    console.log('doctorsCopy', doctorsCopy);
-
                     if (doctorsCopy?.length > 0) {
                         setFilteredDoctors(doctorsCopy);
                     } else {
@@ -174,67 +173,155 @@ const ViewWatchedDoctor = () => {
                         />
                     </Col>
                 </Row>
-                <Row className="block-container mt-3" gutter={24}>
+                <Row className="block-container cards mt-3" gutter={24}>
                     {filteredDoctors.length > 0 ? (
                         filteredDoctors?.map((doctor: Doctor) => {
                             return (
-                                <Col className=" mb-3" span={6}>
-                                    <Card className="shadow" actions={[]}>
-                                        <Image
-                                            src={doctor.image}
+                                <Col
+                                    span={6}
+                                    className="card-item"
+                                    key={doctor?.doctorId}
+                                >
+                                    <div className="card-container flex-grow-1 rounded border border-1 position-relative">
+                                        {doctor?.averageStar && (
+                                            <div className="star text-end ">
+                                                <StarFilled className="text-warning " />
+                                                <span className="score d-inline-block ms-2">
+                                                    {doctor?.averageStar
+                                                        ?.toString()
+                                                        .slice(0, 3)}
+                                                    /5
+                                                </span>
+                                            </div>
+                                        )}
+                                        <div className="col-3 text-center m-auto">
+                                            <Image
+                                                onClick={() => {
+                                                    navigate(
+                                                        '/doctor/detail/' +
+                                                            doctor?.doctorId
+                                                    );
+                                                    handleUpdateViewsDoctor(
+                                                        doctor?.doctorId
+                                                    );
+                                                    // addWatchedDoctor(doctor);
+                                                }}
+                                                className="rounded-circle"
+                                                preview={false}
+                                                src={doctor.image}
+                                            ></Image>
+                                        </div>
+                                        <h6
+                                            className="doctor-name text-center mt-3"
                                             onClick={() => {
                                                 navigate(
                                                     '/doctor/detail/' +
-                                                        doctor.doctor_id
+                                                        doctor?.doctorId
                                                 );
                                                 handleUpdateViewsDoctor(
-                                                    doctor.doctor_id
+                                                    doctor?.doctorId
                                                 );
+                                                // addWatchedDoctor(doctor);
                                             }}
-                                            preview={false}
-                                            className="rounded object-fit-cover doctor-image"
-                                        ></Image>
-                                        <Tag color="blue" className="mt-2">
-                                            {doctor.major_name}
-                                        </Tag>
-                                        <h6 className="mt-2">
-                                            <Link
-                                                className="text-decoration-none text-dark"
-                                                to={
-                                                    '/doctor/detail/' +
-                                                    doctor.doctor_id
-                                                }
-                                                onClick={() => {
-                                                    handleUpdateViewsDoctor(
-                                                        doctor.doctor_id
-                                                    );
-                                                }}
-                                            >
-                                                Bác sĩ. {doctor.full_name}
-                                            </Link>
-                                        </h6>
-                                        <div
-                                            className="location"
-                                            style={{ height: '60px' }}
                                         >
-                                            <EnvironmentOutlined className="me-2" />
-                                            {doctor.location}
-                                        </div>
-                                        <div className="button-container text-center">
-                                            <Button
-                                                className="mt-2 border-primary text-primary w-75 btn-book-now"
-                                                onClick={() => {
-                                                    navigate(
-                                                        '/booking-appointment'
-                                                    );
-                                                    setDoctor(doctor);
-                                                }}
+                                            {doctor.fullName}
+                                        </h6>
+                                        <p className="mb-0 opacity-75 text-center mb-3">
+                                            {doctor.majorName}
+                                        </p>
+                                        <div className="text-center mb-4">
+                                            <Tag
+                                                color="blue"
+                                                title="Tư vấn trực tiêp"
                                             >
-                                                Đặt lịch ngay
-                                            </Button>
+                                                <i className="fa-solid fa-stethoscope"></i>{' '}
+                                                Tư vấn trực tiếp
+                                            </Tag>
                                         </div>
-                                    </Card>
+
+                                        <div className="clinic-info">
+                                            <p className="mb-1">
+                                                <i className="fa-regular fa-hospital me-2"></i>
+                                                {doctor.clinicName}
+                                            </p>
+
+                                            <p>
+                                                <EnvironmentOutlined></EnvironmentOutlined>{' '}
+                                                {doctor.location}
+                                            </p>
+                                            <div className="button text-center">
+                                                <Button
+                                                    className="booking-btn w-75"
+                                                    onClick={() => {
+                                                        navigate(
+                                                            '/booking-appointment'
+                                                        );
+                                                        setDoctor(doctor);
+                                                    }}
+                                                >
+                                                    Đặt lịch bác sĩ
+                                                </Button>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </Col>
+                                // <Col className=" mb-3" span={6}>
+                                //     <Card className="shadow" actions={[]}>
+                                //         <Image
+                                //             src={doctor.image}
+                                //             onClick={() => {
+                                //                 navigate(
+                                //                     '/doctor/detail/' +
+                                //                         doctor.doctorId
+                                //                 );
+                                //                 handleUpdateViewsDoctor(
+                                //                     doctor.doctorId
+                                //                 );
+                                //             }}
+                                //             preview={false}
+                                //             className="rounded doctor-image"
+                                //         ></Image>
+                                //         <Tag color="blue" className="mt-2">
+                                //             {doctor.majorName}
+                                //         </Tag>
+                                //         <h6 className="mt-2">
+                                //             <Link
+                                //                 className="text-decoration-none text-dark"
+                                //                 to={
+                                //                     '/doctor/detail/' +
+                                //                     doctor.doctorId
+                                //                 }
+                                //                 onClick={() => {
+                                //                     handleUpdateViewsDoctor(
+                                //                         doctor.doctorId
+                                //                     );
+                                //                 }}
+                                //             >
+                                //                 Bác sĩ. {doctor.fullName}
+                                //             </Link>
+                                //         </h6>
+                                //         <div
+                                //             className="location"
+                                //             style={{ height: '60px' }}
+                                //         >
+                                //             <EnvironmentOutlined className="me-2" />
+                                //             {doctor.location}
+                                //         </div>
+                                //         <div className="button-container text-center">
+                                //             <Button
+                                //                 className="mt-2 border-primary text-primary w-75 btn-book-now"
+                                //                 onClick={() => {
+                                //                     navigate(
+                                //                         '/booking-appointment'
+                                //                     );
+                                //                     setDoctor(doctor);
+                                //                 }}
+                                //             >
+                                //                 Đặt lịch ngay
+                                //             </Button>
+                                //         </div>
+                                //     </Card>
+                                // </Col>
                             );
                         })
                     ) : (

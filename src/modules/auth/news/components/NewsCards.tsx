@@ -1,5 +1,4 @@
 import { Card, Flex, Image, Button } from 'antd';
-import React from 'react';
 import {
     ClockCircleOutlined,
     EditOutlined,
@@ -18,6 +17,7 @@ export const NewsCards = ({
     setIsShowModalConfirm,
 }: any) => {
     const user = useRecoilValue(userValue);
+
     return (
         <Flex wrap>
             {posts?.length > 0 ? (
@@ -25,28 +25,28 @@ export const NewsCards = ({
                     return (
                         <div className="col-3 ps-2 pe-2 mb-3">
                             <Card className="shadow" actions={[,]}>
-                                <div className="feature-img-container">
+                                <div className="feature-img-container text-center w-100">
                                     <Image
                                         className="rounded feature-img object-fit-cover"
                                         height={150}
                                         preview={false}
-                                        src={post.featured_image}
+                                        src={post.featuredImage}
                                     ></Image>
                                 </div>
                                 <div className="author mt-3">
                                     <Flex className="align-items-center">
                                         <p className="author-name mb-0">
-                                            {post.author_name}
+                                            {post.authorName}
                                         </p>
                                     </Flex>
                                 </div>
                                 <div className="time_public mt-2">
                                     <ClockCircleOutlined className="me-2" />
-                                    {post.public_date != null
-                                        ? post.public_date
+                                    {post.publicDate != null
+                                        ? post.publicDate
                                               .toString()
                                               .slice(0, 10)
-                                        : post.created_at
+                                        : post.createdAt
                                               ?.toString()
                                               .slice(0, 10)}
                                 </div>
@@ -70,7 +70,7 @@ export const NewsCards = ({
                                             setIsUpdate(true);
                                         }}
                                     >
-                                        {user.role_id === 2 ? (
+                                        {user.roleId === 2 ? (
                                             <>
                                                 <EditOutlined /> Sửa
                                             </>

@@ -5,8 +5,6 @@ import 'dayjs/locale/vi';
 import { useEffect } from 'react';
 import dayjs from 'dayjs';
 export const BlockCalendar = ({ setDate, setSchedule, setTimes }: any) => {
-    const currentDate = new Date();
-
     const headerRender: CalendarProps<Dayjs>['headerRender'] = ({
         value,
         onChange,
@@ -69,24 +67,22 @@ export const BlockCalendar = ({ setDate, setSchedule, setTimes }: any) => {
         setDate(value.format('YYYY-MM-DD'));
         setTimes([]);
     };
-    useEffect(() => {
-        const today = dayjs();
-        const formattedDate = today.format('YYYY-MM-DD');
-        console.log(formattedDate); // Ví dụ: 22 04 2024
-        setDate(formattedDate);
-    }, []);
+    useEffect(() => {}, []);
     return (
         <Calendar
             onChange={handleChangeDate}
             fullscreen={false}
             headerRender={headerRender}
             disabledDate={(date: Dayjs) => {
-                const newDate = new Date(date.toISOString().slice(0, 10));
+                const now = dayjs();
                 if (
-                    newDate.getFullYear() === currentDate.getFullYear() &&
-                    newDate.getMonth() === currentDate.getMonth() &&
-                    newDate.getDate() < currentDate.getDate()
+                    date.year() === now.year() &&
+                    date.month() === now.month() &&
+                    date.date() < now.date()
                 ) {
+                    return true;
+                }
+                if (date.year() < now.year() || date.year() < now.month()) {
                     return true;
                 }
                 return false;

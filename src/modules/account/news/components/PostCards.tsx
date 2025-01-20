@@ -1,8 +1,6 @@
-import React, { useEffect } from 'react';
-import { Divider, Flex, Image } from 'antd';
+import { Flex, Image } from 'antd';
 import { Post } from '../../../../models/post';
 import { Link, useNavigate } from 'react-router-dom';
-import parse from 'html-react-parser';
 import '@/assets/scss/app.scss';
 import * as cheerio from 'cheerio';
 import { PostService } from '../../../../services/postService';
@@ -40,7 +38,7 @@ export const PostCards = ({ posts }: any) => {
                                     overflow: 'hidden',
                                 }}
                             >
-                                <div className="img col-1 ">
+                                <div className="img col-1">
                                     <Image
                                         onClick={() => {
                                             navigate('/post/detail/' + post.id);
@@ -49,7 +47,7 @@ export const PostCards = ({ posts }: any) => {
                                         style={{
                                             cursor: 'pointer',
                                         }}
-                                        src={post.featured_image}
+                                        src={post.featuredImage}
                                         preview={false}
                                         className="rounded"
                                     />

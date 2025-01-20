@@ -407,3 +407,11 @@ main {
         position: relative;
     }
 }
+
+.post-page-container {
+    .banner {
+        .ant-image {
+            width: 100%;
+        }
+    }
+}

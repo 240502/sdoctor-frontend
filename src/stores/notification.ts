@@ -9,6 +9,5 @@ export const notificationsValue = selector({
     key: 'notificationsValue',
     get: ({ get }) => ({
         notifications: get(notificationsState),
-        total: get(notificationsState).length,
     }),
 });

@@ -18,22 +18,21 @@ export const useAppointments = (
     const fetchData = async () => {
         try {
             try {
-                const total = await AppointmentService.getTotalPatientInDay(
-                    doctor_id,
-                    config
+                const res = await AppointmentService.getTotalPatientInDay(
+                    doctor_id
                 );
-                setTotalPatientInDay(total[0].totalPatient);
+                console.log(res.totalPatient);
+                setTotalPatientInDay(res.totalPatient);
             } catch (err) {
                 console.error('Error fetching total patients:', err);
             }
 
             try {
-                const examined =
+                const res =
                     await AppointmentService.getTotalPatientExaminedInDay(
-                        doctor_id,
-                        config
+                        doctor_id
                     );
-                setTotalPatientExaminedInDay(examined[0].totalPatient);
+                setTotalPatientExaminedInDay(res.totalPatient);
             } catch (err) {
                 console.error('Error fetching examined patients:', err);
             }

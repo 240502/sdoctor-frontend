@@ -1,4 +1,3 @@
-import React from 'react';
 import { Row, Button, Image, Col } from 'antd';
 import { Clinic } from '../../../../models/clinic';
 import { EnvironmentOutlined } from '@ant-design/icons';
@@ -10,8 +9,8 @@ export const ClinicCard = ({ clinics, handleUpdateViewsClinic }: any) => {
         <Row gutter={24} className="cards">
             {clinics.map((clinic: Clinic) => {
                 return (
-                    <Col span={6} className="card-item" key={clinic.id}>
-                        <div className="card-container rounded border border-1 ">
+                    <Col span={6} className="card-item " key={clinic.id}>
+                        <div className="card-container flex-grow-1 rounded border border-1 ">
                             <div className="clinic-image text-center m-auto">
                                 <Image
                                     onClick={() => {

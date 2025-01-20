@@ -1,9 +1,16 @@
 import { Button, Input, Modal, Form, Row, Col, Rate } from 'antd';
 import { CommentService } from '../../../../services/commentService';
-import { Comment } from '../../../../models/comment';
+import { Comment, CommentCreate } from '../../../../models/comment';
 import { Appointment } from '../../../../models/appointment';
+import { useEffect, useState } from 'react';
+import { NotificationService } from '../../../../services/notificationService';
+import { useRecoilValue } from 'recoil';
+import { doctorListState } from '../../../../stores/doctorAtom';
+import { Doctor } from '../../../../models/doctor';
+import { doctorService } from '../../../../services/doctorService';
 const { TextArea } = Input;
-
+import { NotificationCreate } from '../../../../models/notification';
+import { AppointmentService } from '../../../../services/appointmentService';
 export const InputCommentModal = ({
     openInputModal,
     handleCancelInputModal,
@@ -12,23 +19,45 @@ export const InputCommentModal = ({
     openNotificationWithIcon,
     handleCancelModalInput,
 }: any) => {
+    const doctors = useRecoilValue(doctorListState);
+    const [doctor, setDoctor] = useState<Doctor>({} as Doctor);
+    useEffect(() => {
+        const getDoctorById = async () => {
+            const doctor =
+                doctors.length > 0
+                    ? doctors.find(
+                          (doc: Doctor) => doc.doctorId === appointment.doctorId
+                      )
+                    : null;
+            if (doctor) {
+                setDoctor(doctor);
+            } else {
+                try {
+                    const res = await doctorService.getDoctorById(
+                        appointment.doctorId
+                    );
+                    console.log(res);
+                    setDoctor(res);
+                } catch (err: any) {
+                    console.log(err.message);
+                }
+            }
+        };
+        getDoctorById();
+    }, []);
     const [form] = Form.useForm();
-
-    const createCommentForPatient = async (newComment: Comment) => {
+    const createCommentForPatient = async (newComment: CommentCreate) => {
         try {
-            const data = {
-                newComment: newComment,
-                appointmentId: appointment.id,
-            };
-            const res = await CommentService.createComment(data);
+            const res = await CommentService.createComment(newComment);
             console.log(res);
             openNotificationWithIcon(
                 'success',
                 'Thông báo',
                 'Thêm phản hồi thành công!'
             );
-            handleUpdateIsEvaluateAppointment();
+            handleUpdateIsEvaluationAppointment();
             handleCancelModalInput();
+            handleCreateNotification();
         } catch (err: any) {
             console.log(err.message);
             openNotificationWithIcon(
@@ -38,7 +67,25 @@ export const InputCommentModal = ({
             );
         }
     };
-    const handleUpdateIsEvaluateAppointment = () => {
+    const handleCreateNotification = () => {
+        const newNotification: NotificationCreate = {
+            userId: doctor.userId,
+            message: 'Bạn có 1 bình luận mới!',
+            appointmentId: null,
+        };
+        createNotification(newNotification);
+    };
+    const createNotification = async (newNotification: NotificationCreate) => {
+        try {
+            const res = await NotificationService.createNotification(
+                newNotification
+            );
+            console.log(res);
+        } catch (err: any) {
+            console.log(err.message);
+        }
+    };
+    const handleUpdateIsEvaluationAppointment = async () => {
         setAppointments((prevAppointments: Appointment[]) => {
             const updatedAppointments = [...prevAppointments];
             const index = updatedAppointments.findIndex(
@@ -52,21 +99,24 @@ export const InputCommentModal = ({
             }
             return updatedAppointments;
         });
+        try {
+            const res = await AppointmentService.updateIsValuation(
+                appointment.id
+            );
+            console.log(res);
+        } catch (err: any) {
+            console.log(err);
+        }
     };
     const onFinish = (values: any) => {
-        console.log(values);
-        console.log(appointment);
-
-        const data: Comment = {
-            id: 0,
-            full_name: appointment.patient_name,
-            phone: appointment.patient_phone,
-            date_booking: appointment.appointment_date,
+        const data: CommentCreate = {
+            fullName: appointment.patientName,
             content: values.content,
-            star: values.star,
-            doctor_id: appointment.doctor_id,
-            type: 'Bác sĩ',
+            starCount: values.star,
+            doctorId: appointment.doctorId,
+            dateBooking: appointment.appointmentDate.toString().split('T')[0],
         };
+        console.log('new comment', data);
         createCommentForPatient(data);
     };
 

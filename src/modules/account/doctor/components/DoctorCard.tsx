@@ -1,5 +1,5 @@
-import { Col, Row, Image, Button, Card, Tag } from 'antd';
-import { StarFilled, StarOutlined } from '@ant-design/icons';
+import { Col, Row, Image, Button, Tag } from 'antd';
+import { StarFilled } from '@ant-design/icons';
 import { Doctor } from '../../../../models/doctor';
 import { EnvironmentOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
@@ -14,13 +14,13 @@ export const DoctorCard = ({ doctors, handleUpdateViewsDoctor }: any) => {
         <Row gutter={[16, 16]} className="cards">
             {doctors.map((doctor: Doctor) => {
                 return (
-                    <Col span={6} className="card-item" key={doctor?.doctor_id}>
-                        <div className="card-container rounded border border-1 position-relative">
-                            {doctor?.average_star && (
+                    <Col span={6} className="card-item" key={doctor?.doctorId}>
+                        <div className="card-container flex-grow-1 rounded border border-1 position-relative">
+                            {doctor?.averageStar && (
                                 <div className="star text-end ">
                                     <StarFilled className="text-warning " />
                                     <span className="score d-inline-block ms-2">
-                                        {doctor?.average_star
+                                        {doctor?.averageStar
                                             ?.toString()
                                             .slice(0, 3)}
                                         /5
@@ -31,11 +31,10 @@ export const DoctorCard = ({ doctors, handleUpdateViewsDoctor }: any) => {
                                 <Image
                                     onClick={() => {
                                         navigate(
-                                            '/doctor/detail/' +
-                                                doctor?.doctor_id
+                                            '/doctor/detail/' + doctor?.doctorId
                                         );
                                         handleUpdateViewsDoctor(
-                                            doctor?.doctor_id
+                                            doctor?.doctorId
                                         );
                                         addWatchedDoctor(doctor);
                                     }}
@@ -48,16 +47,16 @@ export const DoctorCard = ({ doctors, handleUpdateViewsDoctor }: any) => {
                                 className="doctor-name text-center mt-3"
                                 onClick={() => {
                                     navigate(
-                                        '/doctor/detail/' + doctor?.doctor_id
+                                        '/doctor/detail/' + doctor?.doctorId
                                     );
-                                    handleUpdateViewsDoctor(doctor?.doctor_id);
+                                    handleUpdateViewsDoctor(doctor?.doctorId);
                                     addWatchedDoctor(doctor);
                                 }}
                             >
-                                {doctor.full_name}
+                                {doctor.fullName}
                             </h6>
                             <p className="mb-0 opacity-75 text-center mb-3">
-                                {doctor.major_name}
+                                {doctor.majorName}
                             </p>
                             <div className="text-center mb-4">
                                 <Tag color="blue" title="Tư vấn trực tiêp">
@@ -69,7 +68,7 @@ export const DoctorCard = ({ doctors, handleUpdateViewsDoctor }: any) => {
                             <div className="clinic-info">
                                 <p className="mb-1">
                                     <i className="fa-regular fa-hospital me-2"></i>
-                                    {doctor.clinic_name}
+                                    {doctor.clinicName}
                                 </p>
 
                                 <p>
@@ -80,6 +79,7 @@ export const DoctorCard = ({ doctors, handleUpdateViewsDoctor }: any) => {
                                     <Button
                                         className="booking-btn w-75"
                                         onClick={() => {
+                                            console.log('doctor', doctor);
                                             navigate('/booking-appointment');
                                             setDoctor(doctor);
                                         }}

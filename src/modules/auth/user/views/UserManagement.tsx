@@ -87,7 +87,7 @@ const UserManagement = () => {
     const updateUserActiveStatus = async () => {
         try {
             const data = {
-                userId: user.user_id,
+                userId: user.userId,
                 active: active === 1 ? 0 : 1,
             };
             const res = await UserService.updateUserActiveStatus(data, header);
@@ -112,7 +112,7 @@ const UserManagement = () => {
     const resetPassword = async () => {
         try {
             const data = {
-                userId: user.user_id,
+                userId: user.userId,
             };
             const res = await UserService.resetPassword(data, header);
             console.log(res);
@@ -137,7 +137,7 @@ const UserManagement = () => {
         getUsers();
     }, [pageIndex, pageSize, active]);
     return (
-        <div className="container user-management">
+        <div className=" user-management">
             {contextHolder}
             <div>
                 <Breadcrumb

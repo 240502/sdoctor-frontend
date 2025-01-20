@@ -14,8 +14,8 @@ function App() {
     const setPatientProfile = useSetRecoilState(patientProfileState);
     const handleWindowLoad = (user: User) => {
         console.log('user', user);
-        if (user?.user_id) {
-            socket.emit('join', user?.user_id);
+        if (user?.userId) {
+            socket.emit('joinRoom', { userId: user.userId });
         }
     };
     const getUser = async () => {
@@ -23,9 +23,8 @@ function App() {
             const user = await JSON.parse(
                 sessionStorage.getItem('user') || '{}'
             );
-            if (user?.user_id) {
+            if (user?.userId) {
                 setUser(user);
-                console.log('get user', user);
                 handleWindowLoad(user);
             }
         } catch (e: any) {

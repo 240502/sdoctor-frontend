@@ -1,4 +1,4 @@
-import { apiClient, nestApi } from '../constants/api';
+import { nestApi } from '../constants/api';
 
 export const ClinicService = {
     async getCommonClinic(): Promise<any> {
@@ -10,13 +10,11 @@ export const ClinicService = {
         return res?.data;
     },
     async updateViewsClinic(id: number): Promise<any> {
-        const res: any = await nestApi.put(
-            '/api/clinic/update-views-clinic/' + id
-        );
+        const res: any = await nestApi.put('/clinic/update-views/' + id);
         return res;
     },
     async getClinicById(id: number): Promise<any> {
-        const res = await nestApi.get('/clinic/getById/' + id);
+        const res = await nestApi.get('/clinic/get-by-id/' + id);
         return res.data;
     },
     async createClinic(data: any, config: any): Promise<any> {

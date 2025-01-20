@@ -5,14 +5,17 @@ import { Doctor } from '../models/doctor';
 import { Image } from 'antd';
 import TextArea from 'antd/es/input/TextArea';
 import dayjs from 'dayjs';
+import { PaymentMethodService } from '../services/paymentMethodService';
+import { PaymentMethod } from '../models/paymentMethod';
 
-const ModalViewAppointment = ({
+const ViewAppointmentModal = ({
     handleCancelModal,
     isModalOpen,
     appointment,
 }: any) => {
     const dateFormat = 'YYYY-MM-DD';
     const [doctor, setDoctor] = useState<Doctor>({} as Doctor);
+    const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
     const getDoctorById = async (id: number) => {
         try {
             const res = await doctorService.getDoctorById(id);
@@ -22,8 +25,20 @@ const ModalViewAppointment = ({
             console.log(err.message);
         }
     };
+    const getAllPaymentMethod = async () => {
+        try {
+            const res = await PaymentMethodService.getAllPaymentMethod();
+            console.log(res?.data);
+            setPaymentMethods(res.data);
+        } catch (err: any) {
+            console.log('err', err.message);
+            setPaymentMethods([]);
+        }
+    };
     useEffect(() => {
-        getDoctorById(appointment.doctor_id);
+        getDoctorById(appointment.doctorId);
+        getAllPaymentMethod();
+        console.log('appointment', appointment);
     }, [appointment]);
 
     return (
@@ -35,7 +50,7 @@ const ModalViewAppointment = ({
             }
             onCancel={handleCancelModal}
             open={isModalOpen}
-            width={800}
+            className="w-50"
             maskClosable={false}
             footer={[
                 <Button
@@ -58,17 +73,15 @@ const ModalViewAppointment = ({
                             className="rounded-circle"
                             width={115}
                         ></Image>
-                        <h6 className="doctor__name mt-3">
-                            {doctor.full_name}
-                        </h6>
+                        <h6 className="doctor__name mt-3">{doctor.fullName}</h6>
                     </div>
                     <div className="appointment__time mt-3">
                         <p className="time">
-                            <strong>Thời gian:</strong> {appointment.time_value}
+                            <strong>Thời gian:</strong> {appointment.timeValue}
                         </p>
                         <p className="date">
                             <strong>Ngày khám:</strong>{' '}
-                            {appointment.appointment_date
+                            {appointment.appointmentDate
                                 .toString()
                                 .slice(0, 10)}
                         </p>
@@ -98,7 +111,7 @@ const ModalViewAppointment = ({
                             <Input
                                 className="form-control patient_name "
                                 id="patient_name"
-                                value={appointment.patient_name}
+                                value={appointment.patientName}
                             ></Input>
 
                             <div
@@ -131,7 +144,7 @@ const ModalViewAppointment = ({
                                 Số điện thoại
                             </label>
                             <Input
-                                value={appointment.patient_phone}
+                                value={appointment.patientPhone}
                                 className=" form-control patient_phone"
                                 id="patient_phone"
                             ></Input>
@@ -148,7 +161,7 @@ const ModalViewAppointment = ({
                                 Email
                             </label>
                             <Input
-                                value={appointment.patient_email}
+                                value={appointment.patientEmail}
                                 className="form-control patient_email"
                                 id="patient_email"
                             ></Input>
@@ -195,7 +208,7 @@ const ModalViewAppointment = ({
                                 Lý do khám
                             </label>
                             <TextArea
-                                value={appointment.examination_reason}
+                                value={appointment.examinationReason}
                                 className="form-control"
                             ></TextArea>
                             <div
@@ -208,10 +221,22 @@ const ModalViewAppointment = ({
                             <label htmlFor="" className="form-label fw-bold">
                                 Hình thức thanh toán
                             </label>
-                            <Radio.Group className="d-block" value={1}>
-                                <Radio value={1}>
-                                    Thanh toán sau tại cơ sở y tế
-                                </Radio>
+                            <Radio.Group
+                                className="d-block"
+                                value={appointment.paymentMethod}
+                            >
+                                {paymentMethods.map(
+                                    (paymentMethod: PaymentMethod) => {
+                                        return (
+                                            <Radio
+                                                value={paymentMethod.id}
+                                                className="d-block"
+                                            >
+                                                {paymentMethod.name}
+                                            </Radio>
+                                        );
+                                    }
+                                )}
                             </Radio.Group>
                             <div
                                 className="error_message mt-3"
@@ -225,4 +250,4 @@ const ModalViewAppointment = ({
     );
 };
 
-export default ModalViewAppointment;
+export default ViewAppointmentModal;

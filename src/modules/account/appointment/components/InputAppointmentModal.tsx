@@ -18,14 +18,13 @@ import { useEffect, useState } from 'react';
 import { ProvinceType, DistrictType, WardType } from '../../../../models/other';
 import axios from 'axios';
 import { AppointmentService } from '../../../../services/appointmentService';
-import socket from '../../../../socket';
 import { useNavigate } from 'react-router-dom';
 import { DatePickerProps } from 'antd/lib';
 import { PatientProfileService } from '../../../../services/patient_profileService';
 import { useSetRecoilState } from 'recoil';
 import { patientProfileState } from '../../../../stores/patientAtom';
 import { PaymentMethod } from '../../../../models/paymentMethod';
-import { PaymentMethodService } from '../../../../services/paymentMethodSerrvice';
+import { PaymentMethodService } from '../../../../services/paymentMethodService';
 import { MailerService } from '../../../../services/mailerService';
 export const InputAppointmentModal = ({
     openModal,
@@ -58,18 +57,19 @@ export const InputAppointmentModal = ({
         try {
             const res = await PaymentMethodService.getAllPaymentMethod();
             setPaymentMethods(res?.data);
-            console.log('res', res);
         } catch (err: any) {
             setPaymentMethods([]);
-
             console.log(err.message);
         }
     };
+
     useEffect(() => console.log(paymentMethods), [paymentMethods]);
+    useEffect(() => console.log('doctor input', doctor), []);
+
     const onFinish = (values: any) => {
         setPaymentMethod(values.payment_method);
         const newAppointment = {
-            doctorId: doctor?.doctor_id,
+            doctorId: doctor?.doctorId,
             appointmentDate: date,
             patientName: values.patientName,
             patientPhone: values.phone,
@@ -80,16 +80,14 @@ export const InputAppointmentModal = ({
             commune: values.patientCommune,
             gender: values.gender,
             examinationReason: values.reason,
-            doctorName: doctor?.full_name,
+            doctorName: doctor?.fullName,
             location: doctor.location,
-            timeValue: `${scheduleDetail.start_time} - ${scheduleDetail.end_time}`,
-            timeId: scheduleDetail.time_id,
+            timeValue: `${scheduleDetail.startTime} - ${scheduleDetail.endTime}`,
+            timeId: scheduleDetail.timeId,
             price: doctor.price,
-            serviceId: doctor.service_id,
-            serviceName: doctor.service_name,
+            serviceId: doctor.serviceId,
+            serviceName: doctor.serviceName,
         };
-        console.log(values);
-        console.log('newAppointment', newAppointment);
         CreateAppointment(newAppointment);
         if (saveProfile) {
             UpdateProfile();
@@ -278,7 +276,6 @@ export const InputAppointmentModal = ({
         ) {
             setDifferent(true);
         } else {
-            console.log('set false');
             setDifferent(false);
         }
     }, [patientProfileCopy]);
@@ -295,7 +292,7 @@ export const InputAppointmentModal = ({
             onCancel={cancelModal}
             maskClosable={false}
             footer={[]}
-            className="w-75"
+            className="w-50"
         >
             <Row gutter={24}>
                 <Col
@@ -310,14 +307,14 @@ export const InputAppointmentModal = ({
                             className="w-25 rounded-circle"
                         />
                         <h6 className="doctor-name w-full mt-3">
-                            {doctor?.full_name}
+                            {doctor?.fullName}
                         </h6>
                     </div>
                     <div className="time">
                         <p className="">
                             <strong>Thời gian: </strong>{' '}
-                            {scheduleDetail.start_time} -{' '}
-                            {scheduleDetail.end_time}
+                            {scheduleDetail.startTime} -{' '}
+                            {scheduleDetail.endTime}
                         </p>
                         <p>
                             {' '}
@@ -335,12 +332,12 @@ export const InputAppointmentModal = ({
                         <p>
                             {' '}
                             <strong>Phí khám: </strong>{' '}
-                            {doctor.price.toLocaleString(undefined)} đ
+                            {doctor?.price?.toLocaleString(undefined)} đ
                         </p>
                     </div>
                     <div className="service">
                         <p>
-                            <strong>Dịch vụ khám:</strong> {doctor.service_name}
+                            <strong>Dịch vụ khám:</strong> {doctor.serviceName}
                         </p>
                     </div>
                 </Col>
@@ -350,10 +347,10 @@ export const InputAppointmentModal = ({
                         layout="vertical"
                         onFinish={onFinish}
                         initialValues={{
-                            patientName: patientProfileCopy.patient_name,
+                            patientName: patientProfileCopy.patientName,
                             gender: patientProfileCopy.gender, // Giá trị mặc định: Nam,
-                            email: patientProfileCopy.patient_email,
-                            phone: patientProfileCopy.patient_phone,
+                            email: patientProfileCopy.patientEmail,
+                            phone: patientProfileCopy.patientPhone,
                             birthday: dayjs(
                                 patientProfileCopy.birthday,
                                 'YYYY-MM-DD'

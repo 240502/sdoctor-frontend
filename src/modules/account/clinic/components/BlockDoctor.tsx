@@ -37,7 +37,7 @@ const BlockDoctor = ({ clinicId, clinic }: any) => {
                 clinicId: Number(clinicId),
                 majorId: majorId === 0 ? null : Number(majorId),
             };
-            const res = await doctorService.viewDoctor(data);
+            const res = await doctorService.viewDoctorForClient(data);
             setDoctors(res.data);
             setPageCount(res.pageCount);
         } catch (err: any) {
@@ -71,18 +71,7 @@ const BlockDoctor = ({ clinicId, clinic }: any) => {
         }
     }, [clinic]);
 
-    const openNotificationWithIcon = (
-        type: NotificationType,
-        title: string,
-        des: string
-    ) => {
-        api[type]({
-            message: title,
-            description: des,
-        });
-    };
     const handleChangeMajor = (value: number) => {
-        console.log(`selected ${value}`);
         setMajorId(value);
     };
     const changePageSize = (value: any) => {
@@ -141,13 +130,13 @@ const BlockDoctor = ({ clinicId, clinic }: any) => {
                             return (
                                 <div
                                     className="list__item mb-3 p-3 border rounded"
-                                    key={Number(doctor.doctor_id)}
+                                    key={Number(doctor.doctorId)}
                                 >
                                     <div className="item_container d-flex pt-1">
                                         <div className="item__left col-6 d-flex border border-start-0 border-bottom-0 border-top-0 pe-3">
                                             <div className="col-3 text-center">
                                                 <Link
-                                                    to={`/doctor/detail/${doctor.doctor_id}`}
+                                                    to={`/doctor/detail/${doctor.doctorId}`}
                                                 >
                                                     <Image
                                                         preview={false}
@@ -163,7 +152,7 @@ const BlockDoctor = ({ clinicId, clinic }: any) => {
                                                 </Link>
 
                                                 <Link
-                                                    to={`/doctor/detail/${doctor.doctor_id}`}
+                                                    to={`/doctor/detail/${doctor.doctorId}`}
                                                     className="btn__more text-decoration-none mt-3"
                                                 >
                                                     Xem thêm
@@ -172,11 +161,11 @@ const BlockDoctor = ({ clinicId, clinic }: any) => {
                                             <div className="col-9 doctor_info">
                                                 <h3 className="doctor__name fs-5">
                                                     <Link
-                                                        to={`/doctor/detail/${doctor.doctor_id}`}
+                                                        to={`/doctor/detail/${doctor.doctorId}`}
                                                         className="text-decoration-none"
                                                     >
                                                         {doctor.title}{' '}
-                                                        {doctor.full_name}
+                                                        {doctor.fullName}
                                                     </Link>
                                                 </h3>
                                                 <div className="doctor__des">

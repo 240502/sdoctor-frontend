@@ -1,19 +1,19 @@
 export interface Invoices {
     id: number;
-    appointment_id: number;
-    doctor_id: number;
-    service_id: number;
+    appointmentId: number;
+    doctorId: number;
+    serviceId: number;
     amount: number;
     status: string;
-    created_at: Date;
-    updated_at: Date;
-    patient_name: string;
-    time_value: string;
-    appointment_date: Date;
-    doctor_name: string;
-    payment_date: Date;
-    payment_method: number;
-    payment_name: string;
-    service_name: string;
-    patient_phone: string;
+    createdAt: Date;
+    updatedAt: Date;
+    patientName: string;
+    timeValue: string;
+    appointmentDate: Date;
+    doctorName: string;
+    paymentDate: Date;
+    paymentMethod: number;
+    paymentName: string;
+    serviceName: string;
+    patientPhone: string;
 }

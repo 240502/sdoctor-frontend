@@ -30,7 +30,7 @@ const ViewClinic = () => {
     const viewClinic = async (data: any) => {
         try {
             const res = await ClinicService.viewClinic(data);
-            console.log(res);
+            console.log('clinics data', res.data);
             setClinics(res.data);
             setPageCount(res.pageCount);
         } catch (err: any) {
@@ -38,12 +38,11 @@ const ViewClinic = () => {
             console.log(err.message);
         }
     };
-    const onSearch: SearchProps['onSearch'] = (value, _e, info) => {
+    const onSearch: SearchProps['onSearch'] = (value, _e) => {
         const newOptions = { ...optionsFilter, name: value };
         setOptionsFilter(newOptions);
     };
     const handleChangeLocation = (value: string) => {
-        console.log('value', value);
         let province: string = '';
         const cityStr = 'thành phố';
         const provinceStr = 'tỉnh';

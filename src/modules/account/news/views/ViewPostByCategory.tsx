@@ -1,10 +1,9 @@
 import { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
 import { Post } from '../../../../models/post';
 import { PostService } from '../../../../services/postService';
 import { Breadcrumb, Flex, Select, Input, Pagination } from 'antd';
 import { HomeOutlined } from '@ant-design/icons';
-import { PostCategoryService } from '../../../../services/post_categorySerivce';
+import { PostCategoryService } from '../../../../services/post_categoryService';
 import { PostCategory } from '../../../../models/post_category';
 import { SearchProps } from 'antd/es/input';
 import { PostCards } from '../components/PostCards';
@@ -25,7 +24,7 @@ const ViewPostByCategory = () => {
     const [pageCount, setPageCount] = useState<number>(0);
     const [posts, setPosts] = useState<Post[]>([]);
     const [postCategories, setPostCategories] = useState<PostCategory[]>([]);
-    const onSearch: SearchProps['onSearch'] = (value, _e, info) => {
+    const onSearch: SearchProps['onSearch'] = (value, _e) => {
         setSearchOptions({ ...searchOptions, searchContent: value });
     };
 
@@ -48,9 +47,9 @@ const ViewPostByCategory = () => {
                 categoryId:
                     searchOptions.categoryId !== null
                         ? searchOptions.categoryId
-                        : postCategory.post_category_id,
+                        : postCategory.postCategoryId,
             };
-            const res = await PostService.viewPostClient(data);
+            const res = await PostService.viewPost(data);
             setPosts(res.data);
             setPageCount(res.pageCount);
         } catch (err: any) {
@@ -81,7 +80,7 @@ const ViewPostByCategory = () => {
                     },
                     {
                         title: `${
-                            postCategory?.post_category_id
+                            postCategory?.postCategoryId
                                 ? postCategory.name
                                 : ''
                         }`,
@@ -95,7 +94,7 @@ const ViewPostByCategory = () => {
                         value={
                             searchOptions.categoryId !== null
                                 ? searchOptions.categoryId
-                                : postCategory.post_category_id
+                                : postCategory.postCategoryId
                         }
                         optionFilterProp="children"
                         allowClear
@@ -103,7 +102,7 @@ const ViewPostByCategory = () => {
                         onChange={(value: number) => {
                             const category: any = postCategories.find(
                                 (item: PostCategory) =>
-                                    item.post_category_id === value
+                                    item.postCategoryId === value
                             );
                             setSearchOptions({
                                 ...searchOptions,
@@ -117,8 +116,8 @@ const ViewPostByCategory = () => {
                         {postCategories.map((category: PostCategory) => {
                             return (
                                 <Option
-                                    key={category.post_category_id}
-                                    value={category.post_category_id}
+                                    key={category.postCategoryId}
+                                    value={category.postCategoryId}
                                     label={category.name}
                                 >
                                     {category.name}
@@ -135,7 +134,7 @@ const ViewPostByCategory = () => {
                 </div>
             </Flex>
             <PostCards posts={posts} />
-            {pageCount > 1 && (
+            {pageCount > 0 && (
                 <Pagination
                     align="center"
                     className="mt-3 mb-3"

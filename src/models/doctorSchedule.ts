@@ -2,10 +2,10 @@ import { DoctorScheduleDetail } from './doctorScheduleDetails';
 
 export interface DoctorSchedule {
     id: Number;
-    doctor_id: Number;
+    doctorId: Number;
     date: Date;
-    created_at: Date;
-    updated_at: Date;
+    createdAt: Date;
+    updatedAt: Date;
     type: string;
-    listScheduleDetails: DoctorScheduleDetail[];
+    doctorScheduleDetails: DoctorScheduleDetail[];
 }

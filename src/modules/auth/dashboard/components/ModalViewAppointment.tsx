@@ -23,7 +23,7 @@ export const ModalViewAppointment = ({
         }
     };
     useEffect(() => {
-        getDoctorById(appointment.doctor_id);
+        getDoctorById(appointment.doctorId);
     }, [appointment]);
 
     return (
@@ -58,17 +58,15 @@ export const ModalViewAppointment = ({
                             className="rounded-circle"
                             width={115}
                         ></Image>
-                        <h6 className="doctor__name mt-3">
-                            {doctor.full_name}
-                        </h6>
+                        <h6 className="doctor__name mt-3">{doctor.fullName}</h6>
                     </div>
                     <div className="appointment__time mt-3">
                         <p className="time">
-                            <strong>Thời gian:</strong> {appointment.time_value}
+                            <strong>Thời gian:</strong> {appointment.timeValue}
                         </p>
                         <p className="date">
                             <strong>Ngày khám:</strong>{' '}
-                            {appointment.appointment_date
+                            {appointment.appointmentDate
                                 .toString()
                                 .slice(0, 10)}
                         </p>
@@ -76,7 +74,7 @@ export const ModalViewAppointment = ({
                     <div className="location mt-3">
                         <span>
                             {' '}
-                            <strong>Địa điểm:</strong> {doctor.address}
+                            <strong>Địa điểm:</strong> {appointment.location}
                         </span>
                     </div>
                     <div className="fee mt-3">
@@ -98,7 +96,7 @@ export const ModalViewAppointment = ({
                             <Input
                                 className="form-control patient_name "
                                 id="patient_name"
-                                value={appointment.patient_name}
+                                value={appointment.patientName}
                             ></Input>
 
                             <div
@@ -131,7 +129,7 @@ export const ModalViewAppointment = ({
                                 Số điện thoại
                             </label>
                             <Input
-                                value={appointment.patient_phone}
+                                value={appointment.patientPhone}
                                 className=" form-control patient_phone"
                                 id="patient_phone"
                             ></Input>
@@ -148,7 +146,7 @@ export const ModalViewAppointment = ({
                                 Email
                             </label>
                             <Input
-                                value={appointment.patient_email}
+                                value={appointment.patientEmail}
                                 className="form-control patient_email"
                                 id="patient_email"
                             ></Input>
@@ -195,7 +193,7 @@ export const ModalViewAppointment = ({
                                 Lý do khám
                             </label>
                             <TextArea
-                                value={appointment.examination_reason}
+                                value={appointment.examinationReason}
                                 className="form-control"
                             ></TextArea>
                             <div

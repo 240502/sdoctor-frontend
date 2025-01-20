@@ -1,4 +1,4 @@
-import { apiClient, nestApi } from '../constants/api';
+import { nestApi } from '../constants/api';
 export const PostService = {
     async getCommonPost(): Promise<any> {
         const res = await nestApi.get('/post/get-common');
@@ -12,16 +12,13 @@ export const PostService = {
         const res = await nestApi.post('/post/create', data, config);
         return res.data;
     },
-    async viewPostAdmin(data: any, config: any): Promise<any> {
-        const res = await nestApi.post('/post/view-news-doctor', data, config);
-        return res.data;
-    },
-    async viewPostClient(data: any): Promise<any> {
-        const res = await nestApi.post('/post/view-news-client', data);
+
+    async viewPost(data: any): Promise<any> {
+        const res = await nestApi.post('/post/view', data);
         return res.data;
     },
     async getNewPost(): Promise<any> {
-        const res = await nestApi.get('/post/get-new-post');
+        const res = await nestApi.get('/post/get-new-posts');
         return res?.data;
     },
     async updatePost(data: any, config: any): Promise<any> {
@@ -37,7 +34,7 @@ export const PostService = {
         return res?.data;
     },
     async getRelatedPost(data: any): Promise<any> {
-        const res = await nestApi.post('/post/get-related', data);
+        const res = await nestApi.post('/post/get-related-post', data);
         return res?.data;
     },
     async confirmPost(id: number, config: any): Promise<any> {

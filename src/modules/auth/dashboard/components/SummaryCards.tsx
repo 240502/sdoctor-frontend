@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Card, Flex } from 'antd';
 
 interface SummaryCardsProps {
@@ -10,6 +10,10 @@ const SummaryCards: React.FC<SummaryCardsProps> = ({
     totalPatientInDay,
     totalPatientExaminedInDay,
 }) => {
+    useEffect(() => {
+        console.log('totalPatientExaminedInDay', totalPatientExaminedInDay);
+        console.log('totalPatientInDay', totalPatientInDay);
+    }, []);
     return (
         <Flex vertical gap="middle">
             <Card className="shadow">

@@ -5,15 +5,18 @@ import { useEffect, useState } from 'react';
 import { Invoices } from '../../../../models/invoices';
 import { EyeOutlined } from '@ant-design/icons';
 import { ViewInvoiceModal } from '../../../../components';
-export const RecentInvoicesTable = () => {
+import { User } from '../../../../models/user';
+import { useNavigate } from 'react-router-dom';
+export const RecentInvoicesTable = ({ user }: { user: User }) => {
+    const navigate = useNavigate();
     const [recentInvoices, setRecentInvoices] = useState<Invoices[]>([]);
     const [openViewInvoiceModal, setOpenViewInvoiceModal] =
         useState<boolean>(false);
     const [invoice, setInvoice] = useState<Invoices>({} as Invoices);
     const getRecentInvoices = async () => {
         try {
-            const res = await invoicesService.getRecentInvoice();
-            console.log(res);
+            const res = await invoicesService.getRecentInvoice(user.doctorId);
+            console.log('getRecentInvoices', res);
             setRecentInvoices(res);
         } catch (err: any) {
             console.log(err.message);
@@ -30,13 +33,13 @@ export const RecentInvoicesTable = () => {
     const columns: TableProps<Invoices>['columns'] = [
         {
             title: 'Tên bệnh nhân',
-            dataIndex: 'patient_name',
+            dataIndex: 'patientName',
             key: 'patient_name',
             render: (text) => <a>{text}</a>,
         },
         {
             title: 'Dịch vụ',
-            dataIndex: 'service_name',
+            dataIndex: 'serviceName',
             key: 'service_name',
             render: (text) => <a>{text}</a>,
         },
@@ -83,7 +86,12 @@ export const RecentInvoicesTable = () => {
             title={
                 <Flex className="justify-content-between align-items-center">
                     <h6>Hóa đơn gần đây</h6>{' '}
-                    <Button className="border-top-0 border-start-0 border-end-0 text-primary fw-bold">
+                    <Button
+                        className="border-top-0 border-start-0 border-end-0 text-primary fw-bold"
+                        onClick={() => {
+                            navigate('/admin/invoice');
+                        }}
+                    >
                         Xem thêm
                     </Button>
                 </Flex>

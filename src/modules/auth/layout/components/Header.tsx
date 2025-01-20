@@ -15,6 +15,7 @@ import { notificationsValue } from '../../../../stores/notification';
 import { Notifications } from '../../../../models/notification';
 import NotificationList from './NotificationList';
 import { Link } from 'react-router-dom';
+import socket from '../../../../socket';
 export const HeaderLayout = ({ collapsed, setCollapsed }: any) => {
     const navigate = useNavigate();
     const setUser = useSetRecoilState(userState);
@@ -49,6 +50,7 @@ export const HeaderLayout = ({ collapsed, setCollapsed }: any) => {
                 key="3"
                 className="bg-danger text-light"
                 onClick={() => {
+                    socket?.emit('leaveRoom', `user:${user.userId}`);
                     setUser({} as User);
                     sessionStorage.removeItem('user');
                     navigate('/');
@@ -111,7 +113,7 @@ export const HeaderLayout = ({ collapsed, setCollapsed }: any) => {
                     >
                         <Avatar icon={<UserOutlined />} />
                         <span style={{ marginLeft: '8px' }}>
-                            {user.full_name}
+                            {user.fullName}
                         </span>
                     </div>
                 </Dropdown>

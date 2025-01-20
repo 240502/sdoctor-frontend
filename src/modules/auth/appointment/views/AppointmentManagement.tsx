@@ -9,7 +9,7 @@ import { userValue } from '../../../../stores/userAtom';
 const { Option } = Select;
 import { AppointmentStatus } from '../../../../models/appointment_status';
 import { AppointmentStatusService } from '../../../../services/appointment_statusService';
-import { ModalViewAppointment } from '../../../../components';
+import { ViewAppointmentModal } from '../../../../components';
 type NotificationType = 'success' | 'warning' | 'error';
 const AppointmentManagement = () => {
     const user = useRecoilValue(userValue);
@@ -51,10 +51,11 @@ const AppointmentManagement = () => {
             const data = {
                 pageIndex: pageIndex,
                 pageSize: pageSize,
-                type: options.statusId,
-                doctorId: user.doctor_id,
+                status: options.statusId,
+                doctorId: user.doctorId,
             };
             const res = await AppointmentService.getAppointmentByType(data);
+            console.log('appointments', res);
             setAppointments(res.data);
             setPageCount(res.pageCount);
         } catch (err: any) {
@@ -140,7 +141,7 @@ const AppointmentManagement = () => {
                 />
             </div>
             {openViewAppointmentModal && (
-                <ModalViewAppointment
+                <ViewAppointmentModal
                     handleCancelModal={cancelViewAppointmentModal}
                     isModalOpen={openViewAppointmentModal}
                     appointment={appointment}

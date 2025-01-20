@@ -4,8 +4,7 @@ import { Breadcrumb } from 'antd';
 import { HomeOutlined } from '@ant-design/icons';
 import { MajorCards } from '../components/MajorCards';
 import { Major } from '../../../../models/major';
-import { useRecoilState, useSetRecoilState } from 'recoil';
-import { majorIdState } from '../../../../stores/majorAtom';
+import { useRecoilState } from 'recoil';
 import { searchDoctorOptionsGlobal } from '../../../../stores/doctorAtom';
 
 const ViewMajor = () => {

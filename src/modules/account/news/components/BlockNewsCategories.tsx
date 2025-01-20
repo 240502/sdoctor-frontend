@@ -7,8 +7,8 @@ import PrevArrow from './PrevArrow';
 import Slider from 'react-slick';
 import { Image } from 'antd';
 import { PostCategory } from '../../../../models/post_category';
-import { PostCategoryService } from '../../../../services/post_categorySerivce';
-import { baseURL } from '../../../../constants/api';
+import { PostCategoryService } from '../../../../services/post_categoryService';
+import { nestJsServiceUrl } from '../../../../constants/api';
 import { useSetRecoilState } from 'recoil';
 import { postCategoryState } from '../../../../stores/scheduleAtom';
 export const BlockNewCategories = () => {
@@ -53,7 +53,7 @@ export const BlockNewCategories = () => {
                         return (
                             <div
                                 className="slide__container col-3 ps-3 pe-3"
-                                key={item.post_category_id}
+                                key={item.postCategoryId}
                             >
                                 <div className="item  border rounded p-3 text-center  ">
                                     <Link
@@ -63,7 +63,7 @@ export const BlockNewCategories = () => {
                                         <Image
                                             className="item__image rounded-circle"
                                             preview={false}
-                                            src={baseURL + item.image}
+                                            src={nestJsServiceUrl + item.image}
                                             onClick={() => {
                                                 setPostCategory(item);
                                             }}

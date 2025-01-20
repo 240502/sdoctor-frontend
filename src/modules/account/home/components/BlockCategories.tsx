@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { Col, Image, Row } from 'antd';
-import { baseURL, nestJsServiceUrl } from '../../../../constants/api';
+import { nestJsServiceUrl } from '../../../../constants/api';
 import { MajorService } from '../../../../services/majorService';
 import { useEffect, useState } from 'react';
 import { Major } from '../../../../models/major';

@@ -1,15 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { Button, Card, Flex, Row, Col, Image, Tag } from 'antd';
 import { Link, useNavigate } from 'react-router-dom';
 import { doctorService } from '../../../../services/doctorService';
 import { Doctor } from '../../../../models/doctor';
 import { useRecoilState, useSetRecoilState } from 'recoil';
 import { commonDoctorsState, doctorState } from '../../../../stores/doctorAtom';
-import {
-    EnvironmentOutlined,
-    StarFilled,
-    StarOutlined,
-} from '@ant-design/icons';
+import { EnvironmentOutlined, StarFilled } from '@ant-design/icons';
 import { addWatchedDoctor } from '../../../../utils/doctor';
 export const BlockHotDoctor = (): JSX.Element => {
     const navigate = useNavigate();
@@ -58,7 +54,7 @@ export const BlockHotDoctor = (): JSX.Element => {
                             <Col
                                 className=" mb-3"
                                 span={6}
-                                key={doctor.doctor_id}
+                                key={doctor.doctorId}
                             >
                                 <Card
                                     className="shadow position-relative"
@@ -69,10 +65,10 @@ export const BlockHotDoctor = (): JSX.Element => {
                                         onClick={() => {
                                             navigate(
                                                 '/doctor/detail/' +
-                                                    doctor.doctor_id
+                                                    doctor.doctorId
                                             );
                                             handleUpdateViewsDoctor(
-                                                doctor.doctor_id
+                                                doctor.doctorId
                                             );
                                             addWatchedDoctor(doctor);
                                         }}
@@ -81,13 +77,13 @@ export const BlockHotDoctor = (): JSX.Element => {
                                     ></Image>
                                     <Flex className="justify-content-between align-items-center ">
                                         <Tag color="blue" className="mt-2">
-                                            {doctor.major_name}
+                                            {doctor.majorName}
                                         </Tag>
-                                        {doctor?.average_star && (
+                                        {doctor?.averageStar && (
                                             <div className="star text-end ">
                                                 <StarFilled className="text-warning " />
                                                 <span className="score d-inline-block ms-2">
-                                                    {doctor?.average_star
+                                                    {doctor?.averageStar
                                                         ?.toString()
                                                         .slice(0, 3)}
                                                     /5
@@ -100,16 +96,16 @@ export const BlockHotDoctor = (): JSX.Element => {
                                             className="text-decoration-none text-dark"
                                             to={
                                                 '/doctor/detail/' +
-                                                doctor.doctor_id
+                                                doctor.doctorId
                                             }
                                             onClick={() => {
                                                 handleUpdateViewsDoctor(
-                                                    doctor.doctor_id
+                                                    doctor.doctorId
                                                 );
                                                 addWatchedDoctor(doctor);
                                             }}
                                         >
-                                            Bác sĩ. {doctor.full_name}
+                                            Bác sĩ. {doctor.fullName}
                                         </Link>
                                     </h6>
                                     <div className="location">

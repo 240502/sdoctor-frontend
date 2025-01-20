@@ -20,8 +20,8 @@ import { handleGetDateByActiveDay } from '../../../../utils/schedule_management'
 type NotificationType = 'success' | 'error';
 import '@/assets/scss/schedule_management.scss';
 import { scheduleDetailsState } from '../../../../stores/scheduleDetailAtom';
-import { TimeService } from '../../../../services/timeService';
 import { handleTimeOverRealTime } from '../../../../utils/schedule';
+import { scheduleListState } from '../../../../stores/scheduleAtom';
 const tabs: TabsProps['items'] = [
     {
         key: '1',
@@ -58,6 +58,8 @@ const ScheduleManagement = () => {
     const config = useRecoilValue(configValue);
     const [api, contextHolder] = notification.useNotification();
     const [activeDay, setActiveDay] = useState<string>(String(now.getDay()));
+    const [doctorSchedules, setDoctorSchedules] =
+        useRecoilState(scheduleListState);
     const [schedule, setSchedule] = useState<DoctorSchedule>(
         {} as DoctorSchedule
     );
@@ -67,8 +69,7 @@ const ScheduleManagement = () => {
 
     const [doctorScheduleDetails, setDoctorScheduleDetails] =
         useRecoilState(scheduleDetailsState);
-    const [isVisibleButtonSave, setIsVisibleButtonSave] =
-        useState<boolean>(false);
+
     const [isUpdate, setIsUpdate] = useState<boolean>(false);
     const openNotification = (
         type: NotificationType,
@@ -83,20 +84,65 @@ const ScheduleManagement = () => {
 
     const handleGetScheduleBySubscriberAndDate = () => {
         const dateOfWeek = handleGetDateByActiveDay(Number(activeDay));
-        const data = {
-            doctor_id: user.doctor_id,
-            date: `${dateOfWeek.getFullYear()}-${
-                dateOfWeek.getMonth() + 1
-            }-${dateOfWeek.getDate()}`,
-        };
-
-        GetScheduleBySubscriberIdAndDate(data);
+        if (doctorSchedules.length > 0) {
+            let doctorSchedule: DoctorSchedule | any = doctorSchedules.find(
+                (schedule: DoctorSchedule) => {
+                    const date = new Date(schedule.date);
+                    if (
+                        schedule.doctorId === user.doctorId &&
+                        date.getFullYear() === dateOfWeek.getFullYear() &&
+                        date.getMonth() + 1 === dateOfWeek.getMonth() + 1 &&
+                        date.getDate() === dateOfWeek.getDate()
+                    ) {
+                        return schedule;
+                    }
+                }
+            );
+            if (doctorSchedule) {
+                setSchedule(doctorSchedule);
+                getSelectedTimes(doctorSchedule.doctorScheduleDetails);
+            } else {
+                const data = {
+                    doctorId: user.doctorId,
+                    date: `${dateOfWeek.getFullYear()}-${
+                        dateOfWeek.getMonth() + 1
+                    }-${dateOfWeek.getDate()}`,
+                    viewType: 'doctor',
+                };
+                GetScheduleBySubscriberIdAndDate(data);
+            }
+        } else {
+            const data = {
+                doctorId: user.doctorId,
+                date: `${dateOfWeek.getFullYear()}-${
+                    dateOfWeek.getMonth() + 1
+                }-${dateOfWeek.getDate()}`,
+                viewType: 'doctor',
+            };
+            console.log('call api', data);
+            GetScheduleBySubscriberIdAndDate(data);
+        }
     };
+
     const GetScheduleBySubscriberIdAndDate = async (data: any) => {
         try {
-            const res = await scheduleService.viewScheduleForDoctor(data);
-            setSchedule(res.data);
-            getSelectedTimes(res?.data?.listScheduleDetails);
+            const res = await scheduleService.viewSchedule(data);
+
+            if (doctorSchedules.length > 0) {
+                if (
+                    !doctorSchedules.find(
+                        (schedule: DoctorSchedule) => schedule.id === res.id
+                    )
+                ) {
+                    const newDoctorSchedules = [...doctorSchedules, res];
+                    setDoctorSchedules(newDoctorSchedules);
+                    console.log('new doctor schedules', newDoctorSchedules);
+                }
+            } else {
+                setDoctorSchedules([res]);
+            }
+            setSchedule(res);
+            getSelectedTimes(res?.doctorScheduleDetails);
         } catch (err: any) {
             console.log(err.message);
             setSchedule({} as DoctorSchedule);
@@ -110,9 +156,9 @@ const ScheduleManagement = () => {
         let selectedTimes: Time[] = [];
         doctorScheduleDetails?.forEach((detail: DoctorScheduleDetail) => {
             const time: Time = {
-                id: detail.time_id,
-                start_time: detail.start_time,
-                end_time: detail.end_time,
+                id: detail.timeId,
+                startTime: detail.startTime,
+                endTime: detail.endTime,
                 interval: null,
                 disable: null,
             };
@@ -123,30 +169,33 @@ const ScheduleManagement = () => {
                 selectedTimes = [time];
             }
         });
+
         if (Number(activeDay) === now.getDay()) {
             console.log('handle1');
 
-            const newTimes = handleTimeOverRealTime(selectedTimes);
-            setSelectedTimes(newTimes);
-            console.log(newTimes);
+            selectedTimes = handleTimeOverRealTime(selectedTimes);
+            setSelectedTimes(selectedTimes);
+            console.log('newTimes', selectedTimes);
         }
         if (Number(activeDay) !== 0 && Number(activeDay) < now.getDay()) {
-            const newTimes = selectedTimes.map((time: Time) => {
+            selectedTimes = selectedTimes.map((time: Time) => {
                 return { ...time, disable: true };
             });
             console.log('handle2');
-
-            setSelectedTimes(newTimes);
+            console.log('newTimes', selectedTimes);
+            setSelectedTimes(selectedTimes);
         }
         if (Number(activeDay) === 0 || Number(activeDay) > now.getDay()) {
             setSelectedTimes(selectedTimes);
         }
     };
     useEffect(() => {
-        handleGetScheduleBySubscriberAndDate();
         setSelectedTimes([]);
+        handleGetScheduleBySubscriberAndDate();
     }, [activeDay]);
-
+    useEffect(() => {
+        console.log('selectedTimes', selectedTimes);
+    }, [selectedTimes]);
     return (
         <div className="schedule-management">
             {contextHolder}

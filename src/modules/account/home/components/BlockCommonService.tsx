@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Service } from '../../../../models/service';
 import { ServiceService } from '../../../../services/serviceService';
 import { ServiceCard } from '../../../../components';
@@ -12,7 +12,6 @@ export const BlockCommonService = () => {
             try {
                 const res = await ServiceService.getCommonService();
                 setCommonServices(res);
-                console.log(res);
             } catch (err: any) {
                 setCommonServices([]);
                 console.log(err);

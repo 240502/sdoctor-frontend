@@ -6,8 +6,8 @@ export const handleTimeOverRealTime = (times: any) => {
     const minutes = String(now.getMinutes()).padStart(2, '0');
     let newTimes: any = [];
     newTimes = times.map((time: Time) => {
-        const startMinute = time?.start_time?.split(':')[1];
-        const startHour = time?.start_time?.split(':')[0];
+        const startMinute = time?.startTime?.split(':')[1];
+        const startHour = time?.startTime?.split(':')[0];
         if (Number(hours) === Number(startHour)) {
             if (Number(startMinute) - Number(minutes) <= 15) {
                 return { ...time, disable: true };

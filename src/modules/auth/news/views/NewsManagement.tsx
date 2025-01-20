@@ -20,7 +20,7 @@ import '@/assets/scss/new_management.scss';
 import { NewsCards } from '../components/NewsCards';
 import { ModalConfirmDeleteNews } from '../components/ModalConfirmDeleteNews';
 import { PostCategory } from '../../../../models/post_category';
-import { PostCategoryService } from '../../../../services/post_categorySerivce';
+import { PostCategoryService } from '../../../../services/post_categoryService';
 import { SearchProps } from 'antd/es/input';
 const { Option } = Select;
 const { Search } = Input;
@@ -35,13 +35,12 @@ const NewsManagement = () => {
     const [pageIndex, setPageIndex] = useState<number>(1);
     const [pageSize, setPageSize] = useState<number>(5);
     const [pageCount, setPageCount] = useState<number>(0);
-    const [categoryId, setCategoryId] = useState<any>(null);
     const [posts, setPosts] = useState<Post[]>([]);
     const [post, setPost] = useState<Post>({} as Post);
     const [postCategories, setPostCategories] = useState<PostCategory[]>([]);
     const [searchOptions, setSearchOptions] = useState<any>({
         categoryId: null,
-        title: null,
+        searchContent: null,
         status: 'Chờ duyệt',
     });
     const openNotificationWithIcon = (
@@ -63,7 +62,7 @@ const NewsManagement = () => {
             setPostCategories([]);
         }
     };
-    const onSearch: SearchProps['onSearch'] = (value, _e, info) => {
+    const onSearch: SearchProps['onSearch'] = (value, _e, _) => {
         setSearchOptions({
             ...searchOptions,
             title: value !== '' ? value : null,
@@ -74,10 +73,11 @@ const NewsManagement = () => {
             const data = {
                 pageIndex: pageIndex,
                 pageSize: pageSize,
-                authorId: user?.role_id === 2 ? user.user_id : null,
+                authorId: user?.roleId === 2 ? user.userId : null,
                 ...searchOptions,
             };
-            const res = await PostService.viewPostAdmin(data, config);
+            const res = await PostService.viewPost(data);
+            console.log('post data', res);
             setPageCount(res.pageCount);
             setPosts(res.data);
         } catch (err: any) {
@@ -97,7 +97,7 @@ const NewsManagement = () => {
     }, [pageIndex, pageSize, searchOptions]);
 
     return (
-        <div className="container">
+        <div className="">
             {contextHolder}
             <Flex className=" justify-content-between">
                 <div>
@@ -113,12 +113,14 @@ const NewsManagement = () => {
                         ]}
                     />
                 </div>
-                <Button
-                    className="border-0 text-white bg-primary"
-                    onClick={() => setIsShowModal(true)}
-                >
-                    <PlusOutlined /> Thêm mới
-                </Button>
+                {user.roleId === 2 && (
+                    <Button
+                        className="border-0 text-white bg-primary"
+                        onClick={() => setIsShowModal(true)}
+                    >
+                        <PlusOutlined /> Thêm mới
+                    </Button>
+                )}
             </Flex>
             <Divider />
             <div className="block__list__news">
@@ -178,8 +180,8 @@ const NewsManagement = () => {
                             {postCategories.map((category: PostCategory) => {
                                 return (
                                     <Option
-                                        key={category.post_category_id}
-                                        value={category.post_category_id}
+                                        key={category.postCategoryId}
+                                        value={category.postCategoryId}
                                         label={category.name}
                                     >
                                         {category.name}

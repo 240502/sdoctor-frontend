@@ -1,13 +1,9 @@
-import React, { useEffect, useState } from 'react';
-import { Button, Menu } from 'antd';
-import { UserOutlined } from '@ant-design/icons';
+import { useEffect, useState } from 'react';
+import { Menu } from 'antd';
 import { Link, useNavigate } from 'react-router-dom';
 import { HomeMenuService } from '../../../../../services/home_menuService';
 import { HomeMenuModel } from '../../../../../models/home_menu';
-import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
-import { userState, userValue } from '../../../../../stores/userAtom';
-import { patientProfileState } from '../../../../../stores/patientAtom';
-import { PatientProfile } from '../../../../../models/patient_profile';
+import { useSetRecoilState } from 'recoil';
 import { majorIdState } from '../../../../../stores/majorAtom';
 
 export const HomeMenu = () => {

@@ -103,7 +103,7 @@ const DoctorManagement = () => {
                 pageSize: pageSize,
                 ...options,
             };
-            const res = await doctorService.viewDoctor(data);
+            const res = await doctorService.viewDoctorForAdmin(data);
 
             setPageCount(res.pageCount);
             setDoctors(res.data);
@@ -139,7 +139,7 @@ const DoctorManagement = () => {
         if (searchContent !== '') {
             const newDoctors = doctors.filter(
                 (doctor: Doctor) =>
-                    doctor.full_name
+                    doctor.fullName
                         .toLocaleLowerCase()
                         .includes(searchContent.toLocaleLowerCase()) ||
                     doctor.title
@@ -154,7 +154,7 @@ const DoctorManagement = () => {
         }
     }, [searchContent, doctors]);
     return (
-        <div className="container doctor-management">
+        <div className=" doctor-management">
             {contextHolder}
             <div className="block__filter">
                 <Breadcrumb
@@ -277,7 +277,7 @@ const DoctorManagement = () => {
                 <ModalConfirmDelete
                     showModalConfirm={showModalConfirm}
                     handleCloseModalConfirm={handleCloseModalConfirm}
-                    doctorId={doctor?.doctor_id}
+                    doctorId={doctor?.doctorId}
                     openNotificationWithIcon={openNotificationWithIcon}
                     getDoctors={getDoctors}
                     config={config}

@@ -6,9 +6,9 @@ import NextArrow from './NextArrow';
 import PrevArrow from './PrevArrow';
 import Slider from 'react-slick';
 import { Post } from '../../../../models/post';
-import { Button, Image } from 'antd';
+import { Image } from 'antd';
 import { PostService } from '../../../../services/postService';
-import { baseURL } from '../../../../constants/api';
+import { nestJsServiceUrl } from '../../../../constants/api';
 
 export const BlockCommonPost = () => {
     var settings = {
@@ -49,7 +49,6 @@ export const BlockCommonPost = () => {
         <div className="row mt-5 mb-5">
             <div className="block__header d-flex justify-content-between align-items-center">
                 <h3 className="block__title fs-4 fw-bold">Bài phổ biến</h3>
-                <Button className="btn__more pt-3 pb-3 fs-5">Xem thêm</Button>
             </div>
             <div className="block__list mt-4 position-relative posts">
                 <Slider {...settings}>
@@ -60,7 +59,7 @@ export const BlockCommonPost = () => {
                                     className="slide__container  col-3 ps-3 pe-3"
                                     key={post.id}
                                 >
-                                    <div className="item border border-1 rounded p-3 text-center   ">
+                                    <div className="item border flex-grow-1 border-1 rounded p-3 text-center   ">
                                         <Link
                                             onClick={() => {
                                                 updateViewPost(post.id);
@@ -72,12 +71,12 @@ export const BlockCommonPost = () => {
                                                 className="item__image feature-img object-fit-cover rounded "
                                                 preview={false}
                                                 src={
-                                                    post?.featured_image?.includes(
+                                                    post?.featuredImage?.includes(
                                                         'cloudinary'
                                                     )
-                                                        ? post?.featured_image
-                                                        : baseURL +
-                                                          post?.featured_image
+                                                        ? post?.featuredImage
+                                                        : nestJsServiceUrl +
+                                                          post?.featuredImage
                                                 }
                                             ></Image>
                                             <p className="post-title mt-3 text-center text-dark fw-bold fs-6 text-capitalize">

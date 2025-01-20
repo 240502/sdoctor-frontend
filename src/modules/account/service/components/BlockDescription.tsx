@@ -1,4 +1,3 @@
-import React, { useEffect } from 'react';
 import parse from 'html-react-parser';
 import { Row, Col, Button } from 'antd';
 import { DollarOutlined, EnvironmentOutlined } from '@ant-design/icons';
@@ -16,13 +15,13 @@ export const BlockDescription = ({ service }: any) => {
                 <div className="preparation-process position-relative">
                     <h6 className="title">Quá trình chuẩn bị</h6>
                     <div className="content fs-6">
-                        {parse(service?.preparation_process)}
+                        {parse(service?.preparationProcess)}
                     </div>
                 </div>
                 <div className="service-detail position-relative">
                     <h6 className="title">Chi tiết dịch vụ</h6>
                     <div className="content fs-6">
-                        {parse(service?.service_detail)}
+                        {parse(service?.serviceDetail)}
                     </div>
                 </div>
             </Col>

@@ -1,8 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Clinic } from '../../../../models/clinic';
-import { Button, Card, Col, Image, Pagination, Row } from 'antd';
-import { baseURL } from '../../../../constants/api';
-import { Link, useNavigate } from 'react-router-dom';
+import { Button, Col, Image, Row } from 'antd';
+import { useNavigate } from 'react-router-dom';
 import { PatientProfileLayout } from '../components/PatientProfileLayout';
 import { EnvironmentOutlined } from '@ant-design/icons';
 import '@/assets/scss/clinic.scss';
@@ -38,12 +37,13 @@ const ViewWatchedClinic = () => {
                                 return (
                                     <Col
                                         span={6}
-                                        className="card-item"
+                                        className="card-item "
                                         key={clinic.id}
                                     >
-                                        <div className="card-container rounded border border-1 ">
+                                        <div className="card-container flex-grow-1 flex-column h-100 rounded border border-1 ">
                                             <div className="clinic-image text-center m-auto">
                                                 <Image
+                                                    height={150}
                                                     onClick={() => {
                                                         navigate(
                                                             '/clinic/detail/' +
@@ -52,7 +52,6 @@ const ViewWatchedClinic = () => {
                                                         handleUpdateViewsClinic(
                                                             clinic?.id
                                                         );
-                                                        // addWatchedClinic(clinic);
                                                     }}
                                                     className=" object-fit-contain"
                                                     preview={false}
@@ -66,8 +65,9 @@ const ViewWatchedClinic = () => {
                                                         '/clinic/detail/' +
                                                             clinic?.id
                                                     );
-                                                    // handleUpdateViewsClinic(clinic?.id);
-                                                    // addWatchedClinic(clinic);
+                                                    handleUpdateViewsClinic(
+                                                        clinic?.id
+                                                    );
                                                 }}
                                             >
                                                 {clinic.name}

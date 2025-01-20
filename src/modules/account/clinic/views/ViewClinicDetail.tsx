@@ -73,7 +73,7 @@ export const ViewClinicDetail = () => {
             setFilteredDoctors(doctors);
         } else {
             const filteredDoctors = doctors.filter((doc: Doctor) =>
-                doc.full_name.includes(searchContent)
+                doc.fullName.includes(searchContent)
             );
             setFilteredDoctors(filteredDoctors);
         }
@@ -94,7 +94,7 @@ export const ViewClinicDetail = () => {
                 clinicId: Number(id),
                 majorId: majorId === 0 ? null : Number(majorId),
             };
-            const res = await doctorService.viewDoctor(data);
+            const res = await doctorService.viewDoctorForClient(data);
             setDoctors(res.data);
         } catch (err: any) {
             setDoctors([]);
@@ -107,7 +107,7 @@ export const ViewClinicDetail = () => {
                 pageIndex: pageIndex,
                 pageSize: pageSize,
                 categoryId: categoryId,
-                clinicId: id,
+                clinicId: Number(id),
             };
             const result = await ServiceService.viewService(data);
             setServices(result?.data);
@@ -195,9 +195,9 @@ export const ViewClinicDetail = () => {
                         }}
                         // className="position-absolute start-0 end-0 bottom-0"
                         src={
-                            clinic?.cover_image?.includes('cloudinary')
-                                ? clinic?.cover_image
-                                : baseURL + clinic?.cover_image
+                            clinic?.coverImage?.includes('cloudinary')
+                                ? clinic?.coverImage
+                                : baseURL + clinic?.coverImage
                         }
                     />
                 </div>

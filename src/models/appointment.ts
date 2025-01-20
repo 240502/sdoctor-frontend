@@ -1,32 +1,32 @@
 export interface Appointment {
     id: number;
-    doctor_id: number;
-    appointment_date: Date;
-    patient_name: string;
-    patient_phone: string;
-    patient_email: string;
+    doctorId: number;
+    appointmentDate: Date;
+    patientName: string;
+    patientPhone: string;
+    patientEmail: string;
     birthday: Date | string;
     province: string;
     district: string;
     commune: string;
-    examination_reason: string;
-    time_id: number;
-    status_id: number;
-    created_at: Date;
-    updated_at: Date;
-    doctor_name: string;
-    time_value: string;
+    examinationReason: string;
+    timeId: number;
+    statusId: number;
+    createdAt: Date;
+    updatedAt: Date;
+    doctorName: string;
+    timeValue: string;
     price: number;
     location: string;
     type: string;
     gender: number;
     rejectionReason: string;
-    service_id: number;
-    service_name: string;
-    invoice_status: string;
-    payment_method: number;
+    serviceId: number;
+    serviceName: string;
+    invoiceStatus: string;
+    paymentMethod: number;
     isEvaluate: number;
 }
 export interface AppointmentViewForPatient extends Appointment {
-    status_name: string;
+    statusName: string;
 }

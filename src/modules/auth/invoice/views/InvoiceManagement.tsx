@@ -30,7 +30,7 @@ const InvoiceManagement = () => {
                 status: status,
             };
             const res = await invoicesService.viewInvoice(data);
-            console.log(res);
+            console.log('data', res);
             setInvoices(res.data);
             setPageCount(res.pageCount);
         } catch (err: any) {

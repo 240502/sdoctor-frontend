@@ -48,7 +48,7 @@ const ViewDoctor = () => {
                 ...options,
                 name: options.name === null ? optionsGlobal.name : options.name,
             };
-            const res = await doctorService.viewDoctor(data);
+            const res = await doctorService.viewDoctorForClient(data);
             setDoctors(res.data);
             setPageCount(res.pageCount);
         } catch (err: any) {
@@ -95,7 +95,6 @@ const ViewDoctor = () => {
             majorId: optionsGlobal.majorId,
         });
         getAllClinic();
-        console.log(optionsGlobal);
         return () => {
             setOptions({
                 majorId: null,
@@ -202,7 +201,7 @@ const ViewDoctor = () => {
                             doctors={doctors}
                             handleUpdateViewsDoctor={handleUpdateViewsDoctor}
                         />
-                        {pageCount > 1 && (
+                        {pageCount > 0 && (
                             <Pagination
                                 className="mt-3"
                                 align="center"

@@ -1,5 +1,5 @@
 export interface PostCategory {
-    post_category_id: number;
+    postCategoryId: number;
     name: string;
     description: string;
     image: string;

@@ -4,7 +4,6 @@ import {
     DatePicker,
     DatePickerProps,
     Input,
-    InputRef,
     Radio,
     Select,
     notification,
@@ -13,8 +12,6 @@ import {
     Col,
     message,
 } from 'antd';
-import { v4 as uuidv4 } from 'uuid';
-
 import { useEffect, useState } from 'react';
 import dayjs from 'dayjs';
 import axios from 'axios';
@@ -22,12 +19,11 @@ import { useRecoilState } from 'recoil';
 import { patientProfileState } from '../../../../stores/patientAtom';
 import { PatientProfileService } from '../../../../services/patient_profileService';
 import { PatientProfileLayout } from '../components/PatientProfileLayout';
-import { ModalViewAppointment } from '../components/ModalViewAppointment';
 import { ModalConfirmDeletePatientProfile } from '../components/ModalConfirmDeletePatientProfile';
 import { PatientProfile } from '../../../../models/patient_profile';
 import { ProvinceType, DistrictType, WardType } from '../../../../models/other';
+import { ConfirmModal } from '../../../../components';
 type NotificationType = 'success' | 'error';
-type MessageType = 'success' | 'warning';
 const ViewProfile = () => {
     const [messageApi, messageContextHolder] = message.useMessage();
     const [patientProfile, setPatientProfile] =
@@ -38,8 +34,6 @@ const ViewProfile = () => {
     const [form] = Form.useForm();
     const dateFormat = 'DD-MM-YYYY';
     const [isCreate, setIsCreate] = useState<boolean>(true);
-    const [isOpenModalAddProfile, setIsOpenModalAddProfile] =
-        useState<boolean>(false);
     const [isOpenModalConfirm, setIsOpenModalConfirm] =
         useState<boolean>(false);
 
@@ -74,17 +68,15 @@ const ViewProfile = () => {
     };
     const handleUpdate = (values: any) => {
         if (isCreate) {
-            const uuid = uuidv4();
             const newProfile = {
-                patient_name: values.patient_name,
-                patient_phone: values.patient_phone,
-                patient_email: values.patient_email,
+                patientName: values.patientName,
+                patientPhone: values.patientPhone,
+                patientEmail: values.patientEmail,
                 birthday: dayjs(values.birthday).format('YYYY-MM-DD'),
                 province: values.province,
                 district: values.district,
                 commune: values.commune,
                 gender: values.gender,
-                uuid: uuid,
             };
             CreatePatientProfile(newProfile);
         } else {
@@ -125,14 +117,15 @@ const ViewProfile = () => {
     const CreatePatientProfile = async (data: any) => {
         try {
             const res = await PatientProfileService.createPatientProfile(data);
-            localStorage.setItem('uuid', JSON.stringify(data.uuid));
+            console.log(res.data.result);
+            localStorage.setItem('uuid', JSON.stringify(res.data.result.uuid));
             openNotificationWithIcon(
                 'success',
                 'Thông báo',
                 'Thêm hồ sơ thành công'
             );
             setIsCreate(false);
-            setPatientProfile(data);
+            setPatientProfile(res.data.result);
         } catch (err: any) {
             console.log(err.message);
             openNotificationWithIcon(
@@ -147,6 +140,7 @@ const ViewProfile = () => {
             const res = await PatientProfileService.updatePatientProfile(
                 newProfile
             );
+            console.log(res);
             openNotificationWithIcon(
                 'success',
                 'Thông báo!',
@@ -190,13 +184,13 @@ const ViewProfile = () => {
     const handleDeleteProfile = async (uuid: string) => {
         try {
             const res = await PatientProfileService.deletePatientProfile(uuid);
+            console.log(res);
             openNotificationWithIcon(
                 'success',
                 'Thông báo!',
                 'Xóa thành công!'
             );
             localStorage.removeItem('uuid');
-            form.resetFields();
             setPatientProfile({} as PatientProfile);
             handleCancelModalConfirm();
             setProvinces([]);
@@ -205,6 +199,16 @@ const ViewProfile = () => {
             setProvince({} as ProvinceType);
             setDistrict({} as DistrictType);
             setWard({} as WardType);
+            setPatientProfile({} as PatientProfile);
+            form.setFieldValue('patientName', '');
+            form.setFieldValue('patientPhone', '');
+            form.setFieldValue('patientEmail', '');
+            form.setFieldValue('gender', null);
+            form.setFieldValue('province', null);
+            form.setFieldValue('district', null);
+            form.setFieldValue('commune', null);
+            form.setFieldValue('birthday', null);
+
             window.scrollTo(0, 0);
         } catch (err: any) {
             console.log(err.message);
@@ -234,6 +238,7 @@ const ViewProfile = () => {
             localStorage.setItem('uuid', res.uuid);
             setIsCreate(false);
             setPatientProfile(res);
+            setSearchValue('');
         } catch (err: any) {
             console.log(err.message);
             openNotificationWithIcon(
@@ -243,25 +248,24 @@ const ViewProfile = () => {
             );
         }
     };
+    const getProvinces = async () => {
+        console.log('getProvinces');
+        try {
+            const res = await axios.get(
+                'https://vapi.vnappmob.com/api/v2/province'
+            );
+            setProvinces(res.data.results);
+        } catch (err) {
+            console.log(err);
+        }
+    };
     useEffect(() => {
+        getProvinces();
+        window.scrollTo(0, 0);
         if (patientProfile.uuid) {
             setProfileCopy(patientProfile);
             setIsCreate(false);
         }
-    }, []);
-    useEffect(() => {
-        const getProvinces = async () => {
-            try {
-                const res = await axios.get(
-                    'https://vapi.vnappmob.com/api/v2/province'
-                );
-                setProvinces(res.data.results);
-            } catch (err) {
-                console.log(err);
-            }
-        };
-        getProvinces();
-        window.scrollTo(0, 0);
     }, []);
 
     useEffect(() => {
@@ -299,8 +303,6 @@ const ViewProfile = () => {
             }
         };
         if (districts.length > 1) {
-            console.log('get district');
-
             getDistrict();
         }
     }, [districts.length]);
@@ -317,7 +319,6 @@ const ViewProfile = () => {
             getWards();
         }
     }, [wards.length]);
-
     return (
         <>
             {contextHolder}
@@ -338,7 +339,7 @@ const ViewProfile = () => {
                                 <Col span={12}>
                                     <Form.Item
                                         label="Họ và tên"
-                                        name="patient_name"
+                                        name="patientName"
                                         rules={[
                                             {
                                                 required: true,
@@ -366,8 +367,7 @@ const ViewProfile = () => {
                                             onChange={(e: any) =>
                                                 setProfileCopy({
                                                     ...patientProfile,
-                                                    patient_name:
-                                                        e.target.value,
+                                                    patientName: e.target.value,
                                                 })
                                             }
                                         />
@@ -376,7 +376,7 @@ const ViewProfile = () => {
                                 <Col span={12}>
                                     <Form.Item
                                         label="Số điện thoại"
-                                        name={'patient_phone'}
+                                        name={'patientPhone'}
                                         rules={[
                                             {
                                                 required: true,
@@ -395,7 +395,7 @@ const ViewProfile = () => {
                                             onChange={(e) =>
                                                 setProfileCopy({
                                                     ...patientProfile,
-                                                    patient_phone:
+                                                    patientPhone:
                                                         e.target.value,
                                                 })
                                             }
@@ -405,7 +405,7 @@ const ViewProfile = () => {
                                 <Col span={12}>
                                     <Form.Item
                                         label="Email"
-                                        name={'patient_email'}
+                                        name={'patientEmail'}
                                         rules={[
                                             {
                                                 required: true,
@@ -421,7 +421,7 @@ const ViewProfile = () => {
                                             onChange={(e) =>
                                                 setProfileCopy({
                                                     ...patientProfile,
-                                                    patient_email:
+                                                    patientEmail:
                                                         e.target.value,
                                                 })
                                             }
@@ -469,6 +469,7 @@ const ViewProfile = () => {
                                         ]}
                                     >
                                         <DatePicker
+                                            placeholder="Chọn ngày"
                                             onChange={onBirthDayChange}
                                             className="d-block"
                                             type="date"
@@ -698,6 +699,7 @@ const ViewProfile = () => {
                                     className="mt-4"
                                     onClick={() => {
                                         setIsCreate(true);
+                                        getProvinces();
                                     }}
                                 >
                                     Thêm mới hồ sơ
@@ -707,10 +709,11 @@ const ViewProfile = () => {
                     )}
                 </Card>
                 {isOpenModalConfirm && (
-                    <ModalConfirmDeletePatientProfile
-                        handleCancelModalConfirm={handleCancelModalConfirm}
-                        isOpenModalConfirm={isOpenModalConfirm}
-                        handleDeleteProfile={handleDeleteProfile}
+                    <ConfirmModal
+                        message="Bạn chắc chắc muốn xóa hồ sơ này!"
+                        openModal={isOpenModalConfirm}
+                        handleCancelModal={() => setIsOpenModalConfirm(false)}
+                        handleOk={handleDeleteProfile}
                     />
                 )}
             </PatientProfileLayout>

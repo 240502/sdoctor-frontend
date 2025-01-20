@@ -24,6 +24,7 @@ export const BookingSuccess = () => {
     };
     useEffect(() => {
         console.log(invoice);
+        console.log(newAppointment.createdAt);
     }, []);
     return (
         <div
@@ -51,20 +52,20 @@ export const BookingSuccess = () => {
                     Đặt lịch thành công!
                 </Title>
                 <Text>Chúc mừng, bạn đã đặt lịch hẹn khám thành công.</Text>
-                {invoice.payment_method === 2 && (
+                {invoice.paymentMethod === 2 && (
                     <p>
                         Bạn cần thanh toán hóa đơn phí khám trước
                         <br></br>
                         {dayjs(
-                            newAppointment.created_at.toString().split('Z')[0]
+                            newAppointment.createdAt.toString().split('Z')[0]
                         )
-                            .add(30, 'minute')
+                            .add(60, 'minute')
                             .format('HH:mm:ss DD-MM-YYYY')}
                     </p>
                 )}
 
                 <Space style={{ marginTop: '24px' }}>
-                    {invoice.payment_method === 2 && (
+                    {invoice.paymentMethod === 2 && (
                         <Button
                             type="primary"
                             onClick={() => {

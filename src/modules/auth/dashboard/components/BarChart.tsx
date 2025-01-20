@@ -65,7 +65,6 @@ const BarChart = ({ type }: any) => {
                 data,
                 config
             );
-            console.log(res);
             const weekDays = ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'];
             const pricesMap = new Map<string, number>();
 
@@ -75,7 +74,6 @@ const BarChart = ({ type }: any) => {
                     weekDays[date.getDay() === 0 ? 6 : date.getDay() - 1];
                 pricesMap.set(day, Number(item.totalPrice));
             });
-
             const prices = weekDays.map((day) => pricesMap.get(day) || 0);
             setFigures(prices);
         } catch (err: any) {
@@ -83,12 +81,13 @@ const BarChart = ({ type }: any) => {
         }
     };
 
-    const getTotalAppointmentByWeek = async (data: any, config: any) => {
+    const statisticsAppointmentsByDay = async (data: any, config: any) => {
         try {
-            const res = await AppointmentService.getTotalAppointmentByWeek(
+            const res = await AppointmentService.statisticsAppointmentsByDay(
                 data,
                 config
             );
+            console.log(res);
             const weekDays = ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'];
             const pricesMap = new Map<string, number>();
 
@@ -99,8 +98,9 @@ const BarChart = ({ type }: any) => {
                 pricesMap.set(day, Number(item.total_appointment));
             });
 
-            const prices = weekDays.map((day) => pricesMap.get(day) || 0);
-            setFigures(prices);
+            const appointments = weekDays.map((day) => pricesMap.get(day) || 0);
+            console.log('appointments', appointments);
+            setFigures(appointments);
         } catch (err: any) {
             console.error(err.message);
         }
@@ -114,18 +114,14 @@ const BarChart = ({ type }: any) => {
         const data = {
             startWeek: startOfWeek,
             endWeek: endOfWeek,
-            doctorId: user.doctor_id,
+            doctorId: user.doctorId,
         };
         if (type === 'appointment') {
-            getTotalAppointmentByWeek(data, header);
+            statisticsAppointmentsByDay(data, header);
         } else {
             getTotalPriceAppointmentByWeek(data, header);
         }
     }, []);
-
-    useEffect(() => {
-        console.log('Figures:', figures);
-    }, [figures]);
 
     useEffect(() => {
         let maxYValue: number = 0;

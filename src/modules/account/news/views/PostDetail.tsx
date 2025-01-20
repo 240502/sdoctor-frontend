@@ -4,11 +4,10 @@ import { Post } from '../../../../models/post';
 import { useRecoilValue } from 'recoil';
 import { postsValue } from '../../../../stores/postAtom';
 import { PostService } from '../../../../services/postService';
-import { Breadcrumb, Card, Image, Flex, Divider } from 'antd';
+import { Breadcrumb, Card, Flex, Divider } from 'antd';
 import { CalendarOutlined, HomeOutlined } from '@ant-design/icons';
 import parse from 'html-react-parser';
 import '@/assets/scss/app.scss';
-import { Link } from 'react-router-dom';
 import { RelatedPost } from '../components/RelatedPost';
 
 type DataParams = {
@@ -48,7 +47,7 @@ const PostDetail = () => {
         try {
             const data = {
                 id: post.id,
-                categoryId: post.category_id,
+                categoryId: post.categoryId,
                 pageIndex: pageIndex,
                 pageSize: pageSize,
             };
@@ -107,13 +106,13 @@ const PostDetail = () => {
                     <Flex className="author align-items-center">
                         <img
                             style={{ width: '4%' }}
-                            src={post.image}
+                            src={post.featuredImage}
                             className="rounded-circle col-1 me-2"
                         />
-                        <p className="fw-bold m-0 me-2">{post.full_name}</p>
+                        <p className="fw-bold m-0 me-2">{post.fullName}</p>
                         <p className=" m-0">
                             <CalendarOutlined className="me-1" />
-                            {post.public_date?.toString().slice(0, 10)}
+                            {post.publicDate?.toString().slice(0, 10)}
                         </p>
                     </Flex>
                     <div className="content">

@@ -19,15 +19,15 @@ export const ModalConfirmDeletePatientProfile = ({
                 open={isOpenModalConfirm}
                 maskClosable={false}
                 footer={[
-                    <Button key={'back'} onClick={handleCancelModalConfirm}>
-                        Đóng
-                    </Button>,
                     <Button
                         key={'ok'}
                         className="bg-danger text-white"
                         onClick={() => handleDeleteProfile(patientProfile.uuid)}
                     >
                         Xác nhận
+                    </Button>,
+                    <Button key={'back'} onClick={handleCancelModalConfirm}>
+                        Đóng
                     </Button>,
                 ]}
             >

@@ -2,6 +2,7 @@ import { Modal, Col, Row, Divider, Button } from 'antd';
 import { useEffect, useState } from 'react';
 import { Appointment } from '../models/appointment';
 import { AppointmentService } from '../services/appointmentService';
+import dayjs from 'dayjs';
 // import downloadInvoicePdf from '../../../../utils/dowloadPDF';
 import { useRef } from 'react';
 
@@ -15,41 +16,39 @@ const ViewInvoiceModal = ({
     );
     const [appointmentDate, setAppointmentDate] = useState<string>('');
     const [createdInvoiceDate, setCreatedInvoiceDate] = useState<string>('');
-    const getAppointmentById = async () => {
-        try {
-            const res = await AppointmentService.getAppointmentById(
-                invoice?.appointment_id
-            );
+    // const getAppointmentById = async () => {
+    //     try {
+    //         const res = await AppointmentService.getAppointmentById(
+    //             invoice?.appointment_id
+    //         );
 
-            console.log('invoice', invoice);
-            console.log(res);
-            setAppointment(res);
-            const convertedAppointmentDate = new Date(
-                res?.appointment_date.split('Z')[0]
-            );
-            const formattedAppointmentDate = `${convertedAppointmentDate.getDate()}-${
-                convertedAppointmentDate.getMonth() + 1
-            }-${convertedAppointmentDate.getFullYear()}`;
-            const convertedCreatedDate = new Date(
-                res?.created_at.split('Z')[0]
-            );
-            const formattedCreatedDate = `${convertedCreatedDate.getDate()}-${
-                convertedCreatedDate.getMonth() + 1
-            }-${convertedCreatedDate.getFullYear()} ${convertedCreatedDate.getHours()}:${convertedCreatedDate.getMinutes()}:${convertedCreatedDate.getSeconds()}`;
-            setAppointmentDate(formattedAppointmentDate);
-            setCreatedInvoiceDate(formattedCreatedDate);
-        } catch (err: any) {
-            console.log(err.message);
-        }
-    };
+    //         console.log('invoice', invoice);
+    //         console.log(res);
+    //         setAppointment(res);
+    //         const convertedAppointmentDate = new Date(
+    //             res?.appointment_date.split('Z')[0]
+    //         );
+    //         const formattedAppointmentDate = `${convertedAppointmentDate.getDate()}-${
+    //             convertedAppointmentDate.getMonth() + 1
+    //         }-${convertedAppointmentDate.getFullYear()}`;
+    //         const convertedCreatedDate = new Date(
+    //             res?.created_at.split('Z')[0]
+    //         );
+    //         const formattedCreatedDate = `${convertedCreatedDate.getDate()}-${
+    //             convertedCreatedDate.getMonth() + 1
+    //         }-${convertedCreatedDate.getFullYear()} ${convertedCreatedDate.getHours()}:${convertedCreatedDate.getMinutes()}:${convertedCreatedDate.getSeconds()}`;
+    //         setAppointmentDate(formattedAppointmentDate);
+    //         setCreatedInvoiceDate(formattedCreatedDate);
+    //     } catch (err: any) {
+    //         console.log(err.message);
+    //     }
+    // };
     useEffect(() => {
-        getAppointmentById();
+        // getAppointmentById();
     }, []);
     const ref = useRef<HTMLDivElement>(null);
     const generatePdf = () => {
         if (ref.current) {
-            console.log('gendr');
-            // ReactToPdf(ref, { filename: 'document.pdf' });
         }
     };
     return (
@@ -73,22 +72,27 @@ const ViewInvoiceModal = ({
                             <strong>Mã hóa đơn:</strong> {invoice?.id}
                         </p>
                         <p className="text-end">
-                            <strong>Ngày tạo:</strong> {createdInvoiceDate}
+                            <strong>Ngày tạo:</strong>{' '}
+                            {dayjs(invoice.createdAt?.split('Z')[0]).format(
+                                'DD-MM-YYYY HH:mm:ss'
+                            )}
                         </p>
                     </Col>
                 </Row>
                 <Row gutter={24}>
                     <Col span={12} className="mb-2">
-                        <strong>Họ và tên:</strong> {invoice?.patient_name}
+                        <strong>Họ và tên:</strong> {invoice?.patientName}
                     </Col>
                     <Col span={12} className="text-end">
-                        <strong>Khám ngày:</strong> {appointmentDate}
+                        <strong>Khám ngày:</strong>{' '}
+                        {dayjs(invoice.appointmentDate?.split('Z')[0]).format(
+                            'DD-MM-YYYY'
+                        )}
                     </Col>
                 </Row>
                 <Row gutter={24}>
                     <Col span={12} className="mb-2">
-                        <strong>Thời gian khám:</strong>{' '}
-                        {appointment?.time_value}
+                        <strong>Thời gian khám:</strong> {invoice?.timeValue}
                     </Col>
                     <Col span={12} className="mb-2 text-end">
                         <strong>Tổng thanh toán:</strong>{' '}
@@ -98,7 +102,7 @@ const ViewInvoiceModal = ({
                 <Row className="mb-2" gutter={24}>
                     <Col span={12}>
                         <strong>Phương thức thanh toán:</strong>{' '}
-                        {invoice?.payment_name}
+                        {invoice?.paymentName}
                     </Col>
                     <Col span={12} className="text-end">
                         <strong>Trạng thái:</strong> {invoice?.status}
@@ -130,13 +134,13 @@ const ViewInvoiceModal = ({
                             <Divider className="mt-2 mb-2" />
                             <Row gutter={24} className="">
                                 <Col span={8} className=" text-center">
-                                    {appointment?.service_name}
+                                    {invoice?.serviceName}
                                 </Col>
                                 <Col span={8} className=" text-center">
                                     1
                                 </Col>
                                 <Col span={8} className=" text-center">
-                                    {appointment?.price?.toLocaleString()} VNĐ
+                                    {invoice?.amount?.toLocaleString()} VNĐ
                                 </Col>
                             </Row>
                         </Col>

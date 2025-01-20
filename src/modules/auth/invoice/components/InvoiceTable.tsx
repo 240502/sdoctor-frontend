@@ -148,12 +148,12 @@ export const InvoiceTable = ({
     const columns: ColumnsType<Invoices> = [
         {
             title: 'Bệnh nhân',
-            dataIndex: 'patient_name',
-            ...getColumnSearchProps('patient_name'),
+            dataIndex: 'patientName',
+            ...getColumnSearchProps('patientName'),
         },
         {
             title: 'Ngày hẹn khám',
-            dataIndex: 'appointment_date',
+            dataIndex: 'appointmentDate',
             render(value, record, index) {
                 const date = new Date(value.split('Z')[0]);
                 return (
@@ -169,8 +169,8 @@ export const InvoiceTable = ({
         },
         {
             title: 'Dịch vụ',
-            dataIndex: 'service_name',
-            ...getColumnSearchProps('service_name'),
+            dataIndex: 'serviceName',
+            ...getColumnSearchProps('serviceName'),
         },
         {
             title: 'Tổng tiền',
@@ -188,6 +188,9 @@ export const InvoiceTable = ({
             render(value, record, index) {
                 return (
                     <Select
+                        disabled={
+                            record.status === 'Đã thanh toán' ? true : false
+                        }
                         value={record.status}
                         className="w-100"
                         onChange={(value: string) => {
