@@ -14,23 +14,32 @@ import { Clinic } from '../../../../models/clinic';
 import { ClinicService } from '../../../../services/clinicService';
 import { SearchProps } from 'antd/es/input';
 import { DoctorCard } from '../components/DoctorCard';
+import { useFetchDataWithPaginationProps } from '../../../../hooks';
+import { Doctor } from '../../../../models/doctor';
+import { paginationState } from '../../../../stores/paginationAtom';
 const { Option } = Select;
 const { Search } = Input;
 const ViewDoctor = () => {
     const [optionsGlobal, setOptionsGlobal] = useRecoilState(
         searchDoctorOptionsGlobal
     );
+    const apiViewDoctorEndpoint = '/doctor/view-for-client';
+
     const doctors = useRecoilValue(doctorListValue);
     const [majors, setMajors] = useState<Major[]>([]);
-    const [pageIndex, setPageIndex] = useState<number>(1);
-    const [pageSize, setPageSize] = useState<number>(8);
-    const [pageCount, setPageCount] = useState<number>(0);
     const [clinics, setClinics] = useState<Clinic[]>([]);
     const [options, setOptions] = useState<any>({
         majorId: null,
         clinicId: null,
         name: null,
     });
+    const [pagination, setPagination] = useRecoilState(paginationState);
+    const { data, loading, error, changePage } =
+        useFetchDataWithPaginationProps<Doctor>(apiViewDoctorEndpoint, options);
+    useEffect(() => {
+        setDoctors(data);
+    }, [data]);
+
     const setDoctors = useSetRecoilState(doctorListState);
     const getAllClinic = async () => {
         try {
@@ -38,22 +47,6 @@ const ViewDoctor = () => {
             setClinics(res.data);
         } catch (err: any) {
             console.log(err.message);
-        }
-    };
-    const loadData = async () => {
-        try {
-            const data = {
-                pageIndex: pageIndex,
-                pageSize: pageSize,
-                ...options,
-                name: options.name === null ? optionsGlobal.name : options.name,
-            };
-            const res = await doctorService.viewDoctorForClient(data);
-            setDoctors(res.data);
-            setPageCount(res.pageCount);
-        } catch (err: any) {
-            console.log(err.message);
-            setDoctors([]);
         }
     };
     const handleUpdateViewsDoctor = async (id: number) => {
@@ -72,22 +65,10 @@ const ViewDoctor = () => {
         }
     };
 
-    const changePage = (current: number, size: number) => {
-        if (size !== pageSize) {
-            setPageIndex(1);
-            setPageSize(size);
-        } else {
-            setPageIndex(current);
-        }
-    };
-    const onSearch: SearchProps['onSearch'] = (value, _e, info) => {
-        loadData();
-    };
     useEffect(() => {
-        loadData();
         getAllMajor();
         window.scrollTo(0, 0);
-    }, [options.clinicId, options.majorId, pageIndex, pageSize]);
+    }, []);
     useEffect(() => {
         setOptions({
             ...options,
@@ -140,6 +121,10 @@ const ViewDoctor = () => {
                                         ...options,
                                         clinicId: value ?? null,
                                     });
+                                    setPagination({
+                                        ...pagination,
+                                        pageIndex: 1,
+                                    });
                                 }}
                             >
                                 {clinics.map((clinic: Clinic) => (
@@ -166,6 +151,10 @@ const ViewDoctor = () => {
                                         ...options,
                                         majorId: value ?? null,
                                     });
+                                    setPagination({
+                                        ...pagination,
+                                        pageIndex: 1,
+                                    });
                                 }}
                             >
                                 {majors?.map((major: Major) => (
@@ -182,41 +171,45 @@ const ViewDoctor = () => {
                     </Flex>
                     <Flex className="col-5 justify-content-end position-relative">
                         <Search
-                            onSearch={onSearch}
+                            placeholder="Nhập tên bác sĩ"
+                            value={options.name}
                             onChange={(e) => {
                                 setOptions({
                                     ...options,
                                     name: e.target.value,
                                 });
                             }}
-                            placeholder="Nhập tên bác sĩ"
-                            value={options.name}
                             style={{ width: '48%' }}
                         />
                     </Flex>
                 </Flex>
-                {doctors?.length ? (
+                {loading ? (
+                    <p className="fs-6 fw-bold text-center mt-4">
+                        Đang tải dữ liệu...
+                    </p>
+                ) : error ? (
+                    <p className="fs-6 fw-bold text-center mt-4"> {error}</p>
+                ) : data.length > 0 ? (
                     <>
                         <DoctorCard
                             doctors={doctors}
                             handleUpdateViewsDoctor={handleUpdateViewsDoctor}
                         />
-                        {pageCount > 0 && (
-                            <Pagination
-                                className="mt-3"
-                                align="center"
-                                current={pageIndex}
-                                pageSize={pageSize}
-                                showSizeChanger
-                                pageSizeOptions={['4', '8', '12', '16', '20']}
-                                onChange={changePage}
-                                total={pageCount * pageSize}
-                            />
-                        )}
+
+                        <Pagination
+                            className="mt-3"
+                            align="center"
+                            current={pagination.pageIndex}
+                            pageSize={pagination.pageSize}
+                            showSizeChanger
+                            pageSizeOptions={['4', '8', '12', '16', '20']}
+                            onChange={changePage}
+                            total={pagination.pageCount * pagination.pageSize}
+                        />
                     </>
                 ) : (
-                    <p className="fs-5 fw-bold text-center">
-                        Không có bác sĩ nào
+                    <p className="fs-6 fw-bold text-center">
+                        Không có dữ liệu bác sĩ !
                     </p>
                 )}
             </div>
