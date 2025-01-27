@@ -27,7 +27,6 @@ export const BlockClinic = (): JSX.Element => {
     const loadData = async () => {
         try {
             const data = await ClinicService.getCommonClinic();
-            console.log('clinics data', data);
             setClinics(data);
         } catch (err: any) {
             console.log(err.message);

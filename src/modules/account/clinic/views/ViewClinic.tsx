@@ -2,7 +2,7 @@ import { HomeOutlined } from '@ant-design/icons';
 import '@/assets/scss/clinic.scss';
 import { Breadcrumb, Flex, Input, Pagination, Select } from 'antd';
 import { ClinicService } from '../../../../services/clinicService';
-import { useRecoilValue, useSetRecoilState } from 'recoil';
+import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import {
     clinicListState,
     clinicListValue,
@@ -11,38 +11,32 @@ import { useEffect, useState } from 'react';
 import { SearchProps } from 'antd/es/input';
 import axios from 'axios';
 import { ClinicCard } from '../components/ClinicCard';
+import { useFetchDataWithPaginationProps } from '../../../../hooks';
+import { paginationState } from '../../../../stores/paginationAtom';
+import { Clinic } from '../../../../models/clinic';
 const { Search } = Input;
 const ViewClinic = () => {
     const [optionsFilter, setOptionsFilter] = useState<any>({
         location: null,
         name: null,
     });
-    const [pageIndex, setPageIndex] = useState<number>(1);
-    const [pageSize, setPageSize] = useState<number>(4);
+    const apiEndpoint = '/clinic/view';
+    const { data, loading, error, changePage } =
+        useFetchDataWithPaginationProps<Clinic>(apiEndpoint, optionsFilter);
+    const [pagination, setPagination] = useRecoilState(paginationState);
     const [provinces, setProvinces] = useState([
         { province_id: 0, province_name: '' },
     ]);
 
-    const [pageCount, setPageCount] = useState<number>(0);
     const setClinics = useSetRecoilState(clinicListState);
     const clinics = useRecoilValue(clinicListValue);
 
-    const viewClinic = async (data: any) => {
-        try {
-            const res = await ClinicService.viewClinic(data);
-            console.log('clinics data', res.data);
-            setClinics(res.data);
-            setPageCount(res.pageCount);
-        } catch (err: any) {
-            setClinics([]);
-            console.log(err.message);
-        }
-    };
     const onSearch: SearchProps['onSearch'] = (value, _e) => {
         const newOptions = { ...optionsFilter, name: value };
         setOptionsFilter(newOptions);
     };
     const handleChangeLocation = (value: string) => {
+        setPagination({ ...pagination, pageIndex: 1 });
         let province: string = '';
         const cityStr = 'thành phố';
         const provinceStr = 'tỉnh';
@@ -53,19 +47,11 @@ const ViewClinic = () => {
             if (value.toLowerCase().includes('tỉnh')) {
                 province = value.slice(provinceStr.length, value.length);
             }
-            const newOptions = { ...optionsFilter, location: province };
+            const newOptions = { ...optionsFilter, location: province.trim() };
             setOptionsFilter(newOptions);
         } else {
             const newOptions = { ...optionsFilter, location: null };
             setOptionsFilter(newOptions);
-        }
-    };
-    const changePage = (current: number, size: number) => {
-        if (size !== pageSize) {
-            setPageIndex(1);
-            setPageSize(size);
-        } else {
-            setPageIndex(current);
         }
     };
     const handleUpdateViewsClinic = async (id: number) => {
@@ -87,14 +73,14 @@ const ViewClinic = () => {
             }
         };
         getProvinces();
-        const data = {
-            pageIndex: pageIndex,
-            pageSize: pageSize,
-            ...optionsFilter,
-        };
-        viewClinic(data);
+
         window.scrollTo(0, 0);
-    }, [pageIndex, pageSize, optionsFilter]);
+    }, [optionsFilter]);
+
+    useEffect(() => {
+        setClinics(data);
+    }, [data]);
+
     return (
         <div className="container view-clinic-container mt-5 mb-5">
             <Breadcrumb
@@ -142,22 +128,28 @@ const ViewClinic = () => {
                     />
                 </Flex>
             </Flex>
-            {clinics?.length > 0 ? (
+            {loading ? (
+                <p className="fs-6 fw-bold text-center mt-4">
+                    Đang tải dữ liệu ...
+                </p>
+            ) : error ? (
+                <p className="fs-6 fw-bold text-center mt-4">{error}</p>
+            ) : clinics?.length > 0 ? (
                 <>
                     <ClinicCard
                         clinics={clinics}
                         handleUpdateViewsClinic={handleUpdateViewsClinic}
                     />
-                    {pageCount > 1 && (
+                    {pagination.pageCount > 1 && (
                         <Pagination
-                            current={pageIndex}
-                            pageSize={pageSize}
+                            current={pagination.pageIndex}
+                            pageSize={pagination.pageSize}
                             showSizeChanger
                             pageSizeOptions={['4', '8', '12', '16', '20']}
                             onChange={changePage}
                             align="center"
                             className="mt-3"
-                            total={pageCount * pageSize}
+                            total={pagination.pageCount * pagination.pageSize}
                         ></Pagination>
                     )}
                 </>

@@ -15,7 +15,7 @@ interface UseFetchDataWithPaginationProps<T> {
 
 export const useFetchDataWithPaginationProps = <T,>(
     apiEndpoint: string,
-    payload: PaginationParams
+    payload?: PaginationParams
 ): UseFetchDataWithPaginationProps<T> => {
     const [data, setData] = useState<T[]>([]);
     const [loading, setLoading] = useState(false);
@@ -51,6 +51,7 @@ export const useFetchDataWithPaginationProps = <T,>(
                 });
             } catch (err: any) {
                 setError(err?.response?.data?.message || 'Error fetching data');
+                setData([]);
             } finally {
                 setLoading(false);
             }

@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { HomeOutlined } from '@ant-design/icons';
 import { Breadcrumb, Pagination, Select, Flex, Input } from 'antd';
+import type { InputRef } from 'antd';
 import { doctorService } from '../../../../services/doctorService';
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import {
@@ -12,7 +13,6 @@ import { MajorService } from '../../../../services/majorService';
 import { Major } from '../../../../models/major';
 import { Clinic } from '../../../../models/clinic';
 import { ClinicService } from '../../../../services/clinicService';
-import { SearchProps } from 'antd/es/input';
 import { DoctorCard } from '../components/DoctorCard';
 import { useFetchDataWithPaginationProps } from '../../../../hooks';
 import { Doctor } from '../../../../models/doctor';
@@ -33,6 +33,7 @@ const ViewDoctor = () => {
         clinicId: null,
         name: null,
     });
+    const [searchContent, setSearchContent] = useState<string>('');
     const [pagination, setPagination] = useRecoilState(paginationState);
     const { data, loading, error, changePage } =
         useFetchDataWithPaginationProps<Doctor>(apiViewDoctorEndpoint, options);
@@ -52,6 +53,7 @@ const ViewDoctor = () => {
     const handleUpdateViewsDoctor = async (id: number) => {
         try {
             const res = await doctorService.updateViewsDoctor(id);
+            console.log(res);
         } catch (err: any) {
             console.log(err.message);
         }
@@ -70,11 +72,15 @@ const ViewDoctor = () => {
         window.scrollTo(0, 0);
     }, []);
     useEffect(() => {
-        setOptions({
-            ...options,
-            name: optionsGlobal.name,
-            majorId: optionsGlobal.majorId,
-        });
+        if (optionsGlobal.name || optionsGlobal.majorId) {
+            setOptions({
+                ...options,
+                majorId: optionsGlobal.majorId,
+                name: optionsGlobal.name,
+            });
+            setSearchContent(optionsGlobal.name);
+        }
+
         getAllClinic();
         return () => {
             setOptions({
@@ -87,7 +93,9 @@ const ViewDoctor = () => {
             });
         };
     }, []);
-
+    useEffect(() => {
+        setDoctors(data);
+    }, [data]);
     return (
         <div className="container doctor-list mt-4 mb-4">
             <Breadcrumb
@@ -171,13 +179,14 @@ const ViewDoctor = () => {
                     </Flex>
                     <Flex className="col-5 justify-content-end position-relative">
                         <Search
+                            className="search-input"
                             placeholder="Nhập tên bác sĩ"
-                            value={options.name}
+                            value={searchContent}
+                            onSearch={() => {
+                                setOptions({ ...options, name: searchContent });
+                            }}
                             onChange={(e) => {
-                                setOptions({
-                                    ...options,
-                                    name: e.target.value,
-                                });
+                                setSearchContent(e.target.value);
                             }}
                             style={{ width: '48%' }}
                         />
@@ -189,7 +198,7 @@ const ViewDoctor = () => {
                     </p>
                 ) : error ? (
                     <p className="fs-6 fw-bold text-center mt-4"> {error}</p>
-                ) : data.length > 0 ? (
+                ) : doctors.length > 0 ? (
                     <>
                         <DoctorCard
                             doctors={doctors}
@@ -208,7 +217,7 @@ const ViewDoctor = () => {
                         />
                     </>
                 ) : (
-                    <p className="fs-6 fw-bold text-center">
+                    <p className="fs-6 fw-bold text-center mt-4">
                         Không có dữ liệu bác sĩ !
                     </p>
                 )}

@@ -19,6 +19,9 @@ import { Clinic } from '../../../../models/clinic';
 import { ServiceCategory } from '../../../../models/category_services';
 import { ClinicService } from '../../../../services/clinicService';
 import { ServiceCategoryService } from '../../../../services/serviceCategoryService';
+import { useFetchDataWithPaginationProps } from '../../../../hooks';
+import { Service } from '../../../../models/service';
+import { paginationState } from '../../../../stores/paginationAtom';
 
 const ViewService = () => {
     const priceOptions = [
@@ -54,9 +57,8 @@ const ViewService = () => {
             endPrice: 999999999,
         },
     ];
-    const [pageIndex, setPageIndex] = useState<number>(1);
-    const [pageSize, setPageSize] = useState<number>(8);
-    const [pageCount, setPageCount] = useState<number>(0);
+    const [pagination, setPagination] = useRecoilState(paginationState);
+    const apiEndpoint = '/service/view';
     const [services, setServices] = useRecoilState(serviceListState);
     const [clinics, setClinics] = useState<Clinic[]>([]);
     const [categories, setCategories] = useState<ServiceCategory[]>([]);
@@ -68,6 +70,8 @@ const ViewService = () => {
         name: null,
     });
     const inputSearchRef = useRef<InputRef>(null);
+    const { data, loading, error, changePage } =
+        useFetchDataWithPaginationProps<Service>(apiEndpoint, filterOptions);
     const getAllClinic = async () => {
         try {
             const res = await ClinicService.viewClinic({});
@@ -86,31 +90,15 @@ const ViewService = () => {
             setCategories([]);
         }
     };
-    const getServices = async () => {
-        try {
-            const data = {
-                pageIndex: pageIndex,
-                pageSize: pageSize,
-                ...filterOptions,
-            };
-            const res = await ServiceService.viewService(data);
-            console.log(res);
-            setServices(res?.data);
-            setPageCount(res?.pageCount);
-        } catch (err: any) {
-            console.log(err.message);
-            setServices([]);
-            setPageCount(0);
-        }
-    };
+    useEffect(() => {
+        setServices(data);
+    }, [data]);
     useEffect(() => {
         getAllClinic();
         getAllServiceCategory();
         window.scrollTo(0, 0);
     }, []);
-    useEffect(() => {
-        getServices();
-    }, [pageIndex, pageSize, filterOptions]);
+
     return (
         <div className="container view-service-container  mt-4 mb-4">
             <Breadcrumb
@@ -237,26 +225,27 @@ const ViewService = () => {
             </Row>
             <div className="service-list mt-4">
                 <h6>Danh sách dịch vụ</h6>
-                {services?.length ? (
+                {loading ? (
+                    <p className="fs-6 fw-bold mt-4 text-center">
+                        Đang tải dữ liệu ...
+                    </p>
+                ) : error ? (
+                    <p className="mt-4 fs-6 fw-bold text-center">{error}</p>
+                ) : services?.length ? (
                     <ServiceCard services={services} />
                 ) : (
                     <p className="text-center">Không có dịch vụ nào!</p>
                 )}
-                {pageCount > 1 && (
+                {pagination.pageCount > 0 && (
                     <Pagination
-                        current={pageIndex}
-                        pageSize={pageSize}
-                        total={pageCount * pageSize}
+                        align="center"
+                        className="mt-4"
+                        current={pagination.pageIndex}
+                        pageSize={pagination.pageSize}
+                        total={pagination.pageCount * pagination.pageSize}
                         showSizeChanger
                         pageSizeOptions={['4', '8', '12', '16', '20']}
-                        onChange={(current: number, size: number) => {
-                            if (size !== pageSize) {
-                                setPageSize(size);
-                                setPageIndex(1);
-                            } else {
-                                setPageIndex(current);
-                            }
-                        }}
+                        onChange={changePage}
                     />
                 )}
             </div>

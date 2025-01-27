@@ -1,14 +1,10 @@
 import { Pagination, Flex, Card } from 'antd';
 import { Major } from '../../../../models/major';
-import { baseURL, nestJsServiceUrl } from '../../../../constants/api';
+import { nestJsServiceUrl } from '../../../../constants/api';
 import { useNavigate } from 'react-router-dom';
 
 export const MajorCards = ({
     majors,
-    pageCount,
-    pageIndex,
-    pageSize,
-    changePage,
     setOptionsGlobal,
     optionsGlobal,
 }: any) => {
@@ -66,28 +62,10 @@ export const MajorCards = ({
                     </>
                 ) : (
                     <p className="fs-5 fw-bold text-center">
-                        Không có bác sĩ nào
+                        Không có dữ liệu chuyên khoa!
                     </p>
                 )}
             </Flex>
-            <section className="page d-flex justify-content-center align-items-center">
-                {pageCount > 1 ? (
-                    <Pagination
-                        showSizeChanger
-                        defaultCurrent={1}
-                        align="center"
-                        current={pageIndex}
-                        pageSize={pageSize}
-                        total={pageCount * pageSize}
-                        pageSizeOptions={['4', '8', '12', '16']}
-                        onChange={(current: number, size: number) => {
-                            changePage(current, size);
-                        }}
-                    />
-                ) : (
-                    <></>
-                )}
-            </section>
         </>
     );
 };
