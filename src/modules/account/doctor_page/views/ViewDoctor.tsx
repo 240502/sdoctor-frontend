@@ -204,7 +204,6 @@ const ViewDoctor = () => {
                             doctors={doctors}
                             handleUpdateViewsDoctor={handleUpdateViewsDoctor}
                         />
-
                         <Pagination
                             className="mt-3"
                             align="center"

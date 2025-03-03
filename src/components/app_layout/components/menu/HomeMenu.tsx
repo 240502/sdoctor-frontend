@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react';
 import { Menu } from 'antd';
-import { Link, useNavigate } from 'react-router-dom';
-import { HomeMenuService } from '../../../../../services/home_menuService';
-import { HomeMenuModel } from '../../../../../models/home_menu';
+import { Link } from 'react-router-dom';
+import { HomeMenuService } from '../../../../services/home_menuService';
+import { HomeMenuModel } from '../../../../models/home_menu';
 import { useRecoilState, useSetRecoilState } from 'recoil';
-import { majorIdState } from '../../../../../stores/majorAtom';
-import { paginationState } from '../../../../../stores/paginationAtom';
+import { majorIdState } from '../../../../stores/majorAtom';
+import { paginationState } from '../../../../stores/paginationAtom';
 
 export const HomeMenu = () => {
     const setMajorId = useSetRecoilState(majorIdState);

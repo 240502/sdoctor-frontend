@@ -5,7 +5,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { UserOutlined } from '@ant-design/icons';
 import '@/assets/scss/app.scss';
 import { useRecoilValue } from 'recoil';
-import { userValue } from '../../../../stores/userAtom';
+import { userValue } from '../../../stores/userAtom';
 
 const { Header, Content, Footer } = Layout;
 export const AppLayout = ({ children }: any) => {

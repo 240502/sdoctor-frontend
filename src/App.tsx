@@ -15,7 +15,7 @@ function App() {
     const handleWindowLoad = (user: User) => {
         console.log('user', user);
         if (user?.userId) {
-            socket.emit('joinRoom', { userId: user.userId });
+            socket?.emit('joinRoom', { userId: user.userId });
         }
     };
     const getUser = async () => {

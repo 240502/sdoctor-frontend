@@ -6,16 +6,14 @@ import {
     UserOutlined,
 } from '@ant-design/icons';
 import '@/assets/scss/animation.scss';
-import { User } from '../../../../models/user';
+import { User } from '../../../models/user';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
-import { userState, userValue } from '../../../../stores/userAtom';
-import { notificationsValue } from '../../../../stores/notification';
-import { Notifications } from '../../../../models/notification';
+import { userState, userValue } from '../../../stores/userAtom';
 import NotificationList from './NotificationList';
 import { Link } from 'react-router-dom';
-import socket from '../../../../socket';
+import socket from '../../../socket';
 export const HeaderLayout = ({ collapsed, setCollapsed }: any) => {
     const navigate = useNavigate();
     const setUser = useSetRecoilState(userState);

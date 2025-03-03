@@ -3,11 +3,11 @@ import { useRecoilValue, useSetRecoilState } from 'recoil';
 import {
     notificationsState,
     notificationsValue,
-} from '../../../../stores/notification';
+} from '../../../stores/notification';
 import { useEffect } from 'react';
 import { BellOutlined, CloseOutlined } from '@ant-design/icons';
-import { NotificationService } from '../../../../services/notificationService';
-import { userValue } from '../../../../stores/userAtom';
+import { NotificationService } from '../../../services/notificationService';
+import { userValue } from '../../../stores/userAtom';
 import 'dayjs/locale/vi';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
@@ -18,7 +18,7 @@ dayjs.extend(utc);
 dayjs.extend(timezone);
 dayjs.extend(relativeTime);
 dayjs.locale('vi');
-import { Notifications } from '../../../../models/notification';
+import { Notifications } from '../../../models/notification';
 const NotificationList = () => {
     const user = useRecoilValue(userValue);
     const notificationSelector = useRecoilValue(notificationsValue);

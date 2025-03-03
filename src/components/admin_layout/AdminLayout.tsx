@@ -6,12 +6,13 @@ import { Link } from 'react-router-dom';
 import { Sidenav } from './components/Sidenav';
 import { HeaderLayout } from './components/Header';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
-import { requestConfig, userValue } from '../../../stores/userAtom';
-import socket from '../../../socket';
+import { requestConfig, userValue } from '../../stores/userAtom';
 import {
     notificationsState,
     notificationsValue,
-} from '../../../stores/notification';
+} from '../../stores/notification';
+import socket from '../../socket';
+
 const { Sider, Content } = Layout;
 
 const AdminLayout: React.FC = ({ children }: any) => {

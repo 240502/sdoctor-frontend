@@ -1,11 +1,11 @@
 import { Menu } from 'antd';
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import parse from 'html-react-parser';
 
-import { Functions } from '../../../../models/functions';
+import { Functions } from '../../../models/functions';
 import { Link } from 'react-router-dom';
 import { useRecoilValue } from 'recoil';
-import { userValue } from '../../../../stores/userAtom';
+import { userValue } from '../../../stores/userAtom';
 
 export const Sidenav = ({ current }: any) => {
     const user = useRecoilValue(userValue);

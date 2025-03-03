@@ -1,21 +1,38 @@
-import { AppLayout } from '../modules/account/app';
-import { ViewClinic } from '../modules/account/clinic';
-import { ViewClinicDetail } from '../modules/account/clinic/views/ViewClinicDetail';
-import { ViewDetailDoctor, ViewDoctor } from '../modules/account/doctor';
-import { Home } from '../modules/account/home';
-import { LoginLayout } from '../modules/account/login/LoginLayout';
+import { AdminLayout } from '../components/admin_layout';
+import { AppLayout } from '../components/app_layout';
+import { BookingSuccess } from '../components/BookingSuccess';
+import BookingAppointment from '../modules/account/appointment_page';
+import { ViewClinic } from '../modules/account/clinic_page';
+import { ViewClinicDetail } from '../modules/account/clinic_page/views/ViewClinicDetail';
+import { ViewDetailDoctor, ViewDoctor } from '../modules/account/doctor_page';
+import { Home } from '../modules/account/home_page';
+import { LoginLayout } from '../modules/account/login_page/LoginLayout';
+import { ViewMajor } from '../modules/account/major_page';
 import {
     PostDetail,
     ViewPost,
     ViewPostByCategory,
-} from '../modules/account/news';
-import { ViewService, ViewDetailService } from '../modules/account/service';
-import { AppointmentManagement } from '../modules/auth/appointment';
-import { DashBoard } from '../modules/auth/dashboard';
-import { AdminLayout } from '../modules/auth/layout';
-import { NewsManagement } from '../modules/auth/news';
-import { DoctorManagement } from '../modules/auth/doctor';
-
+} from '../modules/account/news_page';
+import {
+    ViewAppointment,
+    ViewProfile,
+    ViewWatchedClinic,
+    ViewWatchedDoctor,
+} from '../modules/account/patient_profile_page';
+import {
+    ViewDetailService,
+    ViewService,
+} from '../modules/account/service_page';
+import { AppointmentManagement } from '../modules/admin/appointment_page';
+import { ClinicManagement } from '../modules/admin/clinic_page';
+import { DashBoard } from '../modules/admin/dashboard_page';
+import { DoctorManagement } from '../modules/admin/doctor_page';
+import { InvoiceManagement } from '../modules/admin/invoice_page';
+import { NewsManagement } from '../modules/admin/news_page';
+import { Profile } from '../modules/admin/profile_page';
+import { ScheduleManagement } from '../modules/admin/schedule_page';
+import { ServiceManagement } from '../modules/admin/service_management_page';
+import { UserManagement } from '../modules/admin/user_page';
 import {
     VIEW_POST_BY_CATEGORY_PATH,
     VIEW_MAJOR_PATH,
@@ -46,21 +63,6 @@ import {
     PROFILE_PATH,
     SERVICE_MANAGEMENT_PATH,
 } from './path';
-import { ScheduleManagement } from '../modules/auth/schedule';
-import {
-    ViewAppointment,
-    ViewProfile,
-    ViewWatchedClinic,
-    ViewWatchedDoctor,
-} from '../modules/account/patient_profile';
-import { ClinicManagement } from '../modules/auth/clinic';
-import { ViewMajor } from '../modules/account/major';
-import { UserManagement } from '../modules/auth/user';
-import BookingAppointment from '../modules/account/appointment';
-import { BookingSuccess } from '../components/BookingSuccess';
-import { InvoiceManagement } from '../modules/auth/invoice';
-import { Profile } from '../modules/auth/profile';
-import { ServiceManagement } from '../modules/auth/service_management';
 
 export const publicRoutes = [
     {
