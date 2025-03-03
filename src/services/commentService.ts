@@ -1,11 +1,11 @@
-import { nestApi } from '../constants/api';
+import { apiClient } from '../constants/api';
 export const CommentService = {
     async createComment(data: any): Promise<any> {
-        const res = await nestApi.post('/comment/create', data);
+        const res = await apiClient.post('/comment/create', data);
         return res;
     },
     async getCommentByUserId(data: any): Promise<any> {
-        const res = await nestApi.post(
+        const res = await apiClient.post(
             '/comment/get-comment-by-doctor-id',
             data
         );

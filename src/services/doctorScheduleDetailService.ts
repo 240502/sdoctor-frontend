@@ -1,8 +1,8 @@
-import { apiClient, nestApi } from '../constants/api';
+import { apiClient } from '../constants/api';
 
 export const doctorScheduleDetailService = {
     async getScheduleDetailByScheduleId(scheduleId: number): Promise<any> {
-        const res = await nestApi.get(
+        const res = await apiClient.get(
             '/api/schedule-details/get-by-schedule-id/' + scheduleId
         );
         return res.data;
@@ -10,7 +10,7 @@ export const doctorScheduleDetailService = {
     async updateAvailableScheduleDetail(
         scheduleDetailId: number
     ): Promise<any> {
-        const res = await nestApi.put(
+        const res = await apiClient.put(
             '/doctor-schedule-detail/update-available/' + scheduleDetailId
         );
         return res;

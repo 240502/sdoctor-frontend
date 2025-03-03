@@ -1,8 +1,8 @@
-import { apiClient, nestApi } from '../constants/api';
+import { apiClient } from '../constants/api';
 
 export const ServiceCategoryService = {
     async getAll(): Promise<any> {
-        const res = await nestApi.get('/service-category/get-all');
+        const res = await apiClient.get('/service-category/get-all');
         return res.data;
     },
 };

@@ -1,12 +1,12 @@
-import { apiClient, nestApi } from '../constants/api';
+import { apiClient } from '../constants/api';
 
 export const paymentService = {
     async create(data: any): Promise<any> {
-        const res = await nestApi.post('/payment/create', data);
+        const res = await apiClient.post('/payment/create', data);
         return res;
     },
     async callBack(): Promise<any> {
-        const res = await nestApi.post('/payment/callback');
+        const res = await apiClient.post('/payment/callback');
         return res;
     },
 };

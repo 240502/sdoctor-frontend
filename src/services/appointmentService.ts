@@ -1,12 +1,12 @@
-import { apiClient, nestApi } from '../constants/api';
+import { apiClient } from '../constants/api';
 
 export const AppointmentService = {
     async getAppointmentById(id: number): Promise<any> {
-        const res = await nestApi.get('/appointment/get-by-id/' + id);
+        const res = await apiClient.get('/appointment/get-by-id/' + id);
         return res.data;
     },
     async getAppointmentByType(data: any): Promise<any> {
-        const res = await nestApi.post(
+        const res = await apiClient.post(
             '/appointment/get-appointments-by-status',
             data
         );
@@ -14,26 +14,26 @@ export const AppointmentService = {
     },
 
     async getAppointmentInDay(doctorId: any): Promise<any> {
-        const res = await nestApi.get(
+        const res = await apiClient.get(
             '/appointment/get-appointment-in-day/' + doctorId
         );
         return res.data;
     },
     async getTotalPatientExaminedInDay(doctorId: number): Promise<any> {
-        const res = await nestApi.get(
+        const res = await apiClient.get(
             '/appointment/get-total-examined-patient-in-day/' + doctorId
         );
         return res.data;
     },
     async getTotalPatientInDay(doctorId: number): Promise<any> {
-        const res = await nestApi.get(
+        const res = await apiClient.get(
             '/appointment/get-total-patient-in-day/' + doctorId
         );
         return res.data;
     },
 
     async statisticsAppointmentsByDay(data: any, config: any): Promise<any> {
-        const res = await nestApi.post(
+        const res = await apiClient.post(
             '/appointment/statistics-appointments-by-day',
             data,
             config
@@ -56,15 +56,15 @@ export const AppointmentService = {
     },
 
     async createAppointment(data: any): Promise<any> {
-        const res = await nestApi.post('/appointment/create', data);
+        const res = await apiClient.post('/appointment/create', data);
         return res;
     },
     async viewAppointment(data: any): Promise<any> {
-        const res = await nestApi.post('/appointment/view', data);
+        const res = await apiClient.post('/appointment/view', data);
         return res.data;
     },
     async updateAppointmentStatus(data: any, config: any): Promise<any> {
-        const res = await nestApi.put(
+        const res = await apiClient.put(
             '/appointment/update-appointment-status',
             data,
             config
@@ -72,14 +72,14 @@ export const AppointmentService = {
         return res;
     },
     async getAppointmentAtInvoice(data: any): Promise<any> {
-        const res = await nestApi.post(
+        const res = await apiClient.post(
             '/appointment/get-appointment-at-invoice',
             data
         );
         return res?.data;
     },
     async updateIsValuation(appointmentId: number): Promise<any> {
-        const res = await nestApi.put(
+        const res = await apiClient.put(
             '/appointment/update-valuation/' + appointmentId
         );
         return res;

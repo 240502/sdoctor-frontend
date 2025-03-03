@@ -1,4 +1,4 @@
-import { apiClient, nestApi } from '../constants/api';
+import { apiClient } from '../constants/api';
 
 export const TimeService = {
     async getTimeById(id: number): Promise<any> {
@@ -6,7 +6,7 @@ export const TimeService = {
         return res.data;
     },
     async getTimeByTimeType(data: any): Promise<any> {
-        const res = await nestApi.post('/time/get-by-type', data);
+        const res = await apiClient.post('/time/get-by-type', data);
         return res.data;
     },
 };

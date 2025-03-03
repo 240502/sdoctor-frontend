@@ -1,9 +1,9 @@
-import { apiClient, nestApi } from '../constants/api';
+import { apiClient } from '../constants/api';
 
 export const invoicesService = {
     async createInvoice(data: any): Promise<any> {
         console.log('call create invoice');
-        const res = await nestApi.post('/invoice/create', data);
+        const res = await apiClient.post('/invoice/create', data);
         return res;
     },
     async updateInvoice(data: any): Promise<any> {
@@ -15,11 +15,11 @@ export const invoicesService = {
         return res;
     },
     async getRecentInvoice(doctorId: number): Promise<any> {
-        const res = await nestApi.get('/invoice/get-recent/' + doctorId);
+        const res = await apiClient.get('/invoice/get-recent/' + doctorId);
         return res?.data;
     },
     async getTotalRevenueByDateInNowWeek(data: any, config: any): Promise<any> {
-        const res = await nestApi.post(
+        const res = await apiClient.post(
             '/invoice/get-total-revenue-by-date-in-now-week',
             data,
             config
@@ -27,15 +27,15 @@ export const invoicesService = {
         return res.data;
     },
     async viewInvoice(data: any): Promise<any> {
-        const res = await nestApi.post('/invoice/view', data);
+        const res = await apiClient.post('/invoice/view', data);
         return res.data;
     },
     async updateInvoiceStatus(data: any, config: any): Promise<any> {
-        const res = await nestApi.put('/invoice/update-status', data, config);
+        const res = await apiClient.put('/invoice/update-status', data, config);
         return res;
     },
     async getInvoiceByAppointmentId(appointmentId: number): Promise<any> {
-        const res = await nestApi.get(
+        const res = await apiClient.get(
             '/invoice/get-by-appointment-id/' + appointmentId
         );
         return res?.data;
