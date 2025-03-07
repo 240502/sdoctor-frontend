@@ -1,7 +1,7 @@
 import { apiClient } from '../constants/api';
 export const PostService = {
     async getCommonPost(): Promise<any> {
-        const res = await apiClient.get('/post/get-common');
+        const res = await apiClient.get('/post/get-common-post');
         return res.data;
     },
     async updateViewPost(id: number): Promise<any> {

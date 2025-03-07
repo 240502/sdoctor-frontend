@@ -22,7 +22,7 @@ export const ServiceService = {
         return res?.data;
     },
     async getCommonService(): Promise<any> {
-        const res = await apiClient.get('/service/get-common');
+        const res = await apiClient.get('/service/get-common-service');
         return res?.data;
     },
     async updateView(id: any): Promise<any> {

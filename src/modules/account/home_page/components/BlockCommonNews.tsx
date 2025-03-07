@@ -74,12 +74,12 @@ export const BlockCommonPost = () => {
                                                 className="item__image feature-img object-fit-cover rounded "
                                                 preview={false}
                                                 src={
-                                                    post?.featuredImage?.includes(
+                                                    post?.featured_image?.includes(
                                                         'cloudinary'
                                                     )
-                                                        ? post?.featuredImage
+                                                        ? post?.featured_image
                                                         : baseURL +
-                                                          post?.featuredImage
+                                                          post?.featured_image
                                                 }
                                             ></Image>
                                             <p className="post-title mt-3 text-center text-dark fw-bold fs-6 text-capitalize">

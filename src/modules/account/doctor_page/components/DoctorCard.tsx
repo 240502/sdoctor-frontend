@@ -14,13 +14,13 @@ export const DoctorCard = ({ doctors, handleUpdateViewsDoctor }: any) => {
         <Row gutter={[16, 16]} className="cards">
             {doctors.map((doctor: Doctor) => {
                 return (
-                    <Col span={6} className="card-item" key={doctor?.doctorId}>
+                    <Col span={6} className="card-item" key={doctor?.doctor_id}>
                         <div className="card-container flex-grow-1 rounded border border-1 position-relative">
-                            {doctor?.averageStar && (
+                            {doctor?.average_star && (
                                 <div className="star text-end ">
                                     <StarFilled className="text-warning " />
                                     <span className="score d-inline-block ms-2">
-                                        {doctor?.averageStar
+                                        {doctor?.average_star
                                             ?.toString()
                                             .slice(0, 3)}
                                         /5
@@ -31,10 +31,11 @@ export const DoctorCard = ({ doctors, handleUpdateViewsDoctor }: any) => {
                                 <Image
                                     onClick={() => {
                                         navigate(
-                                            '/doctor/detail/' + doctor?.doctorId
+                                            '/doctor/detail/' +
+                                                doctor?.doctor_id
                                         );
                                         handleUpdateViewsDoctor(
-                                            doctor?.doctorId
+                                            doctor?.doctor_id
                                         );
                                         addWatchedDoctor(doctor);
                                     }}
@@ -47,16 +48,16 @@ export const DoctorCard = ({ doctors, handleUpdateViewsDoctor }: any) => {
                                 className="doctor-name text-center mt-3"
                                 onClick={() => {
                                     navigate(
-                                        '/doctor/detail/' + doctor?.doctorId
+                                        '/doctor/detail/' + doctor?.doctor_id
                                     );
-                                    handleUpdateViewsDoctor(doctor?.doctorId);
+                                    handleUpdateViewsDoctor(doctor?.doctor_id);
                                     addWatchedDoctor(doctor);
                                 }}
                             >
-                                {doctor.fullName}
+                                {doctor.full_name}
                             </h6>
                             <p className="mb-0 opacity-75 text-center mb-3">
-                                {doctor.majorName}
+                                {doctor.major_name}
                             </p>
                             <div className="text-center mb-4">
                                 <Tag color="blue" title="Tư vấn trực tiêp">
@@ -68,7 +69,7 @@ export const DoctorCard = ({ doctors, handleUpdateViewsDoctor }: any) => {
                             <div className="clinic-info">
                                 <p className="mb-1">
                                     <i className="fa-regular fa-hospital me-2"></i>
-                                    {doctor.clinicName}
+                                    {doctor.clinic_name}
                                 </p>
 
                                 <p>

@@ -8,7 +8,7 @@ import Slider from 'react-slick';
 import { Post } from '../../../../models/post';
 import { Image } from 'antd';
 import { PostService } from '../../../../services/postService';
-import { nestJsServiceUrl } from '../../../../constants/api';
+import { baseURL } from '../../../../constants/api';
 
 export const BlockCommonPost = () => {
     var settings = {
@@ -71,12 +71,12 @@ export const BlockCommonPost = () => {
                                                 className="item__image feature-img object-fit-cover rounded "
                                                 preview={false}
                                                 src={
-                                                    post?.featuredImage?.includes(
+                                                    post?.featured_image?.includes(
                                                         'cloudinary'
                                                     )
-                                                        ? post?.featuredImage
-                                                        : nestJsServiceUrl +
-                                                          post?.featuredImage
+                                                        ? post?.featured_image
+                                                        : baseURL +
+                                                          post?.featured_image
                                                 }
                                             ></Image>
                                             <p className="post-title mt-3 text-center text-dark fw-bold fs-6 text-capitalize">

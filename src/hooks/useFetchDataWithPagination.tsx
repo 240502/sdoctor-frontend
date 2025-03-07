@@ -1,16 +1,16 @@
-import { useState, useEffect } from 'react';
-import { nestApi } from '../constants/api';
-import { paginationState } from '../stores/paginationAtom';
-import { useRecoilState } from 'recoil';
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { apiClient } from '../constants/api';
 interface PaginationParams {
     filterOption?: any;
+    pageIndex?: number;
+    pageSize?: number;
 }
 
 interface UseFetchDataWithPaginationProps<T> {
     data: T[];
     loading: boolean;
     error: string | null;
-    changePage: (page: number, pageSize: number) => void;
+    pageCount: number;
 }
 
 export const useFetchDataWithPaginationProps = <T,>(
@@ -20,49 +20,47 @@ export const useFetchDataWithPaginationProps = <T,>(
     const [data, setData] = useState<T[]>([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
-    const [pagination, setPagination] = useRecoilState(paginationState);
-    const changePage = (currentPageIndex: number, newPageSize: number) => {
-        if (newPageSize !== pagination.pageSize) {
-            setPagination({
-                ...pagination,
-                pageSize: newPageSize,
-                pageIndex: 1,
-            });
-        } else {
-            setPagination({ ...pagination, pageIndex: currentPageIndex });
-        }
-    };
+    const [pageCount, setPageCount] = useState<number>(0);
+
+    const prevUrl = useRef<string | null>(null);
 
     useEffect(() => {
+        console.log('payload', payload);
         const fetchData = async () => {
+            console.log(
+                'prevUrl.current === apiEndpoint && payload?.pageIndex === 1',
+                prevUrl.current === apiEndpoint && payload?.pageIndex === 1
+            );
+            if (prevUrl.current === apiEndpoint && payload?.pageIndex === 1)
+                return;
+
+            prevUrl.current = apiEndpoint;
             setLoading(true);
             setError(null);
             try {
-                const res = await nestApi.post(apiEndpoint, {
+                const res = await apiClient.post(apiEndpoint, {
                     ...payload,
-                    pageIndex: pagination.pageIndex,
-                    pageSize: pagination.pageSize,
+                    pageIndex: payload?.pageIndex,
+                    pageSize: payload?.pageSize,
                 });
                 setData(res?.data?.data);
-                setPagination({
-                    ...pagination,
-                    pageCount: res?.data?.pageCount,
-                    totalItems: res?.data?.totalItems,
-                });
+                setPageCount(res?.data?.pageCount);
             } catch (err: any) {
                 setError(err?.response?.data?.message || 'Error fetching data');
                 setData([]);
             } finally {
-                setLoading(false);
+                setTimeout(() => {
+                    setLoading(false);
+                }, 1000);
             }
         };
         fetchData();
-    }, [apiEndpoint, pagination.pageIndex, pagination.pageSize, payload]);
+    }, [apiEndpoint, payload]);
 
     return {
         data,
         loading,
         error,
-        changePage,
+        pageCount,
     };
 };

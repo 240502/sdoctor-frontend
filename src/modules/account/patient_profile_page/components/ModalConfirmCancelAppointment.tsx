@@ -29,7 +29,6 @@ export const ModalConfirmCancelAppointment = ({
                 },
                 requirementObject: 'Bệnh nhân',
             };
-            console.log(data);
             const res = await AppointmentService.cancelAppointment(data);
 
             openNotificationWithIcon(

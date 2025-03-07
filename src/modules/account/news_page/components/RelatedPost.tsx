@@ -29,7 +29,7 @@ export const RelatedPost = ({
                                 >
                                     <Image
                                         className="feature-img object-fit-cover rounded"
-                                        src={post.featuredImage}
+                                        src={post.featured_image}
                                         preview={false}
                                     />
                                 </Link>
@@ -50,7 +50,7 @@ export const RelatedPost = ({
                                 </p>
                                 <p className="ms-2">
                                     <CalendarOutlined className="me-2" />
-                                    {dayjs(post.publicDate).format(
+                                    {dayjs(post.public_date).format(
                                         'DD-MM-YYYY'
                                     )}
                                 </p>

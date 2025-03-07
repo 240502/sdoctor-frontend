@@ -15,6 +15,7 @@ export const BlockHotDoctor = (): JSX.Element => {
     const handleUpdateViewsDoctor = async (id: number) => {
         try {
             const res = await doctorService.updateViewsDoctor(id);
+            console.log(res);
         } catch (err: any) {
             console.log(err.message);
         }
@@ -54,7 +55,7 @@ export const BlockHotDoctor = (): JSX.Element => {
                             <Col
                                 className=" mb-3"
                                 span={6}
-                                key={doctor.doctorId}
+                                key={doctor.doctor_id}
                             >
                                 <Card
                                     className="shadow position-relative"
@@ -65,10 +66,10 @@ export const BlockHotDoctor = (): JSX.Element => {
                                         onClick={() => {
                                             navigate(
                                                 '/doctor/detail/' +
-                                                    doctor.doctorId
+                                                    doctor.doctor_id
                                             );
                                             handleUpdateViewsDoctor(
-                                                doctor.doctorId
+                                                doctor.doctor_id
                                             );
                                             addWatchedDoctor(doctor);
                                         }}
@@ -77,13 +78,13 @@ export const BlockHotDoctor = (): JSX.Element => {
                                     ></Image>
                                     <Flex className="justify-content-between align-items-center ">
                                         <Tag color="blue" className="mt-2">
-                                            {doctor.majorName}
+                                            {doctor.major_name}
                                         </Tag>
-                                        {doctor?.averageStar && (
+                                        {doctor?.average_star && (
                                             <div className="star text-end ">
                                                 <StarFilled className="text-warning " />
                                                 <span className="score d-inline-block ms-2">
-                                                    {doctor?.averageStar
+                                                    {doctor?.average_star
                                                         ?.toString()
                                                         .slice(0, 3)}
                                                     /5
@@ -96,16 +97,16 @@ export const BlockHotDoctor = (): JSX.Element => {
                                             className="text-decoration-none text-dark"
                                             to={
                                                 '/doctor/detail/' +
-                                                doctor.doctorId
+                                                doctor.doctor_id
                                             }
                                             onClick={() => {
                                                 handleUpdateViewsDoctor(
-                                                    doctor.doctorId
+                                                    doctor.doctor_id
                                                 );
                                                 addWatchedDoctor(doctor);
                                             }}
                                         >
-                                            Bác sĩ. {doctor.fullName}
+                                            Bác sĩ. {doctor.full_name}
                                         </Link>
                                     </h6>
                                     <div className="location">

@@ -3,14 +3,14 @@ export interface Service {
     name: string;
     summary: string;
     price: number;
-    clinicId: number;
-    categoryId: number;
+    clinic_id: number;
+    category_id: number;
     image: string;
-    preparationProcess: string;
+    preparation_process: string;
     views: number;
-    serviceDetail: string;
-    categoryName: string;
+    service_detail: string;
+    category_name: string;
     location: string;
-    clinicName: string;
-    coverImage: string;
+    clinic_name: string;
+    cover_image: string;
 }

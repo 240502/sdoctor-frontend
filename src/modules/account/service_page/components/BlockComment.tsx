@@ -1,15 +1,13 @@
 import { CheckCircleOutlined } from '@ant-design/icons';
-import { Button, notification } from 'antd';
+import { Button } from 'antd';
 import { useState, useEffect } from 'react';
 import { CommentService } from '../../../../services/commentService';
 import { Comment } from '../../../../models/comment';
 import socket from '../../../../socket';
-type NotificationType = 'success' | 'error';
 export const BlockComment = ({ userId, setIsModalCommentOpen }: any) => {
     const [comments, setComments] = useState<Comment[]>();
     const [pageIndex, setPageIndex] = useState(1);
     const [pageSize, setPageSize] = useState(10);
-    const [api, contextHolder] = notification.useNotification();
     const getCommentByUserId = async (userID: number) => {
         try {
             const data = {

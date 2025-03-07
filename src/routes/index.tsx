@@ -1,5 +1,5 @@
-import { AdminLayout } from '../components/admin_layout';
-import { AppLayout } from '../components/app_layout';
+import { AdminLayout } from '../layouts/admin_layout';
+import { AppLayout } from '../layouts/app_layout';
 import { BookingSuccess } from '../components/BookingSuccess';
 import BookingAppointment from '../modules/account/appointment_page';
 import { ViewClinic } from '../modules/account/clinic_page';

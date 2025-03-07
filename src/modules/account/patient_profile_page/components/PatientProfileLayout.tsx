@@ -1,10 +1,5 @@
-import {
-    HomeOutlined,
-    UserOutlined,
-    SolutionOutlined,
-} from '@ant-design/icons';
+import { HomeOutlined, UserOutlined } from '@ant-design/icons';
 import { Breadcrumb, Divider, Menu } from 'antd';
-import type { MenuProps } from 'antd';
 import { useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 

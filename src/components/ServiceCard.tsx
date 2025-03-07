@@ -9,6 +9,7 @@ const ServiceCard = ({ services }: any) => {
     const updateViewService = async (id: number) => {
         try {
             const res = await ServiceService.updateView(id);
+            console.log(res);
         } catch (err: any) {
             console.log(err.message);
         }
@@ -45,7 +46,7 @@ const ServiceCard = ({ services }: any) => {
                                     {service.name}
                                 </h6>
                                 <p className="mb-0 opacity-75 text-center mb-3">
-                                    {service.categoryName}
+                                    {service.category_name}
                                 </p>
                                 <div className="clinic-info">
                                     <p className="mb-1">
@@ -59,7 +60,7 @@ const ServiceCard = ({ services }: any) => {
                                     </p>
                                     <p className="mb-1">
                                         <i className="fa-regular fa-hospital me-1"></i>
-                                        {service.clinicName}
+                                        {service.clinic_name}
                                     </p>
 
                                     <p>

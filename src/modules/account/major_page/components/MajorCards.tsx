@@ -1,6 +1,6 @@
-import { Pagination, Flex, Card } from 'antd';
+import { Flex, Card } from 'antd';
 import { Major } from '../../../../models/major';
-import { nestJsServiceUrl } from '../../../../constants/api';
+import { baseURL } from '../../../../constants/api';
 import { useNavigate } from 'react-router-dom';
 
 export const MajorCards = ({
@@ -32,10 +32,7 @@ export const MajorCards = ({
                                                         majorId: major.id,
                                                     });
                                                 }}
-                                                src={
-                                                    nestJsServiceUrl +
-                                                    major?.image
-                                                }
+                                                src={baseURL + major?.image}
                                             ></img>
                                         }
                                     >

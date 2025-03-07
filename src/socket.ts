@@ -1,10 +1,10 @@
 // src/socket.ts
 import { io, Socket } from 'socket.io-client';
-import { nestJsServiceUrl } from './constants/api';
+import { baseURL } from './constants/api';
 let socket: Socket | null = null;
 
 if (!socket) {
-    socket = io(nestJsServiceUrl); // Khởi tạo chỉ một lần
+    socket = io(baseURL); // Khởi tạo chỉ một lần
 }
 
 // Trạng thái đã join room

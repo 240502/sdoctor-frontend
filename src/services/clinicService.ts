@@ -2,7 +2,7 @@ import { apiClient } from '../constants/api';
 
 export const ClinicService = {
     async getCommonClinic(): Promise<any> {
-        const res: any = await apiClient.get('/clinic/get-common');
+        const res: any = await apiClient.get('/clinic/get-common-clinic');
         return res?.data;
     },
     async viewClinic(data: any): Promise<any> {

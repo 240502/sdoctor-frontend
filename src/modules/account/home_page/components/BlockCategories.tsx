@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { Col, Image, Row } from 'antd';
-import { nestJsServiceUrl } from '../../../../constants/api';
+import { baseURL } from '../../../../constants/api';
 import { MajorService } from '../../../../services/majorService';
 import { useEffect, useState } from 'react';
 import { Major } from '../../../../models/major';
@@ -42,7 +42,7 @@ export const BlockCategories = (): JSX.Element => {
                                 <Image
                                     preview={false}
                                     className="category-image rounded"
-                                    src={nestJsServiceUrl + major.image}
+                                    src={baseURL + major.image}
                                 ></Image>
                                 <p className="category-name pb-0 text-center fw-bold">
                                     {major.name}

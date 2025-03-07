@@ -8,7 +8,7 @@ import Slider from 'react-slick';
 import { Image } from 'antd';
 import { PostCategory } from '../../../../models/post_category';
 import { PostCategoryService } from '../../../../services/post_categoryService';
-import { nestJsServiceUrl } from '../../../../constants/api';
+import { baseURL } from '../../../../constants/api';
 import { useSetRecoilState } from 'recoil';
 import { postCategoryState } from '../../../../stores/scheduleAtom';
 export const BlockNewCategories = () => {
@@ -63,7 +63,7 @@ export const BlockNewCategories = () => {
                                         <Image
                                             className="item__image rounded-circle"
                                             preview={false}
-                                            src={nestJsServiceUrl + item.image}
+                                            src={baseURL + item.image}
                                             onClick={() => {
                                                 setPostCategory(item);
                                             }}

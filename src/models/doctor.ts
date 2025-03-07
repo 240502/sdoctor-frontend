@@ -1,18 +1,18 @@
 import { DoctorSchedule } from './doctorSchedule';
 
 export interface Doctor {
-    doctorId: number;
-    userId: number;
-    fullName: string;
-    clinicId: number;
-    majorId: number;
+    doctor_id: number;
+    user_id: number;
+    full_name: string;
+    clinic_id: number;
+    major_id: number;
     summary: String;
     image: string;
     email: string;
     phone: string;
     password: string;
-    createdAt: Date;
-    updatedAt: Date;
+    created_at: Date;
+    updated_at: Date;
     city: string;
     district: string;
     commune: string;
@@ -20,13 +20,13 @@ export interface Doctor {
     title: string;
     price: number;
     views: number;
-    clinicName: string;
+    clinic_name: string;
     location: string;
-    majorName: string;
+    major_name: string;
     schedule: DoctorSchedule;
     introduction: string;
     birthday: Date;
-    serviceId: number;
-    serviceName: string;
-    averageStar: number;
+    service_id: number;
+    service_name: string;
+    average_star: number;
 }

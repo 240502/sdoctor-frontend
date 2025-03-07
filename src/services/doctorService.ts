@@ -16,11 +16,11 @@ export const doctorService = {
         return res.data;
     },
     async viewDoctorForClient(data: any): Promise<any> {
-        const res: any = await apiClient.post('/doctor/view-for-client', data);
+        const res: any = await apiClient.post('/doctor/view', data);
         return res?.data;
     },
     async viewDoctorForAdmin(data: any): Promise<any> {
-        const res: any = await apiClient.post('/doctor/view-for-admin', data);
+        const res: any = await apiClient.post('/doctor/view', data);
         return res?.data;
     },
     async getDoctorById(id: number): Promise<any> {
