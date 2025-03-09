@@ -1,1 +1,2 @@
-export { AppLayout } from './components/AppLayout';
+import { AppLayout } from './components/AppLayout';
+export default AppLayout;

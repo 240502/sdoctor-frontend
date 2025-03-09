@@ -20,7 +20,6 @@ import { ClinicService } from '../../../../services/clinicService';
 import { ServiceCategoryService } from '../../../../services/serviceCategoryService';
 import { useFetchDataWithPaginationProps } from '../../../../hooks';
 import { Service } from '../../../../models/service';
-import { paginationState } from '../../../../stores/paginationAtom';
 
 const ViewService = () => {
     const priceOptions = [
@@ -56,7 +55,6 @@ const ViewService = () => {
             endPrice: 999999999,
         },
     ];
-    const [pagination, setPagination] = useRecoilState(paginationState);
     const apiEndpoint = '/service/view';
     const [services, setServices] = useRecoilState(serviceListState);
     const [clinics, setClinics] = useState<Clinic[]>([]);
@@ -235,7 +233,7 @@ const ViewService = () => {
                 ) : (
                     <p className="text-center">Không có dịch vụ nào!</p>
                 )}
-                {pagination.pageCount > 0 && (
+                {/* {pagination.pageCount > 0 && (
                     <Pagination
                         align="center"
                         className="mt-4"
@@ -246,7 +244,7 @@ const ViewService = () => {
                         pageSizeOptions={['4', '8', '12', '16', '20']}
                         onChange={changePage}
                     />
-                )}
+                )} */}
             </div>
         </div>
     );

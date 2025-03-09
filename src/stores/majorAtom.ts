@@ -9,3 +9,7 @@ export const majorIdValue = selector({
         return get(majorIdState);
     },
 });
+export const allMajorsState = atom({
+    key: 'allMajorsState',
+    default: [] as Major[],
+});

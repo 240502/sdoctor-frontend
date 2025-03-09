@@ -11,3 +11,8 @@ export const clinicListValue = selector({
         return get(clinicListState);
     },
 });
+
+export const allClinicsState = atom({
+    key: 'allClinicsState',
+    default: [] as Clinic[],
+});

@@ -1,2 +1,3 @@
-import DashBoard from './views/DashBoard';
+import React from 'react';
+const DashBoard = React.lazy(() => import('./views/DashBoard'));
 export { DashBoard };

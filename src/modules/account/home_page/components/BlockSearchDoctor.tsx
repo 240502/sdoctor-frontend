@@ -1,22 +1,16 @@
 import { SearchOutlined } from '@ant-design/icons';
 import { Button, Input, Flex, InputRef, Form } from 'antd';
 import { useRef } from 'react';
-import { useRecoilState } from 'recoil';
-import { searchDoctorOptionsGlobal } from '../../../../stores/doctorAtom';
 import { useNavigate } from 'react-router-dom';
 
 export const BlockSearchDoctor = () => {
-    const [options, setOptions] = useRecoilState(searchDoctorOptionsGlobal);
     const inputSearchRef = useRef<InputRef>(null);
     const navigate = useNavigate();
     const [form] = Form.useForm();
     const onFinish = (values: any) => {
-        const newOptions = {
-            ...options,
-            name: values.search_content,
-        };
-        setOptions(newOptions);
-        navigate('/list/doctor');
+        const queryParams = new URLSearchParams();
+        queryParams.append('name', values.search_content);
+        navigate('/list/doctor?' + queryParams.toString());
     };
     return (
         <div className="search-group">

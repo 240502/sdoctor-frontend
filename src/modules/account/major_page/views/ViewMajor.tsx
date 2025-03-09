@@ -4,16 +4,12 @@ import { HomeOutlined } from '@ant-design/icons';
 import { MajorCards } from '../components/MajorCards';
 import { Major } from '../../../../models/major';
 import { useRecoilState } from 'recoil';
-import { searchDoctorOptionsGlobal } from '../../../../stores/doctorAtom';
-import { paginationState } from '../../../../stores/paginationAtom';
 import { useFetchDataWithPaginationProps } from '../../../../hooks';
 
 const ViewMajor = () => {
     const [pagination, setPagination] = useRecoilState(paginationState);
     const [majors, setMajors] = useState<Major[]>([]);
-    const [optionsGlobal, setOptionsGlobal] = useRecoilState(
-        searchDoctorOptionsGlobal
-    );
+
     const apiEndpoint = '/major/view';
 
     const { data, loading, error, changePage } =
@@ -39,7 +35,7 @@ const ViewMajor = () => {
                 ]}
             />
 
-            <div className="block__list__doctor mt-4">
+            {/* <div className="block__list__doctor mt-4">
                 {loading ? (
                     <p>Đang tải dữ liệu ...</p>
                 ) : error ? (
@@ -49,12 +45,8 @@ const ViewMajor = () => {
                         <>
                             <MajorCards
                                 majors={majors}
-                                pageCount={pagination.pageCount}
-                                pageIndex={pagination.pageIndex}
-                                pageSize={pagination.pageSize}
+                            
                                 changePage={changePage}
-                                setOptionsGlobal={setOptionsGlobal}
-                                optionsGlobal={optionsGlobal}
                             />
                             <section className="page d-flex justify-content-center align-items-center">
                                 {pagination.pageCount > 0 ? (
@@ -83,7 +75,7 @@ const ViewMajor = () => {
                         </>
                     )
                 )}
-            </div>
+            </div> */}
         </div>
     );
 };

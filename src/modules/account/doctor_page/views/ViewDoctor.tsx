@@ -1,60 +1,71 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { HomeOutlined } from '@ant-design/icons';
 import { Breadcrumb, Select, Flex, Input } from 'antd';
 import { doctorService } from '../../../../services/doctorService';
-import { useRecoilState, useSetRecoilState } from 'recoil';
+import { useRecoilState } from 'recoil';
 import {
     doctorListState,
-    doctorState,
-    searchDoctorOptionsGlobal,
+    doctorPagination,
+    isPreventCallApi,
+    doctorOptions,
 } from '../../../../stores/doctorAtom';
-import { MajorService } from '../../../../services/majorService';
-import { Major } from '../../../../models/major';
 import { Clinic } from '../../../../models/clinic';
 import { DoctorCard } from '../components/DoctorCard';
 import { useFetchDataWithPaginationProps } from '../../../../hooks';
 import { Doctor } from '../../../../models/doctor';
-import { paginationState } from '../../../../stores/paginationAtom';
 import LoadingLayout from '../../../../layouts/loading_layout/LoadingLayout';
 import ShowMoreComp from '../../../../components/ShowMoreComp';
 import {
     VIEW_CLINIC_ENDPOINT,
     VIEW_DOCTOR_ENDPOINT,
+    VIEW_MAJOR_ENDPOINT,
 } from '../../../../constants/endpoints';
+import { Major } from '../../../../models/major';
+import { useSearchParams } from 'react-router-dom';
+import { allClinicsState } from '../../../../stores/clinicAtom';
+import { allMajorsState } from '../../../../stores/majorAtom';
 const { Option } = Select;
 const { Search } = Input;
 
 const ViewDoctor = () => {
-    const [optionsGlobal, setOptionsGlobal] = useRecoilState(
-        searchDoctorOptionsGlobal
-    );
+    const [searchParams] = useSearchParams();
+    const [doctorsState, setDoctorsState] = useRecoilState(doctorListState);
+    const [majorsState, setMajorsState] = useRecoilState(allMajorsState);
+    const [clinicsState, setClinicsState] = useRecoilState(allClinicsState);
+    const [doctorPaginationState, setDoctorPaginationState] =
+        useRecoilState(doctorPagination);
+    const [isPreventCallApiGetDoctors, setIsPreventCallApiGetDoctors] =
+        useRecoilState(isPreventCallApi);
 
-    const [options, setOptions] = useState<any>({
-        majorId: null,
-        clinicId: null,
-        name: null,
-        pageIndex: 1,
-        pageSize: 8,
-    });
-    const [searchContent, setSearchContent] = useState<string>('');
-    const [pagination, setPagination] = useRecoilState(paginationState);
+    const [doctorOptionsState, setDoctorOptions] =
+        useRecoilState(doctorOptions);
     const {
         data: doctors,
         loading: loadingDoctors,
         error: errorDoctors,
-        pageCount: doctorPageCount,
-    } = useFetchDataWithPaginationProps<Doctor>(VIEW_DOCTOR_ENDPOINT, options);
+        pageCount,
+        resetFirstFetch,
+    } = useFetchDataWithPaginationProps<Doctor>(
+        VIEW_DOCTOR_ENDPOINT,
+        {
+            filterOptions: doctorOptionsState as any,
+            pageIndex: doctorPaginationState.pageIndex,
+            pageSize: doctorPaginationState.pageSize,
+        },
+        isPreventCallApiGetDoctors
+    );
 
-    const {
-        data: clinics,
-        loading: loadingClinics,
-        error: errorClinics,
-        pageCount: clinicPageCount,
-    } = useFetchDataWithPaginationProps<Clinic>(VIEW_CLINIC_ENDPOINT);
-    useEffect(() => {
-        console.log('clinics', clinics);
-    }, [clinics]);
-    const [doctorsState, setDoctorsState] = useRecoilState(doctorListState);
+    const { data: clinics } = useFetchDataWithPaginationProps<Clinic>(
+        VIEW_CLINIC_ENDPOINT,
+        undefined,
+        clinicsState.length > 0
+    );
+    const { data: majors } = useFetchDataWithPaginationProps<Major>(
+        VIEW_MAJOR_ENDPOINT,
+        undefined,
+        majorsState.length > 0
+    );
+
     const handleUpdateViewsDoctor = async (id: number) => {
         try {
             const res = await doctorService.updateViewsDoctor(id);
@@ -65,17 +76,32 @@ const ViewDoctor = () => {
     };
 
     const handleOnClickShowMoreButton = () => {
-        if (options.pageIndex < doctorPageCount) {
-            setOptions({ ...options, pageIndex: options.pageIndex + 1 });
+        if (doctorPaginationState.pageIndex < pageCount) {
+            setDoctorPaginationState({
+                ...doctorPaginationState,
+                pageIndex: doctorPaginationState.pageIndex + 1,
+            });
         }
     };
 
     useEffect(() => {
-        if (!doctors) {
+        setDoctorPaginationState({
+            ...doctorPaginationState,
+            pageCount: pageCount,
+        });
+
+        if (!doctors || doctors.length === 0) {
             return;
         }
+        let timeOutId: any;
         if (doctorsState.length > 0) {
-            if (JSON.stringify(doctorsState) === JSON.stringify(doctors)) {
+            const isSameData =
+                doctorsState.length === doctors?.length &&
+                doctorsState.every(
+                    (doctor: Doctor, index: number) =>
+                        doctor.doctor_id === doctors[index].doctor_id
+                );
+            if (isSameData) {
                 return;
             }
             const existingKeys = new Set(
@@ -85,88 +111,110 @@ const ViewDoctor = () => {
                 (doctor: Doctor) => !existingKeys.has(doctor.doctor_id)
             );
             const newDoctors = [...doctorsState, ...newItems];
-            if (JSON.stringify(doctorsState) === JSON.stringify(newDoctors)) {
-                console.log('dữ liệu cũ giống với dữ liệu mới 2');
+            const isSameNewData =
+                doctorsState?.length === newDoctors?.length &&
+                doctorsState.every(
+                    (doctor: Doctor, index: number) =>
+                        doctor.doctor_id === newDoctors[index].doctor_id
+                );
+            if (isSameNewData) {
                 return;
             }
+
             setDoctorsState(newDoctors);
         } else {
-            if (JSON.stringify(doctorsState) !== JSON.stringify(doctors)) {
-                setDoctorsState(doctors);
-                console.log('set state lần 1:');
-            }
+            setTimeout(() => {
+                timeOutId = setDoctorsState(doctors);
+            }, 1000);
         }
+        return () => {
+            clearTimeout(timeOutId);
+        };
     }, [doctors]);
 
     useEffect(() => {
-        window.scrollTo(0, 0);
-        if (optionsGlobal.name || optionsGlobal.majorId) {
-            setOptions({
-                ...options,
-                majorId: optionsGlobal.majorId,
-                name: optionsGlobal.name,
-            });
-            setSearchContent(optionsGlobal.name);
+        if (majorsState.length === 0) {
+            setMajorsState(majors);
         }
+    }, [majors]);
 
-        return () => {
-            setOptions({
-                majorId: null,
-                clinicId: null,
-                pageIndex: 1,
-                pageSize: 8,
+    useEffect(() => {
+        if (majorsState.length === 0) {
+            setClinicsState(clinics);
+        }
+    }, [clinics]);
+
+    useEffect(() => {
+        console.log("searchParams.get('majorId'", searchParams.get('majorId'));
+        window.scrollTo(0, 0);
+        if (searchParams.get('majorId')) {
+            setDoctorOptions({
+                ...doctorOptionsState,
+                majorId: Number(searchParams.get('majorId')),
             });
-            setOptionsGlobal({
-                majorId: null,
-                name: null,
+            resetFirstFetch('/doctor/view');
+        }
+        if (searchParams.get('name')) {
+            setDoctorOptions({
+                ...doctorOptionsState,
+                name: searchParams.get('name') ?? '',
             });
-        };
+            resetFirstFetch('/doctor/view');
+        }
+        if (doctorsState.length > 0) {
+            setIsPreventCallApiGetDoctors(true);
+        }
+        console.log('majors', majorsState);
+        console.log('clinics', clinicsState);
+
+        return () => {};
     }, []);
+    useEffect(() => {
+        console.log('doctorOptionsState', doctorOptionsState);
+    }, [doctorOptionsState]);
 
     return (
-        <LoadingLayout loading={loadingDoctors}>
-            {errorDoctors ? (
-                <p className="fs-6 fw-bold text-center mt-4"> {errorDoctors}</p>
-            ) : (
-                <div className="container doctor-list mt-4 mb-4">
-                    <Breadcrumb
-                        items={[
-                            {
-                                href: '',
-                                title: <HomeOutlined />,
-                            },
+        <LoadingLayout loading={doctorsState?.length === 0}>
+            <div className="container doctor-list mt-4 mb-4">
+                <Breadcrumb
+                    items={[
+                        {
+                            href: '',
+                            title: <HomeOutlined />,
+                        },
 
-                            {
-                                title: `Danh sách bác sĩ`,
-                            },
-                        ]}
-                    />
-                    <div className="block__list__doctor mt-3">
-                        <Flex
-                            gap={'middle'}
-                            className=" justify-content-between shadow p-3 rounded"
-                        >
-                            <Flex className="col-5" gap={'middle'}>
-                                <div className="col">
-                                    <Select
-                                        className="d-block"
-                                        placeholder="Chọn cơ sở y tế"
-                                        optionFilterProp="children"
-                                        allowClear
-                                        showSearch
-                                        value={options.clinicId}
-                                        onChange={(value: any) => {
-                                            setOptions({
-                                                ...options,
-                                                clinicId: value ?? null,
-                                            });
-                                            setPagination({
-                                                ...pagination,
-                                                pageIndex: 1,
-                                            });
-                                        }}
-                                    >
-                                        {/* {clinics.map((clinic: Clinic) => (
+                        {
+                            title: `Danh sách bác sĩ`,
+                        },
+                    ]}
+                />
+                <div className="block__list__doctor mt-3">
+                    <Flex
+                        gap={'middle'}
+                        className=" justify-content-between shadow p-3 rounded"
+                    >
+                        <Flex className="col-5" gap={'middle'}>
+                            <div className="col">
+                                <Select
+                                    className="d-block"
+                                    placeholder="Chọn cơ sở y tế"
+                                    optionFilterProp="children"
+                                    allowClear
+                                    showSearch
+                                    value={
+                                        doctorOptionsState.clinicId !== 0
+                                            ? doctorOptionsState.clinicId
+                                            : null
+                                    }
+                                    onChange={(value: any) => {
+                                        setDoctorOptions({
+                                            ...doctorOptionsState,
+                                            clinicId: value ?? null,
+                                        });
+                                        resetFirstFetch('/doctor/view');
+                                    }}
+                                >
+                                    {clinicsState.map((clinic: Clinic) => (
                                         <Option
                                             key={clinic.id}
                                             value={clinic.id}
@@ -174,75 +222,87 @@ const ViewDoctor = () => {
                                         >
                                             {clinic.name}
                                         </Option>
-                                    ))} */}
-                                    </Select>
-                                </div>
-                                <div className="col">
-                                    <Select
-                                        className="d-block"
-                                        placeholder="Chọn chuyên ngành"
-                                        optionFilterProp="children"
-                                        allowClear
-                                        showSearch
-                                        value={options.majorId}
-                                        onChange={(value: any) => {
-                                            setOptions({
-                                                ...options,
-                                                majorId: value ?? null,
-                                            });
-                                            setPagination({
-                                                ...pagination,
-                                                pageIndex: 1,
-                                            });
-                                        }}
-                                    >
-                                        {/* {majors?.map((major: Major) => (
-                                            <Option
-                                                key={major.id}
-                                                value={major.id}
-                                                label={major.name}
-                                            >
-                                                {major.name}
-                                            </Option>
-                                        ))} */}
-                                    </Select>
-                                </div>
-                            </Flex>
-                            <Flex className="col-5 justify-content-end position-relative">
-                                <Search
-                                    className="search-input"
-                                    placeholder="Nhập tên bác sĩ"
-                                    value={searchContent}
-                                    onSearch={() => {
-                                        setOptions({
-                                            ...options,
-                                            name: searchContent,
+                                    ))}
+                                </Select>
+                            </div>
+                            <div className="col">
+                                <Select
+                                    className="d-block"
+                                    placeholder="Chọn chuyên ngành"
+                                    optionFilterProp="children"
+                                    allowClear
+                                    showSearch
+                                    value={
+                                        doctorOptionsState.majorId !== 0
+                                            ? doctorOptionsState.majorId
+                                            : searchParams.get('majorId')
+                                            ? Number(
+                                                  searchParams.get('majorId')
+                                              )
+                                            : null
+                                    }
+                                    onChange={(value: any) => {
+                                        setDoctorOptions({
+                                            ...doctorOptionsState,
+                                            majorId: value ?? null,
                                         });
+                                        resetFirstFetch('/doctor/view');
                                     }}
-                                    onChange={(e) => {
-                                        setSearchContent(e.target.value);
-                                    }}
-                                    style={{ width: '48%' }}
-                                />
-                            </Flex>
+                                >
+                                    {majorsState?.map((major: Major) => (
+                                        <Option
+                                            key={major.id}
+                                            value={major.id}
+                                            label={major.name}
+                                        >
+                                            {major.name}
+                                        </Option>
+                                    ))}
+                                </Select>
+                            </div>
                         </Flex>
-                        <>
-                            <DoctorCard
-                                doctors={doctorsState}
-                                handleUpdateViewsDoctor={
-                                    handleUpdateViewsDoctor
-                                }
+                        <Flex className="col-5 justify-content-end position-relative">
+                            <Search
+                                className="search-input"
+                                placeholder="Nhập tên bác sĩ"
+                                value={doctorOptionsState.name}
+                                onChange={(e) => {
+                                    setDoctorOptions({
+                                        ...doctorOptionsState,
+                                        name: e.target.value,
+                                    });
+                                }}
+                                style={{ width: '48%' }}
                             />
-                            {options?.pageIndex < doctorPageCount && (
-                                <ShowMoreComp
-                                    loading={loadingDoctors}
-                                    onClick={handleOnClickShowMoreButton}
+                        </Flex>
+                    </Flex>
+                    <>
+                        {errorDoctors ? (
+                            <p className="fs-6 fw-bold text-center mt-4">
+                                {' '}
+                                {errorDoctors}
+                            </p>
+                        ) : (
+                            <>
+                                <DoctorCard
+                                    doctors={doctorsState}
+                                    handleUpdateViewsDoctor={
+                                        handleUpdateViewsDoctor
+                                    }
                                 />
-                            )}
-                        </>
-                    </div>
+                                {(doctorPaginationState?.pageIndex <
+                                    pageCount ||
+                                    loadingDoctors) && (
+                                    <ShowMoreComp
+                                        loading={loadingDoctors}
+                                        onClick={handleOnClickShowMoreButton}
+                                    />
+                                )}
+                            </>
+                        )}
+                    </>
                 </div>
-            )}
+            </div>
         </LoadingLayout>
     );
 };

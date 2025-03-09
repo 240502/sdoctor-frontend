@@ -6,7 +6,6 @@ import {
 import {
     Breadcrumb,
     Image,
-    notification,
     Button,
     Tag,
     Divider,
@@ -83,7 +82,7 @@ const ViewDetailDoctor = () => {
         try {
             if (doctors.length > 0) {
                 const res: any = doctors.find((doctor: Doctor) => {
-                    if (doctor.doctorId === Number(id)) return doctor;
+                    if (doctor.doctor_id === Number(id)) return doctor;
                 });
                 setDoctor(res);
             } else {
@@ -182,9 +181,9 @@ const ViewDetailDoctor = () => {
                             </div>
                             <div className="info ms-3">
                                 <h5 className="doctor-name">
-                                    {doctor?.title} {doctor?.fullName}
+                                    {doctor?.title} {doctor?.full_name}
                                 </h5>
-                                <Tag color="blue">{doctor?.majorName}</Tag>
+                                <Tag color="blue">{doctor?.major_name}</Tag>
                                 <p className="doctor-location mt-2">
                                     <EnvironmentOutlined className="me-2"></EnvironmentOutlined>
                                     {doctor?.location}
@@ -204,14 +203,14 @@ const ViewDetailDoctor = () => {
                             </div>
                         </Flex>
                         <div className="col-3 text-end">
-                            {doctor?.averageStar !== null && (
+                            {doctor?.average_star !== null && (
                                 <Tag
                                     color="default"
                                     className="fs-6 rounded border-0 p-32d-inline-block"
                                 >
                                     <StarFilled className="text-warning" />
                                     <span className="fw-bold">
-                                        {doctor?.averageStar
+                                        {doctor?.average_star
                                             ?.toString()
                                             ?.slice(0, 3)}
                                         /5
@@ -241,10 +240,10 @@ const ViewDetailDoctor = () => {
                     <Divider></Divider>
                     <Row gutter={24}>
                         {commonDoctors?.map((doctor: Doctor) => {
-                            if (doctor.doctorId !== Number(id)) {
+                            if (doctor.doctor_id !== Number(id)) {
                                 return (
                                     <Col
-                                        key={doctor?.doctorId}
+                                        key={doctor?.doctor_id}
                                         span={24}
                                         style={{ cursor: 'pointer' }}
                                     >
@@ -254,7 +253,7 @@ const ViewDetailDoctor = () => {
                                                     onClick={() => {
                                                         navigate(
                                                             '/doctor/detail/' +
-                                                                doctor.doctorId
+                                                                doctor.doctor_id
                                                         );
                                                     }}
                                                     className="rounded-circle"
@@ -268,18 +267,18 @@ const ViewDetailDoctor = () => {
                                                     onClick={() => {
                                                         navigate(
                                                             '/doctor/detail/' +
-                                                                doctor.doctorId
+                                                                doctor.doctor_id
                                                         );
                                                     }}
                                                 >
                                                     {doctor.title}{' '}
-                                                    {doctor?.fullName}
+                                                    {doctor?.full_name}
                                                 </p>
                                                 <Tag
                                                     color="blue"
                                                     className="mb-2"
                                                 >
-                                                    {doctor.majorName}
+                                                    {doctor.major_name}
                                                 </Tag>
                                                 <p>
                                                     <EnvironmentOutlined />{' '}

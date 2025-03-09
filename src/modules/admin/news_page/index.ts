@@ -1,3 +1,4 @@
-import NewsManagement from './views/NewsManagement';
+import React from 'react';
 
+const NewsManagement = React.lazy(() => import('./views/NewsManagement'));
 export { NewsManagement };

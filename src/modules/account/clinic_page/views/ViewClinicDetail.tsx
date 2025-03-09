@@ -34,7 +34,7 @@ import { ServiceService } from '../../../../services/serviceService';
 import { ServiceCategoryService } from '../../../../services/serviceCategoryService';
 import { ServiceCategory } from '../../../../models/category_services';
 
-export const ViewClinicDetail = () => {
+const ViewClinicDetail = () => {
     const { id } = useParams<any>();
     const clinics = useRecoilValue(clinicListValue);
     const [clinic, setClinic] = useState<Clinic>();
@@ -432,3 +432,5 @@ export const ViewClinicDetail = () => {
         </div>
     );
 };
+
+export default ViewClinicDetail;

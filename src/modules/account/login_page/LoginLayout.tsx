@@ -3,7 +3,7 @@ import type { TabsProps } from 'antd';
 import { FormLogin } from './FormLogin';
 import { FormRegister } from './FormRegister';
 import '@/assets/scss/login.scss';
-export const LoginLayout = () => {
+const LoginLayout = () => {
     const items: TabsProps['items'] = [
         {
             key: '1',
@@ -27,3 +27,4 @@ export const LoginLayout = () => {
         </>
     );
 };
+export default LoginLayout;

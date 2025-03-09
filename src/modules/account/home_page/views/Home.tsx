@@ -6,11 +6,10 @@ import { BlockClinic } from '../components/BlockClinic';
 import { BlockHotDoctor } from '../components/BlockHotDoctor';
 import { BlockCommonPost } from '../components/BlockCommonNews';
 import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { BlockSearchDoctor } from '../components/BlockSearchDoctor';
 import { BlockCommonService } from '../components/BlockCommonService';
-
-export const Home = () => {
+import { useNavigate } from 'react-router-dom';
+const Home = () => {
     const navigate = useNavigate();
     useEffect(() => {
         window.scrollTo(0, 0);
@@ -63,3 +62,4 @@ export const Home = () => {
         </>
     );
 };
+export default Home;

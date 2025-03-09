@@ -1,12 +1,11 @@
-import { AdminLayout } from '../layouts/admin_layout';
-import { AppLayout } from '../layouts/app_layout';
-import { BookingSuccess } from '../components/BookingSuccess';
+import BookingSuccess from '../components/BookingSuccess';
+import AdminLayout from '../layouts/admin_layout';
+import AppLayout from '../layouts/app_layout';
 import BookingAppointment from '../modules/account/appointment_page';
-import { ViewClinic } from '../modules/account/clinic_page';
-import { ViewClinicDetail } from '../modules/account/clinic_page/views/ViewClinicDetail';
+import { ViewClinic, ViewClinicDetail } from '../modules/account/clinic_page';
 import { ViewDetailDoctor, ViewDoctor } from '../modules/account/doctor_page';
 import { Home } from '../modules/account/home_page';
-import { LoginLayout } from '../modules/account/login_page/LoginLayout';
+import { LoginLayout } from '../modules/account/login_page';
 import { ViewMajor } from '../modules/account/major_page';
 import {
     PostDetail,

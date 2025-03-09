@@ -13,17 +13,6 @@ export const doctorListValue = selector({
     },
 });
 
-export const searchDoctorOptionsGlobal = atom({
-    key: 'searchDoctorOptionsGlobal',
-    default: { name: null, majorId: null } as any,
-});
-export const searchDoctorOptionsGlobalValue = selector({
-    key: 'searchDoctorOptionsGlobalValue',
-    get: ({ get }) => {
-        return get(searchDoctorOptionsGlobal);
-    },
-});
-
 export const doctorState = atom({
     key: 'doctorState',
     default: {} as Doctor,
@@ -44,5 +33,29 @@ export const commonDoctorValue = selector({
     key: 'commonDoctorValue',
     get: ({ get }) => {
         return get(commonDoctorsState);
+    },
+});
+
+export const doctorPagination = atom({
+    key: 'doctorPagination',
+    default: {
+        pageCount: 0,
+        pageIndex: 1,
+        pageSize: 8,
+        totalItems: 0,
+    },
+});
+
+export const isPreventCallApi = atom({
+    key: 'isPreventCallApi',
+    default: false,
+});
+
+export const doctorOptions = atom({
+    key: 'doctorOptions',
+    default: {
+        majorId: 0,
+        clinicId: 0,
+        name: '',
     },
 });

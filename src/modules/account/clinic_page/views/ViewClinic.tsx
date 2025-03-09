@@ -12,7 +12,6 @@ import { SearchProps } from 'antd/es/input';
 import axios from 'axios';
 import { ClinicCard } from '../components/ClinicCard';
 import { useFetchDataWithPaginationProps } from '../../../../hooks';
-import { paginationState } from '../../../../stores/paginationAtom';
 import { Clinic } from '../../../../models/clinic';
 const { Search } = Input;
 const ViewClinic = () => {
@@ -36,7 +35,6 @@ const ViewClinic = () => {
         setOptionsFilter(newOptions);
     };
     const handleChangeLocation = (value: string) => {
-        setPagination({ ...pagination, pageIndex: 1 });
         let province: string = '';
         const cityStr = 'thành phố';
         const provinceStr = 'tỉnh';

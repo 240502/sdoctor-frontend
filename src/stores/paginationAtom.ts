@@ -1,11 +1,8 @@
 import { atom } from 'recoil';
 
-export const paginationState = atom({
-    key: 'paginationState',
+export const paginationAtom = atom({
+    key: 'paginationAtom',
     default: {
-        pageIndex: 1,
-        pageSize: 8,
-        totalItems: 0,
         pageCount: 0,
     },
 });

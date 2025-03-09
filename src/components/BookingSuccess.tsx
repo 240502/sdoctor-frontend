@@ -9,7 +9,7 @@ import { invoiceValue } from '../stores/invoice';
 import { Invoices } from '../models/invoices';
 const { Title, Text } = Typography;
 import dayjs from 'dayjs';
-export const BookingSuccess = () => {
+const BookingSuccess = () => {
     const navigate = useNavigate();
     const newAppointment = useRecoilValue(newAppointmentValue);
     const invoice = useRecoilValue(invoiceValue);
@@ -83,3 +83,4 @@ export const BookingSuccess = () => {
         </div>
     );
 };
+export default BookingSuccess;

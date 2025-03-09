@@ -8,7 +8,6 @@ import { SearchProps } from 'antd/es/input';
 import { PostCards } from '../components/PostCards';
 import { useRecoilState } from 'recoil';
 import { postCategoryState } from '../../../../stores/scheduleAtom';
-import { paginationState } from '../../../../stores/paginationAtom';
 import { useFetchDataWithPaginationProps } from '../../../../hooks';
 
 const { Option } = Select;
@@ -94,7 +93,6 @@ const ViewPostByCategory = () => {
                                 ...searchOptions,
                                 categoryId: value,
                             });
-                            setPagination({ ...pagination, pageIndex: 1 });
                             setPostCategory(category);
                         }}
                         placeholder="Chọn loại bài viết"
@@ -134,7 +132,7 @@ const ViewPostByCategory = () => {
                 </p>
             )}
 
-            {pagination.pageCount > 0 && (
+            {/* {pagination.pageCount > 0 && (
                 <Pagination
                     align="center"
                     className="mt-3 mb-3"
@@ -145,7 +143,7 @@ const ViewPostByCategory = () => {
                     pageSizeOptions={['4', '8', '12', '16']}
                     onChange={changePage}
                 />
-            )}
+            )} */}
         </div>
     );
 };

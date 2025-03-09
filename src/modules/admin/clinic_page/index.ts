@@ -1,3 +1,3 @@
-import ClinicManagement from './views/ClinicManagement';
-
+import React from 'react';
+const ClinicManagement = React.lazy(() => import('./views/ClinicManagement'));
 export { ClinicManagement };

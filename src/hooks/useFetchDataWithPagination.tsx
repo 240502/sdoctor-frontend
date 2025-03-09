@@ -1,7 +1,7 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { apiClient } from '../constants/api';
-interface PaginationParams {
-    filterOption?: any;
+interface Options {
+    filterOptions?: any;
     pageIndex?: number;
     pageSize?: number;
 }
@@ -11,42 +11,50 @@ interface UseFetchDataWithPaginationProps<T> {
     loading: boolean;
     error: string | null;
     pageCount: number;
+    resetFirstFetch: (url: string) => void;
 }
 
 export const useFetchDataWithPaginationProps = <T,>(
     apiEndpoint: string,
-    payload?: PaginationParams
+    payload?: Options,
+    preventLoading?: boolean
 ): UseFetchDataWithPaginationProps<T> => {
     const [data, setData] = useState<T[]>([]);
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
-    const [pageCount, setPageCount] = useState<number>(0);
-
+    const [loading, setLoading] = useState<boolean>(false);
+    const errorRef = useRef<string | null>(null);
+    const pageCountRef = useRef<number>(0);
     const prevUrl = useRef<string | null>(null);
+    const resetFirstFetch = (url: string) => {
+        if (prevUrl.current === url) {
+            prevUrl.current = null;
+        }
+    };
 
     useEffect(() => {
-        console.log('payload', payload);
         const fetchData = async () => {
-            console.log(
-                'prevUrl.current === apiEndpoint && payload?.pageIndex === 1',
-                prevUrl.current === apiEndpoint && payload?.pageIndex === 1
-            );
-            if (prevUrl.current === apiEndpoint && payload?.pageIndex === 1)
+            if (prevUrl.current === apiEndpoint && payload?.pageIndex === 1) {
                 return;
-
+            }
+            if (preventLoading) {
+                return;
+            }
+            if (prevUrl.current) {
+                setLoading(true);
+            }
             prevUrl.current = apiEndpoint;
-            setLoading(true);
-            setError(null);
+
+            errorRef.current = null;
             try {
                 const res = await apiClient.post(apiEndpoint, {
-                    ...payload,
+                    ...payload?.filterOptions,
                     pageIndex: payload?.pageIndex,
                     pageSize: payload?.pageSize,
                 });
                 setData(res?.data?.data);
-                setPageCount(res?.data?.pageCount);
+                pageCountRef.current = res?.data?.pageCount;
             } catch (err: any) {
-                setError(err?.response?.data?.message || 'Error fetching data');
+                errorRef.current =
+                    err?.response?.data?.message || 'Error fetching data';
                 setData([]);
             } finally {
                 setTimeout(() => {
@@ -55,12 +63,13 @@ export const useFetchDataWithPaginationProps = <T,>(
             }
         };
         fetchData();
-    }, [apiEndpoint, payload]);
+    }, [apiEndpoint, JSON.stringify(payload)]);
 
     return {
         data,
-        loading,
-        error,
-        pageCount,
+        loading: loading,
+        error: errorRef.current,
+        pageCount: pageCountRef.current,
+        resetFirstFetch,
     };
 };
