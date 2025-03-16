@@ -9,8 +9,10 @@ import { patientProfileState } from './stores/patientAtom';
 import { PatientProfileService } from './services/patient_profileService';
 import socket from './socket';
 import { User } from './models/user';
-import LoadingComp from './components/LoadingComp';
+import { Skeleton } from 'antd';
+
 function App() {
+
     const setUser = useSetRecoilState(userState);
     const setPatientProfile = useSetRecoilState(patientProfileState);
     const handleWindowLoad = (user: User) => {
@@ -66,13 +68,7 @@ function App() {
                                     path={route.path}
                                     element={
                                         <Layout>
-                                            <Suspense
-                                                fallback={
-                                                    <div className="text-center">
-                                                        Loading ...
-                                                    </div>
-                                                }
-                                            >
+                                            <Suspense>
                                                 <Page />
                                             </Suspense>
                                         </Layout>

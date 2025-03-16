@@ -20,9 +20,9 @@ const ViewClinic = () => {
         name: null,
     });
     const apiEndpoint = '/clinic/view';
-    const { data, loading, error, changePage } =
+    const { data, loading, error, pageCount, resetFirstFetch } =
         useFetchDataWithPaginationProps<Clinic>(apiEndpoint, optionsFilter);
-    const [pagination, setPagination] = useRecoilState(paginationState);
+    // const [pagination, setPagination] = useRecoilState(paginationState);
     const [provinces, setProvinces] = useState([
         { province_id: 0, province_name: '' },
     ]);
@@ -138,7 +138,7 @@ const ViewClinic = () => {
                         clinics={clinics}
                         handleUpdateViewsClinic={handleUpdateViewsClinic}
                     />
-                    {pagination.pageCount > 1 && (
+                    {/* {pagination.pageCount > 1 && (
                         <Pagination
                             current={pagination.pageIndex}
                             pageSize={pagination.pageSize}
@@ -149,7 +149,7 @@ const ViewClinic = () => {
                             className="mt-3"
                             total={pagination.pageCount * pagination.pageSize}
                         ></Pagination>
-                    )}
+                    )} */}
                 </>
             ) : (
                 <>Không có cơ sở y tế nào!</>

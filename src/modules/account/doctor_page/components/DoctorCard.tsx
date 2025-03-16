@@ -14,8 +14,12 @@ export const DoctorCard = ({ doctors, handleUpdateViewsDoctor }: any) => {
         <Row gutter={[16, 16]} className="cards">
             {doctors.map((doctor: Doctor) => {
                 return (
-                    <Col span={6} className="card-item" key={doctor?.doctor_id}>
-                        <div className="card-container flex-grow-1 rounded border border-1 position-relative">
+                    <Col
+                        span={6}
+                        className="card-item "
+                        key={doctor?.doctor_id}
+                    >
+                        <div className="card-container flex-grow-1 rounded border border-1 position-relative shadow">
                             {doctor?.average_star && (
                                 <div className="star text-end ">
                                     <StarFilled className="text-warning " />
