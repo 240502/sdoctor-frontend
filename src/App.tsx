@@ -3,36 +3,13 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import PrivateRoutes from './routes/private_router';
 import { Fragment, Suspense, useEffect } from 'react';
 import { useSetRecoilState } from 'recoil';
-import { userState } from './stores/userAtom';
 import './assets/fontawesome/css/all.min.css';
 import { patientProfileState } from './stores/patientAtom';
 import { PatientProfileService } from './services/patient_profileService';
-import socket from './socket';
-import { User } from './models/user';
-import { Skeleton } from 'antd';
 
 function App() {
-
-    const setUser = useSetRecoilState(userState);
     const setPatientProfile = useSetRecoilState(patientProfileState);
-    const handleWindowLoad = (user: User) => {
-        if (user?.userId) {
-            socket?.emit('joinRoom', { userId: user.userId });
-        }
-    };
-    const getUser = async () => {
-        try {
-            const user = await JSON.parse(
-                sessionStorage.getItem('user') || '{}'
-            );
-            if (user?.userId) {
-                setUser(user);
-                handleWindowLoad(user);
-            }
-        } catch (e: any) {
-            console.error(e.message);
-        }
-    };
+
     const getPatientProfile = async () => {
         try {
             const uuid: string = await JSON.parse(
@@ -48,7 +25,6 @@ function App() {
         }
     };
     useEffect(() => {
-        getUser();
         getPatientProfile();
     }, []);
     return (

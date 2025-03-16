@@ -1,5 +1,5 @@
 import { Button, theme, Dropdown, Menu, Avatar, Divider } from 'antd';
-import { Header } from 'antd/es/layout/layout';
+import { Header as HeaderLayout } from 'antd/es/layout/layout';
 import {
     MenuFoldOutlined,
     MenuUnfoldOutlined,
@@ -7,14 +7,14 @@ import {
 } from '@ant-design/icons';
 import '@/assets/scss/animation.scss';
 import { User } from '../../../models/user';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { userState, userValue } from '../../../stores/userAtom';
 import NotificationList from './NotificationList';
 import { Link } from 'react-router-dom';
 import socket from '../../../socket';
-export const HeaderLayout = ({ collapsed, setCollapsed }: any) => {
+const Header = ({ collapsed, setCollapsed }: any) => {
     const navigate = useNavigate();
     const setUser = useSetRecoilState(userState);
     const user = useRecoilValue(userValue);
@@ -60,7 +60,7 @@ export const HeaderLayout = ({ collapsed, setCollapsed }: any) => {
     );
 
     return (
-        <Header
+        <HeaderLayout
             style={{
                 display: 'flex',
                 justifyContent: 'space-between',
@@ -116,6 +116,8 @@ export const HeaderLayout = ({ collapsed, setCollapsed }: any) => {
                     </div>
                 </Dropdown>
             </div>
-        </Header>
+        </HeaderLayout>
     );
 };
+
+export default Header;

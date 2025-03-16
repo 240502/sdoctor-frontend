@@ -1,4 +1,5 @@
 import { apiClient } from '../constants/api';
+import { Doctor } from '../models/doctor';
 
 export const doctorService = {
     async getDoctorByUserId(userId: number): Promise<any> {
@@ -15,8 +16,15 @@ export const doctorService = {
         );
         return res.data;
     },
-    async viewDoctorForClient(data: any): Promise<any> {
-        const res: any = await apiClient.post('/doctor/view', data);
+
+    async viewDoctorForClient(
+        queryKey: readonly [string, number, number]
+    ): Promise<any> {
+        const [, pageIndex, pageSize] = queryKey;
+        const res: any = await apiClient.post('/doctor/view', {
+            pageIndex,
+            pageSize,
+        });
         return res?.data;
     },
     async viewDoctorForAdmin(data: any): Promise<any> {

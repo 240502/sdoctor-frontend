@@ -42,11 +42,11 @@ export const DoctorCards = ({
                                     <p className="mb-1">{doctor.title}</p>
                                     <h6>
                                         <h6 className="text-decoration-none text-dark">
-                                            {doctor.fullName}
+                                            {doctor.full_name}
                                         </h6>
                                     </h6>
                                     <p style={{ height: '20px' }}>
-                                        {doctor.fullName}
+                                        {doctor.full_name}
                                     </p>
                                     <Flex className="justify-content-between mt-2 ">
                                         <Button

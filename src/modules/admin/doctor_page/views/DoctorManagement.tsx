@@ -139,7 +139,7 @@ const DoctorManagement = () => {
         if (searchContent !== '') {
             const newDoctors = doctors.filter(
                 (doctor: Doctor) =>
-                    doctor.fullName
+                    doctor.full_name
                         .toLocaleLowerCase()
                         .includes(searchContent.toLocaleLowerCase()) ||
                     doctor.title
@@ -277,7 +277,7 @@ const DoctorManagement = () => {
                 <ModalConfirmDelete
                     showModalConfirm={showModalConfirm}
                     handleCloseModalConfirm={handleCloseModalConfirm}
-                    doctorId={doctor?.doctorId}
+                    doctorId={doctor?.doctor_id}
                     openNotificationWithIcon={openNotificationWithIcon}
                     getDoctors={getDoctors}
                     config={config}

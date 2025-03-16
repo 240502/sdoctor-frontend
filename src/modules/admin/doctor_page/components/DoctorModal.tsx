@@ -32,6 +32,7 @@ import viVN from 'antd/lib/locale/vi_VN';
 import 'dayjs/locale/vi';
 import { ProvinceType, DistrictType, WardType } from '../../../../models/other';
 import axios from 'axios';
+import useCreateDoctor from '../../../../hooks/doctors/useCreateDoctor';
 dayjs.locale('vi');
 dayjs.extend(customParseFormat);
 
@@ -58,6 +59,27 @@ export const DoctorModal = ({
     const [wards, setWards] = useState<WardType[]>([]);
     const [district, setDistrict] = useState<DistrictType>({} as DistrictType);
     const [province, setProvince] = useState<ProvinceType>({} as ProvinceType);
+
+    const createDoctor = useCreateDoctor(config);
+    // test
+    const handleCreateNewDoctor = () => {
+        const data = {
+            password: 'abc',
+            role_id: 1,
+            email: 'sanghip200@gmail.com',
+            gender: 1,
+            phone: '0777435783',
+            image: '',
+            full_name: 'Nguyễn Văn Sang',
+            birthday: '2002-05-24',
+            city: 'Tỉnh Hưng Yên',
+            district: 'Huyện Khoái Châu',
+            commune: 'Xã An Vĩ',
+        };
+        createDoctor.mutate(data);
+    };
+
+    ////////////////////////////////////////////////////////////////
     const [ward, setWard] = useState<WardType>({} as WardType);
     const getBase64 = (file: FileType): Promise<string> =>
         new Promise((resolve, reject) => {
@@ -91,6 +113,7 @@ export const DoctorModal = ({
     const handleChangeSummaryEditor = (data: any) => {
         setDoctor({ ...doctor, summary: data });
     };
+
     const getWards = async (districtId: any) => {
         try {
             const res = await axios.get(
@@ -739,6 +762,7 @@ export const DoctorModal = ({
                     />
                 </Form.Item>
             </Form>
+            <Button onClick={handleCreateNewDoctor}>Test</Button>
         </Modal>
     );
 };

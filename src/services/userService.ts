@@ -2,7 +2,7 @@ import { apiClient } from '../constants/api';
 
 export const UserService = {
     async login(data: any): Promise<any> {
-        const res = await apiClient.post('/auth/signin', data);
+        const res = await apiClient.post('/user/login', data);
         return res?.data;
     },
     async createUser(data: any, config: any): Promise<any> {

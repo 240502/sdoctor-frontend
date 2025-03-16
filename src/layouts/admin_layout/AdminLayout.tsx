@@ -4,14 +4,15 @@ import { Layout, theme, message } from 'antd';
 import { Link } from 'react-router-dom';
 
 import { Sidenav } from './components/Sidenav';
-import { HeaderLayout } from './components/Header';
-import { useRecoilValue, useSetRecoilState } from 'recoil';
-import { requestConfig, userValue } from '../../stores/userAtom';
+import Header from './components/Header';
+import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
+import { requestConfig, userState } from '../../stores/userAtom';
 import {
     notificationsState,
     notificationsValue,
 } from '../../stores/notification';
 import socket from '../../socket';
+import { User } from '../../models/user';
 
 const { Sider, Content } = Layout;
 
@@ -19,14 +20,34 @@ const AdminLayout: React.FC = ({ children }: any) => {
     const [collapsed, setCollapsed] = useState(false);
     const [current, setCurrent] = useState<string[]>([]);
     const [messageApi, contextHolder] = message.useMessage();
-    const user = useRecoilValue(userValue);
+    // const user = useRecoilValue(userValue);
+    const [user, setUser] = useRecoilState(userState);
     const setRequestConfig = useSetRecoilState(requestConfig);
     const setNotifications = useSetRecoilState(notificationsState);
     const notificationsSelector = useRecoilValue(notificationsValue);
     useEffect(() => {
         const config = { headers: { authorization: 'Bearer ' + user.token } };
         setRequestConfig(config);
+        console.log('user', user);
     }, [user]);
+    const handleWindowLoad = (user: User) => {
+        if (user?.userId) {
+            socket?.emit('joinRoom', { userId: user.userId });
+        }
+    };
+    const getUser = async () => {
+        try {
+            const userSession = await JSON.parse(
+                sessionStorage.getItem('user') || '{}'
+            );
+            if (userSession?.user_id) {
+                setUser(userSession);
+                handleWindowLoad(userSession);
+            }
+        } catch (e: any) {
+            console.error(e.message);
+        }
+    };
     useEffect(() => {
         socket?.on('newNotification', (newNotification) => {
             messageApi.info('Có thông báo mới');
@@ -40,7 +61,7 @@ const AdminLayout: React.FC = ({ children }: any) => {
             );
             setNotifications(sortedNotificationsAsc);
         });
-
+        getUser();
         return () => {
             socket?.off('newNotification');
         };
@@ -74,10 +95,7 @@ const AdminLayout: React.FC = ({ children }: any) => {
                 />
             </Sider>
             <Layout style={{ width: '200vh' }}>
-                <HeaderLayout
-                    collapsed={collapsed}
-                    setCollapsed={setCollapsed}
-                />
+                <Header collapsed={collapsed} setCollapsed={setCollapsed} />
                 <Content
                     style={{
                         margin: '24px 16px',

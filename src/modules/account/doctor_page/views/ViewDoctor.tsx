@@ -11,7 +11,10 @@ import {
 } from '../../../../stores/doctorAtom';
 import { Clinic } from '../../../../models/clinic';
 import { DoctorCard } from '../components/DoctorCard';
-import { useFetchDataWithPaginationProps } from '../../../../hooks';
+import {
+    useFetchDataWithPaginationProps,
+    useFetchDoctorsWithPagination,
+} from '../../../../hooks';
 import { Doctor } from '../../../../models/doctor';
 import ShowMoreComp from '../../../../components/ShowMoreComp';
 import {
@@ -33,26 +36,38 @@ const ViewDoctor = () => {
     const [clinicsState, setClinicsState] = useRecoilState(allClinicsState);
     const [doctorPaginationState, setDoctorPaginationState] =
         useRecoilState(doctorPagination);
-    const [isPreventCallApiGetDoctors, setIsPreventCallApiGetDoctors] =
-        useRecoilState(isPreventCallApi);
+    // const [isPreventCallApiGetDoctors, setIsPreventCallApiGetDoctors] =
+    //     useRecoilState(isPreventCallApi);
 
     const [doctorOptionsState, setDoctorOptions] =
         useRecoilState(doctorOptions);
+
     const {
-        data: doctors,
-        loading: loadingDoctors,
+        data: doctorResponse,
+        isLoading,
         error: errorDoctors,
-        pageCount,
-        resetFirstFetch,
-    } = useFetchDataWithPaginationProps<Doctor>(
-        VIEW_DOCTOR_ENDPOINT,
-        {
-            filterOptions: doctorOptionsState as any,
-            pageIndex: doctorPaginationState.pageIndex,
-            pageSize: doctorPaginationState.pageSize,
-        },
-        isPreventCallApiGetDoctors
-    );
+        isFetching,
+    } = useFetchDoctorsWithPagination(1, 10);
+    useEffect(() => {
+        console.log('doctors', doctorResponse);
+        console.log('isLoading', isLoading);
+        console.log('isFetching', isFetching); // isFetching hoạt động khi dữ liệu đang refetch
+    }, [doctorResponse]);
+    // const {
+    //     data: doctors,
+    //     loading: loadingDoctors,
+    //     error: errorDoctors,
+    //     pageCount,
+    //     resetFirstFetch,
+    // } = useFetchDataWithPaginationProps<Doctor>(
+    //     VIEW_DOCTOR_ENDPOINT,
+    //     {
+    //         filterOptions: doctorOptionsState as any,
+    //         pageIndex: doctorPaginationState.pageIndex,
+    //         pageSize: doctorPaginationState.pageSize,
+    //     },
+    //     isPreventCallApiGetDoctors
+    // );
 
     const { data: clinics } = useFetchDataWithPaginationProps<Clinic>(
         VIEW_CLINIC_ENDPOINT,
@@ -75,61 +90,13 @@ const ViewDoctor = () => {
     };
 
     const handleOnClickShowMoreButton = () => {
-        if (doctorPaginationState.pageIndex < pageCount) {
-            setDoctorPaginationState({
-                ...doctorPaginationState,
-                pageIndex: doctorPaginationState.pageIndex + 1,
-            });
-        }
+        // if (doctorPaginationState.pageIndex < pageCount) {
+        //     setDoctorPaginationState({
+        //         ...doctorPaginationState,
+        //         pageIndex: doctorPaginationState.pageIndex + 1,
+        //     });
+        // }
     };
-
-    useEffect(() => {
-        setDoctorPaginationState({
-            ...doctorPaginationState,
-            pageCount: pageCount,
-        });
-
-        if (!doctors || doctors.length === 0) {
-            return;
-        }
-        let timeOutId: any;
-        if (doctorsState.length > 0) {
-            const isSameData =
-                doctorsState.length === doctors?.length &&
-                doctorsState.every(
-                    (doctor: Doctor, index: number) =>
-                        doctor.doctor_id === doctors[index].doctor_id
-                );
-            if (isSameData) {
-                return;
-            }
-            const existingKeys = new Set(
-                doctorsState.map((doctor: Doctor) => doctor.doctor_id)
-            );
-            const newItems = doctors.filter(
-                (doctor: Doctor) => !existingKeys.has(doctor.doctor_id)
-            );
-            const newDoctors = [...doctorsState, ...newItems];
-            const isSameNewData =
-                doctorsState?.length === newDoctors?.length &&
-                doctorsState.every(
-                    (doctor: Doctor, index: number) =>
-                        doctor.doctor_id === newDoctors[index].doctor_id
-                );
-            if (isSameNewData) {
-                return;
-            }
-
-            setDoctorsState(newDoctors);
-        } else {
-            setTimeout(() => {
-                timeOutId = setDoctorsState(doctors);
-            }, 1000);
-        }
-        return () => {
-            clearTimeout(timeOutId);
-        };
-    }, [doctors]);
 
     useEffect(() => {
         if (majorsState.length === 0) {
@@ -150,17 +117,17 @@ const ViewDoctor = () => {
                 ...doctorOptionsState,
                 majorId: Number(searchParams.get('majorId')),
             });
-            resetFirstFetch('/doctor/view');
+            // resetFirstFetch('/doctor/view');
         }
         if (searchParams.get('name')) {
             setDoctorOptions({
                 ...doctorOptionsState,
                 name: searchParams.get('name') ?? '',
             });
-            resetFirstFetch('/doctor/view');
+            // resetFirstFetch('/doctor/view');
         }
         if (doctorsState.length > 0) {
-            setIsPreventCallApiGetDoctors(true);
+            // setIsPreventCallApiGetDoctors(true);
         }
 
         return () => {};
@@ -207,7 +174,7 @@ const ViewDoctor = () => {
                                         ...doctorOptionsState,
                                         clinicId: value ?? null,
                                     });
-                                    resetFirstFetch('/doctor/view');
+                                    // resetFirstFetch('/doctor/view');
                                 }}
                             >
                                 {clinicsState.map((clinic: Clinic) => (
@@ -240,7 +207,7 @@ const ViewDoctor = () => {
                                         ...doctorOptionsState,
                                         majorId: value ?? null,
                                     });
-                                    resetFirstFetch('/doctor/view');
+                                    // resetFirstFetch('/doctor/view');
                                 }}
                             >
                                 {majorsState?.map((major: Major) => (
@@ -274,30 +241,32 @@ const ViewDoctor = () => {
                     {errorDoctors ? (
                         <p className="fs-6 fw-bold text-center mt-4">
                             {' '}
-                            {errorDoctors}
+                            {errorDoctors.message}
                         </p>
                     ) : (
                         <>
                             <Skeleton
-                                loading={doctorsState?.length === 0}
+                                loading={isFetching}
                                 active
                                 className="mt-6"
                             >
-                                <DoctorCard
-                                    doctors={doctorsState}
-                                    handleUpdateViewsDoctor={
-                                        handleUpdateViewsDoctor
-                                    }
-                                />
+                                {doctorResponse?.doctors && (
+                                    <DoctorCard
+                                        doctors={doctorResponse?.doctors}
+                                        handleUpdateViewsDoctor={
+                                            handleUpdateViewsDoctor
+                                        }
+                                    />
+                                )}
                             </Skeleton>
-
+                            {/* 
                             {(doctorPaginationState?.pageIndex < pageCount ||
-                                loadingDoctors) && (
+                                isLoading) && (
                                 <ShowMoreComp
-                                    loading={loadingDoctors}
+                                    loading={isLoading}
                                     onClick={handleOnClickShowMoreButton}
                                 />
-                            )}
+                            )} */}
                         </>
                     )}
                 </>

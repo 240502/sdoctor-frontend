@@ -16,7 +16,8 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
     <QueryClientProvider client={queryClient}>
         <RecoilRoot>
             <App />
+            <ReactQueryDevtools initialIsOpen={false} />{' '}
+            {/* Devtools để debug */}
         </RecoilRoot>
-        <ReactQueryDevtools initialIsOpen={false} /> {/* Devtools để debug */}
     </QueryClientProvider>
 );
