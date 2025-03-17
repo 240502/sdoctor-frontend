@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { EnvironmentOutlined } from '@ant-design/icons';
 import { Image, notification, Pagination, Select } from 'antd';
 import { Link } from 'react-router-dom';
-import { doctorService } from '../../../../services/doctorService';
+import { doctorService } from '../../../../services/doctor.service';
 import { Doctor } from '../../../../models/doctor';
 import { baseURL } from '../../../../constants/api';
 import parse from 'html-react-parser';
@@ -12,7 +12,7 @@ import {
     doctorListState,
     doctorListValue,
 } from '../../../../stores/doctorAtom';
-import { MajorService } from '../../../../services/majorService';
+import { MajorService } from '../../../../services/major.service';
 import { Major } from '../../../../models/major';
 type NotificationType = 'success' | 'error';
 const BlockDoctor = ({ clinicId, clinic }: any) => {

@@ -6,10 +6,10 @@ import {
     CategoryScale,
     LinearScale,
 } from 'chart.js';
-import { AppointmentService } from '../../../../services/appointmentService';
+import { AppointmentService } from '../../../../services/appointment.service';
 import { useRecoilValue } from 'recoil';
 import { userValue } from '../../../../stores/userAtom';
-import { invoicesService } from '../../../../services/invoicesService';
+import { invoicesService } from '../../../../services/invoices.service';
 
 // Register the components of Chart.js that are needed
 Chart.register(BarController, BarElement, CategoryScale, LinearScale);

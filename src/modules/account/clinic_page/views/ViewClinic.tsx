@@ -1,7 +1,7 @@
 import { HomeOutlined } from '@ant-design/icons';
 import '@/assets/scss/clinic.scss';
 import { Breadcrumb, Flex, Input, Pagination, Select } from 'antd';
-import { ClinicService } from '../../../../services/clinicService';
+import { ClinicService } from '../../../../services/clinic.service';
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import {
     clinicListState,

@@ -7,7 +7,7 @@ import PrevArrow from './PrevArrow';
 import Slider from 'react-slick';
 import { Post } from '../../../../models/post';
 import { Image } from 'antd';
-import { PostService } from '../../../../services/postService';
+import { PostService } from '../../../../services/post.service';
 import { baseURL } from '../../../../constants/api';
 
 export const BlockCommonPost = () => {

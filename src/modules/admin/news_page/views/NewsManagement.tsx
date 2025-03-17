@@ -12,7 +12,7 @@ import {
 import { useEffect, useState } from 'react';
 import { ModalAddNews } from '../components/ModalAddNews';
 import { Post } from '../../../../models/post';
-import { PostService } from '../../../../services/postService';
+import { PostService } from '../../../../services/post.service';
 type NotificationType = 'success' | 'error';
 import { useRecoilValue } from 'recoil';
 import { configValue, userValue } from '../../../../stores/userAtom';
@@ -20,7 +20,7 @@ import '@/assets/scss/new_management.scss';
 import { NewsCards } from '../components/NewsCards';
 import { ModalConfirmDeleteNews } from '../components/ModalConfirmDeleteNews';
 import { PostCategory } from '../../../../models/post_category';
-import { PostCategoryService } from '../../../../services/post_categoryService';
+import { PostCategoryService } from '../../../../services/post_category.service';
 import { SearchProps } from 'antd/es/input';
 const { Option } = Select;
 const { Search } = Input;

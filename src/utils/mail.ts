@@ -1,4 +1,4 @@
-import { MailerService } from '../services/mailerService';
+import { MailerService } from '../services/mailer.service';
 
 export const sendRejectionMail = async (mailBody: any) => {
     try {

@@ -22,7 +22,7 @@ import { ColumnsType } from 'antd/es/table';
 import { FilterDropdownProps } from 'antd/es/table/interface';
 
 import Highlighter from 'react-highlight-words';
-import { UserService } from '../../../../services/userService';
+import { UserService } from '../../../../services/user.service';
 
 type DataIndex = keyof User;
 export const UserTable = ({

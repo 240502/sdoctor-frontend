@@ -1,6 +1,6 @@
 import { Button, Modal } from 'antd';
 import React, { useEffect, useRef } from 'react';
-import { AppointmentService } from '../../../../services/appointmentService';
+import { AppointmentService } from '../../../../services/appointment.service';
 import TextArea from 'antd/es/input/TextArea';
 
 export const ModalConfirmCancelAppointment = ({

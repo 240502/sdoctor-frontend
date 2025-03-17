@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Clinic } from '../../../../models/clinic';
-import { ClinicService } from '../../../../services/clinicService';
+import { ClinicService } from '../../../../services/clinic.service';
 import {
     Breadcrumb,
     Button,
@@ -17,7 +17,7 @@ import { useRecoilValue } from 'recoil';
 import { configValue } from '../../../../stores/userAtom';
 import { ConfirmModal } from '../../../../components';
 import { ProvinceType } from '../../../../models/other';
-import { OtherService } from '../../../../services/otherService';
+import { OtherService } from '../../../../services/other.service';
 import { SearchProps } from 'antd/es/input';
 const { Option } = Select;
 const { Search } = Input;

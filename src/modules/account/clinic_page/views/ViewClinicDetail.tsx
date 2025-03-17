@@ -15,23 +15,23 @@ import { useRecoilValue } from 'recoil';
 import { clinicListValue } from '../../../../stores/clinicAtom';
 import { Clinic } from '../../../../models/clinic';
 import { baseURL } from '../../../../constants/api';
-import { ClinicService } from '../../../../services/clinicService';
+import { ClinicService } from '../../../../services/clinic.service';
 import parse from 'html-react-parser';
 import '@/assets/scss/clinic.scss';
 import { DoctorCard, ServiceCard } from '../../../../components';
 import { Doctor } from '../../../../models/doctor';
-import { doctorService } from '../../../../services/doctorService';
+import { doctorService } from '../../../../services/doctor.service';
 import {
     EnvironmentOutlined,
     HomeOutlined,
     SearchOutlined,
 } from '@ant-design/icons';
 import { BlockDescription } from '../components/BlockDescription';
-import { MajorService } from '../../../../services/majorService';
+import { MajorService } from '../../../../services/major.service';
 import { Major } from '../../../../models/major';
 import { Service } from '../../../../models/service';
-import { ServiceService } from '../../../../services/serviceService';
-import { ServiceCategoryService } from '../../../../services/serviceCategoryService';
+import { ServiceService } from '../../../../services/medical_package.service';
+import { ServiceCategoryService } from '../../../../services/service_category.service';
 import { ServiceCategory } from '../../../../models/category_services';
 
 const ViewClinicDetail = () => {

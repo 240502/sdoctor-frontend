@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Post } from '../../../../models/post';
 import { Breadcrumb, Flex, Select, Input, Pagination } from 'antd';
 import { HomeOutlined } from '@ant-design/icons';
-import { PostCategoryService } from '../../../../services/post_categoryService';
+import { PostCategoryService } from '../../../../services/post_category.service';
 import { PostCategory } from '../../../../models/post_category';
 import { SearchProps } from 'antd/es/input';
 import { PostCards } from '../components/PostCards';

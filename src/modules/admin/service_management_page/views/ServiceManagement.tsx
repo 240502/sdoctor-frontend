@@ -9,16 +9,16 @@ import {
     Pagination,
 } from 'antd';
 import { HomeOutlined, PlusOutlined } from '@ant-design/icons';
-import { ServiceService } from '../../../../services/serviceService';
+import { ServiceService } from '../../../../services/medical_package.service';
 import { useState, useEffect } from 'react';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { configValue } from '../../../../stores/userAtom';
 import { Service } from '../../../../models/service';
 import { InputServiceModal } from '../components/InputServiceModal';
-import { ClinicService } from '../../../../services/clinicService';
+import { ClinicService } from '../../../../services/clinic.service';
 import { Clinic } from '../../../../models/clinic';
 import { ServiceCategory } from '../../../../models/category_services';
-import { ServiceCategoryService } from '../../../../services/serviceCategoryService';
+import { ServiceCategoryService } from '../../../../services/service_category.service';
 import { serviceListState } from '../../../../stores/servicesAtom';
 import ServiceCard from '../components/ServiceCard';
 import { ConfirmModal } from '../../../../components';

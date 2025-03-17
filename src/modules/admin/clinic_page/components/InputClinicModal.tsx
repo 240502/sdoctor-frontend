@@ -12,11 +12,11 @@ import {
     InputRef,
 } from 'antd';
 type FileType = Parameters<GetProp<UploadProps, 'beforeUpload'>>[0];
-import { UploadService } from '../../../../services/upload';
+import { UploadService } from '../../../../services/upload.service';
 import { useState, useEffect, useRef } from 'react';
 import { isEmpty, showSuccess } from '../../../../utils/global';
 import ClinicEditor from './ClinicEditor';
-import { ClinicService } from '../../../../services/clinicService';
+import { ClinicService } from '../../../../services/clinic.service';
 export const InputClinicModal = ({
     openModalInputClinic,
     handleCloseInputModal,

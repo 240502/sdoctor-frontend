@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { AppointmentService } from '../services/appointmentService';
+import { AppointmentService } from '../services/appointment.service';
 import { useSetRecoilState } from 'recoil';
 import { appointmentListInDayState } from '../stores/appointmentAtom';
 

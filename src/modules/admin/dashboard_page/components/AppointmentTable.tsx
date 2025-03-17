@@ -13,7 +13,7 @@ import {
     EyeOutlined,
     SearchOutlined,
 } from '@ant-design/icons';
-import { AppointmentService } from '../../../../services/appointmentService';
+import { AppointmentService } from '../../../../services/appointment.service';
 import { ConfirmAppointmentModal } from '../../../../components';
 import {
     sendConfirmingSuccessMail,

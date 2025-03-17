@@ -16,8 +16,8 @@ import { HomeOutlined, SearchOutlined } from '@ant-design/icons';
 import { ServiceCard } from '../../../../components';
 import { Clinic } from '../../../../models/clinic';
 import { ServiceCategory } from '../../../../models/category_services';
-import { ClinicService } from '../../../../services/clinicService';
-import { ServiceCategoryService } from '../../../../services/serviceCategoryService';
+import { ClinicService } from '../../../../services/clinic.service';
+import { ServiceCategoryService } from '../../../../services/service_category.service';
 import { useFetchDataWithPaginationProps } from '../../../../hooks';
 import { Service } from '../../../../models/service';
 

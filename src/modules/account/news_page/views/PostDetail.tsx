@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 import { Post } from '../../../../models/post';
 import { useRecoilValue } from 'recoil';
 import { postsValue } from '../../../../stores/postAtom';
-import { PostService } from '../../../../services/postService';
+import { PostService } from '../../../../services/post.service';
 import { Breadcrumb, Card, Flex, Divider } from 'antd';
 import { CalendarOutlined, HomeOutlined } from '@ant-design/icons';
 import parse from 'html-react-parser';

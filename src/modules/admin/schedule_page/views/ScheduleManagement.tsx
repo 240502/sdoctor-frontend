@@ -14,7 +14,7 @@ import { DoctorScheduleDetail } from '../../../../models/doctorScheduleDetails';
 import { Time } from '../../../../models/time';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { configValue, userValue } from '../../../../stores/userAtom';
-import { scheduleService } from '../../../../services/doctorScheduleService';
+import { scheduleService } from '../../../../services/doctor_schedule.service';
 import { DoctorSchedule } from '../../../../models/doctorSchedule';
 import { handleGetDateByActiveDay } from '../../../../utils/schedule_management';
 type NotificationType = 'success' | 'error';

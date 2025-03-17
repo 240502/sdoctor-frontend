@@ -44,3 +44,4 @@ export const BlockSearchDoctor = () => {
         </div>
     );
 };
+export default BlockSearchDoctor;

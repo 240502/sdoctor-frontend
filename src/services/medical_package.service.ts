@@ -1,6 +1,6 @@
 import { apiClient } from '../constants/api';
 
-export const ServiceService = {
+export const MedicalPackageService = {
     async createService(data: any, config: any): Promise<any> {
         const res = await apiClient.post('/service/create', data, config);
         return res;

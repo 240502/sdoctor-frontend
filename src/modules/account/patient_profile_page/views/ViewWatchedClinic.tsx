@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { PatientProfileLayout } from '../components/PatientProfileLayout';
 import { EnvironmentOutlined } from '@ant-design/icons';
 import '@/assets/scss/clinic.scss';
-import { ClinicService } from '../../../../services/clinicService';
+import { ClinicService } from '../../../../services/clinic.service';
 
 const ViewWatchedClinic = () => {
     const [watchedClinics, setWatchedClinics] = useState<Clinic[]>([]);

@@ -1,12 +1,11 @@
-import { useState, useEffect, useRef, useMemo } from 'react';
+import { useEffect } from 'react';
 import { HomeOutlined } from '@ant-design/icons';
 import { Breadcrumb, Select, Flex, Input, Skeleton } from 'antd';
-import { doctorService } from '../../../../services/doctorService';
+import { doctorService } from '../../../../services/doctor.service';
 import { useRecoilState } from 'recoil';
 import {
     doctorListState,
     doctorPagination,
-    isPreventCallApi,
     doctorOptions,
 } from '../../../../stores/doctorAtom';
 import { Clinic } from '../../../../models/clinic';
@@ -15,11 +14,9 @@ import {
     useFetchDataWithPaginationProps,
     useFetchDoctorsWithPagination,
 } from '../../../../hooks';
-import { Doctor } from '../../../../models/doctor';
 import ShowMoreComp from '../../../../components/ShowMoreComp';
 import {
     VIEW_CLINIC_ENDPOINT,
-    VIEW_DOCTOR_ENDPOINT,
     VIEW_MAJOR_ENDPOINT,
 } from '../../../../constants/endpoints';
 import { Major } from '../../../../models/major';

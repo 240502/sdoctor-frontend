@@ -9,7 +9,7 @@ import {
     SearchOutlined,
 } from '@ant-design/icons';
 import { News } from '../../../../models/post';
-import { NewsService } from '../../../../services/postService';
+import { NewsService } from '../../../../services/post.service';
 import { FilterDropdownProps } from 'antd/es/table/interface';
 import Highlighter from 'react-highlight-words';
 

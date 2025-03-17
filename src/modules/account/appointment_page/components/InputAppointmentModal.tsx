@@ -17,15 +17,15 @@ import TextArea from 'antd/es/input/TextArea';
 import { useEffect, useState } from 'react';
 import { ProvinceType, DistrictType, WardType } from '../../../../models/other';
 import axios from 'axios';
-import { AppointmentService } from '../../../../services/appointmentService';
+import { AppointmentService } from '../../../../services/appointment.service';
 import { useNavigate } from 'react-router-dom';
 import { DatePickerProps } from 'antd/lib';
-import { PatientProfileService } from '../../../../services/patient_profileService';
+import { PatientProfileService } from '../../../../services/patient_profile.service';
 import { useSetRecoilState } from 'recoil';
 import { patientProfileState } from '../../../../stores/patientAtom';
 import { PaymentMethod } from '../../../../models/paymentMethod';
-import { PaymentMethodService } from '../../../../services/paymentMethodService';
-import { MailerService } from '../../../../services/mailerService';
+import { PaymentMethodService } from '../../../../services/payment_method.service';
+import { MailerService } from '../../../../services/mailer.service';
 export const InputAppointmentModal = ({
     openModal,
     cancelModal,

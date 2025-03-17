@@ -1,5 +1,5 @@
 import { Form, Modal, Input, Button } from 'antd';
-import { UserService } from '../../../../services/userService';
+import { UserService } from '../../../../services/user.service';
 
 export const UserAddModal = ({
     openAccountModal,

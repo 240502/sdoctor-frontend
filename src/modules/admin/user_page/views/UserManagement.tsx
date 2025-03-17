@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { UserService } from '../../../../services/userService';
+import { UserService } from '../../../../services/user.service';
 import { useRecoilValue } from 'recoil';
 import { configValue } from '../../../../stores/userAtom';
 import { notification, Breadcrumb, Divider, Flex, Button, Select } from 'antd';

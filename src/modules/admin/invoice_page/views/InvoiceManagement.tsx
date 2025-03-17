@@ -6,7 +6,7 @@ import { InvoiceTable } from '../components/InvoiceTable';
 import { useEffect, useState } from 'react';
 import { Invoices } from '../../../../models/invoices';
 import { InvoiceModal } from '../components/InvoviceModal';
-import { invoicesService } from '../../../../services/invoicesService';
+import { invoicesService } from '../../../../services/invoices.service';
 import { ConfirmModal } from '../../../../components';
 
 type NotificationType = 'success' | 'error';

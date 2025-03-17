@@ -6,7 +6,7 @@ import {
 import { Breadcrumb, Col, notification, Row, Button } from 'antd';
 import 'dayjs/locale/vi';
 import { useEffect, useState } from 'react';
-import { scheduleService } from '../../../../services/doctorScheduleService';
+import { scheduleService } from '../../../../services/doctor_schedule.service';
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import { doctorValue } from '../../../../stores/doctorAtom';
 import { DoctorSchedule } from '../../../../models/doctorSchedule';
@@ -15,11 +15,11 @@ import { DoctorScheduleDetail } from '../../../../models/doctorScheduleDetails';
 import { InputAppointmentModal } from '../components/InputAppointmentModal';
 import { patientProfileValue } from '../../../../stores/patientAtom';
 import { PatientProfile } from '../../../../models/patient_profile';
-import { doctorScheduleDetailService } from '../../../../services/doctorScheduleDetailService';
+import { doctorScheduleDetailService } from '../../../../services/doctor_schedule_detail.service';
 import socket from '../../../../socket';
-import { NotificationService } from '../../../../services/notificationService';
+import { NotificationService } from '../../../../services/notification.service';
 import { newAppointmentState } from '../../../../stores/appointmentAtom';
-import { invoicesService } from '../../../../services/invoicesService';
+import { invoicesService } from '../../../../services/invoices.service';
 import { invoiceState } from '../../../../stores/invoice';
 type NotificationType = 'success' | 'error';
 

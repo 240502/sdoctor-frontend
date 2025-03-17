@@ -1,16 +1,16 @@
 import { Button, Input, Modal, Form, Row, Col, Rate } from 'antd';
-import { CommentService } from '../../../../services/commentService';
+import { CommentService } from '../../../../services/comment.service';
 import { Comment, CommentCreate } from '../../../../models/comment';
 import { Appointment } from '../../../../models/appointment';
 import { useEffect, useState } from 'react';
-import { NotificationService } from '../../../../services/notificationService';
+import { NotificationService } from '../../../../services/notification.service';
 import { useRecoilValue } from 'recoil';
 import { doctorListState } from '../../../../stores/doctorAtom';
 import { Doctor } from '../../../../models/doctor';
-import { doctorService } from '../../../../services/doctorService';
+import { doctorService } from '../../../../services/doctor.service';
 const { TextArea } = Input;
 import { NotificationCreate } from '../../../../models/notification';
-import { AppointmentService } from '../../../../services/appointmentService';
+import { AppointmentService } from '../../../../services/appointment.service';
 export const InputCommentModal = ({
     openInputModal,
     handleCancelInputModal,

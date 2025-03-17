@@ -6,11 +6,12 @@ import NextArrow from './NextArrow';
 import PrevArrow from './PrevArrow';
 import Slider from 'react-slick';
 import { Post } from '../../../../models/post';
-import { Button, Image } from 'antd';
-import { PostService } from '../../../../services/postService';
+import { Button, Image, Skeleton } from 'antd';
+import { PostService } from '../../../../services/post.service';
 import { baseURL } from '../../../../constants/api';
+import { useFetchCommonPosts } from '../../../../hooks';
 
-export const BlockCommonPost = () => {
+const BlockCommonPost = () => {
     var settings = {
         dots: false,
         infinite: true,
@@ -24,25 +25,26 @@ export const BlockCommonPost = () => {
         nextArrow: <NextArrow />,
         prevArrow: <PrevArrow />,
     };
-    const [posts, setPosts] = useState<Post[]>([]);
-    const getCommonNews = async () => {
-        try {
-            const res = await PostService.getCommonPost();
-            setPosts(res);
-        } catch (err: any) {
-            console.log(err.message);
-        }
-    };
-    const updateViewPost = async (id: number) => {
-        try {
-            const res = await PostService.updateViewPost(id);
-        } catch (err: any) {
-            console.log(err.message);
-        }
-    };
-    useEffect(() => {
-        getCommonNews();
-    }, []);
+    // const [posts, setPosts] = useState<Post[]>([]);
+    // const getCommonNews = async () => {
+    //     try {
+    //         const res = await PostService.getCommonPost();
+    //         setPosts(res);
+    //     } catch (err: any) {
+    //         console.log(err.message);
+    //     }
+    // };
+    // const updateViewPost = async (id: number) => {
+    //     try {
+    //         const res = await PostService.updateViewPost(id);
+    //     } catch (err: any) {
+    //         console.log(err.message);
+    //     }
+    // };
+    // useEffect(() => {
+    //     getCommonNews();
+    // }, []);
+    const { data, error, isFetching } = useFetchCommonPosts();
     return (
         <div className="row mt-5 mb-5">
             <div className="block__header d-flex justify-content-between align-items-center">
@@ -54,58 +56,63 @@ export const BlockCommonPost = () => {
                 </Button>
             </div>
             <div className="block__list mt-4 position-relative posts">
-                <Slider {...settings}>
-                    {posts?.length > 0 ? (
-                        posts.map((post: Post) => {
-                            return (
-                                <div
-                                    className="slide__container  col-3 ps-3 pe-3"
-                                    key={post.id}
-                                >
-                                    <div className="item border border-1 rounded p-3 text-center   ">
-                                        <Link
-                                            onClick={() => {
-                                                updateViewPost(post.id);
-                                            }}
-                                            to={'/post/detail/' + post.id}
-                                            className=" text-decoration-none feature-img-container"
-                                        >
-                                            <Image
-                                                className="item__image feature-img object-fit-cover rounded "
-                                                preview={false}
-                                                src={
-                                                    post?.featured_image?.includes(
-                                                        'cloudinary'
-                                                    )
-                                                        ? post?.featured_image
-                                                        : baseURL +
-                                                          post?.featured_image
-                                                }
-                                            ></Image>
-                                            <p className="post-title mt-3 text-center text-dark fw-bold fs-6 text-capitalize">
-                                                <Link
-                                                    to={
-                                                        '/post/detail/' +
-                                                        post.id
-                                                    }
-                                                    className=" text-decoration-none text-dark"
-                                                    onClick={() => {
-                                                        updateViewPost(post.id);
-                                                    }}
-                                                >
-                                                    {post.title}
-                                                </Link>
-                                            </p>
-                                        </Link>
-                                    </div>
-                                </div>
-                            );
-                        })
+                <Skeleton active loading={isFetching}>
+                    {error ? (
+                        <p>{error.message}</p>
                     ) : (
-                        <></>
+                        <Slider {...settings}>
+                            {data.map((post: Post) => {
+                                return (
+                                    <div
+                                        className="slide__container  col-3 ps-3 pe-3"
+                                        key={post.id}
+                                    >
+                                        <div className="item border border-1 rounded p-3 text-center   ">
+                                            <Link
+                                                onClick={() => {
+                                                    // updateViewPost(post.id);
+                                                }}
+                                                to={'/post/detail/' + post.id}
+                                                className=" text-decoration-none feature-img-container"
+                                            >
+                                                <Image
+                                                    className="item__image feature-img object-fit-cover rounded "
+                                                    preview={false}
+                                                    src={
+                                                        post?.featured_image?.includes(
+                                                            'cloudinary'
+                                                        )
+                                                            ? post?.featured_image
+                                                            : baseURL +
+                                                              post?.featured_image
+                                                    }
+                                                ></Image>
+                                                <p className="post-title mt-3 text-center text-dark fw-bold fs-6 text-capitalize">
+                                                    <Link
+                                                        to={
+                                                            '/post/detail/' +
+                                                            post.id
+                                                        }
+                                                        className=" text-decoration-none text-dark"
+                                                        onClick={() => {
+                                                            // updateViewPost(
+                                                            //     post.id
+                                                            // );
+                                                        }}
+                                                    >
+                                                        {post.title}
+                                                    </Link>
+                                                </p>
+                                            </Link>
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </Slider>
                     )}
-                </Slider>
+                </Skeleton>
             </div>
         </div>
     );
 };
+export default BlockCommonPost;

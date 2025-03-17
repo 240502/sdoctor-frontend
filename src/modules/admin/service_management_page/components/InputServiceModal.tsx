@@ -14,11 +14,11 @@ import { SummaryEditor } from './SummaryEditor';
 import { PreparationProcessEditor } from './PreparationProcessEditor';
 import type { GetProp, UploadFile, UploadProps } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
-import { UploadService } from '../../../../services/upload';
+import { UploadService } from '../../../../services/upload.service';
 type FileType = Parameters<GetProp<UploadProps, 'beforeUpload'>>[0];
 import { Clinic } from '../../../../models/clinic';
 import { ServiceDetailEditor } from './ServiceDetailEditor';
-import { ServiceService } from '../../../../services/serviceService';
+import { ServiceService } from '../../../../services/medical_package.service';
 import { Service } from '../../../../models/service';
 import { openNotification } from '../../../../utils/notification';
 export const InputServiceModal = ({

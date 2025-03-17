@@ -3,12 +3,12 @@ import { Breadcrumb, Divider, Flex, Select, notification } from 'antd';
 import { useEffect, useState } from 'react';
 import AppointmentTable from '../components/AppointmentTable';
 import { Appointment } from '../../../../models/appointment';
-import { AppointmentService } from '../../../../services/appointmentService';
+import { AppointmentService } from '../../../../services/appointment.service';
 import { useRecoilValue } from 'recoil';
 import { userValue } from '../../../../stores/userAtom';
 const { Option } = Select;
 import { AppointmentStatus } from '../../../../models/appointment_status';
-import { AppointmentStatusService } from '../../../../services/appointment_statusService';
+import { AppointmentStatusService } from '../../../../services/appointment_status.service';
 import { ViewAppointmentModal } from '../../../../components';
 type NotificationType = 'success' | 'warning' | 'error';
 const AppointmentManagement = () => {

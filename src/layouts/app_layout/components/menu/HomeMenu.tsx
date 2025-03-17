@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Menu } from 'antd';
 import { Link } from 'react-router-dom';
-import { HomeMenuService } from '../../../../services/home_menuService';
+import { HomeMenuService } from '../../../../services/home_menu.service';
 import { HomeMenuModel } from '../../../../models/home_menu';
 import { useRecoilState, useSetRecoilState } from 'recoil';
 import { majorIdState } from '../../../../stores/majorAtom';

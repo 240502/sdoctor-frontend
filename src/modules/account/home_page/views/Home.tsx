@@ -1,35 +1,27 @@
-import { Button, Image, Skeleton } from 'antd';
-import { Carousel } from 'antd';
+import { Button, Image } from 'antd';
 import '@/assets/scss/home.scss';
-import { BlockCategories } from '../components/BlockCategories';
-import { BlockClinic } from '../components/BlockClinic';
-import { BlockHotDoctor } from '../components/BlockHotDoctor';
-import { BlockCommonPost } from '../components/BlockCommonNews';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { BlockSearchDoctor } from '../components/BlockSearchDoctor';
 import { BlockCommonService } from '../components/BlockCommonService';
 import { useNavigate } from 'react-router-dom';
+import {
+    BlockClinic,
+    BlockCommonPost,
+    BlockSpecialization,
+} from '../components';
+import { BlockCommonDoctor } from '../components/BlockCommonDoctor';
 const Home = () => {
     const navigate = useNavigate();
-    const [loadingBanner, setLoadingBanner] = useState(true);
     useEffect(() => {
         window.scrollTo(0, 0);
-        setTimeout(() => {
-            setLoadingBanner(false);
-        }, 1000);
     }, []);
     return (
         <>
             <div className="slide__container  position-relative">
-                <Skeleton active loading={loadingBanner}>
-                    <Carousel autoplay arrows={false} dots={false}>
-                        <Image
-                            preview={false}
-                            src="http://localhost:5173/img/093216-bc.jpg"
-                        ></Image>
-                    </Carousel>
-                </Skeleton>
-
+                <Image
+                    preview={false}
+                    src="http://localhost:5173/img/093216-bc.jpg"
+                ></Image>
                 <div className="position-absolute top-0 start-0 end-0 bottom-0 bg-dark bg-opacity-50"></div>
                 <div
                     className="title position-absolute  z-2 "
@@ -60,8 +52,8 @@ const Home = () => {
             </div>
             <div className="container home__content mt-4 ">
                 <BlockSearchDoctor />
-                <BlockCategories />
-                <BlockHotDoctor />
+                <BlockSpecialization />
+                <BlockCommonDoctor />
                 <BlockCommonService />
                 <BlockCommonPost />
                 <BlockClinic />

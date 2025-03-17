@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Image, Button } from 'antd';
+import { Image, Button, Skeleton } from 'antd';
 import { Link } from 'react-router-dom';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
@@ -7,9 +7,10 @@ import NextArrow from './NextArrow';
 import PrevArrow from './PrevArrow';
 import Slider from 'react-slick';
 import { Clinic } from '../../../../models/clinic';
-import { ClinicService } from '../../../../services/clinicService';
+import { ClinicService } from '../../../../services/clinic.service';
 import { baseURL } from '../../../../constants/api';
-export const BlockClinic = (): JSX.Element => {
+import { useFetchCommonClinic } from '../../../../hooks';
+const BlockClinic = (): JSX.Element => {
     var settings = {
         dots: false,
         infinite: true,
@@ -23,24 +24,25 @@ export const BlockClinic = (): JSX.Element => {
         nextArrow: <NextArrow />,
         prevArrow: <PrevArrow />,
     };
-    const [clinics, setClinics] = useState<Clinic[]>();
-    const loadData = async () => {
-        try {
-            const data = await ClinicService.getCommonClinic();
-            setClinics(data);
-        } catch (err: any) {
-            console.log(err.message);
-        }
-    };
-    const handleUpdateViewsClinic = async (id: number) => {
-        try {
-            const res = await ClinicService.updateViewsClinic(id);
-            console.log(res);
-        } catch (err: any) {}
-    };
-    useEffect(() => {
-        loadData();
-    }, []);
+    // const [clinics, setClinics] = useState<Clinic[]>();
+    // const loadData = async () => {
+    //     try {
+    //         const data = await ClinicService.getCommonClinic();
+    //         setClinics(data);
+    //     } catch (err: any) {
+    //         console.log(err.message);
+    //     }
+    // };
+    // const handleUpdateViewsClinic = async (id: number) => {
+    //     try {
+    //         const res = await ClinicService.updateViewsClinic(id);
+    //         console.log(res);
+    //     } catch (err: any) {}
+    // };
+    // useEffect(() => {
+    //     loadData();
+    // }, []);
+    const { data, error, isFetching } = useFetchCommonClinic();
 
     return (
         <div className="block__clinic row mt-5 mb-5">
@@ -53,44 +55,58 @@ export const BlockClinic = (): JSX.Element => {
                 </Button>
             </div>
             <div className="block__list mt-4 position-relative">
-                <Slider {...settings}>
-                    {clinics?.map((clinic: Clinic) => {
-                        return (
-                            <div className="slide-container" key={clinic.id}>
-                                <div className="item border border-1 rounded p-2 text-center  ">
-                                    <Link
-                                        onClick={() =>
-                                            handleUpdateViewsClinic(
-                                                Number(clinic.id)
-                                            )
-                                        }
-                                        to={'/clinic/detail/' + clinic.id}
-                                        className=" text-decoration-none"
+                <Skeleton loading={isFetching}>
+                    {error ? (
+                        <p className="fw-bold text-center">{error.message}</p>
+                    ) : (
+                        <Slider {...settings}>
+                            {data?.map((clinic: Clinic) => {
+                                return (
+                                    <div
+                                        className="slide-container"
+                                        key={clinic.id}
                                     >
-                                        <Image
-                                            className="item__image object-fit-contain"
-                                            preview={false}
-                                            src={
-                                                clinic.avatar.includes(
-                                                    'cloudinary'
-                                                )
-                                                    ? clinic.avatar
-                                                    : baseURL + clinic.avatar
-                                            }
-                                        ></Image>
-                                        <p
-                                            className="item__text mt-3 text-center text-decoration-none text-capitalize"
-                                            style={{ height: '30px' }}
-                                        >
-                                            {clinic.name}
-                                        </p>
-                                    </Link>
-                                </div>
-                            </div>
-                        );
-                    })}
-                </Slider>
+                                        <div className="item border border-1 rounded p-2 text-center  ">
+                                            <Link
+                                                // onClick={() =>
+                                                //     // handleUpdateViewsClinic(
+                                                //     //     Number(clinic.id)
+                                                //     // )
+                                                // }
+                                                to={
+                                                    '/clinic/detail/' +
+                                                    clinic.id
+                                                }
+                                                className=" text-decoration-none"
+                                            >
+                                                <Image
+                                                    className="item__image object-fit-contain"
+                                                    preview={false}
+                                                    src={
+                                                        clinic.avatar.includes(
+                                                            'cloudinary'
+                                                        )
+                                                            ? clinic.avatar
+                                                            : baseURL +
+                                                              clinic.avatar
+                                                    }
+                                                ></Image>
+                                                <p
+                                                    className="item__text mt-3 text-center text-decoration-none text-capitalize"
+                                                    style={{ height: '30px' }}
+                                                >
+                                                    {clinic.name}
+                                                </p>
+                                            </Link>
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </Slider>
+                    )}
+                </Skeleton>
             </div>
         </div>
     );
 };
+export default BlockClinic;

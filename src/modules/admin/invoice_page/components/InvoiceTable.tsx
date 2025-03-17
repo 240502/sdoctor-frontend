@@ -13,7 +13,7 @@ import {
 import { ColumnsType } from 'antd/es/table';
 import { useRef, useState } from 'react';
 import { Invoices } from '../../../../models/invoices';
-import { invoicesService } from '../../../../services/invoicesService';
+import { invoicesService } from '../../../../services/invoices.service';
 import {
     DeleteOutlined,
     EditOutlined,

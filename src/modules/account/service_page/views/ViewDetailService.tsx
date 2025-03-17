@@ -5,7 +5,7 @@ import { useParams } from 'react-router-dom';
 import { useRecoilValue } from 'recoil';
 import { serviceListValue } from '../../../../stores/servicesAtom';
 import { Service } from '../../../../models/service';
-import { ServiceService } from '../../../../services/serviceService';
+import { ServiceService } from '../../../../services/medical_package.service';
 import { BlockDescription } from '../components/BlockDescription';
 
 type DataParams = {

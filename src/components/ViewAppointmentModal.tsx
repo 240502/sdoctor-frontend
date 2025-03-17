@@ -1,11 +1,11 @@
 import { Button, DatePicker, Form, Input, Modal, Radio } from 'antd';
 import { useEffect, useState } from 'react';
-import { doctorService } from '../services/doctorService';
+import { doctorService } from '../services/doctor.service';
 import { Doctor } from '../models/doctor';
 import { Image } from 'antd';
 import TextArea from 'antd/es/input/TextArea';
 import dayjs from 'dayjs';
-import { PaymentMethodService } from '../services/paymentMethodService';
+import { PaymentMethodService } from '../services/payment_method.service';
 import { PaymentMethod } from '../models/paymentMethod';
 
 const ViewAppointmentModal = ({

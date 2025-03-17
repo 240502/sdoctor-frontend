@@ -1,24 +1,26 @@
 import { useEffect, useState } from 'react';
 import { Service } from '../../../../models/service';
-import { ServiceService } from '../../../../services/serviceService';
 import { ServiceCard } from '../../../../components';
-import { Button } from 'antd';
+import { Button, Skeleton } from 'antd';
 import { Link } from 'react-router-dom';
+import { useFetchCommonMedicalPackages } from '../../../../hooks';
 
 export const BlockCommonService = () => {
-    const [commonServices, setCommonServices] = useState<Service[]>([]);
-    useEffect(() => {
-        const getCommonService = async () => {
-            try {
-                const res = await ServiceService.getCommonService();
-                setCommonServices(res);
-            } catch (err: any) {
-                setCommonServices([]);
-                console.log(err);
-            }
-        };
-        getCommonService();
-    }, []);
+    // const [commonServices, setCommonServices] = useState<Service[]>([]);
+    // useEffect(() => {
+    //     const getCommonService = async () => {
+    //         try {
+    //             const res = await ServiceService.getCommonService();
+    //             setCommonServices(res);
+    //         } catch (err: any) {
+    //             setCommonServices([]);
+    //             console.log(err);
+    //         }
+    //     };
+    //     getCommonService();
+    // }, []);
+
+    const { data, error, isFetching } = useFetchCommonMedicalPackages();
 
     return (
         <div className="mt-5 mb-5">
@@ -30,11 +32,12 @@ export const BlockCommonService = () => {
                     </Link>
                 </Button>
             </div>
-
-            {commonServices.length > 0 ? (
-                <ServiceCard services={commonServices} />
+            {error ? (
+                <p className="text-center fw-bold">{error.message}</p>
             ) : (
-                <p>Không có dịch vụ nào!</p>
+                <Skeleton active loading={isFetching}>
+                    <ServiceCard services={data} />
+                </Skeleton>
             )}
         </div>
     );

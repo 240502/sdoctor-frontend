@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
 import { Button, Row, Col, message } from 'antd';
-import { TimeService } from '../../../../services/timeService';
+import { TimeService } from '../../../../services/time.service';
 import { useRecoilState } from 'recoil';
 import { scheduleDetailsState } from '../../../../stores/scheduleDetailAtom';
 import { Time } from '../../../../models/time';
 import { CloseOutlined, PlusOutlined } from '@ant-design/icons';
 import { handleGetDateByActiveDay } from '../../../../utils/schedule_management';
-import { scheduleService } from '../../../../services/doctorScheduleService';
+import { scheduleService } from '../../../../services/doctor_schedule.service';
 import { DoctorScheduleDetail } from '../../../../models/doctorScheduleDetails';
 import { handleTimeOverRealTime } from '../../../../utils/schedule';
 

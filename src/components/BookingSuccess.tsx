@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useRecoilValue } from 'recoil';
 import { newAppointmentValue } from '../stores/appointmentAtom';
 import { useEffect } from 'react';
-import { paymentService } from '../services/paymentService';
+import { paymentService } from '../services/payment.service';
 import { invoiceValue } from '../stores/invoice';
 import { Invoices } from '../models/invoices';
 const { Title, Text } = Typography;

@@ -10,17 +10,17 @@ import {
     Input,
 } from 'antd';
 import { HomeOutlined, PlusOutlined, SearchOutlined } from '@ant-design/icons';
-import { doctorService } from '../../../../services/doctorService';
+import { doctorService } from '../../../../services/doctor.service';
 import { DoctorCards } from '../components/DoctorCards';
 import { DoctorModal } from '../components/DoctorModal';
 import { ModalConfirmDelete } from '../components/ModalConfirmDelete';
 import { Major } from '../../../../models/major';
 import { Clinic } from '../../../../models/clinic';
-import { ClinicService } from '../../../../services/clinicService';
-import { MajorService } from '../../../../services/majorService';
+import { ClinicService } from '../../../../services/clinic.service';
+import { MajorService } from '../../../../services/major.service';
 import { useRecoilValue } from 'recoil';
 import { configValue } from '../../../../stores/userAtom';
-import { DoctorServiceService } from '../../../../services/doctorServiceService';
+import { DoctorServiceService } from '../../../../services/doctor_service.service';
 import { DoctorService } from '../../../../models/doctorService';
 type NotificationType = 'success' | 'warning' | 'error';
 const { Option } = Select;

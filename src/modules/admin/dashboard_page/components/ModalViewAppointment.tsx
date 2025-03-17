@@ -1,6 +1,6 @@
 import { Button, DatePicker, Form, Input, Modal, Radio } from 'antd';
 import { useEffect, useState } from 'react';
-import { doctorService } from '../../../../services/doctorService';
+import { doctorService } from '../../../../services/doctor.service';
 import { Doctor } from '../../../../models/doctor';
 import { Image } from 'antd';
 import TextArea from 'antd/es/input/TextArea';

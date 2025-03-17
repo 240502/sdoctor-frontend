@@ -2,18 +2,17 @@ import { Col, Row, Image, Button, Flex } from 'antd';
 import { Service } from '../models/service';
 import { useNavigate } from 'react-router-dom';
 import { DollarOutlined, EnvironmentOutlined } from '@ant-design/icons';
-import { ServiceService } from '../services/serviceService';
 
 const ServiceCard = ({ services }: any) => {
     const navigate = useNavigate();
-    const updateViewService = async (id: number) => {
-        try {
-            const res = await ServiceService.updateView(id);
-            console.log(res);
-        } catch (err: any) {
-            console.log(err.message);
-        }
-    };
+    // const updateViewService = async (id: number) => {
+    //     try {
+    //         const res = await ServiceService.updateView(id);
+    //         console.log(res);
+    //     } catch (err: any) {
+    //         console.log(err.message);
+    //     }
+    // };
     return (
         <Row gutter={[24, 24]} className="cards">
             {services?.map((service: Service) => {
@@ -26,7 +25,7 @@ const ServiceCard = ({ services }: any) => {
                                         navigate(
                                             '/service/detail/' + service?.id
                                         );
-                                        updateViewService(Number(service?.id));
+                                        // updateViewService(Number(service?.id));
                                     }}
                                     preview={false}
                                     src={service.image}
@@ -40,7 +39,7 @@ const ServiceCard = ({ services }: any) => {
                                         navigate(
                                             '/service/detail/' + service?.id
                                         );
-                                        updateViewService(Number(service?.id));
+                                        // updateViewService(Number(service?.id));
                                     }}
                                 >
                                     {service.name}
@@ -76,7 +75,7 @@ const ServiceCard = ({ services }: any) => {
                                         navigate(
                                             '/service/detail/' + service?.id
                                         );
-                                        updateViewService(Number(service?.id));
+                                        // updateViewService(Number(service?.id));
                                     }}
                                 >
                                     Đặt lịch hẹn

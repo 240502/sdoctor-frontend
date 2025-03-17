@@ -17,7 +17,7 @@ import dayjs from 'dayjs';
 import axios from 'axios';
 import { useRecoilState } from 'recoil';
 import { patientProfileState } from '../../../../stores/patientAtom';
-import { PatientProfileService } from '../../../../services/patient_profileService';
+import { PatientProfileService } from '../../../../services/patient_profile.service';
 import { PatientProfileLayout } from '../components/PatientProfileLayout';
 import { ModalConfirmDeletePatientProfile } from '../components/ModalConfirmDeletePatientProfile';
 import { PatientProfile } from '../../../../models/patient_profile';

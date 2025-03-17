@@ -1,5 +1,5 @@
 import { Button, Modal } from 'antd';
-import { PostService } from '../../../../services/postService';
+import { PostService } from '../../../../services/post.service';
 
 export const ModalConfirmDeleteNews = ({
     isShowModalConfirm,

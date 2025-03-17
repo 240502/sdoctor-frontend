@@ -6,7 +6,7 @@ import {
 } from '../../../stores/notification';
 import { useEffect } from 'react';
 import { BellOutlined, CloseOutlined } from '@ant-design/icons';
-import { NotificationService } from '../../../services/notificationService';
+import { NotificationService } from '../../../services/notification.service';
 import { userValue } from '../../../stores/userAtom';
 import 'dayjs/locale/vi';
 import dayjs from 'dayjs';

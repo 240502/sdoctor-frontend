@@ -7,7 +7,7 @@ import PrevArrow from './PrevArrow';
 import Slider from 'react-slick';
 import { Image } from 'antd';
 import { PostCategory } from '../../../../models/post_category';
-import { PostCategoryService } from '../../../../services/post_categoryService';
+import { PostCategoryService } from '../../../../services/post_category.service';
 import { baseURL } from '../../../../constants/api';
 import { useSetRecoilState } from 'recoil';
 import { postCategoryState } from '../../../../stores/scheduleAtom';

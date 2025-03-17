@@ -1,5 +1,5 @@
 import { Button, Input, notification, Form } from 'antd';
-import { UserService } from '../../../services/userService';
+import { UserService } from '../../../services/user.service';
 import { useSetRecoilState } from 'recoil';
 import { userState } from '../../../stores/userAtom';
 import { useNavigate } from 'react-router-dom';

@@ -19,7 +19,7 @@ import {
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Doctor } from '../../../../models/doctor';
-import { doctorService } from '../../../../services/doctorService';
+import { doctorService } from '../../../../services/doctor.service';
 import { baseURL } from '../../../../constants/api';
 import parse from 'html-react-parser';
 import { BlockComment } from '../components/BlockComment';
@@ -30,7 +30,7 @@ import {
     doctorState,
 } from '../../../../stores/doctorAtom';
 import { useNavigate } from 'react-router-dom';
-import { CommentService } from '../../../../services/commentService';
+import { CommentService } from '../../../../services/comment.service';
 import socket from '../../../../socket';
 import { Comment } from '../../../../models/comment';
 

@@ -3,7 +3,7 @@ import { Post } from '../../../../models/post';
 import { Link, useNavigate } from 'react-router-dom';
 import '@/assets/scss/app.scss';
 import * as cheerio from 'cheerio';
-import { PostService } from '../../../../services/postService';
+import { PostService } from '../../../../services/post.service';
 
 export const PostCards = ({ posts }: any) => {
     const navigate = useNavigate();

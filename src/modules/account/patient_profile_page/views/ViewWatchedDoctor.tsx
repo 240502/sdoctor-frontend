@@ -10,11 +10,11 @@ import {
 } from '@ant-design/icons';
 import { useSetRecoilState } from 'recoil';
 import { doctorState } from '../../../../stores/doctorAtom';
-import { doctorService } from '../../../../services/doctorService';
+import { doctorService } from '../../../../services/doctor.service';
 import { Major } from '../../../../models/major';
 import { Clinic } from '../../../../models/clinic';
-import { MajorService } from '../../../../services/majorService';
-import { ClinicService } from '../../../../services/clinicService';
+import { MajorService } from '../../../../services/major.service';
+import { ClinicService } from '../../../../services/clinic.service';
 const ViewWatchedDoctor = () => {
     const navigate = useNavigate();
     const [watchedDoctors, setWatchedDoctors] = useState<Doctor[]>([]);

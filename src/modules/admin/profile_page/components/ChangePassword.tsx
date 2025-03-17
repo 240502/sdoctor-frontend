@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Modal, Input, Button, Form, Flex } from 'antd';
 import { useRecoilValue } from 'recoil';
 import { configValue, userValue } from '../../../../stores/userAtom';
-import { UserService } from '../../../../services/userService';
+import { UserService } from '../../../../services/user.service';
 import { openNotification } from '../../../../utils/notification';
 export const ChangePasswordModal = ({
     apiNotification,

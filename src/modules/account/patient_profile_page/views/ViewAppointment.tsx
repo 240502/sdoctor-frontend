@@ -6,7 +6,7 @@ import {
     Appointment,
     AppointmentViewForPatient,
 } from '../../../../models/appointment';
-import { AppointmentService } from '../../../../services/appointmentService';
+import { AppointmentService } from '../../../../services/appointment.service';
 import {
     Button,
     Col,
@@ -33,16 +33,16 @@ import {
 import { ModalConfirmCancelAppointment } from '../components/ModalConfirmCancelAppointment';
 import { useNavigate } from 'react-router-dom';
 import { AppointmentStatus } from '../../../../models/appointment_status';
-import { AppointmentStatusService } from '../../../../services/appointment_statusService';
+import { AppointmentStatusService } from '../../../../services/appointment_status.service';
 type NotificationType = 'success' | 'error';
 import { FilterDropdownProps } from 'antd/es/table/interface';
 import { SearchOutlined } from '@ant-design/icons';
 import Highlighter from 'react-highlight-words';
 import '@/assets/scss/patient_profile.scss';
 import dayjs from 'dayjs';
-import { invoicesService } from '../../../../services/invoicesService';
+import { invoicesService } from '../../../../services/invoices.service';
 import { Invoices } from '../../../../models/invoices';
-import { paymentService } from '../../../../services/paymentService';
+import { paymentService } from '../../../../services/payment.service';
 import { InputCommentModal } from '../components/InputCommentModal';
 import { ViewAppointmentModal } from '../../../../components';
 type DataIndex = keyof AppointmentViewForPatient;

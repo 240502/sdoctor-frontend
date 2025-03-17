@@ -4,15 +4,20 @@ import { HomeOutlined } from '@ant-design/icons';
 import { MajorCards } from '../components/MajorCards';
 import { Major } from '../../../../models/major';
 import { useFetchDataWithPaginationProps } from '../../../../hooks';
+import { useFetchSpecialization } from '../../../../hooks/specialization';
 
 const ViewMajor = () => {
     // const [pagination, setPagination] = useRecoilState(paginationState);
     const [majors, setMajors] = useState<Major[]>([]);
     const apiEndpoint = '/major/view';
-    const { data, loading, error } = useFetchDataWithPaginationProps<Major>(
-        apiEndpoint,
-        undefined
-    );
+    // const { data, loading, error } = useFetchDataWithPaginationProps<Major>(
+    //     apiEndpoint,
+    //     undefined
+    // );
+    const { data, isLoading, error, isFetching } = useFetchSpecialization();
+    useEffect(() => {
+        console.log(data, isLoading, error, isFetching);
+    }, [data]);
     useEffect(() => {
         window.scrollTo(0, 0);
     }, []);
@@ -34,11 +39,11 @@ const ViewMajor = () => {
                 ]}
             />
 
-            <div className="block__list__doctor mt-4">
-                {loading ? (
+            <div className="specialization-list-container mt-4">
+                {isFetching ? (
                     <p>Đang tải dữ liệu ...</p>
                 ) : error ? (
-                    <p>{error}</p>
+                    <p>{error.message}</p>
                 ) : (
                     data?.length > 0 && (
                         <>

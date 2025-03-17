@@ -1,10 +1,10 @@
 import { Modal, Button, Row, Col, Form, Input, Select, DatePicker } from 'antd';
 import { useEffect, useState } from 'react';
-import { DoctorServiceService } from '../../../../services/doctorServiceService';
+import { DoctorServiceService } from '../../../../services/doctor_service.service';
 import { DoctorService } from '../../../../models/doctorService';
 import dayjs from 'dayjs';
-import { invoicesService } from '../../../../services/invoicesService';
-import { AppointmentService } from '../../../../services/appointmentService';
+import { invoicesService } from '../../../../services/invoices.service';
+import { AppointmentService } from '../../../../services/appointment.service';
 
 export const InvoiceModal = ({
     invoice,

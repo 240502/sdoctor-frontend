@@ -3,10 +3,10 @@ import { useEffect, useRef, useState } from 'react';
 import MyEditor from './MyEditor';
 import { useRecoilValue } from 'recoil';
 import { userValue } from '../../../../stores/userAtom';
-import { PostService } from '../../../../services/postService';
+import { PostService } from '../../../../services/post.service';
 import * as cheerio from 'cheerio';
 import { PostCategory } from '../../../../models/post_category';
-import { PostCategoryService } from '../../../../services/post_categoryService';
+import { PostCategoryService } from '../../../../services/post_category.service';
 import { isEmptyEditor } from '../../../../utils/global';
 export const ModalAddNews = ({
     isShowModal,

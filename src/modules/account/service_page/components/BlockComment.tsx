@@ -1,7 +1,7 @@
 import { CheckCircleOutlined } from '@ant-design/icons';
 import { Button } from 'antd';
 import { useState, useEffect } from 'react';
-import { CommentService } from '../../../../services/commentService';
+import { CommentService } from '../../../../services/comment.service';
 import { Comment } from '../../../../models/comment';
 import socket from '../../../../socket';
 export const BlockComment = ({ userId, setIsModalCommentOpen }: any) => {

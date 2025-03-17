@@ -1,7 +1,7 @@
 import { Modal, Col, Row, Divider, Button } from 'antd';
 import { useEffect, useState } from 'react';
 import { Appointment } from '../models/appointment';
-import { AppointmentService } from '../services/appointmentService';
+import { AppointmentService } from '../services/appointment.service';
 import dayjs from 'dayjs';
 // import downloadInvoicePdf from '../../../../utils/dowloadPDF';
 import { useRef } from 'react';
