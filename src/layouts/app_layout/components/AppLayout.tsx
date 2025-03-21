@@ -49,8 +49,8 @@ export const AppLayout = ({ children }: any) => {
                     </div>
                 </div>
             </Header>
-            <Content style={{ background: '#fff', marginTop: '78px' }}>
-                {children}
+            <Content className="bg-body">
+                <div className="container">{children}</div>
             </Content>
             <Footer>
                 <HomeFooter />

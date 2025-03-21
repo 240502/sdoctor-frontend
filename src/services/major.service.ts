@@ -13,8 +13,11 @@ export const MajorService = {
         const res: any = await apiClient.get('/major/get-by-id/' + id);
         return res?.data;
     },
-    async viewMajor(data: any): Promise<any> {
-        const res: any = await apiClient.post('/major/view', data);
+    async viewMajor(payload: {
+        pageIndex?: number;
+        pageSize?: number;
+    }): Promise<any> {
+        const res: any = await apiClient.post('/major/view', payload);
         return res?.data;
     },
 };

@@ -233,37 +233,20 @@ main {
 }
 
 //card-doctor
-.card-item {
-    display: flex;
-    flex: 1 0 25%;
-    box-sizing: border-box;
-    cursor: pointer;
-    padding: 12px 8px 8px 8px;
-}
 
-.card-container {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    height: 100%;
-    background: #fff;
-    border-radius: 8px;
-    padding: 16px;
-}
-
-.cards .card-item .ant-card-body {
-    padding: 10px;
-}
-.cards .clinic-info p:first-child {
-    max-height: 40px;
-}
-.cards .card-item .clinic-info {
-    border-radius: 8px;
-    background: rgb(248, 249, 252);
-    padding: 8px;
-    max-height: 200px;
-    font-size: 13px;
-}
+// .cards .card-item .ant-card-body {
+//     padding: 10px;
+// }
+// .cards .clinic-info p:first-child {
+//     max-height: 40px;
+// }
+// .cards .card-item .clinic-info {
+//     border-radius: 8px;
+//     background: rgb(248, 249, 252);
+//     padding: 8px;
+//     max-height: 200px;
+//     font-size: 13px;
+// }
 .cards .card-item .booking-btn {
     transition: all 0.2s linear;
 }

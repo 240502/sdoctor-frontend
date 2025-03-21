@@ -36,26 +36,18 @@ export const commonDoctorValue = selector({
     },
 });
 
-export const doctorPagination = atom({
-    key: 'doctorPagination',
+export const doctorFilterOptions = atom({
+    key: 'doctorFilterOptions',
     default: {
-        pageCount: 0,
         pageIndex: 1,
         pageSize: 8,
-        totalItems: 0,
+        majorId: 0,
+        clinicId: 0,
+        doctorServiceId: 0,
     },
 });
 
 export const isPreventCallApi = atom({
     key: 'isPreventCallApi',
     default: false,
-});
-
-export const doctorOptions = atom({
-    key: 'doctorOptions',
-    default: {
-        majorId: 0,
-        clinicId: 0,
-        name: '',
-    },
 });

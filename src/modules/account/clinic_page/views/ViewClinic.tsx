@@ -11,8 +11,12 @@ import { useEffect, useState } from 'react';
 import { SearchProps } from 'antd/es/input';
 import axios from 'axios';
 import { ClinicCard } from '../components/ClinicCard';
-import { useFetchDataWithPaginationProps } from '../../../../hooks';
+import {
+    useFetchClinicsWithPagination,
+    useFetchDataWithPaginationProps,
+} from '../../../../hooks';
 import { Clinic } from '../../../../models/clinic';
+import ShowMoreComp from '../../../../components/ShowMoreComp';
 const { Search } = Input;
 const ViewClinic = () => {
     const [optionsFilter, setOptionsFilter] = useState<any>({
@@ -20,12 +24,17 @@ const ViewClinic = () => {
         name: null,
     });
     const apiEndpoint = '/clinic/view';
-    const { data, loading, error, pageCount, resetFirstFetch } =
-        useFetchDataWithPaginationProps<Clinic>(apiEndpoint, optionsFilter);
+    // const { data, loading, error, pageCount, resetFirstFetch } =
+    //     useFetchDataWithPaginationProps<Clinic>(apiEndpoint, optionsFilter);
     // const [pagination, setPagination] = useRecoilState(paginationState);
     const [provinces, setProvinces] = useState([
         { province_id: 0, province_name: '' },
     ]);
+
+    const { data, error, isFetching } = useFetchClinicsWithPagination({
+        pageIndex: 1,
+        pageSize: 10,
+    });
 
     const setClinics = useSetRecoilState(clinicListState);
     const clinics = useRecoilValue(clinicListValue);
@@ -76,7 +85,7 @@ const ViewClinic = () => {
     }, [optionsFilter]);
 
     useEffect(() => {
-        setClinics(data);
+        // setClinics(data);
     }, [data]);
 
     return (
@@ -126,30 +135,19 @@ const ViewClinic = () => {
                     />
                 </Flex>
             </Flex>
-            {loading ? (
+            {isFetching ? (
                 <p className="fs-6 fw-bold text-center mt-4">
                     Đang tải dữ liệu ...
                 </p>
             ) : error ? (
-                <p className="fs-6 fw-bold text-center mt-4">{error}</p>
-            ) : clinics?.length > 0 ? (
+                <p className="fs-6 fw-bold text-center mt-4">{error.message}</p>
+            ) : data?.clinics?.length > 0 ? (
                 <>
                     <ClinicCard
-                        clinics={clinics}
-                        handleUpdateViewsClinic={handleUpdateViewsClinic}
+                        clinics={data?.clinics}
+                        // handleUpdateViewsClinic={handleUpdateViewsClinic}
                     />
-                    {/* {pagination.pageCount > 1 && (
-                        <Pagination
-                            current={pagination.pageIndex}
-                            pageSize={pagination.pageSize}
-                            showSizeChanger
-                            pageSizeOptions={['4', '8', '12', '16', '20']}
-                            onChange={changePage}
-                            align="center"
-                            className="mt-3"
-                            total={pagination.pageCount * pagination.pageSize}
-                        ></Pagination>
-                    )} */}
+                    <ShowMoreComp />
                 </>
             ) : (
                 <>Không có cơ sở y tế nào!</>

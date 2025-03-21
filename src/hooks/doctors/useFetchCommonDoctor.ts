@@ -6,7 +6,7 @@ export const useFetchCommonDoctors = () => {
         queryKey: ['fetchCommonDoctors'],
         queryFn: doctorService.getCommonDoctor,
         select: (response) => ({
-            doctors: response.data, // Mảng danh sách bác sĩ
+            doctors: response.data,
         }),
         staleTime: 1000 * 60 * 5,
         gcTime: 1000 * 60 * 10,

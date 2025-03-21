@@ -1,18 +1,26 @@
 import { DoctorSchedule } from './doctorSchedule';
 
+export interface DoctorOptions {
+    pageIndex: number;
+    pageSize: number | null;
+    clinicId: number | null;
+    majorId: number | null;
+    doctorServiceId: number | null;
+}
+
 export interface Doctor {
-    doctor_id: number;
-    user_id: number;
-    full_name: string;
-    clinic_id: number;
-    major_id: number;
+    doctorId: number;
+    userId: number;
+    fullName: string;
+    clinicId: number;
+    majorId: number;
     summary: String;
     image: string;
     email: string;
     phone: string;
     password: string;
-    created_at: Date;
-    updated_at: Date;
+    createdAt: Date;
+    updatedAt: Date;
     city: string;
     district: string;
     commune: string;
@@ -20,13 +28,13 @@ export interface Doctor {
     title: string;
     price: number;
     views: number;
-    clinic_name: string;
+    clinicName: string;
     location: string;
-    major_name: string;
+    majorName: string;
     schedule: DoctorSchedule;
     introduction: string;
     birthday: Date;
-    service_id: number;
-    service_name: string;
-    average_star: number;
+    serviceId: number;
+    serviceName: string;
+    averageStar: number;
 }

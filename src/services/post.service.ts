@@ -17,7 +17,7 @@ export const PostService = {
         const res = await apiClient.post('/post/view', data);
         return res.data;
     },
-    async getNewPost(): Promise<any> {
+    async getNewPosts(): Promise<any> {
         const res = await apiClient.get('/post/get-new-posts');
         return res?.data;
     },

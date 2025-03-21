@@ -1,22 +1,30 @@
-import { useQuery } from '@tanstack/react-query';
+import { useInfiniteQuery } from '@tanstack/react-query';
 import { doctorService } from '../../services';
-export const useFetchDoctorsWithPagination = (
-    pageIndex: number,
-    pageSize: number
-) => {
-    return useQuery({
-        queryKey: ['fetchDoctors', pageIndex, pageSize] as const, // Thay đổi queryKey khi tham số thay đổi
-        queryFn: async ({ queryKey }) => {
-            return await doctorService.viewDoctorForClient(queryKey);
+import { DoctorOptions } from '../../models/doctor';
+
+export const useFetchDoctorsWithPagination = (payload: DoctorOptions) => {
+    return useInfiniteQuery({
+        queryKey: [
+            'fetchDoctorsWithPaginationAndFilters',
+            JSON.stringify(payload),
+        ],
+
+        queryFn: async ({ pageParam = 1 }) => {
+            return await doctorService.viewDoctorForClient({
+                ...payload,
+                pageIndex: pageParam, // ✅ Gửi pageIndex đúng theo `pageParam`
+            });
         },
-        select: (response) => ({
-            doctors: response.data, // Mảng danh sách bác sĩ
-            totalItems: response.totalItems,
-            page: response.page,
-            pageSize: response.pageSize,
-        }),
-        staleTime: 1000 * 60 * 5, // 5 phút
+        retry: 1,
+        initialPageParam: 1, // ✅ Thêm `initialPageParam` để sửa lỗi
+        getNextPageParam: (lastPage) => {
+            const { page, pageCount } = lastPage;
+            return page < pageCount ? page + 1 : undefined; // ✅ Nếu còn trang tiếp theo, trả về số trang tiếp theo
+        },
+
+        staleTime: 1000 * 60 * 5, // Cache trong 5 phút
         gcTime: 1000 * 60 * 10, // Xóa cache sau 10 phút nếu không dùng
-        placeholderData: (previousData) => previousData ?? [], // ✅ Sử dụng dữ liệu cũ nếu có
+        placeholderData: (previousData) =>
+            previousData ?? { pages: [], pageParams: [] },
     });
 };

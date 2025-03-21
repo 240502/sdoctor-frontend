@@ -2,28 +2,19 @@ import { useEffect, useState } from 'react';
 import { Breadcrumb, Pagination } from 'antd';
 import { HomeOutlined } from '@ant-design/icons';
 import { MajorCards } from '../components/MajorCards';
-import { Major } from '../../../../models/major';
-import { useFetchDataWithPaginationProps } from '../../../../hooks';
-import { useFetchSpecialization } from '../../../../hooks/specialization';
+import { useFetchSpecializationsWithPagination } from '../../../../hooks';
+import ShowMoreComp from '../../../../components/ShowMoreComp';
 
 const ViewMajor = () => {
     // const [pagination, setPagination] = useRecoilState(paginationState);
-    const [majors, setMajors] = useState<Major[]>([]);
-    const apiEndpoint = '/major/view';
-    // const { data, loading, error } = useFetchDataWithPaginationProps<Major>(
-    //     apiEndpoint,
-    //     undefined
-    // );
-    const { data, isLoading, error, isFetching } = useFetchSpecialization();
-    useEffect(() => {
-        console.log(data, isLoading, error, isFetching);
-    }, [data]);
+    const { data, isLoading, error, isFetching } =
+        useFetchSpecializationsWithPagination({ pageIndex: 1, pageSize: 8 });
     useEffect(() => {
         window.scrollTo(0, 0);
     }, []);
-    useEffect(() => {
-        setMajors(data);
-    }, [data]);
+    // useEffect(() => {
+    //     setMajors(data);
+    // }, [data]);
     return (
         <div className="container home__content mt-4 mb-4">
             <Breadcrumb
@@ -45,12 +36,14 @@ const ViewMajor = () => {
                 ) : error ? (
                     <p>{error.message}</p>
                 ) : (
-                    data?.length > 0 && (
+                    data?.majors.length > 0 && (
                         <>
                             <MajorCards
-                                majors={majors}
+                                majors={data?.majors}
                                 // changePage={changePage}
                             />
+
+                            <ShowMoreComp></ShowMoreComp>
                             {/* <section className="page d-flex justify-content-center align-items-center">
                                 {pagination.pageCount > 0 ? (
                                     <Pagination

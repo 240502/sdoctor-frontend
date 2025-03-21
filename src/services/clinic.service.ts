@@ -6,6 +6,7 @@ export const ClinicService = {
         return res?.data;
     },
     async viewClinic(data: any): Promise<any> {
+        console.log(data);
         const res: any = await apiClient.post('/clinic/view', data);
         return res?.data;
     },

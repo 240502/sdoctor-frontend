@@ -6,9 +6,9 @@ import NextArrow from './NextArrow';
 import PrevArrow from './PrevArrow';
 import Slider from 'react-slick';
 import { Post } from '../../../../models/post';
-import { Image } from 'antd';
-import { PostService } from '../../../../services/post.service';
+import { Image, Skeleton } from 'antd';
 import { baseURL } from '../../../../constants/api';
+import { useFetchNewPosts } from '../../../../hooks';
 export const BlockNewPost = () => {
     var settings = {
         dots: false,
@@ -23,84 +23,97 @@ export const BlockNewPost = () => {
         nextArrow: <NextArrow />,
         prevArrow: <PrevArrow />,
     };
-    const [posts, setPosts] = useState<Post[]>([]);
-    const getNewPost = async () => {
-        try {
-            const res = await PostService.getNewPost();
-            console.log(res);
-            setPosts(res);
-        } catch (err: any) {
-            console.log(err.message);
-        }
-    };
-    const updateViewPost = async (id: number) => {
-        try {
-            const res = await PostService.updateViewPost(id);
-            console.log(res);
-        } catch (err: any) {
-            console.log(err.message);
-        }
-    };
-    useEffect(() => {
-        getNewPost();
-    }, []);
+    // const [posts, setPosts] = useState<Post[]>([]);
+    // const getNewPost = async () => {
+    //     try {
+    //         const res = await PostService.getNewPost();
+    //         console.log(res);
+    //         setPosts(res);
+    //     } catch (err: any) {
+    //         console.log(err.message);
+    //     }
+    // };
+    // const updateViewPost = async (id: number) => {
+    //     try {
+    //         const res = await PostService.updateViewPost(id);
+    //         console.log(res);
+    //     } catch (err: any) {
+    //         console.log(err.message);
+    //     }
+    // };
+    // useEffect(() => {
+    //     getNewPost();
+    // }, []);
+    const { data, error, isFetching } = useFetchNewPosts();
+
     return (
         <div className="row mt-5 mb-5">
             <div className="block__header d-flex justify-content-between align-items-center">
                 <h3 className="block__title fs-4 fw-bold">Bài viết mới</h3>
             </div>
             <div className="block__list mt-4 position-relative posts">
-                <Slider {...settings}>
-                    {posts?.length > 0 ? (
-                        posts.map((post: Post) => {
-                            return (
-                                <div
-                                    className="slide__container  col-3 ps-3 pe-3"
-                                    key={post?.id}
-                                >
-                                    <div className="item border flex-grow-1 border-1 rounded p-3 text-center   ">
-                                        <Link
-                                            onClick={() => {
-                                                updateViewPost(post.id);
-                                            }}
-                                            to={'/post/detail/' + post.id}
-                                            className=" text-decoration-none feature-img-container"
+                <Skeleton active loading={isFetching}>
+                    {error ? (
+                        <p className="text-center fw-bold">{error.message}</p>
+                    ) : (
+                        <Slider {...settings}>
+                            {data?.length > 0 ? (
+                                data.map((post: Post) => {
+                                    return (
+                                        <div
+                                            className="slide__container  col-3 ps-3 pe-3"
+                                            key={post?.id}
                                         >
-                                            <Image
-                                                className="item__image feature-img object-fit-cover rounded "
-                                                preview={false}
-                                                src={
-                                                    post?.featured_image?.includes(
-                                                        'cloudinary'
-                                                    )
-                                                        ? post?.featured_image
-                                                        : baseURL +
-                                                          post?.featured_image
-                                                }
-                                            ></Image>
-                                            <p className="post-title mt-3 text-center text-dark fw-bold fs-6 text-capitalize">
+                                            <div className="item border flex-grow-1 border-1 rounded p-3 text-center   ">
                                                 <Link
+                                                    // onClick={() => {
+                                                    //     updateViewPost(post.id);
+                                                    // }}
                                                     to={
                                                         '/post/detail/' +
                                                         post.id
                                                     }
-                                                    className=" text-decoration-none text-dark"
-                                                    onClick={() => {
-                                                        updateViewPost(post.id);
-                                                    }}
+                                                    className=" text-decoration-none feature-img-container"
                                                 >
-                                                    {post.title}
+                                                    <Image
+                                                        className="item__image feature-img object-fit-cover rounded "
+                                                        preview={false}
+                                                        src={
+                                                            post?.featured_image?.includes(
+                                                                'cloudinary'
+                                                            )
+                                                                ? post?.featured_image
+                                                                : baseURL +
+                                                                  post?.featured_image
+                                                        }
+                                                    ></Image>
+                                                    <p className="post-title mt-3 text-center text-dark fw-bold fs-6 text-capitalize">
+                                                        <Link
+                                                            to={
+                                                                '/post/detail/' +
+                                                                post.id
+                                                            }
+                                                            className=" text-decoration-none text-dark"
+                                                            // onClick={() => {
+                                                            //     updateViewPost(
+                                                            //         post.id
+                                                            //     );
+                                                            // }}
+                                                        >
+                                                            {post.title}
+                                                        </Link>
+                                                    </p>
                                                 </Link>
-                                            </p>
-                                        </Link>
-                                    </div>
-                                </div>
-                            );
-                        })
-                    ) : (
-                        <></>
+                                            </div>
+                                        </div>
+                                    );
+                                })
+                            ) : (
+                                <></>
+                            )}
+                        </Slider>
                     )}
-                </Slider>
+                </Skeleton>
             </div>
         </div>
     );
