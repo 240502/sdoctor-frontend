@@ -1,6 +1,6 @@
 import { apiClient } from '../constants/api';
 
-export const doctorScheduleDetailService = {
+const doctorScheduleDetailService = {
     async getScheduleDetailByScheduleId(scheduleId: number): Promise<any> {
         const res = await apiClient.get(
             '/api/schedule-details/get-by-schedule-id/' + scheduleId
@@ -16,3 +16,4 @@ export const doctorScheduleDetailService = {
         return res;
     },
 };
+export default doctorScheduleDetailService;

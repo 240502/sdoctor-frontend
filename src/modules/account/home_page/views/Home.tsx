@@ -51,7 +51,7 @@ const Home = () => {
                 </div>
             </div>
             <div className="container home__content mt-4 ">
-                <BlockSearchDoctor />
+                {/* <BlockSearchDoctor /> */}
                 <BlockSpecialization />
                 <BlockCommonDoctor />
                 <BlockCommonService />

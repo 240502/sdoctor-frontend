@@ -1,6 +1,6 @@
 import { apiClient } from '../constants/api';
 
-export const PatientProfileService = {
+const patientProfileService = {
     async createPatientProfile(data: any): Promise<any> {
         const res: any = await apiClient.post('/patient-profile/create', data);
         return res;
@@ -25,3 +25,4 @@ export const PatientProfileService = {
         return res.data;
     },
 };
+export default patientProfileService;

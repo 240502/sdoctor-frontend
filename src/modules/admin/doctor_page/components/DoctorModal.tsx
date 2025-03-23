@@ -27,7 +27,7 @@ type FileType = Parameters<GetProp<UploadProps, 'beforeUpload'>>[0];
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import SummaryEditor from './SummaryEditor';
-import { DoctorService } from '../../../../models/doctorService';
+import { DoctorService } from '../../../../models/doctor_service';
 import viVN from 'antd/lib/locale/vi_VN';
 import 'dayjs/locale/vi';
 import { ProvinceType, DistrictType, WardType } from '../../../../models/other';

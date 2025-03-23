@@ -21,7 +21,7 @@ import { MajorService } from '../../../../services/major.service';
 import { useRecoilValue } from 'recoil';
 import { configValue } from '../../../../stores/userAtom';
 import { DoctorServiceService } from '../../../../services/doctor_service.service';
-import { DoctorService } from '../../../../models/doctorService';
+import { DoctorService } from '../../../../models/doctor_service';
 type NotificationType = 'success' | 'warning' | 'error';
 const { Option } = Select;
 

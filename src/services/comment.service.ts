@@ -1,5 +1,5 @@
 import { apiClient } from '../constants/api';
-export const CommentService = {
+const commentService = {
     async createComment(data: any): Promise<any> {
         const res = await apiClient.post('/comment/create', data);
         return res;
@@ -12,3 +12,4 @@ export const CommentService = {
         return res?.data;
     },
 };
+export default commentService;

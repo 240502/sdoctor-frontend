@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { MajorService } from '../../services';
+import { majorService } from '../../services';
 
 export const useFetchSpecializationsWithPagination = (payload: {
     pageIndex?: number;
@@ -8,7 +8,7 @@ export const useFetchSpecializationsWithPagination = (payload: {
     return useQuery({
         queryKey: ['fetchSpecializationsWithPagination'],
         queryFn: async () => {
-            return await MajorService.viewMajor(payload);
+            return await majorService.viewMajor(payload);
         },
         select: (response) => ({
             majors: response.data,

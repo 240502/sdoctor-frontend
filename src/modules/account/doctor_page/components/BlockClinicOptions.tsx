@@ -1,9 +1,13 @@
 import { Select } from 'antd';
 import { useFetchClinicsWithPagination } from '../../../../hooks';
 import { Clinic } from '../../../../models/clinic';
+import { useRecoilState } from 'recoil';
+import { doctorFilterOptions } from '../../../../stores';
 
 const BlockClinicOptions = () => {
     const { data, isFetching } = useFetchClinicsWithPagination({});
+    const [doctocOptions, setDoctorOptions] =
+        useRecoilState(doctorFilterOptions);
     return (
         <div className="pb-3">
             <h6 className="mb-3">Cơ sở y tế</h6>
@@ -13,8 +17,15 @@ const BlockClinicOptions = () => {
                 optionFilterProp="children"
                 allowClear
                 showSearch
+                value={
+                    doctocOptions.clinicId === 0 ? null : doctocOptions.clinicId
+                }
                 onChange={(value: any) => {
                     console.log('value', value);
+                    setDoctorOptions({
+                        ...doctocOptions,
+                        clinicId: value ?? 0,
+                    });
                 }}
             >
                 {!isFetching &&

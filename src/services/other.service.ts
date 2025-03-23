@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-export const OtherService = {
+const otherService = {
     async getProvinces(): Promise<any> {
         try {
             const res = await axios.get(
@@ -12,3 +12,4 @@ export const OtherService = {
         }
     },
 };
+export default otherService;

@@ -1,6 +1,6 @@
 import { apiClient } from '../constants/api';
 
-export const MailerService = {
+const mailerService = {
     async sendBookingSuccessMail(data: any): Promise<any> {
         const res = await apiClient.post('/mailer/send-booking-success', data);
         return res;
@@ -18,3 +18,4 @@ export const MailerService = {
         return res;
     },
 };
+export default mailerService;

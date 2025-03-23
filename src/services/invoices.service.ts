@@ -1,6 +1,6 @@
 import { apiClient } from '../constants/api';
 
-export const invoicesService = {
+const invoicesService = {
     async createInvoice(data: any): Promise<any> {
         console.log('call create invoice');
         const res = await apiClient.post('/invoice/create', data);
@@ -41,3 +41,4 @@ export const invoicesService = {
         return res?.data;
     },
 };
+export default invoicesService;

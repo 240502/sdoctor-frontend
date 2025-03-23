@@ -1,25 +1,9 @@
-import { useEffect, useState } from 'react';
-import { Service } from '../../../../models/service';
 import { ServiceCard } from '../../../../components';
 import { Button, Skeleton } from 'antd';
 import { Link } from 'react-router-dom';
 import { useFetchCommonMedicalPackages } from '../../../../hooks';
 
 export const BlockCommonService = () => {
-    // const [commonServices, setCommonServices] = useState<Service[]>([]);
-    // useEffect(() => {
-    //     const getCommonService = async () => {
-    //         try {
-    //             const res = await ServiceService.getCommonService();
-    //             setCommonServices(res);
-    //         } catch (err: any) {
-    //             setCommonServices([]);
-    //             console.log(err);
-    //         }
-    //     };
-    //     getCommonService();
-    // }, []);
-
     const { data, error, isFetching } = useFetchCommonMedicalPackages();
 
     return (

@@ -1,6 +1,6 @@
 import { apiClient } from '../constants/api';
 
-export const AppointmentService = {
+const appointmentService = {
     async getAppointmentById(id: number): Promise<any> {
         const res = await apiClient.get('/appointment/get-by-id/' + id);
         return res.data;
@@ -85,3 +85,4 @@ export const AppointmentService = {
         return res;
     },
 };
+export default appointmentService;

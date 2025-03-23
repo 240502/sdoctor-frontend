@@ -1,6 +1,6 @@
 import { apiClient } from '../constants/api';
 
-export const UploadService = {
+const uploadService = {
     async uploadImage(formData: any): Promise<any> {
         const res = await apiClient.post('/api/upload-image', formData, {
             headers: {
@@ -10,3 +10,4 @@ export const UploadService = {
         return res;
     },
 };
+export default uploadService;

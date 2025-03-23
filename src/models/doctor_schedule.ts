@@ -1,4 +1,4 @@
-import { DoctorScheduleDetail } from './doctorScheduleDetails';
+import { DoctorScheduleDetail } from './doctor_schedule_details';
 
 export interface DoctorSchedule {
     id: Number;

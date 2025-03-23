@@ -1,6 +1,6 @@
 import { apiClient } from '../constants/api';
 
-export const NotificationService = {
+const notificationService = {
     async getNotificationByUserId(userId: number): Promise<any> {
         const res = await apiClient.get(
             '/notifications/get-by-user-id/' + userId
@@ -26,3 +26,4 @@ export const NotificationService = {
         return res;
     },
 };
+export default notificationService;

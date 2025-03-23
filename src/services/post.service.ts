@@ -1,5 +1,5 @@
 import { apiClient } from '../constants/api';
-export const PostService = {
+const postService = {
     async getCommonPost(): Promise<any> {
         const res = await apiClient.get('/post/get-common-post');
         return res.data;
@@ -42,3 +42,4 @@ export const PostService = {
         return res;
     },
 };
+export default postService;

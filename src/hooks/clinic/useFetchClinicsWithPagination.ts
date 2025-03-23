@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { ClinicService } from '../../services';
+import { clinicService } from '../../services';
 
 export const useFetchClinicsWithPagination = (payload: {
     pageIndex?: number;
@@ -8,7 +8,7 @@ export const useFetchClinicsWithPagination = (payload: {
     return useQuery({
         queryKey: ['useFetchClinicsWithPagination'],
         queryFn: async () => {
-            return await ClinicService.viewClinic(payload);
+            return await clinicService.viewClinic(payload);
         },
         select: (response) => ({
             clinics: response.data,

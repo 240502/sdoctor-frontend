@@ -1,6 +1,6 @@
 import { apiClient } from '../constants/api';
 
-export const paymentService = {
+const paymentService = {
     async create(data: any): Promise<any> {
         const res = await apiClient.post('/payment/create', data);
         return res;
@@ -10,3 +10,4 @@ export const paymentService = {
         return res;
     },
 };
+export default paymentService;

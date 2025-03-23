@@ -7,7 +7,6 @@ import {
 } from '@ant-design/icons';
 import '@/assets/scss/animation.scss';
 import { User } from '../../../models/user';
-import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { userState, userValue } from '../../../stores/userAtom';

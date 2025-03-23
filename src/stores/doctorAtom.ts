@@ -1,5 +1,5 @@
 import { atom, selector } from 'recoil';
-import { Doctor } from '../models/doctor';
+import { Doctor, DoctorOptions } from '../models/doctor';
 
 export const doctorListState = atom({
     key: 'doctorListState',
@@ -38,12 +38,13 @@ export const commonDoctorValue = selector({
 
 export const doctorFilterOptions = atom({
     key: 'doctorFilterOptions',
-    default: {
-        pageIndex: 1,
-        pageSize: 8,
-        majorId: 0,
-        clinicId: 0,
-        doctorServiceId: 0,
+    default: {} as DoctorOptions,
+});
+
+export const doctorFilterOptionsValue = selector({
+    key: 'doctorFilterOptionsValue',
+    get: ({ get }) => {
+        return get(doctorFilterOptions);
     },
 });
 

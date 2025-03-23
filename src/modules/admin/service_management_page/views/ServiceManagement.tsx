@@ -15,7 +15,7 @@ import { useRecoilState, useRecoilValue } from 'recoil';
 import { configValue } from '../../../../stores/userAtom';
 import { Service } from '../../../../models/service';
 import { InputServiceModal } from '../components/InputServiceModal';
-import { ClinicService } from '../../../../services/clinic.service';
+import ClinicService from '$services';
 import { Clinic } from '../../../../models/clinic';
 import { ServiceCategory } from '../../../../models/category_services';
 import { ServiceCategoryService } from '../../../../services/service_category.service';

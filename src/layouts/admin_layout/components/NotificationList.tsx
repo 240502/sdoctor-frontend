@@ -6,7 +6,7 @@ import {
 } from '../../../stores/notification';
 import { useEffect } from 'react';
 import { BellOutlined, CloseOutlined } from '@ant-design/icons';
-import { NotificationService } from '../../../services/notification.service';
+import { notificationService } from '../../../services/';
 import { userValue } from '../../../stores/userAtom';
 import 'dayjs/locale/vi';
 import dayjs from 'dayjs';
@@ -25,7 +25,7 @@ const NotificationList = () => {
     const setNotifications = useSetRecoilState(notificationsState);
     const deleteNotification = async (notificationId: number) => {
         try {
-            const res = await NotificationService.deleteNotification(
+            const res = await notificationService.deleteNotification(
                 notificationId
             );
             const newNotifications = notificationSelector.notifications.filter(
@@ -40,7 +40,7 @@ const NotificationList = () => {
     };
     const markAllAsRead = async () => {
         try {
-            const res = await NotificationService.markAllRead(user.userId);
+            const res = await notificationService.markAllRead(user.userId);
             getNotificationByUserId();
         } catch (e: any) {
             console.log(e.message);
@@ -105,7 +105,7 @@ const NotificationList = () => {
     );
     const getNotificationByUserId = async () => {
         try {
-            const res = await NotificationService.getNotificationByUserId(
+            const res = await notificationService.getNotificationByUserId(
                 user?.userId
             );
 

@@ -1,9 +1,8 @@
 import { useNavigate } from 'react-router-dom';
 import { Col, Image, Row, Skeleton } from 'antd';
 import { baseURL } from '../../../../constants/api';
-import { useEffect } from 'react';
 import { Major } from '../../../../models/major';
-import { useFetchCommonSpecialization } from '../../../../hooks/specialization';
+import { useFetchCommonSpecialization } from '../../../../hooks';
 const BlockSpecialization = (): JSX.Element => {
     const navigate = useNavigate();
     const { data, error, isFetching } = useFetchCommonSpecialization();

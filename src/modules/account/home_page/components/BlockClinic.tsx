@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react';
 import { Image, Button, Skeleton } from 'antd';
 import { Link } from 'react-router-dom';
 import 'slick-carousel/slick/slick.css';
@@ -6,8 +5,7 @@ import 'slick-carousel/slick/slick-theme.css';
 import NextArrow from './NextArrow';
 import PrevArrow from './PrevArrow';
 import Slider from 'react-slick';
-import { Clinic } from '../../../../models/clinic';
-import { ClinicService } from '../../../../services/clinic.service';
+import { Clinic } from '../../../../models';
 import { baseURL } from '../../../../constants/api';
 import { useFetchCommonClinic } from '../../../../hooks';
 const BlockClinic = (): JSX.Element => {
@@ -24,24 +22,7 @@ const BlockClinic = (): JSX.Element => {
         nextArrow: <NextArrow />,
         prevArrow: <PrevArrow />,
     };
-    // const [clinics, setClinics] = useState<Clinic[]>();
-    // const loadData = async () => {
-    //     try {
-    //         const data = await ClinicService.getCommonClinic();
-    //         setClinics(data);
-    //     } catch (err: any) {
-    //         console.log(err.message);
-    //     }
-    // };
-    // const handleUpdateViewsClinic = async (id: number) => {
-    //     try {
-    //         const res = await ClinicService.updateViewsClinic(id);
-    //         console.log(res);
-    //     } catch (err: any) {}
-    // };
-    // useEffect(() => {
-    //     loadData();
-    // }, []);
+
     const { data, error, isFetching } = useFetchCommonClinic();
 
     return (

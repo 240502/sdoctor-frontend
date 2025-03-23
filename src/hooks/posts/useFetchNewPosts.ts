@@ -1,13 +1,13 @@
 import { useQuery } from '@tanstack/react-query';
-import { PostService } from '../../services';
+import { postService } from '../../services';
 
 export const useFetchNewPosts = () => {
     return useQuery({
         queryKey: ['useFetchNewPosts'],
         queryFn: async () => {
-            return await PostService.getNewPosts();
+            return await postService.getNewPosts();
         },
-        
+
         placeholderData: (previousData) => previousData ?? [],
     });
 };

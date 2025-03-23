@@ -1,13 +1,21 @@
-import { DoctorSchedule } from './doctorSchedule';
+import { DoctorSchedule } from './doctor_schedule';
 
-export interface DoctorOptions {
-    pageIndex: number;
-    pageSize: number | null;
-    clinicId: number | null;
-    majorId: number | null;
-    doctorServiceId: number | null;
+export interface Pagination {
+    pageIndex?: number;
+    pageSize?: number;
 }
-
+export interface DoctorOptions extends Pagination {
+    clinicId: number | null;
+    majorIds: number[];
+    doctorServiceIds: number[];
+    startPrice: number | null;
+    endPrice: number | null;
+    gender: string | null;
+    titles: string[];
+}
+export interface CommonDoctorOptions extends Pagination {
+    withoutId?: number | null;
+}
 export interface Doctor {
     doctorId: number;
     userId: number;

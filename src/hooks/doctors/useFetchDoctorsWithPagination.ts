@@ -10,8 +10,10 @@ export const useFetchDoctorsWithPagination = (payload: DoctorOptions) => {
         ],
 
         queryFn: async ({ pageParam = 1 }) => {
+            console.log(payload);
             return await doctorService.viewDoctorForClient({
                 ...payload,
+                pageSize: payload.pageSize ?? 8,
                 pageIndex: pageParam, // ✅ Gửi pageIndex đúng theo `pageParam`
             });
         },

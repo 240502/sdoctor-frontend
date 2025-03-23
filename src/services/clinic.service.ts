@@ -1,6 +1,6 @@
 import { apiClient } from '../constants/api';
 
-export const ClinicService = {
+const clinicService = {
     async getCommonClinic(): Promise<any> {
         const res: any = await apiClient.get('/clinic/get-common-clinic');
         return res?.data;
@@ -31,3 +31,4 @@ export const ClinicService = {
         return res;
     },
 };
+export default clinicService;

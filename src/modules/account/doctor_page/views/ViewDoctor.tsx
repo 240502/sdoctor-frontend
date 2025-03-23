@@ -1,22 +1,20 @@
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { HomeOutlined } from '@ant-design/icons';
-import { Breadcrumb, Flex, Input, Skeleton, Col, Row, Divider } from 'antd';
-import { doctorService } from '../../../../services/doctor.service';
-import { useRecoilState } from 'recoil';
-import { doctorFilterOptions } from '../../../../stores';
-import { DoctorCard } from '../components/DoctorCard';
-import { useFetchDoctorsWithPagination } from '../../../../hooks';
-import ShowMoreComp from '../../../../components/ShowMoreComp';
-import { useSearchParams } from 'react-router-dom';
+import { Breadcrumb, Skeleton, Col, Row, Divider } from 'antd';
+import { useRecoilValue } from 'recoil';
 import BlockClinicOptions from '../components/BlockClinicOptions';
 import BlockGenderOptions from '../components/BlockGenderOptions';
-import { BlockSpecializationOptions, PriceOptionsComp } from '../components';
-const { Search } = Input;
-
+import { DoctorCard } from '../../../../components';
+import {
+    BlockSpecializationOptions,
+    PriceOptionsComp,
+    TitleOptions,
+} from '../components';
+import { useFetchDoctorsWithPagination } from '../../../../hooks';
+import { doctorFilterOptionsValue } from '../../../../stores';
+import { doctorService } from '../../../../services';
 const ViewDoctor = () => {
-    const [searchParams] = useSearchParams();
-    const [doctocOptions, setDoctorOptions] =
-        useRecoilState(doctorFilterOptions);
+    const doctocOptionsValue = useRecoilValue(doctorFilterOptionsValue);
     const {
         data,
         error,
@@ -24,7 +22,7 @@ const ViewDoctor = () => {
         fetchNextPage,
         hasNextPage,
         isFetchingNextPage,
-    } = useFetchDoctorsWithPagination(doctocOptions);
+    } = useFetchDoctorsWithPagination(doctocOptionsValue);
 
     const doctors = useMemo(() => {
         return data?.pages.flatMap((page) => page.data) ?? [];
@@ -38,17 +36,38 @@ const ViewDoctor = () => {
             console.log(err.message);
         }
     };
+    // ======= Infinite Scroll Logic =======
+    const observerRef = useRef<HTMLDivElement | null>(null);
 
     useEffect(() => {
         window.scrollTo(0, 0);
-        if (searchParams.get('majorId')) {
-            setDoctorOptions({
-                ...doctocOptions,
-                majorId: Number(searchParams.get('majorId')),
-            });
-        }
+        // if (searchParams.get('majorId')) {
+        //     setDoctorOptions({
+        //         ...doctocOptions,
+        //         majorIds: Number(searchParams.get('majorId')),
+        //     });
+        // }
         return () => {};
     }, []);
+
+    useEffect(() => {
+        if (!observerRef.current || !hasNextPage || isFetchingNextPage) return;
+
+        const observer = new IntersectionObserver(
+            (entries) => {
+                if (entries[0].isIntersecting) {
+                    fetchNextPage();
+                }
+            },
+            { threshold: 1.0 }
+        );
+
+        observer.observe(observerRef.current);
+
+        return () => {
+            if (observerRef.current) observer.unobserve(observerRef.current);
+        };
+    }, [hasNextPage, isFetchingNextPage]);
     return (
         <div className="doctor-list mt-4 mb-4">
             <Breadcrumb
@@ -64,47 +83,31 @@ const ViewDoctor = () => {
                 ]}
             />
             <div className="mt-3">
-                <Flex
-                    gap={'middle'}
-                    className="justify-content-between shadow p-3 rounded mb-3"
-                >
-                    <Flex className="col-5 justify-content-end position-relative">
-                        <Search
-                            className="search-input"
-                            placeholder="Nhập tên bác sĩ"
-                            // value={doctocOptions.name}
-                            onChange={(e) => {
-                                // setDoctorOptions({
-                                //     ...doctocOptions,
-                                //     name: e.target.value,
-                                // });
-                            }}
-                            style={{ width: '48%' }}
-                        />
-                    </Flex>
-                </Flex>
                 <Row gutter={[24, 24]}>
-                    <Col span={5} className="shadow rounded p-3">
+                    <Col span={6} className="shadow rounded p-3">
                         <BlockClinicOptions />
                         <Divider />
                         <BlockSpecializationOptions />
                         <Divider />
                         <PriceOptionsComp />
                         <Divider />
+                        <TitleOptions />
+                        <Divider />
                         <BlockGenderOptions />
                         <Divider />
                     </Col>
-                    <Col span={19}>
+                    <Col span={18}>
                         <>
                             {error ? (
                                 <p className="fs-6 fw-bold text-center mt-4">
-                                    {' '}
-                                    {error.message}
+                                    {'Không có dữ liệu !'}
                                 </p>
                             ) : (
                                 <>
                                     <Skeleton
-                                        loading={isFetching}
+                                        loading={
+                                            isFetching || isFetchingNextPage
+                                        }
                                         active
                                         className="mt-6"
                                     >
@@ -117,16 +120,14 @@ const ViewDoctor = () => {
                                             />
                                         )}
                                     </Skeleton>
+                                    <div
+                                        ref={observerRef}
+                                        // style={{ height: 20, marginBottom: 20 }}
+                                    />
                                 </>
                             )}
                         </>
                     </Col>
-                    {hasNextPage && (
-                        <ShowMoreComp
-                            loading={isFetchingNextPage}
-                            onClick={fetchNextPage}
-                        />
-                    )}
                 </Row>
             </div>
         </div>

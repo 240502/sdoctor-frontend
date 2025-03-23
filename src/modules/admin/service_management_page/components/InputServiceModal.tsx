@@ -18,7 +18,7 @@ import { UploadService } from '../../../../services/upload.service';
 type FileType = Parameters<GetProp<UploadProps, 'beforeUpload'>>[0];
 import { Clinic } from '../../../../models/clinic';
 import { ServiceDetailEditor } from './ServiceDetailEditor';
-import { ServiceService } from '../../../../services/medical_package.service';
+import { MedicalPackageService } from '../../../../services';
 import { Service } from '../../../../models/service';
 import { openNotification } from '../../../../utils/notification';
 export const InputServiceModal = ({

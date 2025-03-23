@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { AppointmentService } from '../services/appointment.service';
+import { appointmentService } from '../services';
 import { useSetRecoilState } from 'recoil';
 import { appointmentListInDayState } from '../stores/appointmentAtom';
 
@@ -18,7 +18,7 @@ export const useAppointments = (
     const fetchData = async () => {
         try {
             try {
-                const res = await AppointmentService.getTotalPatientInDay(
+                const res = await appointmentService.getTotalPatientInDay(
                     doctor_id
                 );
                 console.log(res.totalPatient);
@@ -29,7 +29,7 @@ export const useAppointments = (
 
             try {
                 const res =
-                    await AppointmentService.getTotalPatientExaminedInDay(
+                    await appointmentService.getTotalPatientExaminedInDay(
                         doctor_id
                     );
                 setTotalPatientExaminedInDay(res.totalPatient);
@@ -39,7 +39,7 @@ export const useAppointments = (
 
             try {
                 const appointmentData =
-                    await AppointmentService.getAppointmentInDay(doctor_id);
+                    await appointmentService.getAppointmentInDay(doctor_id);
                 setAppointmentListInDay(appointmentData);
             } catch (err) {
                 setAppointmentListInDay([]);

@@ -1,5 +1,5 @@
 import { atom, selector } from 'recoil';
-import { Appointment } from '../models/appointment';
+import { Appointment } from '@models';
 
 export const appointmentListState = atom({
     key: 'appointmentListState',

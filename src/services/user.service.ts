@@ -1,6 +1,6 @@
 import { apiClient } from '../constants/api';
 
-export const UserService = {
+const userService = {
     async login(data: any): Promise<any> {
         const res = await apiClient.post('/user/login', data);
         return res?.data;
@@ -58,3 +58,5 @@ export const UserService = {
         return res;
     },
 };
+
+export default userService;

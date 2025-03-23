@@ -22,16 +22,18 @@ import { configValue, userValue } from '../../../../stores/userAtom';
 import { doctorService } from '../../../../services/doctor.service';
 import { Clinic } from '../../../../models/clinic';
 import { Major } from '../../../../models/major';
-import { DoctorService } from '../../../../models/doctorService';
+import { DoctorService } from '../../../../models/doctor_service';
 type FileType = Parameters<GetProp<UploadProps, 'beforeUpload'>>[0];
 import viVN from 'antd/lib/locale/vi_VN';
 import 'dayjs/locale/vi';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import { DescriptionEditor, SummaryEditor } from '../../../../components';
 import { UploadService } from '../../../../services/upload.service';
-import { ClinicService } from '../../../../services/clinic.service';
-import { DoctorServiceService } from '../../../../services/doctor_service.service';
-import { MajorService } from '../../../../services/major.service';
+import {
+    ClinicService,
+    DoctorServiceService,
+    MajorService,
+} from '../../../../services';
 import { openNotification } from '../../../../utils/notification';
 import { DistrictType, ProvinceType, WardType } from '../../../../models/other';
 import axios from 'axios';

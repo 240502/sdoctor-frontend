@@ -1,6 +1,6 @@
 import { apiClient } from '../constants/api';
 
-export const scheduleService = {
+const scheduleService = {
     async viewSchedule(data: object): Promise<any> {
         const res = await apiClient.post('/doctor-schedule/view', data);
         return res.data;
@@ -23,3 +23,4 @@ export const scheduleService = {
         return res;
     },
 };
+export default scheduleService;

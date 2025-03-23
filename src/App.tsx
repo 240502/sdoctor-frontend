@@ -5,9 +5,7 @@ import { Fragment, Suspense, useEffect } from 'react';
 import { useSetRecoilState } from 'recoil';
 import './assets/fontawesome/css/all.min.css';
 import { patientProfileState } from './stores/patientAtom';
-import { PatientProfileService } from './services/patient_profile.service';
-import { Divider, Skeleton, Spin } from 'antd';
-import { LoadingOutlined } from '@ant-design/icons';
+import { patientProfileService } from './services';
 
 function App() {
     const setPatientProfile = useSetRecoilState(patientProfileState);
@@ -19,7 +17,7 @@ function App() {
             );
             if (uuid) {
                 const patientProfile =
-                    await PatientProfileService.getPatientProfileByUuid(uuid);
+                    await patientProfileService.getPatientProfileByUuid(uuid);
                 setPatientProfile(patientProfile);
             }
         } catch (err: any) {

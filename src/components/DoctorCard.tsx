@@ -1,4 +1,4 @@
-import { Col, Row, Image, Button, Card, Tag } from 'antd';
+import { Col, Row, Image, Button, Tag } from 'antd';
 import { EnvironmentOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { useSetRecoilState } from 'recoil';
@@ -11,16 +11,16 @@ const DoctorCard = ({ doctors, handleUpdateViewsDoctor }: any) => {
     const setDoctor = useSetRecoilState(doctorState);
     console.log('doctors', doctors);
     return (
-        <Row gutter={[16, 16]} className="cards">
+        <Row gutter={[24, 24]} className="cards h-100">
             {doctors?.length > 0 ? (
                 doctors?.map((doctor: Doctor) => {
                     return (
                         <Col
-                            span={6}
+                            span={8}
                             className="card-item"
                             key={doctor?.fullName}
                         >
-                            <div className="card-container rounded border border-1 ">
+                            <div className="card-container p-3 rounded border border-1 h-100 d-flex flex-column ">
                                 <div className="doctor-image col-3 text-center m-auto">
                                     <Image
                                         onClick={() => {
@@ -61,7 +61,7 @@ const DoctorCard = ({ doctors, handleUpdateViewsDoctor }: any) => {
                                         Tư vấn trực tiếp
                                     </Tag>
                                 </div>
-                                <div className="clinic-info">
+                                <div className="clinic-info p-3">
                                     <p className="mb-1">
                                         <i className="fa-regular fa-hospital me-2"></i>
                                         {doctor.clinicName}

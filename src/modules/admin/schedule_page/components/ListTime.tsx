@@ -7,7 +7,7 @@ import { Time } from '../../../../models/time';
 import { CloseOutlined, PlusOutlined } from '@ant-design/icons';
 import { handleGetDateByActiveDay } from '../../../../utils/schedule_management';
 import { scheduleService } from '../../../../services/doctor_schedule.service';
-import { DoctorScheduleDetail } from '../../../../models/doctorScheduleDetails';
+import { DoctorScheduleDetail } from '../../../../models/doctor_schedule_details';
 import { handleTimeOverRealTime } from '../../../../utils/schedule';
 
 type MessageType = 'success' | 'error' | 'warning';

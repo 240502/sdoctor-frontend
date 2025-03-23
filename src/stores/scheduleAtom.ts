@@ -1,5 +1,5 @@
 import { atom, selector } from 'recoil';
-import { DoctorSchedule } from '../models/doctorSchedule';
+import { DoctorSchedule } from '../models/doctor_schedule';
 import { PostCategory } from '../models/post_category';
 
 export const scheduleListState = atom({

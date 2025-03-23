@@ -23,7 +23,7 @@ import { DatePickerProps } from 'antd/lib';
 import { PatientProfileService } from '../../../../services/patient_profile.service';
 import { useSetRecoilState } from 'recoil';
 import { patientProfileState } from '../../../../stores/patientAtom';
-import { PaymentMethod } from '../../../../models/paymentMethod';
+import { PaymentMethod } from '../../../../models/payment_method';
 import { PaymentMethodService } from '../../../../services/payment_method.service';
 import { MailerService } from '../../../../services/mailer.service';
 export const InputAppointmentModal = ({

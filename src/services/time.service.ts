@@ -1,6 +1,6 @@
 import { apiClient } from '../constants/api';
 
-export const TimeService = {
+const timeService = {
     async getTimeById(id: number): Promise<any> {
         const res = await apiClient.get('/api/time/get-by-id/' + id);
         return res.data;
@@ -10,3 +10,4 @@ export const TimeService = {
         return res.data;
     },
 };
+export default timeService;

@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
@@ -7,7 +6,6 @@ import PrevArrow from './PrevArrow';
 import Slider from 'react-slick';
 import { Post } from '../../../../models/post';
 import { Button, Image, Skeleton } from 'antd';
-import { PostService } from '../../../../services/post.service';
 import { baseURL } from '../../../../constants/api';
 import { useFetchCommonPosts } from '../../../../hooks';
 
@@ -25,25 +23,7 @@ const BlockCommonPost = () => {
         nextArrow: <NextArrow />,
         prevArrow: <PrevArrow />,
     };
-    // const [posts, setPosts] = useState<Post[]>([]);
-    // const getCommonNews = async () => {
-    //     try {
-    //         const res = await PostService.getCommonPost();
-    //         setPosts(res);
-    //     } catch (err: any) {
-    //         console.log(err.message);
-    //     }
-    // };
-    // const updateViewPost = async (id: number) => {
-    //     try {
-    //         const res = await PostService.updateViewPost(id);
-    //     } catch (err: any) {
-    //         console.log(err.message);
-    //     }
-    // };
-    // useEffect(() => {
-    //     getCommonNews();
-    // }, []);
+
     const { data, error, isFetching } = useFetchCommonPosts();
     return (
         <div className="row mt-5 mb-5">

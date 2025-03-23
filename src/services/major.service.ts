@@ -1,6 +1,6 @@
 import { apiClient } from '../constants/api';
 
-export const MajorService = {
+const majorService = {
     async getCommonMajor(): Promise<any> {
         const res: any = await apiClient.get('/major/get-common-major');
         return res?.data;
@@ -21,3 +21,4 @@ export const MajorService = {
         return res?.data;
     },
 };
+export default majorService;

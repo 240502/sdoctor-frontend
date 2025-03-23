@@ -7,7 +7,7 @@ type Props = {
 };
 const ShowMoreComp = ({ loading, onClick }: Props) => {
     return (
-        <div className="text-center">
+        <div className="text-center mt-3">
             <Button
                 className="text-center bg-primary text-white pt-4 pb-4 fs-6 position-relative"
                 onClick={onClick}

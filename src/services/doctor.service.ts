@@ -1,7 +1,7 @@
 import { apiClient } from '../constants/api';
 import { Doctor, DoctorOptions } from '../models/doctor';
 
-export const doctorService = {
+const doctorService = {
     async getDoctorByUserId(userId: number): Promise<any> {
         console.log();
         const res: any = await apiClient.get(
@@ -49,3 +49,4 @@ export const doctorService = {
         return res;
     },
 };
+export default doctorService;

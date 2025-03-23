@@ -10,12 +10,12 @@ import {
 } from 'antd';
 import { useEffect, useState } from 'react';
 import { ListTime } from '../components/ListTime';
-import { DoctorScheduleDetail } from '../../../../models/doctorScheduleDetails';
+import { DoctorScheduleDetail } from '../../../../models/doctor_schedule_details';
 import { Time } from '../../../../models/time';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { configValue, userValue } from '../../../../stores/userAtom';
 import { scheduleService } from '../../../../services/doctor_schedule.service';
-import { DoctorSchedule } from '../../../../models/doctorSchedule';
+import { DoctorSchedule } from '../../../../models/doctor_schedule';
 import { handleGetDateByActiveDay } from '../../../../utils/schedule_management';
 type NotificationType = 'success' | 'error';
 import '@/assets/scss/schedule_management.scss';

@@ -1,5 +1,5 @@
 import { atom, selector } from 'recoil';
-import { DoctorScheduleDetail } from '../models/doctorScheduleDetails';
+import { DoctorScheduleDetail } from '../models/doctor_schedule_details';
 
 export const scheduleDetailsState = atom({
     key: 'scheduleDetailsState',

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Menu } from 'antd';
 import { Link } from 'react-router-dom';
-import { HomeMenuService } from '../../../../services/home_menu.service';
+import { homeMenuService } from '../../../../services';
 import { HomeMenuModel } from '../../../../models/home_menu';
 import { useRecoilState, useSetRecoilState } from 'recoil';
 import { majorIdState } from '../../../../stores/majorAtom';
@@ -12,7 +12,7 @@ export const HomeMenu = () => {
     const [selectedKeys, setSelectedKeys] = useState<string[]>([]);
     const loadData = async () => {
         try {
-            const data = await HomeMenuService.getHomeMenu();
+            const data = await homeMenuService.getHomeMenu();
             setHomeMenus(data);
         } catch (err: any) {
             console.log(err.message);

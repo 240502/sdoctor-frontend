@@ -4,9 +4,9 @@ import { useNavigate } from 'react-router-dom';
 import { useRecoilValue } from 'recoil';
 import { newAppointmentValue } from '../stores/appointmentAtom';
 import { useEffect } from 'react';
-import { paymentService } from '../services/payment.service';
 import { invoiceValue } from '../stores/invoice';
 import { Invoices } from '../models/invoices';
+import { paymentService } from '../services';
 const { Title, Text } = Typography;
 import dayjs from 'dayjs';
 const BookingSuccess = () => {

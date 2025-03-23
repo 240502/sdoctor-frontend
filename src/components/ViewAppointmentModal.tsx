@@ -1,12 +1,12 @@
 import { Button, DatePicker, Form, Input, Modal, Radio } from 'antd';
 import { useEffect, useState } from 'react';
-import { doctorService } from '../services/doctor.service';
+import { doctorService } from '../services';
 import { Doctor } from '../models/doctor';
 import { Image } from 'antd';
 import TextArea from 'antd/es/input/TextArea';
 import dayjs from 'dayjs';
-import { PaymentMethodService } from '../services/payment_method.service';
-import { PaymentMethod } from '../models/paymentMethod';
+import { paymentMethodService } from '../services';
+import { PaymentMethod } from '../models/payment_method';
 
 const ViewAppointmentModal = ({
     handleCancelModal,
@@ -27,7 +27,7 @@ const ViewAppointmentModal = ({
     };
     const getAllPaymentMethod = async () => {
         try {
-            const res = await PaymentMethodService.getAllPaymentMethod();
+            const res = await paymentMethodService.getAllPaymentMethod();
             console.log(res?.data);
             setPaymentMethods(res.data);
         } catch (err: any) {
