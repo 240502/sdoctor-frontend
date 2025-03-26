@@ -45,10 +45,14 @@ export const TitleOptions = () => {
                 allowClear
                 showSearch
                 mode="multiple"
-                value={doctorOptions.title === '' ? null : doctorOptions.title}
+                value={
+                    doctorOptions?.titles.length === 0
+                        ? null
+                        : doctorOptions?.titles
+                }
                 onChange={(value: any) => {
                     console.log('value', value);
-                    setDoctorOptions({ ...doctorOptions, title: value ?? '' });
+                    setDoctorOptions({ ...doctorOptions, titles: value ?? [] });
                 }}
             >
                 {mocks.map((mock) => {

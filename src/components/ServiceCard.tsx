@@ -17,8 +17,8 @@ const ServiceCard = ({ services }: any) => {
         <Row gutter={[24, 24]} className="cards">
             {services?.map((service: Service) => {
                 return (
-                    <Col span={6} className="card-item" key={service?.name}>
-                        <div className="card-container flex-grow-1 rounded border border-1 ">
+                    <Col span={6} className="card-item " key={service?.name}>
+                        <div className="card-container flex-grow-1 rounded border border-1  p-3  rounded border border-1 h-100 d-flex flex-column ">
                             <div className="service-image">
                                 <Image
                                     onClick={() => {
@@ -47,7 +47,7 @@ const ServiceCard = ({ services }: any) => {
                                 <p className="mb-0 opacity-75 text-center mb-3">
                                     {service.category_name}
                                 </p>
-                                <div className="clinic-info">
+                                <div className="clinic-info p-2 rounded">
                                     <p className="mb-1">
                                         <DollarOutlined className="me-1" /> Giá:{' '}
                                         <span className="text-success fw-bold mb-1">

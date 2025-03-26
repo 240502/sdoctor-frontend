@@ -20,21 +20,17 @@ import {
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Doctor } from '../../../../models/doctor';
-import { doctorService } from '../../../../services';
 import { baseURL } from '../../../../constants/api';
 import parse from 'html-react-parser';
-import { BlockComment } from '../components/BlockComment';
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
-import {
-    commonDoctorsState,
-    doctorListValue,
-    doctorState,
-} from '../../../../stores/doctorAtom';
+import { doctorState } from '../../../../stores/doctorAtom';
 import { useNavigate } from 'react-router-dom';
 import { commentService } from '../../../../services';
 import socket from '../../../../socket';
 import { Comment } from '../../../../models/comment';
 import { useFetchCommonDoctors, useFetchDoctorDetail } from '../../../../hooks';
+import { BlockComment } from '../components/BlockComment';
+import BlockCommonDoctors from '../components/BlockCommonDoctors';
 type DataParams = {
     id: string;
 };
@@ -42,8 +38,6 @@ const ViewDetailDoctor = () => {
     const navigate = useNavigate();
     const { id } = useParams<DataParams>();
     const [doctor, setDoctor] = useState<Doctor>({} as Doctor);
-    const [commonDoctors, setCommonDoctors] =
-        useRecoilState(commonDoctorsState);
     const [pageSize, setPageSize] = useState<number>(4);
     const [pageIndex, setPageIndex] = useState<number>(1);
     const [pageCount, setPageCount] = useState<number>(0);
@@ -63,7 +57,7 @@ const ViewDetailDoctor = () => {
         {
             key: '1',
             label: 'Thông tin chi tiết',
-            children: <>{parse(String(doctor?.introduction))}</>,
+            children: <>{parse(String(data?.introduction))}</>,
         },
         {
             key: '2',
@@ -79,28 +73,6 @@ const ViewDetailDoctor = () => {
             ),
         },
     ];
-
-    // const getCommonDoctor = async () => {
-    //     try {
-    //         const data = { pageIndex: pageIndex, pageSize: pageSize };
-    //         const res = await doctorService.getCommonDoctor(data);
-    //         setCommonDoctors(res.data);
-    //         setPageCount(res.pageCount);
-    //     } catch (err: any) {
-    //         console.log(err.message);
-    //         setCommonDoctors([]);
-    //         setPageCount(0);
-    //     }
-    // };
-    const {
-        data: commonDoctorsRes,
-        error: commonDoctorsError,
-        isFetching: commonDoctorsFetching,
-    } = useFetchCommonDoctors({
-        pageIndex: 1,
-        pageSize: 4,
-        withoutId: Number(id),
-    });
 
     const getCommentByDoctorId = async (doctorId: number) => {
         try {
@@ -139,9 +111,7 @@ const ViewDetailDoctor = () => {
     useEffect(() => {
         window.scrollTo(0, 0);
     }, [id]);
-    useEffect(() => {
-        console.log('a', commonDoctorsRes);
-    }, [commonDoctorsRes]);
+
     // useEffect(() => {
     //     getCommonDoctor();
     // }, [pageIndex, pageSize]);
@@ -249,116 +219,7 @@ const ViewDetailDoctor = () => {
                         >
                             <h6 className="mb-3 fw-bold">Gợi ý</h6>
                             <Divider></Divider>
-                            <Row gutter={24}>
-                                {commonDoctorsError ? (
-                                    <p className="text-center fw-bold">
-                                        {' '}
-                                        {commonDoctorsError.message}
-                                    </p>
-                                ) : (
-                                    commonDoctorsRes?.doctors?.map(
-                                        (doctor: Doctor) => {
-                                            if (
-                                                doctor.doctorId !== Number(id)
-                                            ) {
-                                                return (
-                                                    <Col
-                                                        key={doctor?.doctorId}
-                                                        span={24}
-                                                        style={{
-                                                            cursor: 'pointer',
-                                                        }}
-                                                    >
-                                                        <Flex className="suggestion-doctor-item mt-2">
-                                                            <div className="doctor-image col-2">
-                                                                <Image
-                                                                    onClick={() => {
-                                                                        navigate(
-                                                                            '/doctor/detail/' +
-                                                                                doctor.doctorId
-                                                                        );
-                                                                    }}
-                                                                    className="rounded-circle"
-                                                                    preview={
-                                                                        false
-                                                                    }
-                                                                    src={
-                                                                        doctor?.image
-                                                                    }
-                                                                ></Image>
-                                                            </div>
-                                                            <div className="doctor-info ms-2">
-                                                                <p
-                                                                    className="mt-2 mb-1 fw-bold doctor-name"
-                                                                    onClick={() => {
-                                                                        navigate(
-                                                                            '/doctor/detail/' +
-                                                                                doctor.doctorId
-                                                                        );
-                                                                    }}
-                                                                >
-                                                                    {
-                                                                        doctor.title
-                                                                    }{' '}
-                                                                    {
-                                                                        doctor?.fullName
-                                                                    }
-                                                                </p>
-                                                                <Tag
-                                                                    color="blue"
-                                                                    className="mb-2"
-                                                                >
-                                                                    {
-                                                                        doctor.majorName
-                                                                    }
-                                                                </Tag>
-                                                                <p>
-                                                                    <EnvironmentOutlined />{' '}
-                                                                    {
-                                                                        doctor.location
-                                                                    }
-                                                                </p>
-                                                            </div>
-                                                        </Flex>
-                                                        <Divider className="mt-2 mb-2"></Divider>
-                                                    </Col>
-                                                );
-                                            } else {
-                                                return <></>;
-                                            }
-                                        }
-                                    )
-                                )}
-                                {commonDoctorsRes?.pageCount !== 0 && (
-                                    <Col span={24}>
-                                        <Pagination
-                                            pageSize={pageSize}
-                                            align="center"
-                                            total={
-                                                commonDoctorsRes?.pageSize *
-                                                commonDoctorsRes?.pageCount
-                                            }
-                                            current={
-                                                commonDoctorsRes?.pageIndex
-                                            }
-                                            onChange={(
-                                                current: number,
-                                                size: number
-                                            ) => {
-                                                if (
-                                                    size !==
-                                                    commonDoctorsRes?.pageSize
-                                                ) {
-                                                    setPageSize(size);
-                                                    setPageIndex(1);
-                                                } else {
-                                                    setPageIndex(current);
-                                                }
-                                            }}
-                                        />
-                                    </Col>
-                                )}
-                            </Row>
+                            <BlockCommonDoctors doctorId={Number(id)} />
                         </Col>
                     </Row>
                 )}

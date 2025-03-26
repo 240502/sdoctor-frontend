@@ -19,7 +19,7 @@ export const useFetchDoctorDetail = (doctorId: number) => {
     //     }
     // }
     return useQuery({
-        queryKey: ['useFetchDoctorDetail'],
+        queryKey: ['useFetchDoctorDetail', JSON.stringify(doctorId)],
         queryFn: async () => {
             return await doctorService.getDoctorById(doctorId);
         },

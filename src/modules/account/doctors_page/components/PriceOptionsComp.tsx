@@ -27,8 +27,8 @@ export const PriceOptionsComp = () => {
                 }}
                 step={50000}
                 defaultValue={[
-                    doctorOptions.startPrice,
-                    doctorOptions.endPrice,
+                    doctorOptions?.startPrice ?? 0,
+                    doctorOptions?.endPrice ?? 0,
                 ]}
                 min={50000}
                 max={2000000}
