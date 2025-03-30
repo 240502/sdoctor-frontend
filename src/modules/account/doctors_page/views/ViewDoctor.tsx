@@ -12,7 +12,6 @@ import {
 } from '../components';
 import { useFetchDoctorsWithPagination } from '../../../../hooks';
 import { doctorFilterOptionsValue } from '../../../../stores';
-import { doctorService } from '../../../../services';
 const ViewDoctor = () => {
     const doctocOptionsValue = useRecoilValue(doctorFilterOptionsValue);
     const {
@@ -27,18 +26,8 @@ const ViewDoctor = () => {
     const doctors = useMemo(() => {
         return data?.pages.flatMap((page) => page.data) ?? [];
     }, [data]);
-
-    const handleUpdateViewsDoctor = async (id: number) => {
-        try {
-            const res = await doctorService.updateViewsDoctor(id);
-            console.log(res);
-        } catch (err: any) {
-            console.log(err.message);
-        }
-    };
     // ======= Infinite Scroll Logic =======
     const observerRef = useRef<HTMLDivElement | null>(null);
-
     useEffect(() => {
         window.scrollTo(0, 0);
         // if (searchParams.get('majorId')) {
@@ -112,12 +101,7 @@ const ViewDoctor = () => {
                                         className="mt-6"
                                     >
                                         {doctors && (
-                                            <DoctorCard
-                                                doctors={doctors}
-                                                handleUpdateViewsDoctor={
-                                                    handleUpdateViewsDoctor
-                                                }
-                                            />
+                                            <DoctorCard doctors={doctors} />
                                         )}
                                     </Skeleton>
                                     <div

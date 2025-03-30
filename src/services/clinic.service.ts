@@ -6,8 +6,10 @@ const clinicService = {
         return res?.data;
     },
     async viewClinic(data: any): Promise<any> {
-        console.log(data);
-        const res: any = await apiClient.post('/clinic/view', data);
+        const res: any = await apiClient.post(
+            '/clinic/get-clinic-with-pagination&options',
+            data
+        );
         return res?.data;
     },
     async updateViewsClinic(id: number): Promise<any> {

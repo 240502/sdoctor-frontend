@@ -1,5 +1,5 @@
 import { atom, selector } from 'recoil';
-import { Clinic } from '../models/clinic';
+import { Clinic, ClinicOptions } from '../models/clinic';
 export const clinicListState = atom({
     key: 'clinicListState',
     default: [] as Clinic[],
@@ -15,4 +15,14 @@ export const clinicListValue = selector({
 export const allClinicsState = atom({
     key: 'allClinicsState',
     default: [] as Clinic[],
+});
+
+export const clinicFilterOptions = atom({
+    key: 'clinicFilterOptions',
+    default: {} as ClinicOptions,
+});
+
+export const clinicFilterOptionsValue = selector({
+    key: 'clinicFilterOptionsValue',
+    get: ({ get }) => get(clinicFilterOptions),
 });

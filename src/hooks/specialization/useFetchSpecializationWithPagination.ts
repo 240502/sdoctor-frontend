@@ -10,6 +10,7 @@ export const useFetchSpecializationsWithPagination = (payload: {
         queryFn: async () => {
             return await majorService.viewMajor(payload);
         },
+        retry: 1,
         select: (response) => ({
             majors: response.data,
             totalItems: response.totalItems,

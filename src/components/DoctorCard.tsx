@@ -5,11 +5,12 @@ import { useSetRecoilState } from 'recoil';
 import { doctorState } from '../stores/doctorAtom';
 import { Doctor } from '../models/doctor';
 import { addWatchedDoctor } from '../utils/doctor';
+import useUpdateViewsDoctor from '../hooks/doctors/useUpdateViewsDoctor';
 
-const DoctorCard = ({ doctors, handleUpdateViewsDoctor }: any) => {
+const DoctorCard = ({ doctors }: any) => {
     const navigate = useNavigate();
     const setDoctor = useSetRecoilState(doctorState);
-    console.log('doctors', doctors);
+    const updateViewsDoctor = useUpdateViewsDoctor();
     return (
         <Row gutter={[24, 24]} className="cards h-100">
             {doctors?.length > 0 ? (
@@ -20,7 +21,7 @@ const DoctorCard = ({ doctors, handleUpdateViewsDoctor }: any) => {
                             className="card-item"
                             key={doctor?.fullName}
                         >
-                            <div className="card-container p-3 rounded border border-1 h-100 d-flex flex-column ">
+                            <div className="card-container p-3 rounded border border-1 d-flex flex-column ">
                                 <div className="doctor-image col-3 text-center m-auto">
                                     <Image
                                         onClick={() => {
@@ -28,7 +29,7 @@ const DoctorCard = ({ doctors, handleUpdateViewsDoctor }: any) => {
                                                 '/doctor/detail/' +
                                                     doctor?.doctorId
                                             );
-                                            handleUpdateViewsDoctor(
+                                            updateViewsDoctor.mutate(
                                                 doctor?.doctorId
                                             );
                                             addWatchedDoctor(doctor);
@@ -44,9 +45,10 @@ const DoctorCard = ({ doctors, handleUpdateViewsDoctor }: any) => {
                                         navigate(
                                             '/doctor/detail/' + doctor?.doctorId
                                         );
-                                        handleUpdateViewsDoctor(
+                                        updateViewsDoctor.mutate(
                                             doctor?.doctorId
                                         );
+
                                         addWatchedDoctor(doctor);
                                     }}
                                 >

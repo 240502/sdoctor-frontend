@@ -29,7 +29,7 @@ const BlockClinicOptions = () => {
                 }}
             >
                 {!isFetching &&
-                    data?.clinics.map((clinic: Clinic) => (
+                    data?.clinics?.map((clinic: Clinic) => (
                         <Select.Option
                             key={clinic.id}
                             value={clinic.id}

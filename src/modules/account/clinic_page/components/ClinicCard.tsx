@@ -3,44 +3,51 @@ import { Clinic } from '../../../../models/clinic';
 import { EnvironmentOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { addWatchedClinic } from '../../../../utils/clinic';
-export const ClinicCard = ({ clinics, handleUpdateViewsClinic }: any) => {
+import { useUpdateClinicViews } from '../../../../hooks';
+export const ClinicCard = ({ clinics }: any) => {
     const navigate = useNavigate();
+    const updateClinicViews = useUpdateClinicViews();
     return (
-        <Row gutter={24} className="cards">
+        <Row gutter={[24, 24]} className="cards" justify={'start'}>
             {clinics.map((clinic: Clinic) => {
                 return (
-                    <Col span={6} className="card-item " key={clinic.id}>
-                        <div className="card-container flex-grow-1 rounded border border-1 ">
-                            <div className="clinic-image text-center m-auto">
+                    <Col
+                        span={8}
+                        className="card-item gutter-row"
+                        key={clinic.id}
+                    >
+                        <div className="card-container p-3 rounded border">
+                            <div className="clinic-image">
                                 <Image
+                                    className="text-centerobject-fit-contain"
                                     onClick={() => {
                                         navigate(
                                             '/clinic/detail/' + clinic?.id
                                         );
-                                        handleUpdateViewsClinic(clinic?.id);
+                                        updateClinicViews.mutate(clinic?.id);
                                         addWatchedClinic(clinic);
                                     }}
-                                    className="rounded-circle"
                                     preview={false}
                                     src={clinic.avatar}
-                                ></Image>
+                                />
                             </div>
+
                             <h6
-                                className="clinic-name text-center mt-2 mb-5"
+                                className="clinic-name mt-2 mb-3"
                                 onClick={() => {
                                     navigate('/clinic/detail/' + clinic?.id);
-                                    handleUpdateViewsClinic(clinic?.id);
+                                    updateClinicViews.mutate(clinic?.id);
                                     addWatchedClinic(clinic);
                                 }}
                             >
                                 {clinic.name}
                             </h6>
 
-                            <div className="clinic-info">
+                            <div className="clinic-info p-2 rounded">
                                 <p>
                                     <EnvironmentOutlined /> {clinic.location}
                                 </p>
-                                <div className="button text-center">
+                                <div className="text-center">
                                     <Button
                                         className="booking-btn w-75"
                                         onClick={() => {

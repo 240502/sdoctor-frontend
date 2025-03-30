@@ -46,7 +46,7 @@ export const TitleOptions = () => {
                 showSearch
                 mode="multiple"
                 value={
-                    doctorOptions?.titles.length === 0
+                    doctorOptions?.titles?.length === 0
                         ? null
                         : doctorOptions?.titles
                 }

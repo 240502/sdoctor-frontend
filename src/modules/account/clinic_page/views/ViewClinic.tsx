@@ -1,92 +1,53 @@
 import { HomeOutlined } from '@ant-design/icons';
 import '@/assets/scss/clinic.scss';
-import { Breadcrumb, Flex, Input, Pagination, Select } from 'antd';
-import { ClinicService } from '../../../../services/clinic.service';
-import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
-import {
-    clinicListState,
-    clinicListValue,
-} from '../../../../stores/clinicAtom';
-import { useEffect, useState } from 'react';
-import { SearchProps } from 'antd/es/input';
-import axios from 'axios';
+import { Breadcrumb, Col, Divider, Row, Skeleton } from 'antd';
+import { useEffect, useMemo, useRef } from 'react';
 import { ClinicCard } from '../components/ClinicCard';
-import {
-    useFetchClinicsWithPagination,
-    useFetchDataWithPaginationProps,
-} from '../../../../hooks';
-import { Clinic } from '../../../../models/clinic';
-import ShowMoreComp from '../../../../components/ShowMoreComp';
-const { Search } = Input;
+import { useFetchClinicsWithPagination } from '../../../../hooks';
+import ProvinceOptions from '../components/ProvinceOptions';
+import DepartmentOptions from '../components/DepartmentOptions';
+import { useRecoilValue } from 'recoil';
+import { clinicFilterOptionsValue } from '../../../../stores/clinicAtom';
 const ViewClinic = () => {
-    const [optionsFilter, setOptionsFilter] = useState<any>({
-        location: null,
-        name: null,
-    });
-    const apiEndpoint = '/clinic/view';
-    // const { data, loading, error, pageCount, resetFirstFetch } =
-    //     useFetchDataWithPaginationProps<Clinic>(apiEndpoint, optionsFilter);
-    // const [pagination, setPagination] = useRecoilState(paginationState);
-    const [provinces, setProvinces] = useState([
-        { province_id: 0, province_name: '' },
-    ]);
+    const clinicOptions = useRecoilValue(clinicFilterOptionsValue);
+    const {
+        data,
+        error,
+        isFetching,
+        fetchNextPage,
+        hasNextPage,
+        isFetchingNextPage,
+    } = useFetchClinicsWithPagination(clinicOptions);
 
-    const { data, error, isFetching } = useFetchClinicsWithPagination({
-        pageIndex: 1,
-        pageSize: 10,
-    });
-
-    const setClinics = useSetRecoilState(clinicListState);
-    const clinics = useRecoilValue(clinicListValue);
-
-    const onSearch: SearchProps['onSearch'] = (value, _e) => {
-        const newOptions = { ...optionsFilter, name: value };
-        setOptionsFilter(newOptions);
-    };
-    const handleChangeLocation = (value: string) => {
-        let province: string = '';
-        const cityStr = 'thành phố';
-        const provinceStr = 'tỉnh';
-        if (value) {
-            if (value.toLowerCase().includes('thành phố')) {
-                province = value.slice(cityStr.length, value.length);
-            }
-            if (value.toLowerCase().includes('tỉnh')) {
-                province = value.slice(provinceStr.length, value.length);
-            }
-            const newOptions = { ...optionsFilter, location: province.trim() };
-            setOptionsFilter(newOptions);
-        } else {
-            const newOptions = { ...optionsFilter, location: null };
-            setOptionsFilter(newOptions);
-        }
-    };
-    const handleUpdateViewsClinic = async (id: number) => {
-        try {
-            const res = await ClinicService.updateViewsClinic(id);
-            console.log(res);
-        } catch (err: any) {}
-    };
-
-    useEffect(() => {
-        const getProvinces = async () => {
-            try {
-                const res = await axios.get(
-                    'https://vapi.vnappmob.com/api/v2/province'
-                );
-                setProvinces(res.data.results);
-            } catch (err) {
-                console.log(err);
-            }
-        };
-        getProvinces();
-
-        window.scrollTo(0, 0);
-    }, [optionsFilter]);
-
-    useEffect(() => {
-        // setClinics(data);
+    const clinics = useMemo(() => {
+        return data?.pages.flatMap((page) => page.data) ?? [];
     }, [data]);
+
+    const observerRef = useRef<HTMLDivElement | null>(null);
+
+    useEffect(() => {
+        if (!observerRef.current || !hasNextPage || isFetchingNextPage) {
+            return;
+        }
+
+        const observer = new IntersectionObserver(
+            (entries) => {
+                if (entries[0].isIntersecting) {
+                    fetchNextPage();
+                }
+            },
+            { threshold: 1.0 }
+        );
+
+        observer.observe(observerRef.current);
+
+        return () => {
+            if (observerRef.current) observer.unobserve(observerRef.current);
+        };
+    }, [hasNextPage, isFetchingNextPage]);
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, []);
 
     return (
         <div className="container view-clinic-container mt-5 mb-5">
@@ -102,56 +63,34 @@ const ViewClinic = () => {
                     },
                 ]}
             />
-
-            <Flex className="group__search  d-flex justify-content-between align-items-center shadow rounded p-3 mt-3">
-                <div className="col-5">
-                    <Select
-                        className=""
-                        style={{ width: '48%' }}
-                        onChange={handleChangeLocation}
-                        showSearch
-                        placeholder="Chọn tỉnh thành"
-                        optionFilterProp="children"
-                        allowClear
-                    >
-                        {provinces?.map((province: any) => {
-                            return (
-                                <Select.Option
-                                    key={Number(province.province_id)}
-                                    value={province.province_name}
-                                >
-                                    {province.province_name}
-                                </Select.Option>
-                            );
-                        })}
-                    </Select>
-                </div>
-                <Flex className="col-5 justify-content-end">
-                    <Search
-                        onSearch={onSearch}
-                        placeholder="Nhập tên cơ sở y tế"
-                        className=""
-                        style={{ width: '48%' }}
-                    />
-                </Flex>
-            </Flex>
-            {isFetching ? (
-                <p className="fs-6 fw-bold text-center mt-4">
-                    Đang tải dữ liệu ...
-                </p>
-            ) : error ? (
-                <p className="fs-6 fw-bold text-center mt-4">{error.message}</p>
-            ) : data?.clinics?.length > 0 ? (
-                <>
-                    <ClinicCard
-                        clinics={data?.clinics}
-                        // handleUpdateViewsClinic={handleUpdateViewsClinic}
-                    />
-                    <ShowMoreComp />
-                </>
-            ) : (
-                <>Không có cơ sở y tế nào!</>
-            )}
+            <div className="mt-3">
+                <Row gutter={[24, 24]}>
+                    <Col span={6} className="shadow rounded p-3">
+                        <ProvinceOptions />
+                        <Divider />
+                        <DepartmentOptions />
+                    </Col>
+                    <Col span={18}>
+                        <Skeleton active loading={isFetching}>
+                            {error ? (
+                                <p className="fs-6 fw-bold text-center mt-4">
+                                    {error?.message.includes('404')
+                                        ? 'Không có dữ liệu !'
+                                        : 'Có lỗi khi lấy dữ liệu !'}
+                                </p>
+                            ) : (
+                                <>
+                                    {!error && <ClinicCard clinics={clinics} />}
+                                </>
+                            )}
+                        </Skeleton>
+                        <div
+                            ref={observerRef}
+                            // style={{ height: 20, marginBottom: 20 }}
+                        />
+                    </Col>
+                </Row>
+            </div>
         </div>
     );
 };

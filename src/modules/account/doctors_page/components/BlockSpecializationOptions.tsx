@@ -37,7 +37,7 @@ export const BlockSpecializationOptions = () => {
                 }}
             >
                 {!isFetching &&
-                    data?.majors.map((major: Major) => {
+                    data?.majors?.map((major: Major) => {
                         return (
                             <Select.Option value={major.id}>
                                 {major.name}

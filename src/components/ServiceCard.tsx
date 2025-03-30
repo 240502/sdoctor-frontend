@@ -18,7 +18,7 @@ const ServiceCard = ({ services }: any) => {
             {services?.map((service: Service) => {
                 return (
                     <Col span={6} className="card-item " key={service?.name}>
-                        <div className="card-container flex-grow-1 rounded border border-1  p-3  rounded border border-1 h-100 d-flex flex-column ">
+                        <div className="card-container flex-grow-1 border border-1  p-3  rounded border border-1 h-100 d-flex flex-column ">
                             <div className="service-image">
                                 <Image
                                     onClick={() => {

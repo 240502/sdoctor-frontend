@@ -19,11 +19,19 @@ export const PriceOptionsComp = () => {
                 range
                 onChangeComplete={(newValue: number[]) => {
                     console.log(newValue);
-                    setDoctorOptions({
-                        ...doctorOptions,
-                        startPrice: newValue[0],
-                        endPrice: newValue[1],
-                    });
+                    if (newValue[0] === newValue[1]) {
+                        setDoctorOptions({
+                            ...doctorOptions,
+                            startPrice: newValue[0],
+                            endPrice: null,
+                        });
+                    } else {
+                        setDoctorOptions({
+                            ...doctorOptions,
+                            startPrice: newValue[0],
+                            endPrice: newValue[1],
+                        });
+                    }
                 }}
                 step={50000}
                 defaultValue={[

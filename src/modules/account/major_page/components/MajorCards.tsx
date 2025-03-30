@@ -12,31 +12,18 @@ export const MajorCards = ({
     return (
         <>
             <Flex wrap>
-                {majors?.length > 0 ? (
-                    <>
-                        {majors?.map((major: Major) => {
-                            return (
-                                <div
-                                    className="col-3 ps-2 pe-2 mb-3"
-                                    key={major.id}
-                                >
-                                    <Card
-                                        className="shadow text-center"
-                                        cover={
-                                            <img
-                                                style={{ cursor: 'pointer' }}
-                                                onClick={() => {
-                                                    navigate('/list/doctor');
-                                                    setOptionsGlobal({
-                                                        ...optionsGlobal,
-                                                        majorId: major.id,
-                                                    });
-                                                }}
-                                                src={baseURL + major?.image}
-                                            ></img>
-                                        }
-                                    >
-                                        <h6
+                <>
+                    {majors?.map((major: Major) => {
+                        return (
+                            <div
+                                className="col-3 ps-2 pe-2 mb-3"
+                                key={major.id}
+                            >
+                                <Card
+                                    className="shadow text-center"
+                                    cover={
+                                        <img
+                                            style={{ cursor: 'pointer' }}
                                             onClick={() => {
                                                 navigate('/list/doctor');
                                                 setOptionsGlobal({
@@ -44,24 +31,31 @@ export const MajorCards = ({
                                                     majorId: major.id,
                                                 });
                                             }}
-                                            style={{
-                                                height: '50px',
-                                                maxHeight: '50px',
-                                                cursor: 'pointer',
-                                            }}
-                                        >
-                                            {major.name}
-                                        </h6>
-                                    </Card>
-                                </div>
-                            );
-                        })}
-                    </>
-                ) : (
-                    <p className="fs-5 fw-bold text-center">
-                        Không có dữ liệu chuyên khoa!
-                    </p>
-                )}
+                                            src={baseURL + major?.image}
+                                        ></img>
+                                    }
+                                >
+                                    <h6
+                                        onClick={() => {
+                                            navigate('/list/doctor');
+                                            setOptionsGlobal({
+                                                ...optionsGlobal,
+                                                majorId: major.id,
+                                            });
+                                        }}
+                                        style={{
+                                            height: '50px',
+                                            maxHeight: '50px',
+                                            cursor: 'pointer',
+                                        }}
+                                    >
+                                        {major.name}
+                                    </h6>
+                                </Card>
+                            </div>
+                        );
+                    })}
+                </>
             </Flex>
         </>
     );

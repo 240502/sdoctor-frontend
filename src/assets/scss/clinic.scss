@@ -42,3 +42,27 @@
         cursor: pointer;
     }
 }
+
+.clinic-image {
+    text-align: center;
+    div {
+        text-align: center;
+    }
+}
+
+.card-item {
+    .card-container {
+        min-height: 100%;
+        flex: 1; /* Chiếm toàn bộ chiều cao còn lại */
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between; /* Nội dung co giãn hợp lý */
+
+        .clinic-image {
+            min-height: 150px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    }
+}

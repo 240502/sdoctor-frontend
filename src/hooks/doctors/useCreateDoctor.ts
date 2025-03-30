@@ -1,6 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { doctorService } from '../../services';
-import { Doctor } from '../../models/doctor';
 const useCreateDoctor = (config: any) => {
     const queryClient = useQueryClient();
     return useMutation({
