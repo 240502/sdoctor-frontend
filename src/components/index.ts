@@ -4,7 +4,7 @@ import ViewAppointmentModal from './ViewAppointmentModal';
 import SummaryEditor from './SummaryEditor';
 import DescriptionEditor from './DescriptionEditor';
 import DoctorCard from './DoctorCard';
-import ServiceCard from './ServiceCard';
+import MedicalPackageCard from './MedicalPackageCard';
 import ViewInvoiceModal from './ViewInvoiceModal';
 export {
     DoctorCard,
@@ -13,6 +13,6 @@ export {
     ConfirmModal,
     ViewAppointmentModal,
     SummaryEditor,
-    ServiceCard,
+    MedicalPackageCard,
     ViewInvoiceModal,
 };

@@ -17,6 +17,6 @@ export * from './patient_profile';
 export * from './payment_method';
 export * from './post_category';
 export * from './post';
-export * from './service';
+export * from './medical_package';
 export * from './user';
 export * from './department';

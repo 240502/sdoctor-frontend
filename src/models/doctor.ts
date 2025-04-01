@@ -12,6 +12,7 @@ export interface DoctorOptions extends Pagination {
     endPrice: number | null;
     gender: string | null;
     titles: string[];
+    departmentId: number;
 }
 export interface CommonDoctorOptions extends Pagination {
     withoutId?: number | null;

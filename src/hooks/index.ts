@@ -6,3 +6,4 @@ export * from './clinic';
 export * from './specialization';
 export * from './post_categories';
 export * from './department';
+export * from './medical_package_category';

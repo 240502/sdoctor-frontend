@@ -1,9 +1,9 @@
 import { Col, Row, Image, Button, Flex } from 'antd';
-import { Service } from '../models/service';
+import { MedicalPackage } from '../models/medical_package';
 import { useNavigate } from 'react-router-dom';
 import { DollarOutlined, EnvironmentOutlined } from '@ant-design/icons';
 
-const ServiceCard = ({ services }: any) => {
+const MedicalPackageCard = ({ services }: any) => {
     const navigate = useNavigate();
     // const updateViewService = async (id: number) => {
     //     try {
@@ -15,7 +15,7 @@ const ServiceCard = ({ services }: any) => {
     // };
     return (
         <Row gutter={[24, 24]} className="cards">
-            {services?.map((service: Service) => {
+            {services?.map((service: MedicalPackage) => {
                 return (
                     <Col span={6} className="card-item " key={service?.name}>
                         <div className="card-container flex-grow-1 border border-1  p-3  rounded border border-1 h-100 d-flex flex-column ">
@@ -45,9 +45,9 @@ const ServiceCard = ({ services }: any) => {
                                     {service.name}
                                 </h6>
                                 <p className="mb-0 opacity-75 text-center mb-3">
-                                    {service.category_name}
+                                    {service.categoryName}
                                 </p>
-                                <div className="clinic-info p-2 rounded">
+                                <div className="clinic-info p-2 rounded mt-3">
                                     <p className="mb-1">
                                         <DollarOutlined className="me-1" /> Giá:{' '}
                                         <span className="text-success fw-bold mb-1">
@@ -59,7 +59,7 @@ const ServiceCard = ({ services }: any) => {
                                     </p>
                                     <p className="mb-1">
                                         <i className="fa-regular fa-hospital me-1"></i>
-                                        {service.clinic_name}
+                                        {service.clinicName}
                                     </p>
 
                                     <p>
@@ -88,4 +88,4 @@ const ServiceCard = ({ services }: any) => {
         </Row>
     );
 };
-export default ServiceCard;
+export default MedicalPackageCard;

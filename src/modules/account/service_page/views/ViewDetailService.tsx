@@ -3,8 +3,8 @@ import { Breadcrumb, Image, Row, Col, Divider, Tabs } from 'antd';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useRecoilValue } from 'recoil';
-import { serviceListValue } from '../../../../stores/servicesAtom';
-import { Service } from '../../../../models/service';
+import { serviceListValue } from '../../../../stores/medical_packageAtom';
+import { Service } from '../../../../models/medical_package';
 import { ServiceService } from '../../../../services/medical_package.service';
 import { BlockDescription } from '../components/BlockDescription';
 

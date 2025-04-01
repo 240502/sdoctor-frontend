@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import departmentSerivce from '../../services/department.service';
+import { departmentSerivce } from '../../services';
 
 export const useFetchAllDepartments = () => {
     return useQuery({

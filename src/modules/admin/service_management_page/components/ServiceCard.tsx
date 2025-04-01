@@ -6,7 +6,7 @@ import {
     EditOutlined,
     EnvironmentOutlined,
 } from '@ant-design/icons';
-import { Service } from '../../../../models/service';
+import { Service } from '../../../../models/medical_package';
 
 const ServiceCard = ({
     services,

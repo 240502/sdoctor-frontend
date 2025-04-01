@@ -19,7 +19,7 @@ type FileType = Parameters<GetProp<UploadProps, 'beforeUpload'>>[0];
 import { Clinic } from '../../../../models/clinic';
 import { ServiceDetailEditor } from './ServiceDetailEditor';
 import { MedicalPackageService } from '../../../../services';
-import { Service } from '../../../../models/service';
+import { Service } from '../../../../models/medical_package';
 import { openNotification } from '../../../../utils/notification';
 export const InputServiceModal = ({
     openInputModal,

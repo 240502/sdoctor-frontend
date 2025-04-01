@@ -2,32 +2,49 @@ import { apiClient } from '../constants/api';
 
 const medicalPackageService = {
     async createService(data: any, config: any): Promise<any> {
-        const res = await apiClient.post('/service/create', data, config);
+        const res = await apiClient.post(
+            '/medical-package/create',
+            data,
+            config
+        );
         return res;
     },
     async deleteService(id: number, config: any): Promise<any> {
-        const res = await apiClient.delete('/service/delete/' + id, config);
+        const res = await apiClient.delete(
+            '/medical-package/delete/' + id,
+            config
+        );
         return res;
     },
     async updateService(data: any, config: any): Promise<any> {
-        const res = await apiClient.put('/service/update/', data, config);
+        const res = await apiClient.put(
+            '/medical-package/update/',
+            data,
+            config
+        );
         return res;
     },
     async getServiceById(id: number): Promise<any> {
-        const res = await apiClient.get('/service/get-by-id/' + id);
+        const res = await apiClient.get('/medical-package/get-by-id/' + id);
         return res?.data;
     },
     async viewService(data: any): Promise<any> {
-        const res = await apiClient.post('/service/view', data);
+        const res = await apiClient.post('/medical-package/view', data);
         return res?.data;
     },
     async getCommonService(): Promise<any> {
-        const res = await apiClient.get('/service/get-common-service');
+        const res = await apiClient.get('/medical-package/get-common-service');
         return res?.data;
     },
     async updateView(id: any): Promise<any> {
-        const res = await apiClient.put('/service/update-views/' + id);
+        const res = await apiClient.put('/medical-package/update-views/' + id);
         return res;
+    },
+    async getMedicalPackageByClinicId(clinicId: any): Promise<any> {
+        const res = await apiClient.get(
+            '/medical-package/get-medical-package-by-clinicid/' + clinicId
+        );
+        return res?.data;
     },
 };
 

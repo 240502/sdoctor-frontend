@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useRecoilState } from 'recoil';
-import { serviceListState } from '../../../../stores/servicesAtom';
+import { serviceListState } from '../../../../stores/medical_packageAtom';
 import {
     Row,
     Col,
@@ -19,7 +19,7 @@ import { ServiceCategory } from '../../../../models/category_services';
 import { ClinicService } from '../../../../services/clinic.service';
 import { ServiceCategoryService } from '../../../../services/service_category.service';
 import { useFetchDataWithPaginationProps } from '../../../../hooks';
-import { Service } from '../../../../models/service';
+import { Service } from '../../../../models/medical_package';
 
 const ViewService = () => {
     const priceOptions = [
