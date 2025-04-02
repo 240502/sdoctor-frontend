@@ -7,11 +7,7 @@ import { EnvironmentOutlined } from '@ant-design/icons';
 const BlockCommonDoctors = ({ doctorId }: { doctorId: number }) => {
     const navigate = useNavigate();
 
-    const {
-        data: commonDoctorsRes,
-        error: commonDoctorsError,
-        isFetching: commonDoctorsFetching,
-    } = useFetchCommonDoctors({
+    const { data, error, isFetching } = useFetchCommonDoctors({
         pageIndex: 1,
         pageSize: 4,
         withoutId: doctorId,
@@ -19,13 +15,10 @@ const BlockCommonDoctors = ({ doctorId }: { doctorId: number }) => {
     return (
         <Row gutter={24}>
             {' '}
-            {commonDoctorsError ? (
-                <p className="text-center fw-bold">
-                    {' '}
-                    {commonDoctorsError.message}
-                </p>
+            {error ? (
+                <p className="text-center fw-bold"> {error.message}</p>
             ) : (
-                commonDoctorsRes?.doctors?.map((doctor: Doctor) => {
+                data?.doctors?.map((doctor: Doctor) => {
                     if (doctor.doctorId !== doctorId) {
                         return (
                             <Col

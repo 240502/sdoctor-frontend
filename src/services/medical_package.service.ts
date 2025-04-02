@@ -33,7 +33,9 @@ const medicalPackageService = {
         return res?.data;
     },
     async getCommonService(): Promise<any> {
-        const res = await apiClient.get('/medical-package/get-common-service');
+        const res = await apiClient.get(
+            '/medical-package/get-common-medical-package'
+        );
         return res?.data;
     },
     async updateView(id: any): Promise<any> {

@@ -11,7 +11,7 @@ export interface DoctorOptions extends Pagination {
     startPrice: number | null;
     endPrice: number | null;
     gender: string | null;
-    titles: string[];
+    doctorTitles: string[];
     departmentId: number;
 }
 export interface CommonDoctorOptions extends Pagination {

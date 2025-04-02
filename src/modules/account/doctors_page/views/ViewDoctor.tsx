@@ -30,13 +30,6 @@ const ViewDoctor = () => {
     const observerRef = useRef<HTMLDivElement | null>(null);
     useEffect(() => {
         window.scrollTo(0, 0);
-        // if (searchParams.get('majorId')) {
-        //     setDoctorOptions({
-        //         ...doctocOptions,
-        //         majorIds: Number(searchParams.get('majorId')),
-        //     });
-        // }
-        return () => {};
     }, []);
 
     useEffect(() => {

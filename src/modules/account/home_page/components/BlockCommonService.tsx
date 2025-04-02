@@ -1,4 +1,4 @@
-import { ServiceCard } from '../../../../components';
+import { MedicalPackageCard } from '../../../../components';
 import { Button, Skeleton } from 'antd';
 import { Link } from 'react-router-dom';
 import { useFetchCommonMedicalPackages } from '../../../../hooks';
@@ -20,7 +20,7 @@ export const BlockCommonService = () => {
                 <p className="text-center fw-bold">{error.message}</p>
             ) : (
                 <Skeleton active loading={isFetching}>
-                    <ServiceCard services={data} />
+                    <MedicalPackageCard services={data} />
                 </Skeleton>
             )}
         </div>

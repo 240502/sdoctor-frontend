@@ -3,9 +3,13 @@ import { Col, Image, Row, Skeleton } from 'antd';
 import { baseURL } from '../../../../constants/api';
 import { Major } from '../../../../models/major';
 import { useFetchCommonSpecialization } from '../../../../hooks';
+import { useRecoilState } from 'recoil';
+import { doctorFilterOptions } from '../../../../stores';
 const BlockSpecialization = (): JSX.Element => {
     const navigate = useNavigate();
     const { data, error, isFetching } = useFetchCommonSpecialization();
+    const [doctorOptions, setDoctorOptions] =
+        useRecoilState(doctorFilterOptions);
     return (
         <div className="row block-category mt-4">
             <Row className="category-list" gutter={[16, 16]}>
@@ -23,6 +27,10 @@ const BlockSpecialization = (): JSX.Element => {
                                         key={major.id}
                                         span={4}
                                         onClick={() => {
+                                            setDoctorOptions({
+                                                ...doctorOptions,
+                                                majorIds: [major.id],
+                                            });
                                             const queryParams =
                                                 new URLSearchParams();
                                             queryParams.append(
