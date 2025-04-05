@@ -3,7 +3,7 @@ import { Post } from '../../../../models/post';
 import { Link, useNavigate } from 'react-router-dom';
 import '@/assets/scss/app.scss';
 import * as cheerio from 'cheerio';
-import { PostService } from '../../../../services/post.service';
+import { postService } from '../../../../services';
 
 export const PostCards = ({ posts }: any) => {
     const navigate = useNavigate();
@@ -17,7 +17,7 @@ export const PostCards = ({ posts }: any) => {
     };
     const updateViewPost = async (id: number) => {
         try {
-            const res = await PostService.updateViewPost(id);
+            const res = await postService.updateViewPost(id);
             console.log(res);
         } catch (err: any) {
             console.log(err.message);

@@ -3,11 +3,15 @@ import { useFetchClinicsWithPagination } from '../../../../hooks';
 import { Clinic } from '../../../../models/clinic';
 import { useRecoilState } from 'recoil';
 import { doctorFilterOptions } from '../../../../stores';
+import { useMemo } from 'react';
 
 const BlockClinicOptions = () => {
     const { data, isFetching } = useFetchClinicsWithPagination({});
     const [doctocOptions, setDoctorOptions] =
         useRecoilState(doctorFilterOptions);
+    const clinics = useMemo(() => {
+        return data?.pages?.flatMap((page) => page.data) ?? [];
+    }, [data]);
     return (
         <div className="pb-3">
             <h6 className="mb-3">Cơ sở y tế</h6>
@@ -29,7 +33,7 @@ const BlockClinicOptions = () => {
                 }}
             >
                 {!isFetching &&
-                    data?.clinics?.map((clinic: Clinic) => (
+                    clinics?.map((clinic: Clinic) => (
                         <Select.Option
                             key={clinic.id}
                             value={clinic.id}

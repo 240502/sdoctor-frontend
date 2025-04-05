@@ -24,6 +24,8 @@ const ViewDoctor = () => {
     } = useFetchDoctorsWithPagination(doctocOptionsValue);
 
     const doctors = useMemo(() => {
+        console.log('data', data);
+
         return data?.pages.flatMap((page) => page.data) ?? [];
     }, [data]);
     // ======= Infinite Scroll Logic =======

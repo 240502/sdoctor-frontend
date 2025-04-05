@@ -2,15 +2,15 @@ export interface Post {
     id: number;
     title: string;
     content: string;
-    author_id: number;
-    public_date: Date | null;
-    updated_at: Date | null;
+    authorId: number;
+    publicDate: Date | null;
+    updatedAt: Date | null;
     status: string;
-    category_id: number;
-    featured_image: string;
-    created_at: Date | null;
-    category_name: string;
-    author_name: string;
-    full_name: string;
+    categoryId: number;
+    featuredImage: string;
+    createdAt: Date | null;
+    categoryName: string;
+    authorName: string;
+    fullName: string;
     image: string;
 }

@@ -9,6 +9,7 @@ import { Post } from '../../../../models/post';
 import { Image, Skeleton } from 'antd';
 import { baseURL } from '../../../../constants/api';
 import { useFetchNewPosts } from '../../../../hooks';
+import useUpdatePostViews from '../../../../hooks/posts/useUpdatePostViews';
 export const BlockNewPost = () => {
     var settings = {
         dots: false,
@@ -23,29 +24,8 @@ export const BlockNewPost = () => {
         nextArrow: <NextArrow />,
         prevArrow: <PrevArrow />,
     };
-    // const [posts, setPosts] = useState<Post[]>([]);
-    // const getNewPost = async () => {
-    //     try {
-    //         const res = await PostService.getNewPost();
-    //         console.log(res);
-    //         setPosts(res);
-    //     } catch (err: any) {
-    //         console.log(err.message);
-    //     }
-    // };
-    // const updateViewPost = async (id: number) => {
-    //     try {
-    //         const res = await PostService.updateViewPost(id);
-    //         console.log(res);
-    //     } catch (err: any) {
-    //         console.log(err.message);
-    //     }
-    // };
-    // useEffect(() => {
-    //     getNewPost();
-    // }, []);
     const { data, error, isFetching } = useFetchNewPosts();
-
+    const updatePostViews = useUpdatePostViews();
     return (
         <div className="row mt-5 mb-5">
             <div className="block__header d-flex justify-content-between align-items-center">
@@ -66,9 +46,11 @@ export const BlockNewPost = () => {
                                         >
                                             <div className="item border flex-grow-1 border-1 rounded p-3 text-center   ">
                                                 <Link
-                                                    // onClick={() => {
-                                                    //     updateViewPost(post.id);
-                                                    // }}
+                                                    onClick={() => {
+                                                        updatePostViews.mutate(
+                                                            post.id
+                                                        );
+                                                    }}
                                                     to={
                                                         '/post/detail/' +
                                                         post.id
@@ -79,12 +61,12 @@ export const BlockNewPost = () => {
                                                         className="item__image feature-img object-fit-cover rounded "
                                                         preview={false}
                                                         src={
-                                                            post?.featured_image?.includes(
+                                                            post?.featuredImage?.includes(
                                                                 'cloudinary'
                                                             )
-                                                                ? post?.featured_image
+                                                                ? post?.featuredImage
                                                                 : baseURL +
-                                                                  post?.featured_image
+                                                                  post?.featuredImage
                                                         }
                                                     ></Image>
                                                     <p className="post-title mt-3 text-center text-dark fw-bold fs-6 text-capitalize">
@@ -94,11 +76,11 @@ export const BlockNewPost = () => {
                                                                 post.id
                                                             }
                                                             className=" text-decoration-none text-dark"
-                                                            // onClick={() => {
-                                                            //     updateViewPost(
-                                                            //         post.id
-                                                            //     );
-                                                            // }}
+                                                            onClick={() => {
+                                                                updatePostViews.mutate(
+                                                                    post.id
+                                                                );
+                                                            }}
                                                         >
                                                             {post.title}
                                                         </Link>
