@@ -14,8 +14,7 @@ const BlockSpecialization = (): JSX.Element => {
         <div className="row block-category mt-4">
             <Row className="category-list" gutter={[16, 16]}>
                 {error ? (
-                    <p className="fs-6 fw-bold text-center mt-4">
-                        {' '}
+                    <p className="fw-bold text-center mt-4 w-100">
                         {error.message}
                     </p>
                 ) : (

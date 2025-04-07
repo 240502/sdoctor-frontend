@@ -38,7 +38,9 @@ const BlockCommonPost = () => {
             <div className="block__list mt-4 position-relative posts">
                 <Skeleton active loading={isFetching}>
                     {error ? (
-                        <p>{error.message}</p>
+                        <p className="text-center w-100 fw-bold">
+                            {error.message}
+                        </p>
                     ) : (
                         <Slider {...settings}>
                             {data.map((post: Post) => {
@@ -59,12 +61,12 @@ const BlockCommonPost = () => {
                                                     className="item__image feature-img object-fit-cover rounded "
                                                     preview={false}
                                                     src={
-                                                        post?.featured_image?.includes(
+                                                        post?.featuredImage?.includes(
                                                             'cloudinary'
                                                         )
-                                                            ? post?.featured_image
+                                                            ? post?.featuredImage
                                                             : baseURL +
-                                                              post?.featured_image
+                                                              post?.featuredImage
                                                     }
                                                 ></Image>
                                                 <p className="post-title mt-3 text-center text-dark fw-bold fs-6 text-capitalize">

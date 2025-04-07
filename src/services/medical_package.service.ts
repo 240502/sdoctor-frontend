@@ -24,7 +24,7 @@ const medicalPackageService = {
         );
         return res;
     },
-    async getServiceById(id: number): Promise<any> {
+    async getMedicalPackageById(id: number): Promise<any> {
         const res = await apiClient.get('/medical-package/get-by-id/' + id);
         return res?.data;
     },

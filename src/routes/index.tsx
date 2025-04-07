@@ -9,6 +9,7 @@ import ViewDoctor from '../modules/account/doctors_page';
 import { Home } from '../modules/account/home_page';
 import { LoginLayout } from '../modules/account/login_page';
 import { ViewMajor } from '../modules/account/major_page';
+import ViewMedicalPackageDetail from '../modules/account/medical_package_detail_page';
 import {
     PostDetail,
     ViewPost,
@@ -20,10 +21,7 @@ import {
     ViewWatchedClinic,
     ViewWatchedDoctor,
 } from '../modules/account/patient_profile_page';
-import {
-    ViewDetailService,
-    ViewService,
-} from '../modules/account/service_page';
+import ViewService from '../modules/account/service_page';
 import { AppointmentManagement } from '../modules/admin/appointment_page';
 import { ClinicManagement } from '../modules/admin/clinic_page';
 import { DashBoard } from '../modules/admin/dashboard_page';
@@ -108,7 +106,7 @@ export const publicRoutes = [
     },
     {
         path: VIEW_SERVICE_DETAIL_PATH,
-        component: ViewDetailService,
+        component: ViewMedicalPackageDetail,
         layout: AppLayout,
     },
     {

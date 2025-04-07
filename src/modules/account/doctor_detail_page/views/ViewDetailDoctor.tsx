@@ -16,7 +16,7 @@ import {
     Flex,
     Skeleton,
 } from 'antd';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Doctor } from '../../../../models/doctor';
 import { baseURL } from '../../../../constants/api';
@@ -30,6 +30,7 @@ import { Comment } from '../../../../models/comment';
 import { useFetchDoctorDetail } from '../../../../hooks';
 import { BlockComment } from '../components/BlockComment';
 import BlockCommonDoctors from '../components/BlockCommonDoctors';
+import { useFetchCommentsByCommentableIdAndType } from '../../../../hooks/comment';
 type DataParams = {
     id: string;
 };
@@ -39,7 +40,6 @@ const ViewDetailDoctor = () => {
     const [doctor, setDoctor] = useState<Doctor>({} as Doctor);
     const [totalComment, setTotalComment] = useState<number>(0);
     const setDoctorGlobal = useSetRecoilState(doctorState);
-    const [comments, setComments] = useState<Comment[]>([]);
     const [pageComment, setPageComment] = useState<number>(1);
     const [pageCommentSize, setPageCommentSize] = useState<number>(4);
     const [pageCommentCount, setPageCommentCount] = useState<number>(0);
@@ -49,6 +49,21 @@ const ViewDetailDoctor = () => {
             setPageComment(pageComment + 1);
         }
     };
+    const {
+        data: commentRes,
+        error: commentError,
+        hasNextPage,
+        fetchNextPage,
+        isFetching: isFetchingComments,
+        isFetchingNextPage,
+    } = useFetchCommentsByCommentableIdAndType({
+        pageSize: 6,
+        commentableId: id,
+        type: 'MedicalPackage',
+    });
+    const comments = useMemo(() => {
+        return commentRes?.pages.flatMap((page) => page.comments) ?? [];
+    }, [commentRes]);
     const items: TabsProps['items'] = [
         {
             key: '1',
@@ -70,34 +85,9 @@ const ViewDetailDoctor = () => {
         },
     ];
 
-    const getCommentByDoctorId = async (doctorId: number) => {
-        try {
-            const data = {
-                pageIndex: pageComment,
-                pageSize: pageCommentSize,
-                doctorId: doctorId,
-            };
-            const res = await commentService.getCommentByUserId(data);
-            if (comments.length > 0) {
-                const newComments = [...comments, ...res.data];
-
-                setComments(newComments);
-            } else {
-                setTotalComment(res.totalItems);
-                setPageCommentCount(res.pageCount);
-                setComments(res.data);
-            }
-        } catch (err: any) {
-            console.log(err);
-            setTotalComment(0);
-            setComments([]);
-            setTotalComment(0);
-        }
-    };
-
     const handleOnNewComment = () => {
         socket?.on('newComment', (newComment: Comment) => {
-            getCommentByDoctorId(Number(newComment.doctorId));
+            // getCommentByDoctorId(Number(newComment.doctorId));
         });
     };
     useEffect(() => {
@@ -108,12 +98,6 @@ const ViewDetailDoctor = () => {
         window.scrollTo(0, 0);
     }, [id]);
 
-    // useEffect(() => {
-    //     getCommonDoctor();
-    // }, [pageIndex, pageSize]);
-    useEffect(() => {
-        getCommentByDoctorId(Number(id));
-    }, [pageComment, pageCommentSize]);
     return (
         <div className="container doctor-detail mt-4 mb-4">
             <Breadcrumb

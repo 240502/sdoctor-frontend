@@ -1,7 +1,6 @@
 import { Button, Image } from 'antd';
 import '@/assets/scss/home.scss';
 import { useEffect } from 'react';
-import { BlockSearchDoctor } from '../components/BlockSearchDoctor';
 import { BlockCommonService } from '../components/BlockCommonService';
 import { useNavigate } from 'react-router-dom';
 import {

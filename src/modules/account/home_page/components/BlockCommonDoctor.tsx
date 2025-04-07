@@ -37,7 +37,7 @@ export const BlockCommonDoctor = (): JSX.Element => {
             </div>
             <Row className="block-container mt-4" gutter={16}>
                 {error ? (
-                    <p className="text-center fw-bold"> {error.message}</p>
+                    <p className="text-center fw-bold w-100">{error.message}</p>
                 ) : (
                     <Skeleton active loading={isFetching}>
                         {data?.doctors?.map((doctor: Doctor) => {
