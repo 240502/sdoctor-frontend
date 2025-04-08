@@ -1,12 +1,11 @@
-import { useEffect, useState } from 'react';
-import { Breadcrumb, Pagination, Skeleton } from 'antd';
+import { useEffect } from 'react';
+import { Breadcrumb, Skeleton } from 'antd';
 import { HomeOutlined } from '@ant-design/icons';
 import { MajorCards } from '../components/MajorCards';
 import { useFetchSpecializationsWithPagination } from '../../../../hooks';
 import ShowMoreComp from '../../../../components/ShowMoreComp';
 
 const ViewMajor = () => {
-    // const [pagination, setPagination] = useRecoilState(paginationState);
     const { data, error, isFetching } = useFetchSpecializationsWithPagination({
         pageIndex: 1,
         pageSize: 8,
@@ -14,10 +13,7 @@ const ViewMajor = () => {
     useEffect(() => {
         window.scrollTo(0, 0);
     }, []);
-    console.log('data', data);
-    // useEffect(() => {
-    //     setMajors(data);
-    // }, [data]);
+
     return (
         <div className="container home__content mt-4 mb-4">
             <Breadcrumb

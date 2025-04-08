@@ -2,12 +2,12 @@ import { Flex, Card } from 'antd';
 import { Major } from '../../../../models/major';
 import { baseURL } from '../../../../constants/api';
 import { useNavigate } from 'react-router-dom';
+import { useRecoilState } from 'recoil';
+import { doctorFilterOptions } from '../../../../stores';
 
-export const MajorCards = ({
-    majors,
-    setOptionsGlobal,
-    optionsGlobal,
-}: any) => {
+export const MajorCards = ({ majors }: any) => {
+    const [doctorOptions, setDoctorOptions] =
+        useRecoilState(doctorFilterOptions);
     const navigate = useNavigate();
     return (
         <>
@@ -26,9 +26,9 @@ export const MajorCards = ({
                                             style={{ cursor: 'pointer' }}
                                             onClick={() => {
                                                 navigate('/list/doctor');
-                                                setOptionsGlobal({
-                                                    ...optionsGlobal,
-                                                    majorId: major.id,
+                                                setDoctorOptions({
+                                                    ...doctorOptions,
+                                                    majorIds: [major.id],
                                                 });
                                             }}
                                             src={baseURL + major?.image}
@@ -38,9 +38,9 @@ export const MajorCards = ({
                                     <h6
                                         onClick={() => {
                                             navigate('/list/doctor');
-                                            setOptionsGlobal({
-                                                ...optionsGlobal,
-                                                majorId: major.id,
+                                            setDoctorOptions({
+                                                ...doctorOptions,
+                                                majorIds: [major.id],
                                             });
                                         }}
                                         style={{

@@ -21,7 +21,7 @@ import {
     ViewWatchedClinic,
     ViewWatchedDoctor,
 } from '../modules/account/patient_profile_page';
-import ViewService from '../modules/account/service_page';
+import ViewService from '../modules/account/medical_package_page';
 import { AppointmentManagement } from '../modules/admin/appointment_page';
 import { ClinicManagement } from '../modules/admin/clinic_page';
 import { DashBoard } from '../modules/admin/dashboard_page';

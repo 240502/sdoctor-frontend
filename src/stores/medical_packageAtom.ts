@@ -1,5 +1,8 @@
 import { atom, selector } from 'recoil';
-import { MedicalPackage } from '../models/medical_package';
+import {
+    MedicalPackage,
+    MedicalPackageOptions,
+} from '../models/medical_package';
 
 export const serviceListState = atom({
     key: 'serviceListState',
@@ -14,7 +17,7 @@ export const serviceListValue = selector({
 
 export const medicalPackageOptionsState = atom({
     key: 'medicalPackageOptionsState',
-    default: {} as MedicalPackage,
+    default: {} as MedicalPackageOptions,
 });
 
 export const medicalPackageOptionsValue = selector({

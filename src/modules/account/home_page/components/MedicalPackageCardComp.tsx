@@ -1,17 +1,17 @@
 import { Col, Row, Image, Button, Flex } from 'antd';
-import { MedicalPackage } from '../models/medical_package';
 import { useNavigate } from 'react-router-dom';
 import { DollarOutlined, EnvironmentOutlined } from '@ant-design/icons';
-import { useUpdateMedicalPackageViews } from '../hooks';
+import { useUpdateMedicalPackageViews } from '../../../../hooks';
+import { MedicalPackage } from '../../../../models';
 
-const MedicalPackageCard = ({ medicalPackages }: any) => {
+const MedicalPackageCardComp = ({ medicalPackages }: any) => {
     const navigate = useNavigate();
     const updateMedicalPackageViews = useUpdateMedicalPackageViews();
     return (
         <Row gutter={[24, 24]} className="cards">
             {medicalPackages?.map((service: MedicalPackage) => {
                 return (
-                    <Col span={8} className="card-item " key={service?.name}>
+                    <Col span={6} className="card-item " key={service?.name}>
                         <div className="card-container flex-grow-1 border border-1  p-3  rounded border border-1 h-100 d-flex flex-column ">
                             <div className="service-image">
                                 <Image
@@ -86,4 +86,4 @@ const MedicalPackageCard = ({ medicalPackages }: any) => {
         </Row>
     );
 };
-export default MedicalPackageCard;
+export default MedicalPackageCardComp;

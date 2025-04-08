@@ -1,11 +1,11 @@
-import { MedicalPackageCard } from '../../../../components';
 import { Button, Skeleton } from 'antd';
 import { Link } from 'react-router-dom';
 import { useFetchCommonMedicalPackages } from '../../../../hooks';
+import MedicalPackageCardComp from './MedicalPackageCardComp';
 
 export const BlockCommonService = () => {
     const { data, error, isFetching } = useFetchCommonMedicalPackages();
-
+    console.log('data', data);
     return (
         <div className="mt-5 mb-5">
             <div className="block__header d-flex justify-content-between align-items-center">
@@ -20,7 +20,7 @@ export const BlockCommonService = () => {
                 <p className="text-center fw-bold">{error.message}</p>
             ) : (
                 <Skeleton active loading={isFetching}>
-                    <MedicalPackageCard services={data} />
+                    <MedicalPackageCardComp medicalPackages={data} />
                 </Skeleton>
             )}
         </div>

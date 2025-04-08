@@ -1,31 +1,59 @@
 import { CheckCircleOutlined } from '@ant-design/icons';
 import { Comment } from '../../../../models/comment';
-import { Col, Row, Rate, Button } from 'antd';
-import { useEffect } from 'react';
-export const BlockComment = ({
-    comments,
-    totalItems,
-    onButtonMoreClick,
-    pageCount,
-    pageIndex,
-}: {
-    comments: Comment[] | undefined;
-    totalItems: number;
-    onButtonMoreClick: any;
-    pageCount: number;
-    pageIndex: number;
-}) => {
+import { Col, Row, Rate, Button, Skeleton } from 'antd';
+import { useEffect, useMemo, useRef } from 'react';
+import { useFetchCommentsByCommentableIdAndType } from '../../../../hooks/comment';
+export const BlockComment = ({ doctorId }: { doctorId: number }) => {
+    const {
+        data,
+        error,
+        hasNextPage,
+        fetchNextPage,
+        isFetching,
+        isFetchingNextPage,
+    } = useFetchCommentsByCommentableIdAndType({
+        pageSize: 6,
+        commentableId: doctorId,
+        type: 'Doctor',
+    });
+    const comments = useMemo(() => {
+        return data?.pages.flatMap((page) => page.comments) ?? [];
+    }, [data]);
+    // ======= Infinite Scroll Logic =======
+    const observerRef = useRef<HTMLDivElement | null>(null);
     useEffect(() => {
-        console.log('pageIndex: ', pageIndex);
-        console.log('pageCount: ', pageCount);
-    }, [pageCount, pageIndex]);
+        if (!observerRef.current || !hasNextPage || isFetchingNextPage) return;
+
+        const observer = new IntersectionObserver(
+            (entries) => {
+                if (entries[0].isIntersecting) {
+                    fetchNextPage();
+                }
+            },
+            { threshold: 1.0 }
+        );
+
+        observer.observe(observerRef.current);
+
+        return () => {
+            if (observerRef.current) observer.unobserve(observerRef.current);
+        };
+    }, [hasNextPage, isFetchingNextPage]);
     return (
         <>
-            <h6 className="fs-5 mb-3">{totalItems} Đánh Giá</h6>
-            {totalItems > 0 ? (
+            <h6 className="fs-5 mb-3">
+                {data?.pages[0].totalItems ?? 0} Đánh Giá
+            </h6>
+            <Skeleton active loading={isFetching || isFetchingNextPage}>
                 <div className="list__comment">
-                    {comments ? (
-                        comments.map((comment: Comment) => {
+                    {error ? (
+                        <p className="text-center fw-bold">
+                            {error.message.includes('404')
+                                ? 'Không có đánh giá nào!'
+                                : error.message}
+                        </p>
+                    ) : (
+                        comments?.map((comment: Comment) => {
                             return (
                                 <Row
                                     gutter={24}
@@ -63,27 +91,13 @@ export const BlockComment = ({
                                 </Row>
                             );
                         })
-                    ) : (
-                        <p className="fs-6 fw-bold">Không có phản hồi nào!</p>
-                    )}
-                    {pageCount !== pageIndex && (
-                        <Button
-                            className="border-0 fw-bold ps-0 pe-0"
-                            style={{
-                                color: 'rgb(43, 98, 205)',
-                                fontSize: '16px',
-                            }}
-                            onClick={() => {
-                                onButtonMoreClick();
-                            }}
-                        >
-                            Xem thêm đánh giá{' '}
-                        </Button>
                     )}
                 </div>
-            ) : (
-                <>Không có đánh giá nào</>
-            )}
+                <div
+                    ref={observerRef}
+                    // style={{ height: 20, marginBottom: 20 }}
+                />
+            </Skeleton>
         </>
     );
 };

@@ -1,11 +1,22 @@
-import { useInfiniteQuery } from '@tanstack/react-query';
+import {
+    InfiniteData,
+    useInfiniteQuery,
+    UseInfiniteQueryResult,
+} from '@tanstack/react-query';
 import { medicalPackageService } from '../../services';
-import { MedicalPackageOptions } from '../../models';
+import { MedicalPackage, MedicalPackageOptions } from '../../models';
+
+interface PaginatedMedicalPackage {
+    medicalPackages: MedicalPackage[];
+    pageIndex: number;
+    pageCount: number;
+    totalItems: number;
+}
 
 export const useFetchMedicalPackageWithPaginationAndOptions = (
     payload: MedicalPackageOptions
-) => {
-    return useInfiniteQuery({
+): UseInfiniteQueryResult<InfiniteData<PaginatedMedicalPackage>, Error> => {
+    return useInfiniteQuery<PaginatedMedicalPackage, Error>({
         queryKey: [
             'useFetchMedicalPackageWithPaginationAndOptions',
             JSON.stringify(payload),
@@ -13,13 +24,14 @@ export const useFetchMedicalPackageWithPaginationAndOptions = (
         queryFn: async ({ pageParam = 1 }) =>
             medicalPackageService.viewService({
                 ...payload,
+                pageSize: 6,
                 pageIndex: pageParam,
             }),
         initialPageParam: 1,
         retry: 1,
         getNextPageParam: (lastPage) => {
-            const { page, pageCount } = lastPage;
-            return page < pageCount ? page + 1 : undefined;
+            const { pageIndex, pageCount } = lastPage;
+            return pageIndex < pageCount ? pageIndex + 1 : undefined;
         },
     });
 };

@@ -30,40 +30,19 @@ import { Comment } from '../../../../models/comment';
 import { useFetchDoctorDetail } from '../../../../hooks';
 import { BlockComment } from '../components/BlockComment';
 import BlockCommonDoctors from '../components/BlockCommonDoctors';
-import { useFetchCommentsByCommentableIdAndType } from '../../../../hooks/comment';
 type DataParams = {
     id: string;
 };
 const ViewDetailDoctor = () => {
     const navigate = useNavigate();
     const { id } = useParams<DataParams>();
-    const [doctor, setDoctor] = useState<Doctor>({} as Doctor);
     const [totalComment, setTotalComment] = useState<number>(0);
     const setDoctorGlobal = useSetRecoilState(doctorState);
     const [pageComment, setPageComment] = useState<number>(1);
     const [pageCommentSize, setPageCommentSize] = useState<number>(4);
     const [pageCommentCount, setPageCommentCount] = useState<number>(0);
     const { data, error, isFetching } = useFetchDoctorDetail(Number(id));
-    const onButtonMoreClick = () => {
-        if (pageComment < pageCommentCount) {
-            setPageComment(pageComment + 1);
-        }
-    };
-    const {
-        data: commentRes,
-        error: commentError,
-        hasNextPage,
-        fetchNextPage,
-        isFetching: isFetchingComments,
-        isFetchingNextPage,
-    } = useFetchCommentsByCommentableIdAndType({
-        pageSize: 6,
-        commentableId: id,
-        type: 'MedicalPackage',
-    });
-    const comments = useMemo(() => {
-        return commentRes?.pages.flatMap((page) => page.comments) ?? [];
-    }, [commentRes]);
+
     const items: TabsProps['items'] = [
         {
             key: '1',
@@ -73,15 +52,7 @@ const ViewDetailDoctor = () => {
         {
             key: '2',
             label: 'Đánh giá',
-            children: (
-                <BlockComment
-                    comments={comments}
-                    totalItems={totalComment}
-                    onButtonMoreClick={onButtonMoreClick}
-                    pageCount={pageCommentCount}
-                    pageIndex={pageComment}
-                />
-            ),
+            children: <BlockComment doctorId={Number(id)} />,
         },
     ];
 
@@ -155,7 +126,7 @@ const ViewDetailDoctor = () => {
                                                     navigate(
                                                         '/booking-appointment'
                                                     );
-                                                    setDoctorGlobal(doctor);
+                                                    // setDoctorGlobal(doctor);
                                                 }}
                                             >
                                                 Đặt lịch khám
@@ -178,9 +149,6 @@ const ViewDetailDoctor = () => {
                                             </span>
                                         </Tag>
                                     )}
-                                    <span className="text-decoration-underline fs-6">
-                                        {totalComment} đánh giá
-                                    </span>
                                 </div>
                             </Flex>
                             <Divider className="mt-3" />
