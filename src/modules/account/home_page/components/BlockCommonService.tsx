@@ -5,7 +5,6 @@ import MedicalPackageCardComp from './MedicalPackageCardComp';
 
 export const BlockCommonService = () => {
     const { data, error, isFetching } = useFetchCommonMedicalPackages();
-    console.log('data', data);
     return (
         <div className="mt-5 mb-5">
             <div className="block__header d-flex justify-content-between align-items-center">

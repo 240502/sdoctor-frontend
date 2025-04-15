@@ -4,7 +4,7 @@ export * from './category_services';
 export * from './clinic';
 export * from './comment';
 export * from './doctor';
-export * from './doctor_schedule';
+export * from './schedule';
 export * from './doctor_schedule_details';
 export * from './doctor_service';
 export * from './functions';

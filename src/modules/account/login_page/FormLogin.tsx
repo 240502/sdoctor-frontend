@@ -1,5 +1,6 @@
 import { Button, Input, notification, Form } from 'antd';
-import { UserService } from '../../../services/user.service';
+// import { UserService } from '../../../services/user.service';
+import { userService } from '../../../services';
 import { useSetRecoilState } from 'recoil';
 import { userState } from '../../../stores/userAtom';
 import { useNavigate } from 'react-router-dom';
@@ -23,7 +24,7 @@ export const FormLogin = () => {
     const Login = async (values: any) => {
         const { email, password } = values;
         try {
-            const res = await UserService.login({ email, password });
+            const res = await userService.login({ email, password });
             sessionStorage.setItem('user', JSON.stringify(res));
             setUser(res);
             socket?.emit('joinRoom', { userId: res.userId });

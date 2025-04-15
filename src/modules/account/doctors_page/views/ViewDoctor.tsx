@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef } from 'react';
 import { HomeOutlined } from '@ant-design/icons';
 import { Breadcrumb, Skeleton, Col, Row, Divider } from 'antd';
-import { useRecoilValue } from 'recoil';
+import { useRecoilState } from 'recoil';
 import BlockClinicOptions from '../components/BlockClinicOptions';
 import BlockGenderOptions from '../components/BlockGenderOptions';
 import { DoctorCard } from '../../../../components';
@@ -11,9 +11,12 @@ import {
     TitleOptions,
 } from '../components';
 import { useFetchDoctorsWithPagination } from '../../../../hooks';
-import { doctorFilterOptionsValue } from '../../../../stores';
+import { doctorFilterOptions } from '../../../../stores';
+import { useSearchParams } from 'react-router-dom';
 const ViewDoctor = () => {
-    const doctocOptionsValue = useRecoilValue(doctorFilterOptionsValue);
+    const [searchParams] = useSearchParams();
+    const [doctorOptions, setDoctocOptions] =
+        useRecoilState(doctorFilterOptions);
     const {
         data,
         error,
@@ -21,7 +24,12 @@ const ViewDoctor = () => {
         fetchNextPage,
         hasNextPage,
         isFetchingNextPage,
-    } = useFetchDoctorsWithPagination(doctocOptionsValue);
+    } = useFetchDoctorsWithPagination({
+        ...doctorOptions,
+        majorIds: searchParams.get('majorId')
+            ? [Number(searchParams.get('majorId'))]
+            : [],
+    });
 
     const doctors = useMemo(() => {
         return data?.pages.flatMap((page) => page.data) ?? [];
@@ -30,6 +38,14 @@ const ViewDoctor = () => {
     const observerRef = useRef<HTMLDivElement | null>(null);
     useEffect(() => {
         window.scrollTo(0, 0);
+        const majorId = searchParams.get('majorId');
+        if (majorId) {
+            setDoctocOptions({
+                ...doctorOptions,
+                majorIds: [Number(majorId)],
+            });
+        }
+        console.log('majorId:', majorId); // sẽ log ra "8"
     }, []);
 
     useEffect(() => {

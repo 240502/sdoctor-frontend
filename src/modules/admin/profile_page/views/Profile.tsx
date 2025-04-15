@@ -19,7 +19,7 @@ import { useEffect, useState } from 'react';
 import { Doctor } from '../../../../models/doctor';
 import { useRecoilValue } from 'recoil';
 import { configValue, userValue } from '../../../../stores/userAtom';
-import { doctorService } from '../../../../services/doctor.service';
+import { doctorService } from '../../../../services';
 import { Clinic } from '../../../../models/clinic';
 import { Major } from '../../../../models/major';
 import { DoctorService } from '../../../../models/doctor_service';
@@ -28,11 +28,11 @@ import viVN from 'antd/lib/locale/vi_VN';
 import 'dayjs/locale/vi';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import { DescriptionEditor, SummaryEditor } from '../../../../components';
-import { UploadService } from '../../../../services/upload.service';
 import {
-    ClinicService,
-    DoctorServiceService,
-    MajorService,
+    uploadService,
+    clinicService,
+    doctorServiceService,
+    majorService,
 } from '../../../../services';
 import { openNotification } from '../../../../utils/notification';
 import { DistrictType, ProvinceType, WardType } from '../../../../models/other';
@@ -101,7 +101,7 @@ const Profile = () => {
     };
     const getAllClinic = async () => {
         try {
-            const res = await ClinicService.viewClinic({});
+            const res = await clinicService.viewClinic({});
             setClinics(res.data);
         } catch (err: any) {
             console.log(err.message);
@@ -109,7 +109,7 @@ const Profile = () => {
     };
     const getAllService = async () => {
         try {
-            const res = await DoctorServiceService.getAll();
+            const res = await doctorServiceService.getAll();
             setDoctorServices(res);
         } catch (err: any) {
             console.log(err.message);
@@ -117,7 +117,7 @@ const Profile = () => {
     };
     const getAllMajor = async () => {
         try {
-            const res = await MajorService.getAllMajor();
+            const res = await majorService.getAllMajor();
             setMajors(res);
         } catch (err: any) {
             console.log(err.message);
@@ -149,7 +149,7 @@ const Profile = () => {
         try {
             const formData = new FormData();
             formData.append('file', file);
-            const response = await UploadService.uploadImage(formData);
+            const response = await uploadService.uploadImage(formData);
             const { url } = response.data;
             file.url = url;
             onSuccess?.({}, file);
@@ -165,7 +165,7 @@ const Profile = () => {
             setBirthDayError('Bác sĩ phải đủ 24 tuổi trở lên!');
         }
         const newDoctor = {
-            doctor_id: doctor.doctor_id,
+            doctor_id: doctor.doctorId,
             full_name: values.full_name,
             clinic_id: values.clinic_id,
             major_id: values.major_id,
@@ -383,7 +383,7 @@ const Profile = () => {
                                 />
                             )}
                         </Form.Item>
-                        {user?.role_id === 2 && (
+                        {user?.roleId === 2 && (
                             <Row gutter={24}>
                                 <Col span={12}>
                                     <Form.Item
@@ -714,7 +714,7 @@ const Profile = () => {
                                 </ConfigProvider>
                             </Col>
                         </Row>
-                        {user?.role_id === 2 && (
+                        {user?.roleId === 2 && (
                             <Row gutter={24}>
                                 <Col span={12}>
                                     <Form.Item label="Học vấn" name="title">
@@ -755,7 +755,7 @@ const Profile = () => {
                                 </Col>
                             </Row>
                         )}
-                        {doctor?.doctor_id !== undefined && (
+                        {doctor?.doctorId !== undefined && (
                             <Form.Item label="Mô tả nhanh" name="summary">
                                 <SummaryEditor
                                     doctor={doctor}
@@ -766,7 +766,7 @@ const Profile = () => {
                             </Form.Item>
                         )}
 
-                        {doctor?.doctor_id && (
+                        {doctor?.doctorId && (
                             <Form.Item label="Giới thiệu" name="details">
                                 <DescriptionEditor
                                     handleChangeDoctorEditor={

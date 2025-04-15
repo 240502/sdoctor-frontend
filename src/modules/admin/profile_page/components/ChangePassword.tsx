@@ -1,8 +1,7 @@
-import { useState, useEffect } from 'react';
 import { Modal, Input, Button, Form, Flex } from 'antd';
 import { useRecoilValue } from 'recoil';
 import { configValue, userValue } from '../../../../stores/userAtom';
-import { UserService } from '../../../../services/user.service';
+import { userService } from '../../../../services';
 import { openNotification } from '../../../../utils/notification';
 export const ChangePasswordModal = ({
     apiNotification,
@@ -17,13 +16,13 @@ export const ChangePasswordModal = ({
         const data = {
             currentPassword: values.old_password,
             newPassword: values.new_password,
-            id: user.user_id,
+            id: user.userId,
         };
         ChangePassword(data);
     };
     const ChangePassword = async (data: any) => {
         try {
-            const res = await UserService.changePassword(data, config);
+            const res = await userService.changePassword(data, config);
             console.log(res);
             openNotification(
                 apiNotification,

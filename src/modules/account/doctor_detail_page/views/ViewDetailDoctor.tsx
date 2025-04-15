@@ -41,6 +41,7 @@ const ViewDetailDoctor = () => {
     const [pageComment, setPageComment] = useState<number>(1);
     const [pageCommentSize, setPageCommentSize] = useState<number>(4);
     const [pageCommentCount, setPageCommentCount] = useState<number>(0);
+
     const { data, error, isFetching } = useFetchDoctorDetail(Number(id));
 
     const items: TabsProps['items'] = [
@@ -109,7 +110,7 @@ const ViewDetailDoctor = () => {
                                     </div>
                                     <div className="info ms-3">
                                         <h5 className="doctor-name">
-                                            {data?.title} {data?.fullName}
+                                            {data?.titleName} {data?.fullName}
                                         </h5>
                                         <Tag color="blue">
                                             {data?.majorName}

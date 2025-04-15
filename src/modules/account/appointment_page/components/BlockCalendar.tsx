@@ -4,7 +4,7 @@ import type { Dayjs } from 'dayjs';
 import 'dayjs/locale/vi';
 import { useEffect } from 'react';
 import dayjs from 'dayjs';
-export const BlockCalendar = ({ setDate, setSchedule, setTimes }: any) => {
+export const BlockCalendar = ({ date, setDate }: any) => {
     const headerRender: CalendarProps<Dayjs>['headerRender'] = ({
         value,
         onChange,
@@ -65,7 +65,6 @@ export const BlockCalendar = ({ setDate, setSchedule, setTimes }: any) => {
     };
     const handleChangeDate = (value: Dayjs) => {
         setDate(value.format('YYYY-MM-DD'));
-        setTimes([]);
     };
     useEffect(() => {}, []);
     return (

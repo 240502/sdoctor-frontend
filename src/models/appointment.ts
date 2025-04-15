@@ -30,3 +30,13 @@ export interface Appointment {
 export interface AppointmentViewForPatient extends Appointment {
     statusName: string;
 }
+
+export interface AppointmentCreate {
+    doctorId: number;
+    appointmentDate: Date;
+    examinationReason: string;
+    location: string;
+    uuid: string;
+    scheduleId: number;
+    type: string;
+}

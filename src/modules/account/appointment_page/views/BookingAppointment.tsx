@@ -6,24 +6,29 @@ import {
 import { Breadcrumb, Col, notification, Row, Button } from 'antd';
 import 'dayjs/locale/vi';
 import { useEffect, useState } from 'react';
-import { scheduleService } from '../../../../services/doctor_schedule.service';
+import {
+    scheduleService,
+    notificationService,
+    invoicesService,
+} from '../../../../services';
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import { doctorValue } from '../../../../stores/doctorAtom';
-import { DoctorSchedule } from '../../../../models/doctor_schedule';
 import { BlockCalendar } from '../components/BlockCalendar';
 import { DoctorScheduleDetail } from '../../../../models/doctor_schedule_details';
 import { InputAppointmentModal } from '../components/InputAppointmentModal';
 import { patientProfileValue } from '../../../../stores/patientAtom';
 import { PatientProfile } from '../../../../models/patient_profile';
-import { doctorScheduleDetailService } from '../../../../services/doctor_schedule_detail.service';
 import socket from '../../../../socket';
-import { NotificationService } from '../../../../services/notification.service';
 import { newAppointmentState } from '../../../../stores/appointmentAtom';
-import { invoicesService } from '../../../../services/invoices.service';
 import { invoiceState } from '../../../../stores/invoice';
+import { useSearchParams } from 'react-router-dom';
+import SchedulesComp from '../components/SchedulesComp';
+import { Schedules } from '../../../../models';
 type NotificationType = 'success' | 'error';
 
 const BookingAppointment = () => {
+    const [searchParams] = useSearchParams();
+
     const [api, contextHolder] = notification.useNotification();
     const doctor = useRecoilValue(doctorValue);
     const now = new Date();
@@ -31,12 +36,7 @@ const BookingAppointment = () => {
         `${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()}`
     );
     //
-    const [schedule, setSchedule] = useState<DoctorSchedule>(
-        {} as DoctorSchedule
-    );
-    const [scheduleDetail, setScheduleDetail] = useState<DoctorScheduleDetail>(
-        {} as DoctorScheduleDetail
-    );
+
     const patientProfile = useRecoilValue(patientProfileValue);
     const [patientProfileCopy, setPatientProfileCopy] =
         useState<PatientProfile>({} as PatientProfile);
@@ -55,83 +55,72 @@ const BookingAppointment = () => {
             description: message,
         });
     };
+    const [schedule, setSchedule] = useState<Schedules>({} as Schedules);
 
-    const handleClickTimeButton = (scheduleDetail: DoctorScheduleDetail) => {
+    const handleClickTimeButton = (schedule: Schedules) => {
         setOpenInputModal(true);
-        setScheduleDetail(scheduleDetail);
+        console.log(schedule);
+        setSchedule(schedule);
     };
     const cancelInputModal = () => {
         setOpenInputModal(false);
     };
 
-    const updateAvailableScheduleDetail = async (scheduleDetailId: number) => {
-        try {
-            const res =
-                await doctorScheduleDetailService.updateAvailableScheduleDetail(
-                    scheduleDetailId
-                );
+    // const getDoctorSchedule = async () => {
+    //     try {
+    //         const data = {
+    //             date: date,
+    //             doctorId: doctor.doctorId,
+    //         };
+    //         const result = await scheduleService.viewSchedule(data);
+    //         setSchedule(result);
+    //     } catch (err: any) {
+    //         setSchedule({} as DoctorSchedule);
+    //     }
+    // };
+    // const handleTimeOverRealTime = () => {
+    //     schedule.doctorScheduleDetails.forEach(
+    //         (detail: DoctorScheduleDetail) => {
+    //             if (detail.available === 1) {
+    //                 const now = new Date();
+    //                 const hours = now.getHours();
+    //                 const minutes = now.getMinutes();
+    //                 let startMinute = detail?.startTime?.split(':')[1];
+    //                 let startHour = detail?.startTime?.split(':')[0];
+    //                 if (Number(startHour) === Number(hours)) {
+    //                     if (Number(startMinute) === 0) {
+    //                         updateAvailableScheduleDetail(Number(detail?.id));
+    //                     }
+    //                     if (
+    //                         Math.abs(Number(startHour) - Number(minutes)) >= 20
+    //                     ) {
+    //                         updateAvailableScheduleDetail(Number(detail?.id));
+    //                     }
+    //                     if (Number(minutes) >= Number(startHour)) {
+    //                         updateAvailableScheduleDetail(Number(detail?.id));
+    //                     }
+    //                 }
 
-            getDoctorSchedule();
-        } catch (err: any) {
-            console.log(err.message);
-        }
-    };
-
-    const getDoctorSchedule = async () => {
-        try {
-            const data = {
-                date: date,
-                doctorId: doctor.doctorId,
-            };
-            const result = await scheduleService.viewSchedule(data);
-            setSchedule(result);
-        } catch (err: any) {
-            setSchedule({} as DoctorSchedule);
-        }
-    };
-    const handleTimeOverRealTime = () => {
-        schedule.doctorScheduleDetails.forEach(
-            (detail: DoctorScheduleDetail) => {
-                if (detail.available === 1) {
-                    const now = new Date();
-                    const hours = now.getHours();
-                    const minutes = now.getMinutes();
-                    let startMinute = detail?.startTime?.split(':')[1];
-                    let startHour = detail?.startTime?.split(':')[0];
-                    if (Number(startHour) === Number(hours)) {
-                        if (Number(startMinute) === 0) {
-                            updateAvailableScheduleDetail(Number(detail?.id));
-                        }
-                        if (
-                            Math.abs(Number(startHour) - Number(minutes)) >= 20
-                        ) {
-                            updateAvailableScheduleDetail(Number(detail?.id));
-                        }
-                        if (Number(minutes) >= Number(startHour)) {
-                            updateAvailableScheduleDetail(Number(detail?.id));
-                        }
-                    }
-
-                    if (
-                        Number(startHour) > Number(hours) &&
-                        Math.abs(Number(startHour) - Number(hours)) === 1 &&
-                        Number(startMinute) === 0
-                    ) {
-                        if (Math.abs(60 - Number(minutes)) <= 20) {
-                            updateAvailableScheduleDetail(Number(detail?.id));
-                        }
-                    }
-                    if (Number(startHour) < Number(hours)) {
-                        updateAvailableScheduleDetail(Number(detail?.id));
-                    }
-                }
-            }
-        );
-    };
+    //                 if (
+    //                     Number(startHour) > Number(hours) &&
+    //                     Math.abs(Number(startHour) - Number(hours)) === 1 &&
+    //                     Number(startMinute) === 0
+    //                 ) {
+    //                     if (Math.abs(60 - Number(minutes)) <= 20) {
+    //                         updateAvailableScheduleDetail(Number(detail?.id));
+    //                     }
+    //                 }
+    //                 if (Number(startHour) < Number(hours)) {
+    //                     updateAvailableScheduleDetail(Number(detail?.id));
+    //                 }
+    //             }
+    //         }
+    //     );
+    // };
 
     const CreateNotification = async (data: any) => {
         try {
-            const res = await NotificationService.createNotification(data);
+            const res = await notificationService.createNotification(data);
         } catch (err: any) {
             console.log(err);
         }
@@ -149,13 +138,13 @@ const BookingAppointment = () => {
         socket?.on('newAppointment', (newAppointment) => {
             console.log(newAppointment);
             setNewAppointment(newAppointment);
-            updateAvailableScheduleDetail(Number(scheduleDetail?.id));
+            // updateAvailableScheduleDetail(Number(scheduleDetail?.id));
         });
 
         return () => {
             socket?.off('newAppointment');
         };
-    }, [schedule, paymentMethod]);
+    }, [paymentMethod]);
     useEffect(() => {
         if (newAppointment?.id) {
             console.log('create invoice');
@@ -183,24 +172,27 @@ const BookingAppointment = () => {
         console.log('doctor booking', doctor);
     }, []);
     useEffect(() => {
-        getDoctorSchedule();
-    }, [date]);
-    useEffect(() => {
-        let intervalId: any;
-        if (schedule?.doctorScheduleDetails?.length > 0) {
-            const newDate = new Date(date);
-            const now = new Date();
-            if (newDate.getDate() === now.getDate()) {
-                intervalId = setInterval(() => {
-                    handleTimeOverRealTime();
-                }, 1000);
-            }
-        }
+        console.log('date', date);
 
-        return () => {
-            clearInterval(intervalId);
-        };
-    }, [schedule?.doctorScheduleDetails?.length]);
+        // getDoctorSchedule();
+    }, [date]);
+    const doctorId = searchParams.get('doctorId');
+    // useEffect(() => {
+    //     let intervalId: any;
+    //     if (schedule?.length > 0) {
+    //         const newDate = new Date(date);
+    //        const now = new Date();
+    //         if (newDate.getDate() === now.getDate()) {
+    //             intervalId = setInterval(() => {
+    //                 handleTimeOverRealTime();
+    //             }, 1000);
+    //         }
+    //     }
+
+    //     return () => {
+    //         clearInterval(intervalId);
+    //     };
+    // }, [schedule?.doctorScheduleDetails?.length]);
 
     return (
         <div className="container mt-4 mb-4">
@@ -229,7 +221,7 @@ const BookingAppointment = () => {
                                 date={date}
                                 doctor={doctor}
                                 setDate={setDate}
-                                setSchedule={setSchedule}
+                                // setSchedule={setSchedule}
                             />
                         </div>
                     </Col>
@@ -239,32 +231,11 @@ const BookingAppointment = () => {
                             Chọn thời gian khám
                         </div>
                         <div className="border rounded p-3">
-                            {schedule?.id ? (
-                                <Row gutter={[24, 24]}>
-                                    {schedule.doctorScheduleDetails.map(
-                                        (detail: DoctorScheduleDetail) => {
-                                            return detail.available === 1 ? (
-                                                <Col span={6}>
-                                                    <Button
-                                                        onClick={() => {
-                                                            handleClickTimeButton(
-                                                                detail
-                                                            );
-                                                        }}
-                                                    >
-                                                        {detail.startTime} -{' '}
-                                                        {detail.endTime}
-                                                    </Button>
-                                                </Col>
-                                            ) : (
-                                                <></>
-                                            );
-                                        }
-                                    )}
-                                </Row>
-                            ) : (
-                                <p>Bác sĩ không có thời gian trong hôm nay</p>
-                            )}
+                            <SchedulesComp
+                                entityId={doctor.doctorId ?? doctorId}
+                                date={date}
+                                handleClickTimeButton={handleClickTimeButton}
+                            />
                         </div>
                     </Col>
                 </Row>
@@ -280,7 +251,7 @@ const BookingAppointment = () => {
                     setPatientProfileCopy={setPatientProfileCopy}
                     patientProfile={patientProfile}
                     setPaymentMethod={setPaymentMethod}
-                    scheduleDetail={scheduleDetail}
+                    schedule={schedule}
                 />
             )}
         </div>

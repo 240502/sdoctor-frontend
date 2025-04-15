@@ -1,4 +1,4 @@
-import { DoctorSchedule } from './doctor_schedule';
+import { DoctorSchedule } from './schedule';
 
 export interface Pagination {
     pageIndex?: number;
@@ -46,4 +46,5 @@ export interface Doctor {
     serviceId: number;
     serviceName: string;
     averageStar: number;
+    titleName: string;
 }

@@ -10,7 +10,7 @@ export const useFetchClinicsWithPagination = (payload: {
         queryFn: async ({ pageParam = 1 }) => {
             return await clinicService.viewClinic({
                 ...payload,
-                pageSize: payload.pageSize ?? 6,
+                pageSize: payload.pageSize,
                 pageIndex: pageParam,
             });
         },

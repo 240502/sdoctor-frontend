@@ -14,8 +14,8 @@ import { DoctorScheduleDetail } from '../../../../models/doctor_schedule_details
 import { Time } from '../../../../models/time';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { configValue, userValue } from '../../../../stores/userAtom';
-import { scheduleService } from '../../../../services/doctor_schedule.service';
-import { DoctorSchedule } from '../../../../models/doctor_schedule';
+import { scheduleService } from '../../../../services';
+import { DoctorSchedule } from '../../../../models/schedule';
 import { handleGetDateByActiveDay } from '../../../../utils/schedule_management';
 type NotificationType = 'success' | 'error';
 import '@/assets/scss/schedule_management.scss';
@@ -89,7 +89,7 @@ const ScheduleManagement = () => {
                 (schedule: DoctorSchedule) => {
                     const date = new Date(schedule.date);
                     if (
-                        schedule.doctorId === user.doctorId &&
+                        schedule.entityId === user.doctorId &&
                         date.getFullYear() === dateOfWeek.getFullYear() &&
                         date.getMonth() + 1 === dateOfWeek.getMonth() + 1 &&
                         date.getDate() === dateOfWeek.getDate()
@@ -98,6 +98,7 @@ const ScheduleManagement = () => {
                     }
                 }
             );
+
             if (doctorSchedule) {
                 setSchedule(doctorSchedule);
                 getSelectedTimes(doctorSchedule.doctorScheduleDetails);

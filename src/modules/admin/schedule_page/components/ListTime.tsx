@@ -1,14 +1,17 @@
 import { useEffect, useState } from 'react';
 import { Button, Row, Col, message } from 'antd';
-import { TimeService } from '../../../../services/time.service';
 import { useRecoilState } from 'recoil';
 import { scheduleDetailsState } from '../../../../stores/scheduleDetailAtom';
 import { Time } from '../../../../models/time';
 import { CloseOutlined, PlusOutlined } from '@ant-design/icons';
 import { handleGetDateByActiveDay } from '../../../../utils/schedule_management';
-import { scheduleService } from '../../../../services/doctor_schedule.service';
+// import { scheduleService } from '../../../../services/doctor_schedule.service';
+import { doctorScheduleService, timeService } from '../../../../services';
 import { DoctorScheduleDetail } from '../../../../models/doctor_schedule_details';
 import { handleTimeOverRealTime } from '../../../../utils/schedule';
+import { SchedulesCreate } from '../../../../models';
+import useCreateDoctor from '../../../../hooks/doctors/useCreateDoctor';
+import { useCreateSchedules } from '../../../../hooks/schedules';
 
 type MessageType = 'success' | 'error' | 'warning';
 export const ListTime = ({
@@ -40,7 +43,7 @@ export const ListTime = ({
     const getTimeByType = async () => {
         try {
             const data = { timeType: interval };
-            const res = await TimeService.getTimeByTimeType(data);
+            const res = await timeService.getTimeByTimeType(data);
             const now = new Date();
             if (activeDay === now.getDay()) {
                 const newTimes = handleTimeOverRealTime(res);
@@ -60,6 +63,7 @@ export const ListTime = ({
             setTimes([]);
         }
     };
+    const createSchedules = useCreateSchedules(config);
     const handleCreateSchedule = () => {
         const now = new Date();
         let dateOfWeek;
@@ -68,53 +72,47 @@ export const ListTime = ({
         } else {
             dateOfWeek = handleGetDateByActiveDay(Number(activeDay));
         }
-        let newDoctorScheduleDetail: DoctorScheduleDetail[] =
-            [] as DoctorScheduleDetail[];
+        let schedules: SchedulesCreate[] = [];
         selectedTimes.forEach((time: Time) => {
-            const detail: DoctorScheduleDetail = {
-                id: 0,
+            const schedule: SchedulesCreate = {
+                entityId: user.user_id,
+                date: `${dateOfWeek.getFullYear()}-${
+                    dateOfWeek.getMonth() + 1
+                }-${dateOfWeek.getDate()}`,
+                entityType: 'Doctor',
                 timeId: time.id,
-                scheduleId: null,
-                available: 1,
-                action: 1,
-                startTime: null,
-                endTime: null,
             };
-            if (newDoctorScheduleDetail.length > 0) {
-                newDoctorScheduleDetail.push(detail);
-            } else {
-                newDoctorScheduleDetail = [detail];
-            }
+            schedules.push(schedule);
         });
-        const schedule = {
-            doctorId: user.doctorId,
-            date: `${dateOfWeek.getFullYear()}-${
-                dateOfWeek.getMonth() + 1
-            }-${dateOfWeek.getDate()}`,
-            doctorScheduleDetails: newDoctorScheduleDetail,
-        };
-        CreateSchedule(schedule);
+        console.log('schedules', schedules);
+
+        createSchedules.mutate(schedules);
+
+        // CreateSchedule(schedule);
     };
-    const CreateSchedule = async (data: any) => {
-        try {
-            const res = await scheduleService.createSchedule(data, config);
-            setSchedule(res?.data.result);
-            setDoctorScheduleDetails(res?.data?.result.listScheduleDetails);
-            openNotification(
-                'success',
-                'Thông báo !',
-                'Đăng ký lịch thành công'
-            );
-            handleGetScheduleBySubscriberAndDate();
-        } catch (err: any) {
-            console.log(err.message);
-            openNotification(
-                'error',
-                'Thông báo !',
-                'Đăng ký lịch không thành công'
-            );
-        }
-    };
+    // const CreateSchedule = async (data: any) => {
+    //     try {
+    //         const res = await doctorScheduleService.createSchedule(
+    //             data,
+    //             config
+    //         );
+    //         setSchedule(res?.data.result);
+    //         setDoctorScheduleDetails(res?.data?.result.listScheduleDetails);
+    //         openNotification(
+    //             'success',
+    //             'Thông báo !',
+    //             'Đăng ký lịch thành công'
+    //         );
+    //         handleGetScheduleBySubscriberAndDate();
+    //     } catch (err: any) {
+    //         console.log(err.message);
+    //         openNotification(
+    //             'error',
+    //             'Thông báo !',
+    //             'Đăng ký lịch không thành công'
+    //         );
+    //     }
+    // };
 
     const openMessage = (type: MessageType, message: string) => {
         messageApi.open({ type: type, content: message });
@@ -187,7 +185,10 @@ export const ListTime = ({
                 scheduleDetails: scheduleDetails,
             };
 
-            const res = await scheduleService.updateSchedule(data, config);
+            const res = await doctorScheduleService.updateSchedule(
+                data,
+                config
+            );
             handleGetScheduleBySubscriberAndDate();
             openNotification(
                 'success',

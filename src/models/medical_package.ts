@@ -24,4 +24,5 @@ export interface MedicalPackageOptions extends Pagination {
     categoryIds?: number[] | null;
     startPrice?: number | null;
     endPrice?: number | null;
+    location?: string | null;
 }

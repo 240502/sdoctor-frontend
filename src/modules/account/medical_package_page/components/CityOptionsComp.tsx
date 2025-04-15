@@ -3,11 +3,12 @@ import { ProvinceType } from '../../../../models';
 import axios from 'axios';
 import { Select } from 'antd';
 import { useRecoilState } from 'recoil';
-import { clinicFilterOptions } from '../../../../stores/clinicAtom';
+import { medicalPackageOptionsState } from '../../../../stores/medical_packageAtom';
 
 const CityOptionsComp = () => {
-    const [clinicOptions, setClinicOptions] =
-        useRecoilState(clinicFilterOptions);
+    const [medicalPackageOptions, setMedicalPackageOptions] = useRecoilState(
+        medicalPackageOptionsState
+    );
     const [provinces, setProvinces] = useState<ProvinceType[]>([]);
     const getProvinces = async () => {
         try {
@@ -33,8 +34,15 @@ const CityOptionsComp = () => {
             if (value.toLowerCase().includes('tỉnh')) {
                 province = value.slice(provinceStr.length, value.length);
             }
-            const newOptions = { ...clinicOptions, location: province.trim() };
-            setClinicOptions(newOptions);
+            setMedicalPackageOptions({
+                ...medicalPackageOptions,
+                location: province.trim(),
+            });
+        } else {
+            setMedicalPackageOptions({
+                ...medicalPackageOptions,
+                location: null,
+            });
         }
     };
     return (

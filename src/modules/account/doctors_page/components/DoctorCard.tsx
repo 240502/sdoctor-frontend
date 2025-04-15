@@ -84,8 +84,21 @@ export const DoctorCard = ({ doctors, handleUpdateViewsDoctor }: any) => {
                                     <Button
                                         className="booking-btn w-75 fs-6 fw-normal"
                                         onClick={() => {
-                                            navigate('/booking-appointment');
-                                            setDoctor(doctor);
+                                            const queryParams =
+                                                new URLSearchParams();
+                                            console.log(
+                                                'doctorId',
+                                                doctor.doctorId
+                                            );
+
+                                            queryParams.append(
+                                                'doctorId',
+                                                doctor.doctorId.toString()
+                                            );
+                                            //navigate(
+                                            //    `/booking-appointment?${queryParams}`
+                                            //);
+                                            //  setDoctor(doctor);
                                         }}
                                     >
                                         Đặt lịch bác sĩ

@@ -1,8 +1,15 @@
 import { apiClient } from '../constants/api';
 
 const scheduleService = {
-    async viewSchedule(data: object): Promise<any> {
-        const res = await apiClient.post('/doctor-schedule/view', data);
+    async getScheduleByEntityId(payload: {
+        entityId: number;
+        entityType: string;
+        date: string;
+    }): Promise<any> {
+        const res = await apiClient.post(
+            '/schedule/get-schedules-by-entityId',
+            payload
+        );
         return res.data;
     },
 
@@ -22,5 +29,6 @@ const scheduleService = {
         );
         return res;
     },
+    async updateScheduleStatus(scheduleId: number): Promise<any> {},
 };
 export default scheduleService;
