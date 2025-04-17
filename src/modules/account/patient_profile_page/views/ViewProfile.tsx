@@ -17,7 +17,7 @@ import dayjs from 'dayjs';
 import axios from 'axios';
 import { useRecoilState } from 'recoil';
 import { patientProfileState } from '../../../../stores/patientAtom';
-import { PatientProfileService } from '../../../../services/patient_profile.service';
+import { patientProfileService } from '../../../../services';
 import { PatientProfileLayout } from '../components/PatientProfileLayout';
 import { ModalConfirmDeletePatientProfile } from '../components/ModalConfirmDeletePatientProfile';
 import { PatientProfile } from '../../../../models/patient_profile';
@@ -116,7 +116,7 @@ const ViewProfile = () => {
     };
     const CreatePatientProfile = async (data: any) => {
         try {
-            const res = await PatientProfileService.createPatientProfile(data);
+            const res = await patientProfileService.createPatientProfile(data);
             console.log(res.data.result);
             localStorage.setItem('uuid', JSON.stringify(res.data.result.uuid));
             openNotificationWithIcon(
@@ -137,7 +137,7 @@ const ViewProfile = () => {
     };
     const UpdateProfile = async (newProfile: any) => {
         try {
-            const res = await PatientProfileService.updatePatientProfile(
+            const res = await patientProfileService.updatePatientProfile(
                 newProfile
             );
             console.log(res);
@@ -183,7 +183,7 @@ const ViewProfile = () => {
     };
     const handleDeleteProfile = async (uuid: string) => {
         try {
-            const res = await PatientProfileService.deletePatientProfile(uuid);
+            const res = await patientProfileService.deletePatientProfile(uuid);
             console.log(res);
             openNotificationWithIcon(
                 'success',
@@ -232,7 +232,7 @@ const ViewProfile = () => {
     };
     const getProfileByPhoneOrEmail = async (data: any) => {
         try {
-            const res = await PatientProfileService.getProfileByPhoneOrEmail(
+            const res = await patientProfileService.getProfileByPhoneOrEmail(
                 data
             );
             localStorage.setItem('uuid', res.uuid);

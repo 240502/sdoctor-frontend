@@ -1,16 +1,18 @@
 import { Button, Input, Modal, Form, Row, Col, Rate } from 'antd';
-import { CommentService } from '../../../../services/comment.service';
+import {
+    commentService,
+    notificationService,
+    doctorService,
+    appointmentService,
+} from '../../../../services';
 import { Comment, CommentCreate } from '../../../../models/comment';
 import { Appointment } from '../../../../models/appointment';
 import { useEffect, useState } from 'react';
-import { NotificationService } from '../../../../services/notification.service';
 import { useRecoilValue } from 'recoil';
 import { doctorListState } from '../../../../stores/doctorAtom';
 import { Doctor } from '../../../../models/doctor';
-import { doctorService } from '../../../../services/doctor.service';
 const { TextArea } = Input;
 import { NotificationCreate } from '../../../../models/notification';
-import { AppointmentService } from '../../../../services/appointment.service';
 export const InputCommentModal = ({
     openInputModal,
     handleCancelInputModal,
@@ -48,7 +50,7 @@ export const InputCommentModal = ({
     const [form] = Form.useForm();
     const createCommentForPatient = async (newComment: CommentCreate) => {
         try {
-            const res = await CommentService.createComment(newComment);
+            const res = await commentService.createComment(newComment);
             console.log(res);
             openNotificationWithIcon(
                 'success',
@@ -77,7 +79,7 @@ export const InputCommentModal = ({
     };
     const createNotification = async (newNotification: NotificationCreate) => {
         try {
-            const res = await NotificationService.createNotification(
+            const res = await notificationService.createNotification(
                 newNotification
             );
             console.log(res);
@@ -100,7 +102,7 @@ export const InputCommentModal = ({
             return updatedAppointments;
         });
         try {
-            const res = await AppointmentService.updateIsValuation(
+            const res = await appointmentService.updateIsValuation(
                 appointment.id
             );
             console.log(res);

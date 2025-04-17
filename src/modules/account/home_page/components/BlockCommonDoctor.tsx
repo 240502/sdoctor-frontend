@@ -107,8 +107,19 @@ export const BlockCommonDoctor = (): JSX.Element => {
                                             <Button
                                                 className="mt-2 border-primary text-primary w-75 btn-book-now"
                                                 onClick={() => {
+                                                    const queryParams =
+                                                        new URLSearchParams();
+                                                    console.log(
+                                                        'doctorId',
+                                                        doctor.doctorId
+                                                    );
+
+                                                    queryParams.append(
+                                                        'doctorId',
+                                                        doctor.doctorId.toString()
+                                                    );
                                                     navigate(
-                                                        '/booking-appointment'
+                                                        `/booking-appointment?${queryParams}`
                                                     );
                                                     setDoctor(doctor);
                                                 }}

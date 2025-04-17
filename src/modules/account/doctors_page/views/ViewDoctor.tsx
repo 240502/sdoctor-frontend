@@ -24,12 +24,7 @@ const ViewDoctor = () => {
         fetchNextPage,
         hasNextPage,
         isFetchingNextPage,
-    } = useFetchDoctorsWithPagination({
-        ...doctorOptions,
-        majorIds: searchParams.get('majorId')
-            ? [Number(searchParams.get('majorId'))]
-            : [],
-    });
+    } = useFetchDoctorsWithPagination(doctorOptions);
 
     const doctors = useMemo(() => {
         return data?.pages.flatMap((page) => page.data) ?? [];
@@ -40,12 +35,13 @@ const ViewDoctor = () => {
         window.scrollTo(0, 0);
         const majorId = searchParams.get('majorId');
         if (majorId) {
-            setDoctocOptions({
-                ...doctorOptions,
-                majorIds: [Number(majorId)],
-            });
+            if (doctorOptions.majorIds.length === 0) {
+                setDoctocOptions({
+                    ...doctorOptions,
+                    majorIds: [Number(majorId)],
+                });
+            }
         }
-        console.log('majorId:', majorId); // sẽ log ra "8"
     }, []);
 
     useEffect(() => {

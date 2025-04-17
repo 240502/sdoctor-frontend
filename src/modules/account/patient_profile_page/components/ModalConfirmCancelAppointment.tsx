@@ -1,6 +1,6 @@
 import { Button, Modal } from 'antd';
 import React, { useEffect, useRef } from 'react';
-import { AppointmentService } from '../../../../services/appointment.service';
+import { appointmentService } from '../../../../services';
 import TextArea from 'antd/es/input/TextArea';
 
 export const ModalConfirmCancelAppointment = ({
@@ -29,7 +29,7 @@ export const ModalConfirmCancelAppointment = ({
                 },
                 requirementObject: 'Bệnh nhân',
             };
-            const res = await AppointmentService.cancelAppointment(data);
+            // const res = await appointmentService.createAppointment(data);
 
             openNotificationWithIcon(
                 'success',

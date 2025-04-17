@@ -3,34 +3,27 @@ import {
     ClockCircleOutlined,
     HomeOutlined,
 } from '@ant-design/icons';
-import { Breadcrumb, Col, notification, Row, Button } from 'antd';
+import { Breadcrumb, Col, notification, Row } from 'antd';
 import 'dayjs/locale/vi';
 import { useEffect, useState } from 'react';
-import {
-    scheduleService,
-    notificationService,
-    invoicesService,
-} from '../../../../services';
+import { notificationService, invoicesService } from '../../../../services';
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
-import { doctorValue } from '../../../../stores/doctorAtom';
 import { BlockCalendar } from '../components/BlockCalendar';
-import { DoctorScheduleDetail } from '../../../../models/doctor_schedule_details';
 import { InputAppointmentModal } from '../components/InputAppointmentModal';
 import { patientProfileValue } from '../../../../stores/patientAtom';
-import { PatientProfile } from '../../../../models/patient_profile';
 import socket from '../../../../socket';
 import { newAppointmentState } from '../../../../stores/appointmentAtom';
 import { invoiceState } from '../../../../stores/invoice';
 import { useSearchParams } from 'react-router-dom';
 import SchedulesComp from '../components/SchedulesComp';
 import { Schedules } from '../../../../models';
+import { useFetchDoctorDetail } from '../../../../hooks';
 type NotificationType = 'success' | 'error';
 
 const BookingAppointment = () => {
     const [searchParams] = useSearchParams();
 
     const [api, contextHolder] = notification.useNotification();
-    const doctor = useRecoilValue(doctorValue);
     const now = new Date();
     const [date, setDate] = useState<string>(
         `${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()}`
@@ -38,8 +31,7 @@ const BookingAppointment = () => {
     //
 
     const patientProfile = useRecoilValue(patientProfileValue);
-    const [patientProfileCopy, setPatientProfileCopy] =
-        useState<PatientProfile>({} as PatientProfile);
+
     const [newAppointment, setNewAppointment] =
         useRecoilState(newAppointmentState);
     const setInvoice = useSetRecoilState(invoiceState);
@@ -59,7 +51,6 @@ const BookingAppointment = () => {
 
     const handleClickTimeButton = (schedule: Schedules) => {
         setOpenInputModal(true);
-        console.log(schedule);
         setSchedule(schedule);
     };
     const cancelInputModal = () => {
@@ -117,7 +108,12 @@ const BookingAppointment = () => {
     //         }
     //     );
     // };
+    const doctorId = searchParams.get('doctorId');
 
+    const { data, error, isFetching } = useFetchDoctorDetail(Number(doctorId));
+    useEffect(() => {
+        console.log('doctor', data);
+    }, [data]);
     const CreateNotification = async (data: any) => {
         try {
             const res = await notificationService.createNotification(data);
@@ -136,7 +132,6 @@ const BookingAppointment = () => {
 
     useEffect(() => {
         socket?.on('newAppointment', (newAppointment) => {
-            console.log(newAppointment);
             setNewAppointment(newAppointment);
             // updateAvailableScheduleDetail(Number(scheduleDetail?.id));
         });
@@ -147,19 +142,18 @@ const BookingAppointment = () => {
     }, [paymentMethod]);
     useEffect(() => {
         if (newAppointment?.id) {
-            console.log('create invoice');
             const newInvoice = {
                 appointmentId: newAppointment.id,
-                doctorId: newAppointment.doctorId,
-                serviceId: newAppointment.serviceId,
-                amount: newAppointment.price,
+                doctorId: data.doctorId,
+                serviceId: data.serviceId,
+                amount: data.price,
                 paymentMethod: paymentMethod,
-                patientName: newAppointment.patientName,
-                patientPhone: newAppointment.patientPhone,
             };
+            console.log('newInvoice', newInvoice);
+
             CreateInvoice(newInvoice);
             const newNotification = {
-                userId: doctor.userId,
+                userId: data.userId,
                 message: 'Bạn có một lịch hẹn mới!',
                 appointmentId: newAppointment.id,
             };
@@ -168,15 +162,14 @@ const BookingAppointment = () => {
     }, [newAppointment]);
     useEffect(() => {
         window.scrollTo(0, 0);
-        setPatientProfileCopy(patientProfile);
-        console.log('doctor booking', doctor);
+        console.log('patientProfile', patientProfile);
+        console.log('doctor booking', data);
     }, []);
     useEffect(() => {
         console.log('date', date);
 
         // getDoctorSchedule();
     }, [date]);
-    const doctorId = searchParams.get('doctorId');
     // useEffect(() => {
     //     let intervalId: any;
     //     if (schedule?.length > 0) {
@@ -219,7 +212,7 @@ const BookingAppointment = () => {
                         <div className="border rounded p-3">
                             <BlockCalendar
                                 date={date}
-                                doctor={doctor}
+                                doctor={data}
                                 setDate={setDate}
                                 // setSchedule={setSchedule}
                             />
@@ -232,7 +225,7 @@ const BookingAppointment = () => {
                         </div>
                         <div className="border rounded p-3">
                             <SchedulesComp
-                                entityId={doctor.doctorId ?? doctorId}
+                                entityId={data.doctorId ?? doctorId}
                                 date={date}
                                 handleClickTimeButton={handleClickTimeButton}
                             />
@@ -245,10 +238,8 @@ const BookingAppointment = () => {
                     openModal={openInputModal}
                     cancelModal={cancelInputModal}
                     date={date}
-                    doctor={doctor}
-                    patientProfileCopy={patientProfileCopy}
+                    doctor={data}
                     openNotification={openNotification}
-                    setPatientProfileCopy={setPatientProfileCopy}
                     patientProfile={patientProfile}
                     setPaymentMethod={setPaymentMethod}
                     schedule={schedule}

@@ -7,7 +7,7 @@ interface SchedulesResponse {
     entityId: number;
     entityType: string;
 }
-export const useFetchSchedulesByEntityId = (payload: {
+export const useFetchSchedulesByEntityIdAndDate = (payload: {
     entityId: number;
     date: string;
     entityType: string;

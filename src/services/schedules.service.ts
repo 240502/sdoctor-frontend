@@ -14,11 +14,7 @@ const scheduleService = {
     },
 
     async createSchedule(data: any, config: any): Promise<any> {
-        const res = await apiClient.post(
-            '/doctor-schedule/create',
-            data,
-            config
-        );
+        const res = await apiClient.post('/schedule/create', data, config);
         return res;
     },
     async updateSchedule(data: any, config: any): Promise<any> {

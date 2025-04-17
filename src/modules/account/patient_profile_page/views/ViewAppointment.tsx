@@ -6,7 +6,12 @@ import {
     Appointment,
     AppointmentViewForPatient,
 } from '../../../../models/appointment';
-import { AppointmentService } from '../../../../services/appointment.service';
+import {
+    appointmentService,
+    appointmentStatusService,
+    invoicesService,
+    paymentService,
+} from '../../../../services';
 import {
     Button,
     Col,
@@ -33,18 +38,16 @@ import {
 import { ModalConfirmCancelAppointment } from '../components/ModalConfirmCancelAppointment';
 import { useNavigate } from 'react-router-dom';
 import { AppointmentStatus } from '../../../../models/appointment_status';
-import { AppointmentStatusService } from '../../../../services/appointment_status.service';
 type NotificationType = 'success' | 'error';
 import { FilterDropdownProps } from 'antd/es/table/interface';
 import { SearchOutlined } from '@ant-design/icons';
 import Highlighter from 'react-highlight-words';
 import '@/assets/scss/patient_profile.scss';
 import dayjs from 'dayjs';
-import { invoicesService } from '../../../../services/invoices.service';
 import { Invoices } from '../../../../models/invoices';
-import { paymentService } from '../../../../services/payment.service';
 import { InputCommentModal } from '../components/InputCommentModal';
 import { ViewAppointmentModal } from '../../../../components';
+import { useFetchAppointmentByUuid } from '../../../../hooks/appointments/useFetchAppointmentByUuid';
 type DataIndex = keyof AppointmentViewForPatient;
 const { Option } = Select;
 const ViewAppointment = () => {
@@ -73,9 +76,23 @@ const ViewAppointment = () => {
     const [appointments, setAppointments] = useState<
         AppointmentViewForPatient[]
     >([]);
+
+    const { data, error, isFetching } = useFetchAppointmentByUuid({
+        uuid: '7cef6831-d6ca-41db-ab33-c51ae25f5989',
+        pageIndex: 1,
+        pageSize: 10,
+    });
+    useEffect(() => {
+        if (data) {
+            console.log('data', data);
+        }
+        if (error) {
+            console.log('error', error);
+        }
+    }, [data, error, isFetching]);
     const getAllAppointmentStatus = async () => {
         try {
-            const res = await AppointmentStatusService.getAll();
+            const res = await appointmentStatusService.getAll();
             console.log(res);
             setAppointmentStatuses(res);
         } catch (err: any) {
@@ -205,7 +222,7 @@ const ViewAppointment = () => {
         try {
             const res = await paymentService.create(invoice);
             console.log(res);
-            window.location.href = res?.data?.order_url;
+            window.location.href = res?.data?.orderurl;
         } catch (err: any) {
             console.log(err.message);
         }
@@ -382,7 +399,7 @@ const ViewAppointment = () => {
             statusId: options.statusId,
         };
         try {
-            const res = await AppointmentService.viewAppointment(data);
+            const res = await appointmentService.viewAppointment(data);
             console.log(res);
             setAppointments(res.data);
             setPageCount(res.pageCount);

@@ -17,7 +17,7 @@ const BookingSuccess = () => {
         try {
             const res = await paymentService.create(invoice);
             console.log(res);
-            window.location.href = res?.data?.order_url;
+            window.location.href = res?.data?.orderurl;
         } catch (err: any) {
             console.log(err.message);
         }
@@ -65,7 +65,7 @@ const BookingSuccess = () => {
                 )}
 
                 <Space style={{ marginTop: '24px' }}>
-                    {invoice.paymentMethod === 2 && (
+                    {
                         <Button
                             type="primary"
                             onClick={() => {
@@ -74,7 +74,7 @@ const BookingSuccess = () => {
                         >
                             Thanh toán
                         </Button>
-                    )}
+                    }
                     <Button onClick={() => navigate('/patient/appointment')}>
                         Xem chi tiết
                     </Button>

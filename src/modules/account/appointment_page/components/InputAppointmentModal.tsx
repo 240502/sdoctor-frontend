@@ -17,25 +17,24 @@ import TextArea from 'antd/es/input/TextArea';
 import { useEffect, useState } from 'react';
 import { ProvinceType, DistrictType, WardType } from '../../../../models/other';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { DatePickerProps } from 'antd/lib';
 import { useSetRecoilState } from 'recoil';
 import { patientProfileState } from '../../../../stores/patientAtom';
 import { PaymentMethod } from '../../../../models/payment_method';
 import { paymentMethodService } from '../../../../services';
+import { useCreateAppointment } from '../../../../hooks/appointments';
+
 export const InputAppointmentModal = ({
     openModal,
     cancelModal,
     date,
     doctor,
-    patientProfileCopy,
-    openNotification,
-    setPatientProfileCopy,
     patientProfile,
     setPaymentMethod,
     schedule,
 }: any) => {
-    console.log('schedule', schedule);
+    const [searchParams] = useSearchParams();
 
     const [provinces, setProvinces] = useState<ProvinceType[]>([]);
     const [districts, setDistricts] = useState<DistrictType[]>([]);
@@ -61,31 +60,23 @@ export const InputAppointmentModal = ({
     };
 
     useEffect(() => console.log(paymentMethods), [paymentMethods]);
-    useEffect(() => console.log('doctor input', doctor), []);
-
+    useEffect(() => {
+        console.log('doctor input', doctor);
+        console.log('schedule', schedule);
+    }, []);
+    const createAppointment = useCreateAppointment();
     const onFinish = (values: any) => {
         setPaymentMethod(values.payment_method);
-        // const newAppointment = {
-        //     doctorId: doctor?.doctorId,
-        //     appointmentDate: date,
-        //     patientName: values.patientName,
-        //     patientPhone: values.phone,
-        //     patientEmail: values.email,
-        //     birthday: dayjs(values.birthday).format('YYYY-MM-DD'),
-        //     province: values.patientProvince,
-        //     district: values.patientDistrict,
-        //     commune: values.patientCommune,
-        //     gender: values.gender,
-        //     examinationReason: values.reason,
-        //     doctorName: doctor?.fullName,
-        //     location: doctor.location,
-        //     timeValue: `${scheduleDetail.startTime} - ${scheduleDetail.endTime}`,
-        //     timeId: scheduleDetail.timeId,
-        //     price: doctor.price,
-        //     serviceId: doctor.serviceId,
-        //     serviceName: doctor.serviceName,
-        // };
-        // CreateAppointment(newAppointment);
+        const newAppointment = {
+            doctorId: doctor?.doctorId,
+            appointmentDate: date,
+            examinationReason: values.reason,
+            location: doctor.location,
+            uuid: patientProfile.uuid,
+            scheduleId: schedule.id,
+            type: 'doctor',
+        };
+        createAppointment.mutate(newAppointment);
         if (saveProfile) {
             // UpdateProfile();
         }
@@ -169,14 +160,14 @@ export const InputAppointmentModal = ({
     };
     const onChange: DatePickerProps['onChange'] = (date, dateString) => {
         console.log(date, dateString);
-        setPatientProfileCopy({ ...patientProfileCopy, birthday: dateString });
+        //  setPatientProfileCopy({ ...patientProfileCopy, birthday: dateString });
     };
 
     //find province when patient had a profile
     useEffect(() => {
         const getProvince = () => {
             const province: any = provinces.find(
-                (item) => item?.province_name === patientProfileCopy.province
+                (item) => item?.province_name === patientProfile.province
             );
             if (province) {
                 setProvince(province);
@@ -191,7 +182,7 @@ export const InputAppointmentModal = ({
     useEffect(() => {
         const getDistrict = () => {
             const district: any = districts.find(
-                (item) => item.district_name === patientProfileCopy.district
+                (item) => item.district_name === patientProfile.district
             );
             if (district) {
                 setDistrict(district);
@@ -205,7 +196,7 @@ export const InputAppointmentModal = ({
     useEffect(() => {
         const getWards = () => {
             const ward = wards.find(
-                (item) => item.ward_name === patientProfileCopy.commune
+                (item) => item.ward_name === patientProfile.commune
             );
             if (ward) {
                 setWard(ward);
@@ -235,7 +226,7 @@ export const InputAppointmentModal = ({
     useEffect(() => {
         const getProvince = () => {
             const province: any = provinces.find(
-                (item) => item?.province_name === patientProfileCopy.province
+                (item) => item?.province_name === patientProfile.province
             );
             if (province) {
                 setProvince(province);
@@ -259,6 +250,10 @@ export const InputAppointmentModal = ({
         };
         getProvinces();
         getAllPaymentMethod();
+        console.log('doctor', doctor);
+        if (doctor) {
+            const doctorId = searchParams.get('doctorId');
+        }
     }, []);
     return (
         <Modal
@@ -326,17 +321,17 @@ export const InputAppointmentModal = ({
                         layout="vertical"
                         onFinish={onFinish}
                         initialValues={{
-                            patientName: patientProfileCopy.patientName,
-                            gender: patientProfileCopy.gender, // Giá trị mặc định: Nam,
-                            email: patientProfileCopy.patientEmail,
-                            phone: patientProfileCopy.patientPhone,
+                            patientName: patientProfile.patientName,
+                            gender: patientProfile.gender, // Giá trị mặc định: Nam,
+                            email: patientProfile.patientEmail,
+                            phone: patientProfile.patientPhone,
                             birthday: dayjs(
-                                patientProfileCopy.birthday,
+                                patientProfile.birthday,
                                 'YYYY-MM-DD'
                             ),
-                            patientProvince: patientProfileCopy.province,
-                            patientDistrict: patientProfileCopy?.district,
-                            patientCommune: patientProfileCopy?.commune,
+                            patientProvince: patientProfile.province,
+                            patientDistrict: patientProfile?.district,
+                            patientCommune: patientProfile?.commune,
                             payment_method: 1,
                         }}
                     >
@@ -368,10 +363,10 @@ export const InputAppointmentModal = ({
                             <Input
                                 placeholder="Nhập họ và tên..."
                                 onChange={(e) => {
-                                    setPatientProfileCopy({
-                                        ...patientProfileCopy,
-                                        patient_name: e.target.value,
-                                    });
+                                    // setPatientProfileCopy({
+                                    //     ...patientProfileCopy,
+                                    //     patient_name: e.target.value,
+                                    // });
                                 }}
                                 // value={patientProfile?.patient_name}
                             />
@@ -410,10 +405,10 @@ export const InputAppointmentModal = ({
                             <Input
                                 placeholder="Nhập địa chỉ email..."
                                 onChange={(e) => {
-                                    setPatientProfileCopy({
-                                        ...patientProfileCopy,
-                                        patient_email: e.target.value,
-                                    });
+                                    // setPatientProfileCopy({
+                                    //     ...patientProfileCopy,
+                                    //     patient_email: e.target.value,
+                                    // });
                                 }}
                             />
                         </Form.Item>
@@ -436,10 +431,10 @@ export const InputAppointmentModal = ({
                             <Input
                                 placeholder="Nhập số điện thoại..."
                                 onChange={(e) => {
-                                    setPatientProfileCopy({
-                                        ...patientProfileCopy,
-                                        patient_phone: e.target.value,
-                                    });
+                                    // setPatientProfileCopy({
+                                    //     ...patientProfileCopy,
+                                    //     patient_phone: e.target.value,
+                                    // });
                                 }}
                             />
                         </Form.Item>
@@ -482,10 +477,10 @@ export const InputAppointmentModal = ({
                                             return province.province_name === e;
                                         }
                                     );
-                                    setPatientProfileCopy({
-                                        ...patientProfileCopy,
-                                        province: pro.province_name,
-                                    });
+                                    // setPatientProfileCopy({
+                                    //     ...patientProfileCopy,
+                                    //     province: pro.province_name,
+                                    // });
                                     setProvince(pro);
 
                                     form.setFieldValue('patientDistrict', null);
@@ -526,10 +521,10 @@ export const InputAppointmentModal = ({
                                             return item.district_name === e;
                                         }
                                     );
-                                    setPatientProfileCopy({
-                                        ...patientProfileCopy,
-                                        district: dis.district_name,
-                                    });
+                                    // setPatientProfileCopy({
+                                    //     ...patientProfileCopy,
+                                    //     district: dis.district_name,
+                                    // });
                                     setDistrict(dis);
                                     form.setFieldValue('patientCommune', null);
                                 }}
@@ -564,10 +559,10 @@ export const InputAppointmentModal = ({
                                 optionFilterProp="children"
                                 onChange={(e) => {
                                     console.log(e);
-                                    setPatientProfileCopy({
-                                        ...patientProfileCopy,
-                                        commune: e,
-                                    });
+                                    // setPatientProfileCopy({
+                                    //     ...patientProfileCopy,
+                                    //     commune: e,
+                                    // });
                                 }}
                             >
                                 {wards.map((ward: WardType) => {

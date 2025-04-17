@@ -1,6 +1,16 @@
+import { AxiosResponse } from 'axios';
 import { apiClient } from '../constants/api';
+import { Appointment } from '../models';
 
 const appointmentService = {
+    async getAppointmentByUuid(payload: any): Promise<Appointment[] | any> {
+        const res = await apiClient.get(
+            `/appointment/get-appointment-by-uuid?uuid=${payload.uuid}&pageIndex=${payload.pageIndex}&pageSize=${payload.pageSize}`,
+            payload
+        );
+        return res.data;
+    },
+
     async getAppointmentById(id: number): Promise<any> {
         const res = await apiClient.get('/appointment/get-by-id/' + id);
         return res.data;

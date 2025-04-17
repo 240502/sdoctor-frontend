@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { useFetchSchedulesByEntityId } from '../../../../hooks/schedules/useFetchSchedulesByEntityId';
+import { useFetchSchedulesByEntityIdAndDate } from '../../../../hooks/schedules/useFetchSchedulesByEntityIdAndDate';
 import { Button, Col, Row, Skeleton } from 'antd';
 import { Schedules } from '../../../../models';
 
@@ -8,7 +8,7 @@ const SchedulesComp = (props: {
     date: string;
     handleClickTimeButton: any;
 }) => {
-    const { data, error, isFetching } = useFetchSchedulesByEntityId({
+    const { data, error, isFetching } = useFetchSchedulesByEntityIdAndDate({
         entityId: props.entityId,
         date: props.date,
         entityType: 'doctor',

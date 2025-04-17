@@ -6,7 +6,7 @@ import { Time } from '../../../../models/time';
 import { CloseOutlined, PlusOutlined } from '@ant-design/icons';
 import { handleGetDateByActiveDay } from '../../../../utils/schedule_management';
 // import { scheduleService } from '../../../../services/doctor_schedule.service';
-import { doctorScheduleService, timeService } from '../../../../services';
+import { scheduleService, timeService } from '../../../../services';
 import { DoctorScheduleDetail } from '../../../../models/doctor_schedule_details';
 import { handleTimeOverRealTime } from '../../../../utils/schedule';
 import { SchedulesCreate } from '../../../../models';
@@ -185,10 +185,7 @@ export const ListTime = ({
                 scheduleDetails: scheduleDetails,
             };
 
-            const res = await doctorScheduleService.updateSchedule(
-                data,
-                config
-            );
+            const res = await scheduleService.updateSchedule(data, config);
             handleGetScheduleBySubscriberAndDate();
             openNotification(
                 'success',

@@ -7,3 +7,4 @@ export * from './post_categories';
 export * from './department';
 export * from './medical_package_category';
 export * from './degrees';
+export * from './invoice';
