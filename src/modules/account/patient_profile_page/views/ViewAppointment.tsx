@@ -4,6 +4,7 @@ import { useRecoilValue } from 'recoil';
 import { patientProfileValue } from '../../../../stores/patientAtom';
 import {
     Appointment,
+    AppointmentResponseDto,
     AppointmentViewForPatient,
 } from '../../../../models/appointment';
 import {
@@ -21,6 +22,7 @@ import {
     Pagination,
     Row,
     Select,
+    Skeleton,
     Space,
     Table,
     Tag,
@@ -58,30 +60,31 @@ const ViewAppointment = () => {
     const [isView, setIsView] = useState<boolean>(false);
     const [api, contextHolder] = notification.useNotification();
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-    const [pageIndex, setPageIndex] = useState<number>(1);
-    const [pageSize, setPageSize] = useState<number>(10);
-    const [pageCount, setPageCount] = useState<number>(0);
     const [isOpenModalConfirm, setIsOpenModalConfirm] =
         useState<boolean>(false);
     const [openInputCommentModal, setOpenInputCommentModal] =
         useState<boolean>(false);
     const patientProfile = useRecoilValue(patientProfileValue);
-    const [appointment, setAppointment] = useState<Appointment>(
-        {} as Appointment
+    const [appointment, setAppointment] = useState<AppointmentResponseDto>(
+        {} as AppointmentResponseDto
     );
     const [appointmentStatuses, setAppointmentStatuses] = useState<
         AppointmentStatus[]
     >([]);
-    const [options, setOptions] = useState<any>({ statusId: 1 });
-    const [appointments, setAppointments] = useState<
-        AppointmentViewForPatient[]
-    >([]);
-
-    const { data, error, isFetching } = useFetchAppointmentByUuid({
-        uuid: '7cef6831-d6ca-41db-ab33-c51ae25f5989',
+    const [options, setOptions] = useState<{
+        statusId: number;
+        pageIndex: number;
+        pageSize: number;
+        uuid: string;
+    }>({
+        statusId: 1,
         pageIndex: 1,
-        pageSize: 10,
+        pageSize: 8,
+        uuid: patientProfile.uuid,
     });
+
+    const { data, error, isFetching, refetch, isRefetching } =
+        useFetchAppointmentByUuid(options);
     useEffect(() => {
         if (data) {
             console.log('data', data);
@@ -101,14 +104,14 @@ const ViewAppointment = () => {
             console.log(err.message);
         }
     };
-    const onChangePage = (current: number, size: number) => {
-        if (size !== pageSize) {
-            setPageSize(size);
-            setPageIndex(1);
-        } else {
-            setPageIndex(current);
-        }
-    };
+    // const onChangePage = (current: number, size: number) => {
+    //     if (size !== pageSize) {
+    //         setPageSize(size);
+    //         setPageIndex(1);
+    //     } else {
+    //         setPageIndex(current);
+    //     }
+    // };
     const handleSearch = (
         selectedKeys: string[],
         confirm: FilterDropdownProps['confirm'],
@@ -230,7 +233,7 @@ const ViewAppointment = () => {
     const handleCancelInputModal = () => {
         setOpenInputCommentModal(false);
     };
-    const columns: TableColumnsType<AppointmentViewForPatient> = [
+    const columns: TableColumnsType<AppointmentResponseDto> = [
         {
             title: 'Bác sĩ',
             className: 'patient-name',
@@ -247,6 +250,9 @@ const ViewAppointment = () => {
         {
             title: 'Thời gian',
             dataIndex: 'timeValue',
+            render: (_, record) => (
+                <>{record.startTime + '-' + record.endTime}</>
+            ),
         },
         {
             title: 'Trạng thái lịch hẹn',
@@ -298,14 +304,14 @@ const ViewAppointment = () => {
                             : 'blue'
                     }
                 >
-                    {record.invoiceStatus.toUpperCase()}
+                    {record?.invoiceStatus?.toUpperCase()}
                 </Tag>
             ),
         },
         {
             title: 'Action',
             key: 'action',
-            render: (text: string, record: Appointment) => (
+            render: (text: string, record: AppointmentResponseDto) => (
                 <Row gutter={24} className="">
                     {record.statusId === 4 && (
                         <Col span={6} className="text-center">
@@ -391,34 +397,16 @@ const ViewAppointment = () => {
         },
     ];
 
-    const getAppointmentByPatientPhone = async () => {
-        const data = {
-            pageIndex: pageIndex,
-            pageSize: pageSize,
-            phone: patientProfile.patientPhone,
-            statusId: options.statusId,
-        };
-        try {
-            const res = await appointmentService.viewAppointment(data);
-            console.log(res);
-            setAppointments(res.data);
-            setPageCount(res.pageCount);
-        } catch (err: any) {
-            console.log(err.message);
-            setAppointments([]);
-            setPageCount(0);
-        }
-    };
     const handleCancelModal = () => {
         setIsModalOpen(false);
     };
     const handleCancelModalConfirm = () => {
         setIsOpenModalConfirm(false);
-        setAppointment({} as Appointment);
+        setAppointment({} as AppointmentResponseDto);
     };
     const handleCancelModalInput = () => {
         setOpenInputCommentModal(false);
-        setAppointment({} as Appointment);
+        setAppointment({} as AppointmentResponseDto);
     };
     const openNotificationWithIcon = (
         type: NotificationType,
@@ -432,18 +420,16 @@ const ViewAppointment = () => {
     };
 
     useEffect(() => {
-        getAppointmentByPatientPhone();
-    }, [pageIndex, pageSize, options]);
-    useEffect(() => {
         window.scrollTo(0, 0);
         getAllAppointmentStatus();
     }, []);
     useEffect(() => {
-        console.log('appointments', appointments);
-    }, [appointments]);
+        console.log('appointment', appointment);
+    }, [appointment]);
     return (
         <PatientProfileLayout breadcrumb={'Lịch hẹn'}>
             <Flex className="mb-3">
+                {contextHolder}
                 <div className="col-4">
                     <Select
                         className="w-50"
@@ -466,16 +452,61 @@ const ViewAppointment = () => {
                     </Select>
                 </div>
             </Flex>
-            {appointments?.length > 0 ? (
+            <Skeleton active loading={isFetching || isRefetching}>
+                {error ? (
+                    <p className="fw-bold text-center">{error.message}</p>
+                ) : (
+                    <>
+                        {' '}
+                        <Table<AppointmentResponseDto>
+                            className="table-appointment"
+                            bordered
+                            columns={columns}
+                            dataSource={data?.appointments}
+                            pagination={false}
+                        />
+                        <Pagination
+                            pageSize={data?.pageSize}
+                            current={data?.pageIndex}
+                            total={
+                                data?.appointments
+                                    ? data?.pageCount * data?.pageSize
+                                    : 0
+                            }
+                            align="center"
+                            className="mt-3"
+                            showSizeChanger
+                            pageSizeOptions={['5', '10', '20', '30']}
+                            // onChange={onChangePage}
+                        />
+                        {isModalOpen && (
+                            <ViewAppointmentModal
+                                handleCancelModal={handleCancelModal}
+                                isModalOpen
+                                appointment={appointment}
+                            />
+                        )}
+                        {isOpenModalConfirm && (
+                            <ModalConfirmCancelAppointment
+                                isOpenModalConfirm
+                                handleCancelModalConfirm={
+                                    handleCancelModalConfirm
+                                }
+                                appointment={appointment}
+                                setIsOpenModalConfirm={setIsOpenModalConfirm}
+                                openNotificationWithIcon={
+                                    openNotificationWithIcon
+                                }
+                                refetch={refetch}
+                            />
+                        )}
+                    </>
+                )}
+            </Skeleton>
+
+            {/* {appointments.length > 0 ? (
                 <>
                     {contextHolder}{' '}
-                    <Table<AppointmentViewForPatient>
-                        className="table-appointment"
-                        bordered
-                        columns={columns}
-                        dataSource={appointments}
-                        pagination={false}
-                    />
                     {pageCount > 1 && (
                         <Pagination
                             pageSize={pageSize}
@@ -517,10 +548,7 @@ const ViewAppointment = () => {
                             handleCancelModalInput={handleCancelModalInput}
                         />
                     )}
-                </>
-            ) : (
-                <div>Không có lịch hẹn nào</div>
-            )}
+                </> */}
         </PatientProfileLayout>
     );
 };

@@ -1,18 +1,28 @@
 import { useQuery, UseQueryResult } from '@tanstack/react-query';
 import { appointmentService } from '../../services';
-import { Appointment } from '../../models';
+import { AppointmentResponseDto } from '../../models';
 
 interface PayloadType {
     uuid: string;
     pageIndex?: number;
     pageSize?: number;
+    status?: number;
 }
+interface AppointmentResponse {
+    appointments: AppointmentResponseDto[];
+    pageIndex: number;
+    pageSize: number;
+    pageCount: number;
+    totalItems: number;
+}
+
 export const useFetchAppointmentByUuid = (
     payload: PayloadType
-): UseQueryResult<Appointment[], Error> => {
-    return useQuery<Appointment[], Error>({
+): UseQueryResult<AppointmentResponse, Error> => {
+    return useQuery<AppointmentResponse, Error>({
         queryKey: ['useFetchAppointmentByUuid', payload],
         queryFn: () => appointmentService.getAppointmentByUuid(payload),
+
         refetchOnWindowFocus: false,
         retry: false,
     });

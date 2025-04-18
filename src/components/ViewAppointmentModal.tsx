@@ -13,7 +13,7 @@ const ViewAppointmentModal = ({
     isModalOpen,
     appointment,
 }: any) => {
-    const dateFormat = 'YYYY-MM-DD';
+    const dateFormat = 'DD-MM-YYYY';
     const [doctor, setDoctor] = useState<Doctor>({} as Doctor);
     const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
     const getDoctorById = async (id: number) => {
@@ -73,16 +73,21 @@ const ViewAppointmentModal = ({
                             className="rounded-circle"
                             width={115}
                         ></Image>
-                        <h6 className="doctor__name mt-3">{doctor.fullName}</h6>
+                        <h6 className="doctor__name mt-3">
+                            {doctor?.fullName}
+                        </h6>
                     </div>
                     <div className="appointment__time mt-3">
                         <p className="time">
-                            <strong>Thời gian:</strong> {appointment.timeValue}
+                            <strong>Thời gian:</strong>{' '}
+                            {appointment?.startTime +
+                                '-' +
+                                appointment?.endTime}
                         </p>
                         <p className="date">
                             <strong>Ngày khám:</strong>{' '}
-                            {appointment.appointmentDate
-                                .toString()
+                            {appointment?.appointmentDate
+                                ?.toString()
                                 .slice(0, 10)}
                         </p>
                     </div>
@@ -95,7 +100,7 @@ const ViewAppointmentModal = ({
                     <div className="fee mt-3">
                         <span>
                             <strong>Phí khám:</strong>{' '}
-                            {appointment.price.toLocaleString(undefined)} đ
+                            {appointment.amount.toLocaleString(undefined)} đ
                         </span>
                     </div>
                 </div>
@@ -124,7 +129,7 @@ const ViewAppointmentModal = ({
                                 Giới tính
                             </label>
                             <Radio.Group
-                                value={Number(appointment.gender)}
+                                value={Number(appointment?.gender)}
                                 className="d-block"
                             >
                                 <Radio value={1}>Nam</Radio>
@@ -179,6 +184,7 @@ const ViewAppointmentModal = ({
                                     appointment.birthday,
                                     dateFormat
                                 )}
+                                format={dateFormat}
                                 className="d-block"
                             />
                         </div>
@@ -208,7 +214,7 @@ const ViewAppointmentModal = ({
                                 Lý do khám
                             </label>
                             <TextArea
-                                value={appointment.examinationReason}
+                                value={appointment?.examinationReason}
                                 className="form-control"
                             ></TextArea>
                             <div
@@ -223,7 +229,7 @@ const ViewAppointmentModal = ({
                             </label>
                             <Radio.Group
                                 className="d-block"
-                                value={appointment.paymentMethod}
+                                value={appointment?.paymentMethod}
                             >
                                 {paymentMethods.map(
                                     (paymentMethod: PaymentMethod) => {

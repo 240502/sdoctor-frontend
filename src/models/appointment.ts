@@ -40,3 +40,34 @@ export interface AppointmentCreate {
     scheduleId: number;
     type: string;
 }
+
+export interface AppointmentResponseDto {
+    id: number;
+    doctorId: number;
+    appointmentDate: Date;
+    examinationReason: string;
+    statusId: number;
+    createdAt: Date;
+    updatedAt: Date;
+    location: string;
+    isEvaluate: number;
+    uuid: string;
+    scheduleId: number;
+    type: string;
+    statusName: string;
+    invoiceStatus: string;
+    paymentMethod: number;
+    doctorName: string;
+    startTime: string;
+    endTime: string;
+    amount: number;
+    patientName: string;
+    gender: number;
+    patientPhone: string;
+    patientEmail: string;
+    birthday: Date;
+    province: string;
+    district: string;
+    commune: string;
+    rejectionReason: string;
+}

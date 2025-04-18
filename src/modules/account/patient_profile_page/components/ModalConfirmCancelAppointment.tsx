@@ -2,6 +2,8 @@ import { Button, Modal } from 'antd';
 import React, { useEffect, useRef } from 'react';
 import { appointmentService } from '../../../../services';
 import TextArea from 'antd/es/input/TextArea';
+import { useUpdateAppointmentStatus } from '../../../../hooks/appointments/useUpdateAppointment';
+import { AppointmentResponseDto } from '../../../../models';
 
 export const ModalConfirmCancelAppointment = ({
     isOpenModalConfirm,
@@ -9,14 +11,28 @@ export const ModalConfirmCancelAppointment = ({
     appointment,
     setIsOpenModalConfirm,
     openNotificationWithIcon,
-    getAppointmentByPatientPhone,
-}: any) => {
+    refetch,
+}: {
+    isOpenModalConfirm: any;
+    handleCancelModalConfirm: any;
+    appointment: AppointmentResponseDto;
+    setIsOpenModalConfirm: any;
+    openNotificationWithIcon: any;
+    refetch: any;
+}) => {
     const rejectionReasonInputRef = useRef<any>(null);
     const focusTextArea = () => {
         if (rejectionReasonInputRef.current) {
             rejectionReasonInputRef.current.focus();
         }
     };
+    const {
+        mutate: updateAppointmentStatus,
+        isPending,
+        isSuccess,
+        isError,
+        error,
+    } = useUpdateAppointmentStatus();
     const handleCancelAppointment = async () => {
         try {
             const data = {
@@ -37,7 +53,7 @@ export const ModalConfirmCancelAppointment = ({
                 'Hủy lịch hẹn thành công!'
             );
             setIsOpenModalConfirm(false);
-            getAppointmentByPatientPhone();
+            refetch();
         } catch (err: any) {
             console.log(err.message);
             openNotificationWithIcon(
@@ -65,7 +81,38 @@ export const ModalConfirmCancelAppointment = ({
                 <Button
                     key={'ok'}
                     className="bg-danger text-white"
-                    onClick={handleCancelAppointment}
+                    onClick={() => {
+                        const data = {
+                            appointment: {
+                                ...appointment,
+                                statusId: 3,
+                                rejectionReason:
+                                    rejectionReasonInputRef.current
+                                        ?.resizableTextArea?.textArea.value,
+                            },
+                            requirementObject: 'patient',
+                        };
+                        updateAppointmentStatus(data, {
+                            onSuccess: (data) => {
+                                console.log('Thành công:', data);
+                                openNotificationWithIcon(
+                                    'success',
+                                    'Thông báo!',
+                                    'Hủy lịch hẹn thành công!'
+                                );
+                                setIsOpenModalConfirm(false);
+                                refetch();
+                            },
+                            onError: (err) => {
+                                console.error('Lỗi:', err.message);
+                                openNotificationWithIcon(
+                                    'error',
+                                    'Thông báo!',
+                                    'Hủy lịch hẹn không thành công!'
+                                );
+                            },
+                        });
+                    }}
                 >
                     Xác nhận
                 </Button>,

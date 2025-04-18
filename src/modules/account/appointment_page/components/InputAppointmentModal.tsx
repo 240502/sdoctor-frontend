@@ -24,6 +24,7 @@ import { patientProfileState } from '../../../../stores/patientAtom';
 import { PaymentMethod } from '../../../../models/payment_method';
 import { paymentMethodService } from '../../../../services';
 import { useCreateAppointment } from '../../../../hooks/appointments';
+import { useSendBookingSuccessMail } from '../../../../hooks';
 
 export const InputAppointmentModal = ({
     openModal,
@@ -58,15 +59,18 @@ export const InputAppointmentModal = ({
             console.log(err.message);
         }
     };
-
     useEffect(() => console.log(paymentMethods), [paymentMethods]);
     useEffect(() => {
         console.log('doctor input', doctor);
         console.log('schedule', schedule);
     }, []);
-    const createAppointment = useCreateAppointment();
+    // const createAppointment = useCreateAppointment();
+    const sendBookingSuccessMail = useSendBookingSuccessMail();
+    const { mutate: createAppointment } = useCreateAppointment();
     const onFinish = (values: any) => {
         setPaymentMethod(values.payment_method);
+        console.log('schedule', schedule);
+
         const newAppointment = {
             doctorId: doctor?.doctorId,
             appointmentDate: date,
@@ -76,7 +80,26 @@ export const InputAppointmentModal = ({
             scheduleId: schedule.id,
             type: 'doctor',
         };
-        createAppointment.mutate(newAppointment);
+        createAppointment(newAppointment, {
+            onSuccess: (data) => {
+                console.log('Thành công:', data);
+                const mailPayload = {
+                    patientName: patientProfile.patientName,
+                    email: patientProfile.patientEmail,
+                    doctorName: doctor.fullName,
+                    time: `${schedule.startTime}-${schedule.endTime}`,
+                    date: date,
+                    location: doctor.location,
+                    status: 'Chờ xác nhận',
+                    fee: 10000,
+                    serviceName: doctor.serviceName,
+                };
+                sendBookingSuccessMail.mutate(mailPayload);
+            },
+            onError: (err) => {
+                console.error('Lỗi:', err.message);
+            },
+        });
         if (saveProfile) {
             // UpdateProfile();
         }

@@ -5,7 +5,7 @@ import { Appointment } from '../models';
 const appointmentService = {
     async getAppointmentByUuid(payload: any): Promise<Appointment[] | any> {
         const res = await apiClient.get(
-            `/appointment/get-appointment-by-uuid?uuid=${payload.uuid}&pageIndex=${payload.pageIndex}&pageSize=${payload.pageSize}`,
+            `/appointment/get-appointment-by-uuid?uuid=${payload.uuid}&pageIndex=${payload.pageIndex}&pageSize=${payload.pageSize}&statusId=${payload.statusId}`,
             payload
         );
         return res.data;
@@ -73,11 +73,10 @@ const appointmentService = {
         const res = await apiClient.post('/appointment/view', data);
         return res.data;
     },
-    async updateAppointmentStatus(data: any, config: any): Promise<any> {
+    async updateAppointmentStatus(data: any): Promise<any> {
         const res = await apiClient.put(
             '/appointment/update-appointment-status',
-            data,
-            config
+            data
         );
         return res;
     },
