@@ -124,7 +124,9 @@ const BookingAppointment = () => {
     const CreateInvoice = async (data: any) => {
         try {
             const res = await invoicesService.createInvoice(data);
-            setInvoice(res?.data?.result[0]);
+            console.log('response create invoice', res?.data?.result[0][0]);
+
+            setInvoice(res?.data?.result[0][0]);
         } catch (err: any) {
             console.log(err.message);
         }
@@ -153,7 +155,7 @@ const BookingAppointment = () => {
 
             CreateInvoice(newInvoice);
             const newNotification = {
-                userId: data.userId,
+                userId: data.doctorId,
                 message: 'Bạn có một lịch hẹn mới!',
                 appointmentId: newAppointment.id,
             };

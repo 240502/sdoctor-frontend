@@ -1,6 +1,6 @@
 import { Button, Card, Flex, Table, Tag } from 'antd';
 import type { TableProps } from 'antd';
-import { invoicesService } from '../../../../services/invoices.service';
+import { invoicesService } from '../../../../services';
 import { useEffect, useState } from 'react';
 import { Invoices } from '../../../../models/invoices';
 import { EyeOutlined } from '@ant-design/icons';

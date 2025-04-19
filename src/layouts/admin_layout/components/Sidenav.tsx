@@ -20,7 +20,7 @@ export const Sidenav = ({ current }: any) => {
                         >
                             {parse(String(item.icon))}{' '}
                             <span className="ps-3 ms-3">
-                                {item.function_name}
+                                {item.functionName}
                             </span>
                         </Link>
                     </Menu.Item>

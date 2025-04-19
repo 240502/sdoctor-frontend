@@ -6,10 +6,9 @@ import {
     CategoryScale,
     LinearScale,
 } from 'chart.js';
-import { AppointmentService } from '../../../../services/appointment.service';
+import { appointmentService, invoicesService } from '../../../../services';
 import { useRecoilValue } from 'recoil';
 import { userValue } from '../../../../stores/userAtom';
-import { invoicesService } from '../../../../services/invoices.service';
 
 // Register the components of Chart.js that are needed
 Chart.register(BarController, BarElement, CategoryScale, LinearScale);
@@ -83,7 +82,7 @@ const BarChart = ({ type }: any) => {
 
     const statisticsAppointmentsByDay = async (data: any, config: any) => {
         try {
-            const res = await AppointmentService.statisticsAppointmentsByDay(
+            const res = await appointmentService.statisticsAppointmentsByDay(
                 data,
                 config
             );

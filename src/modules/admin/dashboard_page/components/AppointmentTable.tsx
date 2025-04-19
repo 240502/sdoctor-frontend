@@ -13,7 +13,7 @@ import {
     EyeOutlined,
     SearchOutlined,
 } from '@ant-design/icons';
-import { AppointmentService } from '../../../../services/appointment.service';
+import { appointmentService } from '../../../../services';
 import { ConfirmAppointmentModal } from '../../../../components';
 import {
     sendConfirmingSuccessMail,
@@ -33,7 +33,6 @@ const AppointmentTable = ({
     fetchData,
 }: any) => {
     const config = useRecoilValue(configValue);
-
     const [searchText, setSearchText] = useState('');
     const [searchedColumn, setSearchedColumn] = useState('');
     const searchInput = useRef<InputRef>(null);
@@ -51,10 +50,7 @@ const AppointmentTable = ({
 
     const ChangeAppointmentStatus = async (data: any) => {
         try {
-            const res = await AppointmentService.updateAppointmentStatus(
-                data,
-                config
-            );
+            const res = await appointmentService.updateAppointmentStatus(data);
             console.log(data);
             openNotificationWithIcon(
                 'success',

@@ -50,6 +50,10 @@ import { Invoices } from '../../../../models/invoices';
 import { InputCommentModal } from '../components/InputCommentModal';
 import { ViewAppointmentModal } from '../../../../components';
 import { useFetchAppointmentByUuid } from '../../../../hooks/appointments/useFetchAppointmentByUuid';
+import {
+    useCreatePayment,
+    useFetchInoivceByAppointmentId,
+} from '../../../../hooks';
 type DataIndex = keyof AppointmentViewForPatient;
 const { Option } = Select;
 const ViewAppointment = () => {
@@ -85,6 +89,7 @@ const ViewAppointment = () => {
 
     const { data, error, isFetching, refetch, isRefetching } =
         useFetchAppointmentByUuid(options);
+
     useEffect(() => {
         if (data) {
             console.log('data', data);
@@ -93,6 +98,7 @@ const ViewAppointment = () => {
             console.log('error', error);
         }
     }, [data, error, isFetching]);
+    const createPayment = useCreatePayment();
     const getAllAppointmentStatus = async () => {
         try {
             const res = await appointmentStatusService.getAll();
@@ -104,14 +110,16 @@ const ViewAppointment = () => {
             console.log(err.message);
         }
     };
-    // const onChangePage = (current: number, size: number) => {
-    //     if (size !== pageSize) {
-    //         setPageSize(size);
-    //         setPageIndex(1);
-    //     } else {
-    //         setPageIndex(current);
-    //     }
-    // };
+    const onChangePage = (current: number, size: number) => {
+        console.log(size, options.pageSize);
+        if (Number(size) !== options.pageSize) {
+            console.log('set lại page size');
+
+            setOptions({ ...options, pageIndex: 1, pageSize: size });
+        } else {
+            setOptions({ ...options, pageIndex: current });
+        }
+    };
     const handleSearch = (
         selectedKeys: string[],
         confirm: FilterDropdownProps['confirm'],
@@ -218,18 +226,18 @@ const ViewAppointment = () => {
                 appointmentId
             );
             console.log(res);
-            handleCreateOnlinePayment(res);
+            // handleCreateOnlinePayment(res);
         } catch (err: any) {}
     };
-    const handleCreateOnlinePayment = async (invoice: Invoices) => {
-        try {
-            const res = await paymentService.create(invoice);
-            console.log(res);
-            window.location.href = res?.data?.orderurl;
-        } catch (err: any) {
-            console.log(err.message);
-        }
-    };
+    // const handleCreateOnlinePayment = async (invoice: Invoices) => {
+    //     try {
+    //         const res = await paymentService.create(invoice);
+    //         console.log(res);
+    //         window.location.href = res?.data?.orderurl;
+    //     } catch (err: any) {
+    //         console.log(err.message);
+    //     }
+    // };
     const handleCancelInputModal = () => {
         setOpenInputCommentModal(false);
     };
@@ -384,7 +392,8 @@ const ViewAppointment = () => {
                                         className=""
                                         onClick={() => {
                                             console.log(record);
-                                            getInvoiceByAppointment(record.id);
+                                            // getInvoiceByAppointment(record.id);
+                                            createPayment.mutate(record.id);
                                         }}
                                     >
                                         <DollarOutlined className="" />
@@ -477,7 +486,7 @@ const ViewAppointment = () => {
                             className="mt-3"
                             showSizeChanger
                             pageSizeOptions={['5', '10', '20', '30']}
-                            // onChange={onChangePage}
+                            onChange={onChangePage}
                         />
                         {isModalOpen && (
                             <ViewAppointmentModal

@@ -1,8 +1,8 @@
 import { apiClient } from '../constants/api';
 
 const paymentService = {
-    async create(data: any): Promise<any> {
-        const res = await apiClient.post('/payment/create', data);
+    async create(appointmentId: number): Promise<any> {
+        const res = await apiClient.post('/payment/create/' + appointmentId);
         return res;
     },
     async callBack(): Promise<any> {

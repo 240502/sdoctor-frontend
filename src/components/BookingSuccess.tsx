@@ -9,19 +9,22 @@ import { Invoices } from '../models/invoices';
 import { paymentService } from '../services';
 const { Title, Text } = Typography;
 import dayjs from 'dayjs';
+import { useCreatePayment } from '../hooks';
 const BookingSuccess = () => {
     const navigate = useNavigate();
     const newAppointment = useRecoilValue(newAppointmentValue);
     const invoice = useRecoilValue(invoiceValue);
     const handleCreateOnlinePayment = async (invoice: Invoices) => {
         try {
-            const res = await paymentService.create(invoice);
+            const res = await paymentService.create(invoice.appointment_id);
             console.log(res);
-            window.location.href = res?.data?.orderurl;
+            window.location.href = res?.data?.order_url;
         } catch (err: any) {
             console.log(err.message);
         }
     };
+    const createPayment = useCreatePayment();
+
     useEffect(() => {
         console.log(invoice);
         console.log(newAppointment.createdAt);
@@ -69,7 +72,7 @@ const BookingSuccess = () => {
                         <Button
                             type="primary"
                             onClick={() => {
-                                handleCreateOnlinePayment(invoice);
+                                createPayment.mutate(invoice?.appointment_id);
                             }}
                         >
                             Thanh toán

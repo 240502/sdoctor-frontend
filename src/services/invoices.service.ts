@@ -30,8 +30,8 @@ const invoicesService = {
         const res = await apiClient.post('/invoice/view', data);
         return res.data;
     },
-    async updateInvoiceStatus(data: any, config: any): Promise<any> {
-        const res = await apiClient.put('/invoice/update-status', data, config);
+    async updateInvoiceStatus(data: any): Promise<any> {
+        const res = await apiClient.put('/invoice/update-status', data);
         return res;
     },
     async getInvoiceByAppointmentId(appointmentId: number): Promise<any> {
