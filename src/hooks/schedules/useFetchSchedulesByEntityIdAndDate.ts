@@ -6,6 +6,7 @@ interface SchedulesResponse {
     date: Date;
     entityId: number;
     entityType: string;
+    updatedScheduleId: number[];
 }
 export const useFetchSchedulesByEntityIdAndDate = (payload: {
     entityId: number;
@@ -14,6 +15,9 @@ export const useFetchSchedulesByEntityIdAndDate = (payload: {
 }): UseQueryResult<SchedulesResponse, Error> => {
     return useQuery<SchedulesResponse, Error>({
         queryKey: ['useFetchSchedulesByEntityId', JSON.stringify(payload)],
-        queryFn: async () => scheduleService.getScheduleByEntityId(payload),
+        queryFn: async () => {
+            return await scheduleService.getScheduleByEntityId(payload);
+        },
+        retry: false,
     });
 };

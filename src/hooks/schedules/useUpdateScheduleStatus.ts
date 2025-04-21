@@ -3,8 +3,8 @@ import { scheduleService } from '../../services';
 
 export const useUpdateScheduleStatus = () => {
     return useMutation({
-        mutationFn: async (scheduleId: number) => {
-            return await scheduleService.updateScheduleStatus(scheduleId);
+        mutationFn: async (dataArr: any) => {
+            return await scheduleService.updateScheduleStatus(dataArr);
         },
         onSuccess(data, variables, context) {
             console.log('Update schedule status success', data);

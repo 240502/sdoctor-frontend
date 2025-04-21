@@ -1,4 +1,4 @@
-export const handleGetDateByActiveDay = (activeDay: number) => {
+export const handleGetDateByActiveDay = (activeDay: number): string => {
     const now = new Date();
     let dateOfWeek: Date = now;
     let diff: number;
@@ -17,5 +17,8 @@ export const handleGetDateByActiveDay = (activeDay: number) => {
         now.setDate(now.getDate() + diff);
         dateOfWeek = now;
     }
-    return dateOfWeek;
+    const year = dateOfWeek.getFullYear();
+    const month = String(dateOfWeek.getMonth() + 1).padStart(2, '0'); // tháng bắt đầu từ 0
+    const day = String(dateOfWeek.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
 };

@@ -1,25 +1,28 @@
-import { useEffect } from 'react';
-import { useFetchSchedulesByEntityIdAndDate } from '../../../../hooks/schedules/useFetchSchedulesByEntityIdAndDate';
+import {
+    useFetchSchedulesByEntityIdAndDate,
+    useUpdateScheduleStatus,
+} from '../../../../hooks';
 import { Button, Col, Row, Skeleton } from 'antd';
 import { Schedules } from '../../../../models';
-
+import { useEffect, useState } from 'react';
+import dayjs from 'dayjs';
 const SchedulesComp = (props: {
-    entityId: number;
-    date: string;
+    schedules: Schedules[];
+    isFetching: boolean;
+    error: Error | null;
     handleClickTimeButton: any;
 }) => {
-    const { data, error, isFetching } = useFetchSchedulesByEntityIdAndDate({
-        entityId: props.entityId,
-        date: props.date,
-        entityType: 'doctor',
-    });
     return (
-        <Skeleton active loading={isFetching}>
+        <Skeleton active loading={props.isFetching}>
             <Row gutter={[24, 24]}>
-                {error ? (
-                    <p className="fw-bold text-center">{error.message}</p>
+                {props.error ? (
+                    <p className="fw-bold text-center">
+                        {props.error.message.includes('404')
+                            ? 'Bác sĩ chưa có thời gian làm việc trong hôm này !'
+                            : 'Lỗi không lấy được thời gian làm việc của bác sĩ !'}
+                    </p>
                 ) : (
-                    data?.data?.map((schedule: Schedules, index) => {
+                    props.schedules?.map((schedule: Schedules, index) => {
                         return (
                             <Col span={6}>
                                 <Button

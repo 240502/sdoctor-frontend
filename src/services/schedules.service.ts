@@ -25,6 +25,9 @@ const scheduleService = {
         );
         return res;
     },
-    async updateScheduleStatus(scheduleId: number): Promise<any> {},
+    async updateScheduleStatus(dataArr: any): Promise<any> {
+        const res = await apiClient.put('/api/schedule/update', dataArr);
+        return res;
+    },
 };
 export default scheduleService;

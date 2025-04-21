@@ -7,7 +7,12 @@ import { Breadcrumb, Col, notification, Row } from 'antd';
 import 'dayjs/locale/vi';
 import { useEffect, useState } from 'react';
 import { notificationService, invoicesService } from '../../../../services';
-import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
+import {
+    errorSelector,
+    useRecoilState,
+    useRecoilValue,
+    useSetRecoilState,
+} from 'recoil';
 import { BlockCalendar } from '../components/BlockCalendar';
 import { InputAppointmentModal } from '../components/InputAppointmentModal';
 import { patientProfileValue } from '../../../../stores/patientAtom';
@@ -17,19 +22,20 @@ import { invoiceState } from '../../../../stores/invoice';
 import { useSearchParams } from 'react-router-dom';
 import SchedulesComp from '../components/SchedulesComp';
 import { Schedules } from '../../../../models';
-import { useFetchDoctorDetail } from '../../../../hooks';
+import {
+    useFetchDoctorDetail,
+    useFetchSchedulesByEntityIdAndDate,
+    useUpdateScheduleStatus,
+} from '../../../../hooks';
+import dayjs from 'dayjs';
 type NotificationType = 'success' | 'error';
 
 const BookingAppointment = () => {
     const [searchParams] = useSearchParams();
 
     const [api, contextHolder] = notification.useNotification();
-    const now = new Date();
-    const [date, setDate] = useState<string>(
-        `${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()}`
-    );
-    //
-
+    const now = dayjs();
+    const [date, setDate] = useState<string>(now.format('YYYY-MM-DD'));
     const patientProfile = useRecoilValue(patientProfileValue);
 
     const [newAppointment, setNewAppointment] =
@@ -110,10 +116,90 @@ const BookingAppointment = () => {
     // };
     const doctorId = searchParams.get('doctorId');
 
-    const { data, error, isFetching } = useFetchDoctorDetail(Number(doctorId));
+    const {
+        data: doctorResponse,
+        error: doctorError,
+        isFetching: isFetchingDoctor,
+    } = useFetchDoctorDetail(Number(doctorId));
+    const {
+        data: scheduleReponse,
+        error: scheduleError,
+        isFetching: isFetchingSchedule,
+        refetch,
+    } = useFetchSchedulesByEntityIdAndDate({
+        entityId: Number(doctorId),
+        date: date,
+        entityType: 'doctor',
+    });
+    const [schedules, setSchedules] = useState<Schedules[]>([]);
+    function markScheduleIfExpired(schedules: Schedules[]): {
+        schedules: Schedules[];
+        updatedScheduleIds: number[];
+    } {
+        const now = dayjs();
+        const updatedScheduleIds: number[] = [];
+        let newSchedules: Schedules[] = schedules.map(
+            (schedule: Schedules): Schedules => {
+                const [startHour, startMinute] = schedule.startTime
+                    .split(':')
+                    .map(Number);
+                const startTime = dayjs()
+                    .hour(startHour)
+                    .minute(startMinute)
+                    .second(0);
+                const diffMinutes = now.diff(startTime, 'minute');
+                if (diffMinutes > -20) {
+                    updatedScheduleIds.push(schedule.id);
+                    return { ...schedule, status: 'expired' };
+                } else {
+                    return schedule;
+                }
+            }
+        );
+
+        return {
+            schedules: newSchedules ?? [],
+            updatedScheduleIds: updatedScheduleIds,
+        };
+    }
+    const updateScheduleStatus = useUpdateScheduleStatus();
     useEffect(() => {
-        console.log('doctor', data);
-    }, [data]);
+        let intervalId: any;
+        if (date === dayjs().format('YYYY-MM-DD')) {
+            if (scheduleReponse?.data && scheduleReponse.data?.length > 0) {
+                intervalId = setInterval(() => {
+                    console.log('chạy');
+                    let payload: any = [];
+                    const { schedules, updatedScheduleIds } =
+                        markScheduleIfExpired(scheduleReponse?.data);
+                    if (updatedScheduleIds.length > 0) {
+                        console.log('update scheudle', payload);
+                        refetch();
+                    }
+                }, 60000);
+
+                // gọi 1 lần ngay từ đầu (không cần đợi 1 phút)
+                const { schedules, updatedScheduleIds } = markScheduleIfExpired(
+                    scheduleReponse.data
+                );
+                if (updatedScheduleIds.length > 0) {
+                    const newSchedules = schedules.filter(
+                        (schedule: Schedules) => schedule.status === 'available'
+                    );
+                    setSchedules(newSchedules);
+                } else {
+                    setSchedules(schedules);
+                }
+            }
+        } else {
+            setSchedules(scheduleReponse?.data ?? []);
+        }
+
+        return () => {
+            clearInterval(intervalId); // Cleanup khi unmount
+        };
+    }, [scheduleReponse]);
+
     const CreateNotification = async (data: any) => {
         try {
             const res = await notificationService.createNotification(data);
@@ -135,7 +221,6 @@ const BookingAppointment = () => {
     useEffect(() => {
         socket?.on('newAppointment', (newAppointment) => {
             setNewAppointment(newAppointment);
-            // updateAvailableScheduleDetail(Number(scheduleDetail?.id));
         });
 
         return () => {
@@ -146,16 +231,16 @@ const BookingAppointment = () => {
         if (newAppointment?.id) {
             const newInvoice = {
                 appointmentId: newAppointment.id,
-                doctorId: data.doctorId,
-                serviceId: data.serviceId,
-                amount: data.price,
+                doctorId: doctorResponse.doctorId,
+                serviceId: doctorResponse.serviceId,
+                amount: doctorResponse.price,
                 paymentMethod: paymentMethod,
             };
             console.log('newInvoice', newInvoice);
 
             CreateInvoice(newInvoice);
             const newNotification = {
-                userId: data.doctorId,
+                userId: doctorResponse.doctorId,
                 message: 'Bạn có một lịch hẹn mới!',
                 appointmentId: newAppointment.id,
             };
@@ -164,30 +249,7 @@ const BookingAppointment = () => {
     }, [newAppointment]);
     useEffect(() => {
         window.scrollTo(0, 0);
-        console.log('patientProfile', patientProfile);
-        console.log('doctor booking', data);
     }, []);
-    useEffect(() => {
-        console.log('date', date);
-
-        // getDoctorSchedule();
-    }, [date]);
-    // useEffect(() => {
-    //     let intervalId: any;
-    //     if (schedule?.length > 0) {
-    //         const newDate = new Date(date);
-    //        const now = new Date();
-    //         if (newDate.getDate() === now.getDate()) {
-    //             intervalId = setInterval(() => {
-    //                 handleTimeOverRealTime();
-    //             }, 1000);
-    //         }
-    //     }
-
-    //     return () => {
-    //         clearInterval(intervalId);
-    //     };
-    // }, [schedule?.doctorScheduleDetails?.length]);
 
     return (
         <div className="container mt-4 mb-4">
@@ -214,7 +276,7 @@ const BookingAppointment = () => {
                         <div className="border rounded p-3">
                             <BlockCalendar
                                 date={date}
-                                doctor={data}
+                                doctor={doctorResponse}
                                 setDate={setDate}
                                 // setSchedule={setSchedule}
                             />
@@ -227,8 +289,9 @@ const BookingAppointment = () => {
                         </div>
                         <div className="border rounded p-3">
                             <SchedulesComp
-                                entityId={data.doctorId ?? doctorId}
-                                date={date}
+                                schedules={schedules}
+                                isFetching={isFetchingSchedule}
+                                error={scheduleError}
                                 handleClickTimeButton={handleClickTimeButton}
                             />
                         </div>
@@ -240,7 +303,7 @@ const BookingAppointment = () => {
                     openModal={openInputModal}
                     cancelModal={cancelInputModal}
                     date={date}
-                    doctor={data}
+                    doctor={doctorResponse}
                     openNotification={openNotification}
                     patientProfile={patientProfile}
                     setPaymentMethod={setPaymentMethod}

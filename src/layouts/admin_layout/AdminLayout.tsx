@@ -20,16 +20,10 @@ const AdminLayout: React.FC = ({ children }: any) => {
     const [collapsed, setCollapsed] = useState(false);
     const [current, setCurrent] = useState<string[]>([]);
     const [messageApi, contextHolder] = message.useMessage();
-    // const user = useRecoilValue(userValue);
     const [user, setUser] = useRecoilState(userState);
     const setRequestConfig = useSetRecoilState(requestConfig);
     const setNotifications = useSetRecoilState(notificationsState);
     const notificationsSelector = useRecoilValue(notificationsValue);
-    useEffect(() => {
-        const config = { headers: { authorization: 'Bearer ' + user.token } };
-        setRequestConfig(config);
-        console.log('user', user);
-    }, [user]);
     const handleWindowLoad = (user: User) => {
         if (user?.userId) {
             socket?.emit('joinRoom', { userId: user.userId });
@@ -40,8 +34,12 @@ const AdminLayout: React.FC = ({ children }: any) => {
             const userSession = await JSON.parse(
                 sessionStorage.getItem('user') || '{}'
             );
-            if (userSession?.user_id) {
+            if (userSession?.userId) {
                 setUser(userSession);
+                const config = {
+                    headers: { authorization: 'Bearer ' + userSession.token },
+                };
+                setRequestConfig(config);
                 handleWindowLoad(userSession);
             }
         } catch (e: any) {
@@ -49,6 +47,9 @@ const AdminLayout: React.FC = ({ children }: any) => {
         }
     };
     useEffect(() => {
+        if (!user?.userId) {
+            getUser();
+        }
         socket?.on('newNotification', (newNotification) => {
             messageApi.info('Có thông báo mới');
             console.log('newNotification', newNotification);
@@ -61,7 +62,6 @@ const AdminLayout: React.FC = ({ children }: any) => {
             );
             setNotifications(sortedNotificationsAsc);
         });
-        getUser();
         return () => {
             socket?.off('newNotification');
         };

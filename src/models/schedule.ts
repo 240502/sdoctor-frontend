@@ -1,8 +1,8 @@
 import { DoctorScheduleDetail } from './doctor_schedule_details';
 
 export interface Schedules {
-    id: Number;
-    entityId: Number;
+    id: number;
+    entityId: number;
     entityType: string;
     date: Date;
     status: string;

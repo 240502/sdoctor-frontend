@@ -18,7 +18,6 @@ type NotificationType = 'success' | 'error';
 import '@/assets/scss/schedule_management.scss';
 import { scheduleDetailsState } from '../../../../stores/scheduleDetailAtom';
 import { handleTimeOverRealTime } from '../../../../utils/schedule';
-import { scheduleListState } from '../../../../stores/scheduleAtom';
 const tabs: TabsProps['items'] = [
     {
         key: '1',
@@ -59,10 +58,6 @@ const ScheduleManagement = () => {
     const [selectedTimes, setSelectedTimes] = useState<Time[]>([]);
 
     const [intervalTime, setIntervalTime] = useState<number>(30);
-
-    const [doctorScheduleDetails, setDoctorScheduleDetails] =
-        useRecoilState(scheduleDetailsState);
-
     const [isUpdate, setIsUpdate] = useState<boolean>(false);
     const openNotification = (
         type: NotificationType,
@@ -219,7 +214,6 @@ const ScheduleManagement = () => {
                                     setActiveDay(tab.key);
                                     // setSchedule({} as DoctorSchedule);
                                     setIsUpdate(false);
-                                    setDoctorScheduleDetails([]);
                                 }}
                                 key={tab.key}
                             >
@@ -262,14 +256,9 @@ const ScheduleManagement = () => {
                 >
                     <ListTime
                         activeDay={Number(activeDay)}
-                        // schedule={schedule}
                         user={user}
                         config={config}
-                        // setSchedule={setSchedule}
                         openNotification={openNotification}
-                        // handleGetScheduleBySubscriberAndDate={
-                        //     handleGetScheduleBySubscriberAndDate
-                        // }
                         interval={intervalTime}
                         selectedTimes={selectedTimes}
                         setSelectedTimes={setSelectedTimes}
