@@ -47,6 +47,8 @@ const AdminLayout: React.FC = ({ children }: any) => {
         }
     };
     useEffect(() => {
+        console.log('user', user);
+
         if (!user?.userId) {
             getUser();
         }

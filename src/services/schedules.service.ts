@@ -26,7 +26,10 @@ const scheduleService = {
         return res;
     },
     async updateScheduleStatus(dataArr: any): Promise<any> {
-        const res = await apiClient.put('/api/schedule/update', dataArr);
+        const res = await apiClient.put(
+            '/schedule/update-schedule-status',
+            dataArr
+        );
         return res;
     },
 };

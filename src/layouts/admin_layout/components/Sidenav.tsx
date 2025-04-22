@@ -8,7 +8,6 @@ import { userValue } from '../../../stores/userAtom';
 
 export const Sidenav = ({ current }: any) => {
     const user = useRecoilValue(userValue);
-    console.log('user', user);
     return (
         <Menu theme="dark" selectedKeys={[current]} mode="inline">
             {user?.functions?.map((item: Functions, index: number) => {

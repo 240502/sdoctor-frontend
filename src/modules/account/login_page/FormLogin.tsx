@@ -2,7 +2,7 @@ import { Button, Input, notification, Form } from 'antd';
 // import { UserService } from '../../../services/user.service';
 import { userService } from '../../../services';
 import { useSetRecoilState } from 'recoil';
-import { userState } from '../../../stores/userAtom';
+import { requestConfig, userState } from '../../../stores/userAtom';
 import { useNavigate } from 'react-router-dom';
 import socket from '../../../socket';
 type NotificationType = 'success' | 'error';
@@ -11,6 +11,8 @@ export const FormLogin = () => {
     const [api, contextHolder] = notification.useNotification();
     const setUser = useSetRecoilState(userState);
     const navigate = useNavigate();
+    const setRequestConfig = useSetRecoilState(requestConfig);
+
     const openNotification = (
         type: NotificationType,
         title: string,
@@ -27,6 +29,10 @@ export const FormLogin = () => {
             const res = await userService.login({ email, password });
             sessionStorage.setItem('user', JSON.stringify(res));
             setUser(res);
+            const config = {
+                headers: { authorization: 'Bearer ' + res.token },
+            };
+            setRequestConfig(config);
             socket?.emit('joinRoom', { userId: res.userId });
             if (res.roleId === 2) {
                 navigate('/admin/dashboard');

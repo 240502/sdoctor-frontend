@@ -22,18 +22,24 @@ import { DatePickerProps } from 'antd/lib';
 import { useSetRecoilState } from 'recoil';
 import { patientProfileState } from '../../../../stores/patientAtom';
 import { PaymentMethod } from '../../../../models/payment_method';
-import { paymentMethodService } from '../../../../services';
+import { invoicesService, paymentMethodService } from '../../../../services';
 import { useCreateAppointment } from '../../../../hooks/appointments';
-import { useSendBookingSuccessMail } from '../../../../hooks';
+import {
+    useSendBookingSuccessMail,
+    useUpdateScheduleStatus,
+} from '../../../../hooks';
+import { invoiceState } from '../../../../stores/invoice';
+import { AppointmentResponseDto } from '../../../../models';
 
 export const InputAppointmentModal = ({
     openModal,
     cancelModal,
     date,
     doctor,
+    openMessage,
     patientProfile,
-    setPaymentMethod,
     schedule,
+    refetch,
 }: any) => {
     const [searchParams] = useSearchParams();
 
@@ -60,17 +66,46 @@ export const InputAppointmentModal = ({
         }
     };
     useEffect(() => console.log(paymentMethods), [paymentMethods]);
-    useEffect(() => {
-        console.log('doctor input', doctor);
-        console.log('schedule', schedule);
-    }, []);
-    // const createAppointment = useCreateAppointment();
+
     const sendBookingSuccessMail = useSendBookingSuccessMail();
     const { mutate: createAppointment } = useCreateAppointment();
+    const handleSendBookingSuccessMail = () => {
+        const mailPayload = {
+            patientName: patientProfile.patientName,
+            email: patientProfile.patientEmail,
+            doctorName: doctor.fullName,
+            time: `${schedule.startTime}-${schedule.endTime}`,
+            date: date,
+            location: doctor.location,
+            status: 'Chờ xác nhận',
+            fee: 10000,
+            serviceName: doctor.serviceName,
+        };
+        sendBookingSuccessMail.mutate(mailPayload);
+    };
+    const setInvoice = useSetRecoilState(invoiceState);
+    const CreateInvoice = async (data: any) => {
+        try {
+            const res = await invoicesService.createInvoice(data);
+            console.log('response create invoice', res?.data?.result[0][0]);
+
+            setInvoice(res?.data?.result[0][0]);
+        } catch (err: any) {
+            console.log(err.message);
+        }
+    };
+    const [paymentMethod, setPaymentMethod] = useState<number>(1);
+    const { mutate: updateScheduleStatus } = useUpdateScheduleStatus(refetch);
+    const handleUpdateScheduleStatus = (
+        newAppointment: AppointmentResponseDto
+    ) => {
+        const payload = [
+            { scheduleId: newAppointment.scheduleId, status: 'booked' },
+        ];
+        updateScheduleStatus(payload);
+    };
     const onFinish = (values: any) => {
         setPaymentMethod(values.payment_method);
-        console.log('schedule', schedule);
-
         const newAppointment = {
             doctorId: doctor?.doctorId,
             appointmentDate: date,
@@ -82,21 +117,31 @@ export const InputAppointmentModal = ({
         };
         createAppointment(newAppointment, {
             onSuccess: (data) => {
-                console.log('Thành công:', data);
-                const mailPayload = {
-                    patientName: patientProfile.patientName,
-                    email: patientProfile.patientEmail,
-                    doctorName: doctor.fullName,
-                    time: `${schedule.startTime}-${schedule.endTime}`,
-                    date: date,
-                    location: doctor.location,
-                    status: 'Chờ xác nhận',
-                    fee: 10000,
-                    serviceName: doctor.serviceName,
+                console.log('Create appointment success', data);
+                const appointment = data.data.result;
+                console.log('data.appointment', data.data.result);
+                handleSendBookingSuccessMail();
+                openMessage('Success', 'Đặt lịch hẹn thành công !');
+                navigate('/booking-success');
+                const newInvoice = {
+                    appointmentId: appointment.id,
+                    doctorId: doctor.doctorId,
+                    serviceId: doctor.serviceId,
+                    amount: doctor.price,
+                    paymentMethod: paymentMethod,
                 };
-                sendBookingSuccessMail.mutate(mailPayload);
+                console.log('newInvoice', newInvoice);
+
+                CreateInvoice(newInvoice);
+                // const newNotification = {
+                //     userId: doctorResponse.doctorId,
+                //     message: 'Bạn có một lịch hẹn mới!',
+                //     appointmentId: newAppointment.id,
+                // };
+                // CreateNotification(newNotification);
             },
             onError: (err) => {
+                openMessage('Error', 'Đặt lịch hẹn không thành công !');
                 console.error('Lỗi:', err.message);
             },
         });
@@ -117,49 +162,6 @@ export const InputAppointmentModal = ({
     //     }
     // };
 
-    // const CreateAppointment = async (newAppointment: any) => {
-    //     try {
-    //         const res: any = await AppointmentService.createAppointment(
-    //             newAppointment
-    //         );
-    //         console.log(res);
-    //         const data = {
-    //             patientName: newAppointment.patientName,
-    //             email: newAppointment.patientEmail,
-    //             doctorName: newAppointment.doctorName,
-    //             time: newAppointment.timeValue,
-    //             date: newAppointment.appointmentDate,
-    //             location: newAppointment.location,
-    //             status: 'Chờ xác nhận',
-    //             fee: newAppointment.price,
-    //             serviceName: newAppointment.serviceName,
-    //         };
-    //         sendBookingSuccessMail(data);
-    //         openNotification(
-    //             'success',
-    //             'Thông báo',
-    //             'Đặt lịch hẹn thành công!'
-    //         );
-    //         cancelModal();
-    //         navigate('/booking-success');
-
-    //         //socket.emit('addApp', newAppointment);
-    //     } catch (err: any) {
-    //         console.log('book appointment error', err.message);
-    //         openNotification(
-    //             'error',
-    //             'Thông báo',
-    //             'Đặt lịch hẹn không thành công!'
-    //         );
-    //     }
-    // };
-    // const sendBookingSuccessMail = async (data: any) => {
-    //     try {
-    //         const res = await MailerService.sendBookingSuccessMail(data);
-    //     } catch (err: any) {
-    //         console.log(err.message);
-    //     }
-    // };
     const getWards = async (districtId: any) => {
         try {
             const res = await axios.get(

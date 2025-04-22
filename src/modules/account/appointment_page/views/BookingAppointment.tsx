@@ -3,16 +3,11 @@ import {
     ClockCircleOutlined,
     HomeOutlined,
 } from '@ant-design/icons';
-import { Breadcrumb, Col, notification, Row } from 'antd';
+import { Breadcrumb, Col, Row, message } from 'antd';
 import 'dayjs/locale/vi';
 import { useEffect, useState } from 'react';
 import { notificationService, invoicesService } from '../../../../services';
-import {
-    errorSelector,
-    useRecoilState,
-    useRecoilValue,
-    useSetRecoilState,
-} from 'recoil';
+import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import { BlockCalendar } from '../components/BlockCalendar';
 import { InputAppointmentModal } from '../components/InputAppointmentModal';
 import { patientProfileValue } from '../../../../stores/patientAtom';
@@ -21,38 +16,39 @@ import { newAppointmentState } from '../../../../stores/appointmentAtom';
 import { invoiceState } from '../../../../stores/invoice';
 import { useSearchParams } from 'react-router-dom';
 import SchedulesComp from '../components/SchedulesComp';
-import { Schedules } from '../../../../models';
+import {
+    Appointment,
+    AppointmentResponseDto,
+    Schedules,
+} from '../../../../models';
 import {
     useFetchDoctorDetail,
     useFetchSchedulesByEntityIdAndDate,
     useUpdateScheduleStatus,
 } from '../../../../hooks';
 import dayjs from 'dayjs';
+import { NoticeType } from 'antd/es/message/interface';
 type NotificationType = 'success' | 'error';
 
 const BookingAppointment = () => {
     const [searchParams] = useSearchParams();
 
-    const [api, contextHolder] = notification.useNotification();
+    const [messageApi, contextHolder] = message.useMessage();
     const now = dayjs();
     const [date, setDate] = useState<string>(now.format('YYYY-MM-DD'));
     const patientProfile = useRecoilValue(patientProfileValue);
 
     const [newAppointment, setNewAppointment] =
         useRecoilState(newAppointmentState);
-    const setInvoice = useSetRecoilState(invoiceState);
     const [openInputModal, setOpenInputModal] = useState<boolean>(false);
     const [paymentMethod, setPaymentMethod] = useState<number>(1);
-    const openNotification = (
-        type: NotificationType,
-        title: string,
-        message: string
-    ) => {
-        api[type]({
-            message: title,
-            description: message,
+    const openMessage = (type: NoticeType, content: string) => {
+        messageApi.open({
+            type: type,
+            content: content,
         });
     };
+
     const [schedule, setSchedule] = useState<Schedules>({} as Schedules);
 
     const handleClickTimeButton = (schedule: Schedules) => {
@@ -162,7 +158,6 @@ const BookingAppointment = () => {
             updatedScheduleIds: updatedScheduleIds,
         };
     }
-    const updateScheduleStatus = useUpdateScheduleStatus();
     useEffect(() => {
         let intervalId: any;
         if (date === dayjs().format('YYYY-MM-DD')) {
@@ -200,53 +195,17 @@ const BookingAppointment = () => {
         };
     }, [scheduleReponse]);
 
-    const CreateNotification = async (data: any) => {
-        try {
-            const res = await notificationService.createNotification(data);
-        } catch (err: any) {
-            console.log(err);
-        }
-    };
-    const CreateInvoice = async (data: any) => {
-        try {
-            const res = await invoicesService.createInvoice(data);
-            console.log('response create invoice', res?.data?.result[0][0]);
-
-            setInvoice(res?.data?.result[0][0]);
-        } catch (err: any) {
-            console.log(err.message);
-        }
-    };
-
     useEffect(() => {
         socket?.on('newAppointment', (newAppointment) => {
-            setNewAppointment(newAppointment);
+            console.log('newAppointment', newAppointment);
+            refetch();
         });
 
         return () => {
             socket?.off('newAppointment');
         };
-    }, [paymentMethod]);
-    useEffect(() => {
-        if (newAppointment?.id) {
-            const newInvoice = {
-                appointmentId: newAppointment.id,
-                doctorId: doctorResponse.doctorId,
-                serviceId: doctorResponse.serviceId,
-                amount: doctorResponse.price,
-                paymentMethod: paymentMethod,
-            };
-            console.log('newInvoice', newInvoice);
+    }, []);
 
-            CreateInvoice(newInvoice);
-            const newNotification = {
-                userId: doctorResponse.doctorId,
-                message: 'Bạn có một lịch hẹn mới!',
-                appointmentId: newAppointment.id,
-            };
-            CreateNotification(newNotification);
-        }
-    }, [newAppointment]);
     useEffect(() => {
         window.scrollTo(0, 0);
     }, []);
@@ -304,10 +263,11 @@ const BookingAppointment = () => {
                     cancelModal={cancelInputModal}
                     date={date}
                     doctor={doctorResponse}
-                    openNotification={openNotification}
+                    openMessage={openMessage}
                     patientProfile={patientProfile}
                     setPaymentMethod={setPaymentMethod}
                     schedule={schedule}
+                    refetch={refetch}
                 />
             )}
         </div>

@@ -34,5 +34,11 @@ export const useSendBookingSuccessMail = (): UseMutationResult<
         onSuccess(data, variables, context) {
             console.log('send mail success', data);
         },
+        onError(error, variables, context) {
+            console.log(
+                'Có lỗi khi gửi mail thông báo đăng ký thành công',
+                error
+            );
+        },
     });
 };

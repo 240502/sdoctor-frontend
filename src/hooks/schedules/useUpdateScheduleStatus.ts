@@ -1,15 +1,24 @@
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, UseMutationResult } from '@tanstack/react-query';
 import { scheduleService } from '../../services';
 
-export const useUpdateScheduleStatus = () => {
-    return useMutation({
+type UpdateScheduleResponse = {
+    success: boolean;
+    message: string;
+    updatedAppointment?: any; // Hoặc bạn có thể thay `any` bằng type thực tế
+};
+export const useUpdateScheduleStatus = (
+    refetch: any
+): UseMutationResult<UpdateScheduleResponse, Error, any> => {
+    return useMutation<UpdateScheduleResponse, Error, any>({
         mutationFn: async (dataArr: any) => {
-            return await scheduleService.updateScheduleStatus(dataArr);
-        },
-        onSuccess(data, variables, context) {
-            console.log('Update schedule status success', data);
-            console.log('Update schedule status variables', variables);
-            console.log('Update schedule status context', context);
+            const response = await scheduleService.updateScheduleStatus(
+                dataArr
+            );
+            // In ra kiểm tra nếu cần
+            console.log('🔥 response updateSchedule:', response);
+            refetch();
+            // Chỉ lấy phần data
+            return response.data;
         },
     });
 };
