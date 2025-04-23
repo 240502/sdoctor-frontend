@@ -20,7 +20,6 @@ import axios from 'axios';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { DatePickerProps } from 'antd/lib';
 import { useSetRecoilState } from 'recoil';
-import { patientProfileState } from '../../../../stores/patientAtom';
 import { PaymentMethod } from '../../../../models/payment_method';
 import { invoicesService, paymentMethodService } from '../../../../services';
 import { useCreateAppointment } from '../../../../hooks/appointments';
@@ -31,7 +30,7 @@ import {
 import { invoiceState } from '../../../../stores/invoice';
 import { AppointmentResponseDto } from '../../../../models';
 
-export const InputAppointmentModal = ({
+const InputAppointmentModal = ({
     openModal,
     cancelModal,
     date,
@@ -643,3 +642,5 @@ export const InputAppointmentModal = ({
         </Modal>
     );
 };
+
+export default InputAppointmentModal;

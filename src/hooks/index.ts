@@ -16,3 +16,4 @@ export * from './schedules';
 export * from './specialization';
 
 export * from './payment';
+export * from './time';

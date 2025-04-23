@@ -4,7 +4,7 @@ import type { Dayjs } from 'dayjs';
 import 'dayjs/locale/vi';
 import { useEffect } from 'react';
 import dayjs from 'dayjs';
-export const BlockCalendar = ({ date, setDate }: any) => {
+const BlockCalendar = ({ date, setDate }: any) => {
     const headerRender: CalendarProps<Dayjs>['headerRender'] = ({
         value,
         onChange,
@@ -89,3 +89,4 @@ export const BlockCalendar = ({ date, setDate }: any) => {
         />
     );
 };
+export default BlockCalendar;

@@ -1,4 +1,5 @@
 import { apiClient } from '../constants/api';
+import { Schedules } from '../models';
 
 const scheduleService = {
     async getScheduleByEntityId(payload: {
@@ -30,6 +31,20 @@ const scheduleService = {
             '/schedule/update-schedule-status',
             dataArr
         );
+        return res;
+    },
+    async getScheduleByEntityIdForDoctor(payload: {
+        entityId: number;
+        date: string;
+        entityType: string;
+    }): Promise<Schedules[] | any> {
+        const res = await apiClient.get(
+            `/schedule/get-schedule-by-entityid-for-doctor?entityId=${payload.entityId}&date=${payload.date}&entityType=${payload.entityType}`
+        );
+        return res?.data;
+    },
+    async deleteSchedules(ids: number[]): Promise<any> {
+        const res = await apiClient.post('/schedule/delete-schedules', ids);
         return res;
     },
 };

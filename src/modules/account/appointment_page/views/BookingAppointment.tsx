@@ -6,25 +6,18 @@ import {
 import { Breadcrumb, Col, Row, message } from 'antd';
 import 'dayjs/locale/vi';
 import { useEffect, useState } from 'react';
-import { notificationService, invoicesService } from '../../../../services';
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
-import { BlockCalendar } from '../components/BlockCalendar';
-import { InputAppointmentModal } from '../components/InputAppointmentModal';
+import { BlockCalendar, InputAppointmentModal } from '../components';
 import { patientProfileValue } from '../../../../stores/patientAtom';
 import socket from '../../../../socket';
 import { newAppointmentState } from '../../../../stores/appointmentAtom';
 import { invoiceState } from '../../../../stores/invoice';
 import { useSearchParams } from 'react-router-dom';
 import SchedulesComp from '../components/SchedulesComp';
-import {
-    Appointment,
-    AppointmentResponseDto,
-    Schedules,
-} from '../../../../models';
+import { Schedules } from '../../../../models';
 import {
     useFetchDoctorDetail,
     useFetchSchedulesByEntityIdAndDate,
-    useUpdateScheduleStatus,
 } from '../../../../hooks';
 import dayjs from 'dayjs';
 import { NoticeType } from 'antd/es/message/interface';

@@ -19,3 +19,10 @@ export interface SchedulesCreate {
     date: string;
     timeId: number;
 }
+export interface SchedulesResponse {
+    data: Schedules[];
+    date: Date;
+    entityId: number;
+    entityType: string;
+    updatedScheduleId: number[];
+}

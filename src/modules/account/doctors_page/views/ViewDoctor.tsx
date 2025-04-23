@@ -91,31 +91,27 @@ const ViewDoctor = () => {
                         <Divider />
                     </Col>
                     <Col span={18}>
-                        <>
+                        <Skeleton
+                            loading={isFetching || isFetchingNextPage}
+                            active
+                            className="mt-6"
+                        >
                             {error ? (
                                 <p className="fs-6 fw-bold text-center mt-4">
                                     {'Không có dữ liệu !'}
                                 </p>
                             ) : (
                                 <>
-                                    <Skeleton
-                                        loading={
-                                            isFetching || isFetchingNextPage
-                                        }
-                                        active
-                                        className="mt-6"
-                                    >
-                                        {doctors && (
-                                            <DoctorCard doctors={doctors} />
-                                        )}
-                                    </Skeleton>
+                                    {doctors && (
+                                        <DoctorCard doctors={doctors} />
+                                    )}
                                     <div
                                         ref={observerRef}
                                         // style={{ height: 20, marginBottom: 20 }}
                                     />
                                 </>
                             )}
-                        </>
+                        </Skeleton>
                     </Col>
                 </Row>
             </div>

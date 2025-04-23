@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Button, Row, Col, message } from 'antd';
+import { Button, Row, Col, message, Skeleton } from 'antd';
 import { useRecoilState } from 'recoil';
 import { scheduleDetailsState } from '../../../../stores/scheduleDetailAtom';
 import { Time } from '../../../../models/time';
@@ -10,56 +10,54 @@ import { scheduleService, timeService } from '../../../../services';
 import { DoctorScheduleDetail } from '../../../../models/doctor_schedule_details';
 import { handleTimeOverRealTime } from '../../../../utils/schedule';
 import { SchedulesCreate } from '../../../../models';
-import useCreateDoctor from '../../../../hooks/doctors/useCreateDoctor';
 import { useCreateSchedules } from '../../../../hooks/schedules';
 import dayjs from 'dayjs';
-type MessageType = 'success' | 'error' | 'warning';
+import { useFetchTimeByType } from '../../../../hooks';
 export const ListTime = ({
     activeDay,
     user,
     config,
-    openNotification,
+    openMessage,
     interval,
     selectedTimes,
     setSelectedTimes,
+    isFetchingSchedules,
 }: any) => {
     const [disableSaveButton, setDisableSaveButton] = useState<boolean>(false);
     const [times, setTimes] = useState<Time[]>([]);
     const [deleteDetails, setDeletedDetails] = useState<DoctorScheduleDetail[]>(
         []
     );
-    useEffect(() => {
-        console.log('user', user);
-        console.log('config', config);
-    }, [user, config]);
-    const [messageApi, contextHolder] = message.useMessage();
     const handleOverTime = (day: number) => {
         const now = new Date();
         if (day < now.getDay() && day !== 0) {
             setDisableSaveButton(true);
         } else setDisableSaveButton(false);
     };
-    const getTimeByType = async () => {
-        try {
-            const data = { timeType: interval };
-            const res = await timeService.getTimeByTimeType(data);
-            const now = new Date();
-            if (activeDay === now.getDay()) {
-                const newTimes = handleTimeOverRealTime(res);
-                setTimes(newTimes);
-            }
-            if (activeDay !== 0 && activeDay < now.getDay()) {
-                const newTimes = res.map((time: Time) => {
-                    return { ...time, disable: true };
-                });
-                setTimes(newTimes);
-            }
-            if (activeDay === 0 || activeDay > now.getDay()) {
-                setTimes(res);
-            }
-        } catch (err: any) {
-            console.log(err.message);
-            setTimes([]);
+
+    const { data, error, isFetching } = useFetchTimeByType(interval);
+    console.log(data);
+    useEffect(() => {
+        console.log('data', data);
+        if (data && data?.length > 0) {
+            handleTimes(data);
+        }
+    }, [data]);
+
+    const handleTimes = async (times: Time[]) => {
+        const now = new Date();
+        if (activeDay === now.getDay()) {
+            const newTimes = handleTimeOverRealTime(times);
+            setTimes(newTimes);
+        }
+        if (activeDay !== 0 && activeDay < now.getDay()) {
+            const newTimes = times.map((time: Time) => {
+                return { ...time, disable: true };
+            });
+            setTimes(newTimes);
+        }
+        if (activeDay === 0 || activeDay > now.getDay()) {
+            setTimes(times);
         }
     };
     const createSchedules = useCreateSchedules(config);
@@ -79,39 +77,17 @@ export const ListTime = ({
             };
             schedules.push(schedule);
         });
-        console.log('schedules', schedules);
-
         createSchedules.mutate(schedules);
-
-        // CreateSchedule(schedule);
     };
-    // const CreateSchedule = async (data: any) => {
-    //     try {
-    //         const res = await doctorScheduleService.createSchedule(
-    //             data,
-    //             config
-    //         );
-    //         setSchedule(res?.data.result);
-    //         setDoctorScheduleDetails(res?.data?.result.listScheduleDetails);
-    //         openNotification(
-    //             'success',
-    //             'Thông báo !',
-    //             'Đăng ký lịch thành công'
-    //         );
-    //         handleGetScheduleBySubscriberAndDate();
-    //     } catch (err: any) {
-    //         console.log(err.message);
-    //         openNotification(
-    //             'error',
-    //             'Thông báo !',
-    //             'Đăng ký lịch không thành công'
-    //         );
-    //     }
-    // };
+    const handleDeleteSchedules = () => {
+        let newTimes = [];
+        if(data && data?.length > 0){
+            if(selectedTimes.length >= data?.length){
+                
+            }
 
-    const openMessage = (type: MessageType, message: string) => {
-        messageApi.open({ type: type, content: message });
-    };
+        }
+    }
     // const handleUpdateSchedule = () => {
     //     let newTimes = [];
     //     if (selectedTimes.length >= schedule.listScheduleDetails?.length) {
@@ -267,107 +243,108 @@ export const ListTime = ({
     // };
     useEffect(() => {
         handleOverTime(activeDay);
-        getTimeByType();
     }, [activeDay, interval]);
 
     return (
         <Row gutter={[24, 24]} className="time-slots">
-            {contextHolder}
             <Col
                 span={12}
                 className="border border-start-0 border-bottom-0 pe-3 border-top-0 "
             >
                 <h6 className="mb-3">Chọn thời gian làm việc cho hôm nay</h6>
-                <Row gutter={[24, 24]}>
-                    {/* <Col span={6}>
-                        <Button onClick={() => handleSelectAllTime()}>
-                            Chọn tất cả
-                            <PlusOutlined />
-                        </Button>
-                    </Col> */}
-                    {times.map((time: Time) => {
-                        if (selectedTimes?.length > 0) {
-                            const existTime = selectedTimes?.find(
-                                (selectedTime: Time) =>
-                                    time?.id === selectedTime?.id
-                            );
-                            return (
-                                <Col
-                                    span={6}
-                                    className="time-item"
-                                    key={time?.id}
-                                >
-                                    <Button
-                                        className={`${
-                                            time?.disable ? 'pe-none' : ''
-                                        }`}
+                <Skeleton active loading={isFetching}>
+                    <Row gutter={[24, 24]}>
+                        {times.map((time: Time) => {
+                            if (selectedTimes?.length > 0) {
+                                const existTime = selectedTimes?.find(
+                                    (selectedTime: Time) =>
+                                        time?.id === selectedTime?.id
+                                );
+                                return (
+                                    <Col
+                                        span={6}
+                                        className="time-item"
                                         key={time?.id}
-                                        onClick={() => handleAddTime(time)}
-                                        type={existTime ? 'primary' : 'default'}
                                     >
-                                        {time.startTime}
-                                        <PlusOutlined />
-                                    </Button>
-                                </Col>
-                            );
-                        } else {
-                            return (
-                                <Col
-                                    span={6}
-                                    className="time-item"
-                                    key={time?.id}
-                                >
-                                    <Button
-                                        className={`${
-                                            time?.disable ? 'pe-none' : ''
-                                        }`}
+                                        <Button
+                                            className={`${
+                                                time?.disable ? 'pe-none' : ''
+                                            }`}
+                                            key={time?.id}
+                                            onClick={() => handleAddTime(time)}
+                                            type={
+                                                existTime
+                                                    ? 'primary'
+                                                    : 'default'
+                                            }
+                                        >
+                                            {time.startTime}
+                                            <PlusOutlined />
+                                        </Button>
+                                    </Col>
+                                );
+                            } else {
+                                return (
+                                    <Col
+                                        span={6}
+                                        className="time-item"
                                         key={time?.id}
-                                        onClick={() => handleAddTime(time)}
-                                        type={'default'}
                                     >
-                                        {time?.startTime}
-                                        <PlusOutlined />
-                                    </Button>
-                                </Col>
-                            );
-                        }
-                    })}
-                </Row>
+                                        <Button
+                                            className={`${
+                                                time?.disable ? 'pe-none' : ''
+                                            }`}
+                                            key={time?.id}
+                                            onClick={() => handleAddTime(time)}
+                                            type={'default'}
+                                        >
+                                            {time?.startTime}
+                                            <PlusOutlined />
+                                        </Button>
+                                    </Col>
+                                );
+                            }
+                        })}
+                    </Row>
+                </Skeleton>
             </Col>
             <Col span={12} className="selected-time">
                 <h6 className="mb-3">Thời gian đã chọn</h6>
-                <Row
-                    gutter={[24, 24]}
-                    className="border border-top-0 border-start-0 border-end-0 pb-2"
-                >
-                    {selectedTimes?.length > 0 ? (
-                        selectedTimes?.map((time: Time, index: number) => {
-                            return (
-                                <Col
-                                    span={6}
-                                    className="select-time"
-                                    key={time?.id}
-                                >
-                                    <Button
+                <Skeleton active loading={isFetchingSchedules}>
+                    <Row
+                        gutter={[24, 24]}
+                        className="border border-top-0 border-start-0 border-end-0 pb-2"
+                    >
+                        {selectedTimes?.length > 0 ? (
+                            selectedTimes?.map((time: Time) => {
+                                return (
+                                    <Col
+                                        span={6}
+                                        className="select-time"
                                         key={time?.id}
-                                        className={`${
-                                            time?.disable ? 'pe-none' : ''
-                                        }`}
-                                        type="primary"
-                                        // onClick={() => {
-                                        //     handleRemoveTime(index);
-                                        // }}
                                     >
-                                        {time?.startTime}
-                                        <CloseOutlined />
-                                    </Button>
-                                </Col>
-                            );
-                        })
-                    ) : (
-                        <></>
-                    )}
-                </Row>
+                                        <Button
+                                            key={time?.id}
+                                            className={`${
+                                                time?.disable ? 'pe-none' : ''
+                                            }`}
+                                            type="primary"
+                                            // onClick={() => {
+                                            //     handleRemoveTime(index);
+                                            // }}
+                                        >
+                                            {time?.startTime}
+                                            <CloseOutlined />
+                                        </Button>
+                                    </Col>
+                                );
+                            })
+                        ) : (
+                            <></>
+                        )}
+                    </Row>
+                </Skeleton>
+
                 <Row gutter={24} className="p-3 justify-content-between">
                     <Button
                         className={`bg-dark text-light `}

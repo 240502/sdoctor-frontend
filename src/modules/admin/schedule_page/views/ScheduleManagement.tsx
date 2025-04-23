@@ -6,18 +6,18 @@ import {
     Flex,
     Select,
     TabsProps,
-    notification,
+    message,
 } from 'antd';
+import dayjs from 'dayjs';
 import { useEffect, useState } from 'react';
 import { ListTime } from '../components/ListTime';
-import { DoctorScheduleDetail } from '../../../../models/doctor_schedule_details';
 import { Time } from '../../../../models/time';
-import { useRecoilState, useRecoilValue } from 'recoil';
+import { useRecoilValue } from 'recoil';
 import { configValue, userValue } from '../../../../stores/userAtom';
-type NotificationType = 'success' | 'error';
 import '@/assets/scss/schedule_management.scss';
-import { scheduleDetailsState } from '../../../../stores/scheduleDetailAtom';
-import { handleTimeOverRealTime } from '../../../../utils/schedule';
+import { useFetchSchedulesByEntityIdForDoctor } from '../../../../hooks';
+import { NoticeType } from 'antd/es/message/interface';
+import { Schedules } from '../../../../models';
 const tabs: TabsProps['items'] = [
     {
         key: '1',
@@ -50,138 +50,74 @@ const tabs: TabsProps['items'] = [
 ];
 const ScheduleManagement = () => {
     const now = new Date();
+
     const user = useRecoilValue(userValue);
     const config = useRecoilValue(configValue);
-    const [api, contextHolder] = notification.useNotification();
     const [activeDay, setActiveDay] = useState<string>(String(now.getDay()));
-
+    const [messageApi, contextHolder] = message.useMessage();
     const [selectedTimes, setSelectedTimes] = useState<Time[]>([]);
-
+    const [date, setDate] = useState<string>(dayjs().format('YYYY-MM-DD'));
     const [intervalTime, setIntervalTime] = useState<number>(30);
     const [isUpdate, setIsUpdate] = useState<boolean>(false);
-    const openNotification = (
-        type: NotificationType,
-        title: string,
-        des: string
-    ) => {
-        api[type]({
-            message: title,
-            description: des,
+    const openMessage = (type: NoticeType, des: string) => {
+        messageApi.open({
+            type: type,
+            content: des,
         });
     };
-
-    // const handleGetScheduleBySubscriberAndDate = () => {
-    //     const dateOfWeek = handleGetDateByActiveDay(Number(activeDay));
-    //     if (doctorSchedules.length > 0) {
-    //         let doctorSchedule: DoctorSchedule | any = doctorSchedules.find(
-    //             (schedule: DoctorSchedule) => {
-    //                 const date = new Date(schedule.date);
-    //                 if (
-    //                     schedule.entityId === user.doctorId &&
-    //                     date.getFullYear() === dateOfWeek.getFullYear() &&
-    //                     date.getMonth() + 1 === dateOfWeek.getMonth() + 1 &&
-    //                     date.getDate() === dateOfWeek.getDate()
-    //                 ) {
-    //                     return schedule;
-    //                 }
-    //             }
-    //         );
-
-    //         if (doctorSchedule) {
-    //             setSchedule(doctorSchedule);
-    //             getSelectedTimes(doctorSchedule.doctorScheduleDetails);
-    //         } else {
-    //             const data = {
-    //                 doctorId: user.doctorId,
-    //                 date: `${dateOfWeek.getFullYear()}-${
-    //                     dateOfWeek.getMonth() + 1
-    //                 }-${dateOfWeek.getDate()}`,
-    //                 viewType: 'doctor',
-    //             };
-    //             GetScheduleBySubscriberIdAndDate(data);
-    //         }
-    //     } else {
-    //         const data = {
-    //             doctorId: user.doctorId,
-    //             date: `${dateOfWeek.getFullYear()}-${
-    //                 dateOfWeek.getMonth() + 1
-    //             }-${dateOfWeek.getDate()}`,
-    //             viewType: 'doctor',
-    //         };
-    //         console.log('call api', data);
-    //         GetScheduleBySubscriberIdAndDate(data);
-    //     }
-    // };
-
-    // const GetScheduleBySubscriberIdAndDate = async (data: any) => {
-    //     try {
-    //         const res = await scheduleService.viewSchedule(data);
-
-    //         if (doctorSchedules.length > 0) {
-    //             if (
-    //                 !doctorSchedules.find(
-    //                     (schedule: DoctorSchedule) => schedule.id === res.id
-    //                 )
-    //             ) {
-    //                 const newDoctorSchedules = [...doctorSchedules, res];
-    //                 setDoctorSchedules(newDoctorSchedules);
-    //                 console.log('new doctor schedules', newDoctorSchedules);
-    //             }
-    //         } else {
-    //             setDoctorSchedules([res]);
-    //         }
-    //         setSchedule(res);
-    //         getSelectedTimes(res?.doctorScheduleDetails);
-    //     } catch (err: any) {
-    //         console.log(err.message);
-    //         setSchedule({} as DoctorSchedule);
-    //         setSelectedTimes([]);
-    //     }
-    // };
-    const getSelectedTimes = (
-        doctorScheduleDetails: DoctorScheduleDetail[]
-    ) => {
-        const now = new Date();
-        let selectedTimes: Time[] = [];
-        doctorScheduleDetails?.forEach((detail: DoctorScheduleDetail) => {
-            const time: Time = {
-                id: detail.timeId,
-                startTime: detail.startTime,
-                endTime: detail.endTime,
-                interval: null,
-                disable: null,
-            };
-
-            if (selectedTimes.length > 0) {
-                selectedTimes.push(time);
-            } else {
-                selectedTimes = [time];
-            }
-        });
-
-        if (Number(activeDay) === now.getDay()) {
-            console.log('handle1');
-
-            selectedTimes = handleTimeOverRealTime(selectedTimes);
-            setSelectedTimes(selectedTimes);
-            console.log('newTimes', selectedTimes);
-        }
-        if (Number(activeDay) !== 0 && Number(activeDay) < now.getDay()) {
-            selectedTimes = selectedTimes.map((time: Time) => {
-                return { ...time, disable: true };
-            });
-            console.log('handle2');
-            console.log('newTimes', selectedTimes);
-            setSelectedTimes(selectedTimes);
-        }
-        if (Number(activeDay) === 0 || Number(activeDay) > now.getDay()) {
-            setSelectedTimes(selectedTimes);
-        }
+    const { data, error, isFetching } = useFetchSchedulesByEntityIdForDoctor({
+        entityId: user.userId,
+        date,
+        entityType: 'doctor',
+    });
+    // Hàm để refetch với date mới
+    const handleRefetch = (activeDate: number) => {
+        const dayNow = dayjs(date).day();
+        // Ví dụ: Cập nhật date thành ngày tiếp theo
+        const newDate = dayjs(date)
+            .add(activeDate - dayNow, 'day')
+            .format('YYYY-MM-DD');
+        setDate(newDate); // Cập nhật state date
     };
     useEffect(() => {
-        setSelectedTimes([]);
-        // handleGetScheduleBySubscriberAndDate();
-    }, [activeDay]);
+        console.log('schedule response', data);
+        if (data?.data && data?.data?.length > 0) {
+            getSelectedTimes(data?.data ?? []);
+        }
+    }, [data]);
+    const getSelectedTimes = (schedules: Schedules[]) => {
+        const now = dayjs();
+        let selectedTimes: Time[] = [];
+        schedules.forEach((schedule: Schedules) => {
+            const [startHour, startMinute] = schedule.startTime
+                .split(':')
+                .map(Number);
+            const startTime = dayjs()
+                .hour(startHour)
+                .minute(startMinute)
+                .second(0);
+
+            const diffMinutes = now.diff(startTime, 'minute');
+            if (diffMinutes > -20) {
+                selectedTimes.push({
+                    id: schedule.timeId,
+                    disable: true,
+                    startTime: schedule.startTime,
+                    endTime: schedule.endTime,
+                    interval: null,
+                });
+            } else {
+                selectedTimes.push({
+                    id: schedule.timeId,
+                    disable: false,
+                    startTime: schedule.startTime,
+                    endTime: schedule.endTime,
+                    interval: null,
+                });
+            }
+        });
+        setSelectedTimes(selectedTimes);
+    };
     useEffect(() => {
         console.log('selectedTimes', selectedTimes);
     }, [selectedTimes]);
@@ -212,7 +148,9 @@ const ScheduleManagement = () => {
                                 }}
                                 onClick={() => {
                                     setActiveDay(tab.key);
-                                    // setSchedule({} as DoctorSchedule);
+                                    handleRefetch(Number(tab.key));
+                                    setSelectedTimes([]);
+
                                     setIsUpdate(false);
                                 }}
                                 key={tab.key}
@@ -258,10 +196,11 @@ const ScheduleManagement = () => {
                         activeDay={Number(activeDay)}
                         user={user}
                         config={config}
-                        openNotification={openNotification}
+                        openMessage={openMessage}
                         interval={intervalTime}
                         selectedTimes={selectedTimes}
                         setSelectedTimes={setSelectedTimes}
+                        isFetchingSchedules={isFetching}
                     />
                 </Card>
             </div>

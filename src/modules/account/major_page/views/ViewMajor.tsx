@@ -30,11 +30,11 @@ const ViewMajor = () => {
             />
 
             <div className="specialization-list-container mt-4">
-                {error ? (
-                    <p>{error.message}</p>
-                ) : (
-                    <Skeleton active loading={isFetching}>
-                        {data?.majors?.length > 0 && (
+                <Skeleton active loading={isFetching}>
+                    {error ? (
+                        <p>{error.message}</p>
+                    ) : (
+                        data?.majors?.length > 0 && (
                             <>
                                 <MajorCards
                                     majors={data?.majors}
@@ -43,9 +43,9 @@ const ViewMajor = () => {
 
                                 <ShowMoreComp></ShowMoreComp>
                             </>
-                        )}
-                    </Skeleton>
-                )}
+                        )
+                    )}
+                </Skeleton>
             </div>
         </div>
     );

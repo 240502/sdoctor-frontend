@@ -35,8 +35,8 @@ const BlockClinic = (): JSX.Element => {
                     </Link>
                 </Button>
             </div>
-            <div className="block__list mt-4 position-relative">
-                <Skeleton loading={isFetching}>
+            <Skeleton loading={isFetching}>
+                <div className="block__list mt-4 position-relative">
                     {error ? (
                         <p className="fw-bold text-center">{error.message}</p>
                     ) : (
@@ -85,8 +85,8 @@ const BlockClinic = (): JSX.Element => {
                             })}
                         </Slider>
                     )}
-                </Skeleton>
-            </div>
+                </div>
+            </Skeleton>
         </div>
     );
 };

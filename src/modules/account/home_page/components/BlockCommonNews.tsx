@@ -35,8 +35,8 @@ const BlockCommonPost = () => {
                     </Link>
                 </Button>
             </div>
-            <div className="block__list mt-4 position-relative posts">
-                <Skeleton active loading={isFetching}>
+            <Skeleton active loading={isFetching}>
+                <div className="block__list mt-4 position-relative posts">
                     {error ? (
                         <p className="text-center w-100 fw-bold">
                             {error.message}
@@ -92,8 +92,8 @@ const BlockCommonPost = () => {
                             })}
                         </Slider>
                     )}
-                </Skeleton>
-            </div>
+                </div>
+            </Skeleton>
         </div>
     );
 };

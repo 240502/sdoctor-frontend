@@ -35,12 +35,14 @@ export const BlockCommonDoctor = (): JSX.Element => {
                     Xem thêm
                 </Button>
             </div>
-            <Row className="block-container mt-4" gutter={16}>
-                {error ? (
-                    <p className="text-center fw-bold w-100">{error.message}</p>
-                ) : (
-                    <Skeleton active loading={isFetching}>
-                        {data?.doctors?.map((doctor: Doctor) => {
+            <Skeleton active loading={isFetching}>
+                <Row className="block-container mt-4" gutter={16}>
+                    {error ? (
+                        <p className="text-center fw-bold w-100">
+                            {error.message}
+                        </p>
+                    ) : (
+                        data?.doctors?.map((doctor: Doctor) => {
                             return (
                                 <Col
                                     className=" mb-3"
@@ -130,10 +132,10 @@ export const BlockCommonDoctor = (): JSX.Element => {
                                     </Card>
                                 </Col>
                             );
-                        })}
-                    </Skeleton>
-                )}
-            </Row>
+                        })
+                    )}
+                </Row>
+            </Skeleton>
         </div>
     );
 };

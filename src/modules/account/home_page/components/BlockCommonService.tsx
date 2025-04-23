@@ -15,13 +15,13 @@ export const BlockCommonService = () => {
                     </Link>
                 </Button>
             </div>
-            {error ? (
-                <p className="text-center fw-bold">{error.message}</p>
-            ) : (
-                <Skeleton active loading={isFetching}>
+            <Skeleton active loading={isFetching}>
+                {error ? (
+                    <p className="text-center fw-bold">{error.message}</p>
+                ) : (
                     <MedicalPackageCardComp medicalPackages={data} />
-                </Skeleton>
-            )}
+                )}
+            </Skeleton>
         </div>
     );
 };
