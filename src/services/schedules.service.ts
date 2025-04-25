@@ -1,5 +1,6 @@
+import { AxiosResponse } from 'axios';
 import { apiClient } from '../constants/api';
-import { Schedules } from '../models';
+import { CreateSchedulesResponse, Schedules } from '../models';
 
 const scheduleService = {
     async getScheduleByEntityId(payload: {
@@ -14,9 +15,13 @@ const scheduleService = {
         return res.data;
     },
 
-    async createSchedule(data: any, config: any): Promise<any> {
-        const res = await apiClient.post('/schedule/create', data, config);
-        return res;
+    async createSchedule(
+        data: any,
+        config: any
+    ): Promise<CreateSchedulesResponse> {
+        const res: AxiosResponse<CreateSchedulesResponse> =
+            await apiClient.post('/schedule/create', data, config);
+        return res.data;
     },
     async updateSchedule(data: any, config: any): Promise<any> {
         const res = await apiClient.put(
@@ -43,8 +48,12 @@ const scheduleService = {
         );
         return res?.data;
     },
-    async deleteSchedules(ids: number[]): Promise<any> {
-        const res = await apiClient.post('/schedule/delete-schedules', ids);
+    async deleteSchedules(ids: number[], config: any): Promise<any> {
+        const res = await apiClient.post(
+            '/schedule/delete-schedules',
+            ids,
+            config
+        );
         return res;
     },
 };

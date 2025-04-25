@@ -16,7 +16,7 @@ export interface Schedules {
 export interface SchedulesCreate {
     entityId: Number;
     entityType: string;
-    date: string;
+    date: Date | string;
     timeId: number;
 }
 export interface SchedulesResponse {
@@ -25,4 +25,16 @@ export interface SchedulesResponse {
     entityId: number;
     entityType: string;
     updatedScheduleId: number[];
+}
+// Định nghĩa kiểu trả về cho API xóa
+export interface DeleteSchedulesResponse {
+    success: boolean;
+    message?: string;
+}
+
+// Định nghĩa kiểu trả về cho API thêm
+export interface CreateSchedulesResponse {
+    success: boolean;
+    schedules: Schedules[];
+    message?: string;
 }

@@ -3,6 +3,16 @@ import { apiClient } from '../constants/api';
 import { Appointment } from '../models';
 
 const appointmentService = {
+    async getAppointmentWithOptions(payload: {
+        pageIndex: number;
+        pageSize: number;
+        status: number;
+    }): Promise<any> {
+        const res = await apiClient.get(
+            `/appointment/get-appointment-with-options?pageIndex=${payload.pageIndex}&pageSize=${payload.pageSize}&status=${payload.status}`
+        );
+        return res?.data;
+    },
     async getAppointmentByUuid(payload: any): Promise<Appointment[] | any> {
         const res = await apiClient.get(
             `/appointment/get-appointment-by-uuid?uuid=${payload.uuid}&pageIndex=${payload.pageIndex}&pageSize=${payload.pageSize}&statusId=${payload.statusId}`,

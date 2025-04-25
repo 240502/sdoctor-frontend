@@ -79,10 +79,6 @@ const DoctorCard = ({ doctors }: any) => {
                                             onClick={() => {
                                                 const queryParams =
                                                     new URLSearchParams();
-                                                console.log(
-                                                    'doctorId',
-                                                    doctor.doctorId
-                                                );
 
                                                 queryParams.append(
                                                     'doctorId',

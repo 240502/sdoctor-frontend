@@ -124,8 +124,14 @@ const ViewDetailDoctor = () => {
                                             <Button
                                                 className="border-primary text-primary button-booking-now"
                                                 onClick={() => {
+                                                    const queryParams =
+                                                        new URLSearchParams();
+                                                    queryParams.append(
+                                                        'doctorId',
+                                                        data.doctorId.toString()
+                                                    );
                                                     navigate(
-                                                        '/booking-appointment'
+                                                        `/booking-appointment?${queryParams}`
                                                     );
                                                     // setDoctorGlobal(doctor);
                                                 }}

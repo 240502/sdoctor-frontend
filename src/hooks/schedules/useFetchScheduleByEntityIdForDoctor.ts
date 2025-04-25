@@ -8,14 +8,13 @@ export const useFetchSchedulesByEntityIdForDoctor = (payload: {
     entityType: string;
 }): UseQueryResult<SchedulesResponse, Error> => {
     return useQuery<SchedulesResponse, Error>({
-        queryKey: [
-            'useFetchSchedulesByEntityIdForDoctor',
-            JSON.stringify(payload),
-        ],
+        queryKey: ['useFetchSchedulesByEntityIdForDoctor', payload],
         queryFn: async () => {
-            return await scheduleService.getScheduleByEntityIdForDoctor(
-                payload
-            );
+            console.log('Calling API with payload:', payload);
+            const response =
+                await scheduleService.getScheduleByEntityIdForDoctor(payload);
+            console.log('API response:', response);
+            return response;
         },
         retry: false,
     });

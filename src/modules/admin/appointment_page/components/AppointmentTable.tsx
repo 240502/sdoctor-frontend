@@ -1,6 +1,7 @@
 import Table, { ColumnsType } from 'antd/es/table';
 import {
     Appointment,
+    AppointmentResponseDto,
     AppointmentViewForPatient,
 } from '../../../../models/appointment';
 import {
@@ -9,6 +10,7 @@ import {
     InputRef,
     Pagination,
     Select,
+    Skeleton,
     Space,
     Tag,
     Tooltip,
@@ -22,14 +24,14 @@ import {
     EyeOutlined,
     SearchOutlined,
 } from '@ant-design/icons';
-import { AppointmentService } from '../../../../services/appointment.service';
+import { appointmentService } from '../../../../services';
 import { ConfirmAppointmentModal } from '../../../../components';
 import { useRecoilValue } from 'recoil';
 import { configValue } from '../../../../stores/userAtom';
-type DataIndex = keyof AppointmentViewForPatient;
+import { useFetchAppointmentWithOptions } from '../../../../hooks/appointments/useFetchAppointmentWithOptions';
+type DataIndex = keyof AppointmentResponseDto;
 
 const AppointmentTable = ({
-    data,
     onPageChange,
     pageCount,
     pageSize,
@@ -38,28 +40,34 @@ const AppointmentTable = ({
     getAppointmentByStatusId,
     handleClickViewDetail,
 }: any) => {
-    const config = useRecoilValue(configValue);
     const [searchText, setSearchText] = useState('');
     const [searchedColumn, setSearchedColumn] = useState('');
     const searchInput = useRef<InputRef>(null);
     const [openModalConfirm, setOpenModalConfirm] = useState<boolean>(false);
-    const [appointment, setAppointment] = useState<Appointment>(
-        {} as Appointment
+    const [appointment, setAppointment] = useState<AppointmentResponseDto>(
+        {} as AppointmentResponseDto
     );
+    const [options, setOptions] = useState<{
+        pageIndex: number;
+        pageSize: number;
+        status: number;
+    }>({
+        pageIndex: 1,
+        pageSize: 8,
+        status: 1,
+    });
     const [type, setType] = useState<string>('');
     const [message, setMessage] = useState<string>('');
     const handleCancelModalConfirm = () => {
-        setAppointment({} as Appointment);
+        setAppointment({} as AppointmentResponseDto);
         setOpenModalConfirm(false);
     };
     const rejectionReasonInputRef = useRef<any>(null);
-
+    const { data, error, isError, isFetching } =
+        useFetchAppointmentWithOptions(options);
     const ChangeAppointmentStatus = async (data: any) => {
         try {
-            const res = await AppointmentService.updateAppointmentStatus(
-                data,
-                config
-            );
+            const res = await appointmentService.updateAppointmentStatus(data);
             console.log(res);
             openNotificationWithIcon(
                 'success',
@@ -196,7 +204,7 @@ const AppointmentTable = ({
                 text
             ),
     });
-    const columns: ColumnsType<AppointmentViewForPatient> = [
+    const columns: ColumnsType<AppointmentResponseDto> = [
         {
             title: 'Họ và tên',
             dataIndex: 'patientName',
@@ -354,41 +362,52 @@ const AppointmentTable = ({
             ),
         },
     ];
+    const onChangePage = (current: number, size: number) => {
+        console.log(size, options.pageSize);
+        if (Number(size) !== options.pageSize) {
+            console.log('set lại page size');
 
-    return data.length > 0 ? (
-        <>
-            <Table
-                bordered
-                columns={columns}
-                dataSource={data}
-                pagination={false}
-            />
-            <Pagination
-                className="mt-3"
-                showSizeChanger
-                align="center"
-                defaultCurrent={1}
-                current={pageIndex}
-                pageSize={pageSize}
-                total={pageCount * pageSize}
-                pageSizeOptions={['5', '10', '20', '50']}
-                onChange={(current: number, size: number) => {
-                    onPageChange(current, size);
-                }}
-            />
-            {openModalConfirm && (
-                <ConfirmAppointmentModal
-                    type={type}
-                    message={message}
-                    openModalConfirm={openModalConfirm}
-                    handleCancelModalConfirm={handleCancelModalConfirm}
-                    handleOk={handleOk}
-                    rejectionReasonInputRef={rejectionReasonInputRef}
-                />
+            setOptions({ ...options, pageIndex: 1, pageSize: size });
+        } else {
+            setOptions({ ...options, pageIndex: current });
+        }
+    };
+    return (
+        <Skeleton active loading={isFetching}>
+            {isError ? (
+                <p className="fw-bold text-center">{error.message}</p>
+            ) : (
+                <>
+                    <Table
+                        bordered
+                        columns={columns}
+                        dataSource={data?.appointments}
+                        pagination={false}
+                    />
+                    <Pagination
+                        className="mt-3"
+                        showSizeChanger
+                        align="center"
+                        defaultCurrent={1}
+                        current={pageIndex}
+                        pageSize={pageSize}
+                        total={pageCount * pageSize}
+                        pageSizeOptions={['5', '10', '20', '50']}
+                        onChange={onChangePage}
+                    />
+                    {openModalConfirm && (
+                        <ConfirmAppointmentModal
+                            type={type}
+                            message={message}
+                            openModalConfirm={openModalConfirm}
+                            handleCancelModalConfirm={handleCancelModalConfirm}
+                            handleOk={handleOk}
+                            rejectionReasonInputRef={rejectionReasonInputRef}
+                        />
+                    )}
+                </>
             )}
-        </>
-    ) : (
-        <p className="text-center">Chưa có lịch hẹn!</p>
+        </Skeleton>
     );
 };
 

@@ -1,18 +1,18 @@
 import { useEffect, useState } from 'react';
-import { Button, Row, Col, message, Skeleton } from 'antd';
-import { useRecoilState } from 'recoil';
-import { scheduleDetailsState } from '../../../../stores/scheduleDetailAtom';
+import { Button, Row, Col, Skeleton } from 'antd';
 import { Time } from '../../../../models/time';
 import { CloseOutlined, PlusOutlined } from '@ant-design/icons';
 import { handleGetDateByActiveDay } from '../../../../utils/schedule_management';
-// import { scheduleService } from '../../../../services/doctor_schedule.service';
-import { scheduleService, timeService } from '../../../../services';
-import { DoctorScheduleDetail } from '../../../../models/doctor_schedule_details';
-import { handleTimeOverRealTime } from '../../../../utils/schedule';
-import { SchedulesCreate } from '../../../../models';
-import { useCreateSchedules } from '../../../../hooks/schedules';
+import { Schedules, SchedulesCreate } from '../../../../models';
+import {
+    useCreateSchedules,
+    useDeleteSchedules,
+} from '../../../../hooks/schedules';
 import dayjs from 'dayjs';
-import { useFetchTimeByType } from '../../../../hooks';
+import {
+    useUpdateSchedules,
+    UseUpdateSchedulesReturn,
+} from '../../../../hooks/schedules/useUpdateSchedules';
 export const ListTime = ({
     activeDay,
     user,
@@ -22,44 +22,24 @@ export const ListTime = ({
     selectedTimes,
     setSelectedTimes,
     isFetchingSchedules,
+    times,
+    isFetchingTime,
+    schedules,
+    refetch,
 }: any) => {
     const [disableSaveButton, setDisableSaveButton] = useState<boolean>(false);
-    const [times, setTimes] = useState<Time[]>([]);
-    const [deleteDetails, setDeletedDetails] = useState<DoctorScheduleDetail[]>(
-        []
-    );
+    const [deletedIds, setDeletedIds] = useState<number[]>([]);
     const handleOverTime = (day: number) => {
-        const now = new Date();
-        if (day < now.getDay() && day !== 0) {
+        if (day < dayjs().day() && day !== 0) {
             setDisableSaveButton(true);
         } else setDisableSaveButton(false);
     };
 
-    const { data, error, isFetching } = useFetchTimeByType(interval);
-    console.log(data);
     useEffect(() => {
-        console.log('data', data);
-        if (data && data?.length > 0) {
-            handleTimes(data);
-        }
-    }, [data]);
+        handleOverTime(activeDay);
+        console.log('Times', times);
+    }, []);
 
-    const handleTimes = async (times: Time[]) => {
-        const now = new Date();
-        if (activeDay === now.getDay()) {
-            const newTimes = handleTimeOverRealTime(times);
-            setTimes(newTimes);
-        }
-        if (activeDay !== 0 && activeDay < now.getDay()) {
-            const newTimes = times.map((time: Time) => {
-                return { ...time, disable: true };
-            });
-            setTimes(newTimes);
-        }
-        if (activeDay === 0 || activeDay > now.getDay()) {
-            setTimes(times);
-        }
-    };
     const createSchedules = useCreateSchedules(config);
     const handleCreateSchedule = () => {
         const now = dayjs();
@@ -77,101 +57,59 @@ export const ListTime = ({
             };
             schedules.push(schedule);
         });
-        createSchedules.mutate(schedules);
+        createSchedules.mutate(schedules, {
+            onSuccess(data) {
+                console.log('created schedules successfully', data);
+                openMessage('success', 'Thêm lịch làm việc thành công!');
+                refetch();
+            },
+            onError(error) {
+                console.log('Created schedules error', error);
+                openMessage('error', 'Thêm lịch làm việc không thành công!');
+            },
+        });
     };
-    const handleDeleteSchedules = () => {
-        let newTimes = [];
-        if(data && data?.length > 0){
-            if(selectedTimes.length >= data?.length){
-                
+    const {
+        updateSchedules,
+        isPending,
+        isError,
+        error,
+    }: UseUpdateSchedulesReturn = useUpdateSchedules(config);
+    const handleUpdateSchedules = async () => {
+        try {
+            const now = dayjs();
+            let dateOfWeek: string = now.format('YYYY-MM-DD');
+            if (now.day() !== Number(activeDay)) {
+                dateOfWeek = handleGetDateByActiveDay(Number(activeDay));
             }
-
+            const schedulesToCreate: SchedulesCreate[] = selectedTimes
+                .filter(
+                    (time: Time) =>
+                        !schedules.some(
+                            (schedule: Schedules) => schedule.timeId === time.id
+                        )
+                )
+                .map((time: Time) => ({
+                    entityId: user.userId,
+                    date: dateOfWeek,
+                    entityType: 'Doctor',
+                    timeId: time.id,
+                }));
+            await updateSchedules(deletedIds, schedulesToCreate);
+            openMessage('success', 'Cập nhập thành công !');
+        } catch (err: any) {
+            openMessage('error', 'Cập nhập không thành công !');
         }
-    }
-    // const handleUpdateSchedule = () => {
-    //     let newTimes = [];
-    //     if (selectedTimes.length >= schedule.listScheduleDetails?.length) {
-    //         newTimes = selectedTimes.filter((time: Time) => {
-    //             const exist = schedule.listScheduleDetails.find(
-    //                 (detail: DoctorScheduleDetail) => {
-    //                     return detail.timeId === time.id;
-    //                 }
-    //             );
-    //             if (!exist) {
-    //                 return time;
-    //             }
-    //         });
-    //     } else {
-    //         newTimes = selectedTimes.filter((time: Time) => {
-    //             const exist = schedule.listScheduleDetails.find(
-    //                 (detail: DoctorScheduleDetail) => {
-    //                     return detail.timeId === time.id;
-    //                 }
-    //             );
-    //             if (!exist) {
-    //                 return time;
-    //             }
-    //         });
-    //     }
-    //     let newScheduleDetails: DoctorScheduleDetail[] = [];
-    //     let newDeletedDetails: DoctorScheduleDetail[] = [];
-    //     if (newTimes.length > 0) {
-    //         newTimes.forEach((time: Time) => {
-    //             const newScheduleDetail: DoctorScheduleDetail = {
-    //                 id: null,
-    //                 scheduleId: schedule?.id,
-    //                 startTime: time.startTime,
-    //                 endTime: time.endTime,
-    //                 available: 1,
-    //                 action: 1,
-    //                 timeId: time?.id,
-    //             };
-    //             newScheduleDetails.push(newScheduleDetail);
-    //         });
-    //     }
-    //     if (deleteDetails.length > 0) {
-    //         newDeletedDetails = deleteDetails.map(
-    //             (detail: DoctorScheduleDetail) => {
-    //                 return { ...detail, action: 3 };
-    //             }
-    //         );
-    //     }
-    //     if (newDeletedDetails?.length > 0 || newScheduleDetails?.length > 0) {
-    //         updateSchedule(schedule?.id, [
-    //             ...newDeletedDetails,
-    //             ...newScheduleDetails,
-    //         ]);
-    //     } else {
-    //         console.log('no update');
-    //         openMessage('warning', 'Không có gì thay đổi !');
-    //     }
-    // };
-    // const updateSchedule = async (
-    //     id: number,
-    //     scheduleDetails: DoctorScheduleDetail[]
-    // ) => {
-    //     try {
-    //         const data = {
-    //             id: id,
-    //             scheduleDetails: scheduleDetails,
-    //         };
+    };
+    const handleSubmit = async () => {
+        console.log(schedules && schedules?.length > 0);
 
-    //         const res = await scheduleService.updateSchedule(data, config);
-    //         handleGetScheduleBySubscriberAndDate();
-    //         openNotification(
-    //             'success',
-    //             'Thông báo !',
-    //             'Cập nhập thời gian thành công!'
-    //         );
-    //     } catch (err: any) {
-    //         console.log(err.message);
-    //         openNotification(
-    //             'error',
-    //             'Thông báo !',
-    //             'Cập nhập thời gian không thành công!'
-    //         );
-    //     }
-    // };
+        if (schedules && schedules?.length > 0) {
+            handleUpdateSchedules();
+        } else {
+            handleCreateSchedule();
+        }
+    };
     const handleAddTime = (time: Time) => {
         const existTime = selectedTimes.find(
             (selectedTime: Time) =>
@@ -222,20 +160,21 @@ export const ListTime = ({
     //         setSelectedTimes([...times]);
     //     }
     // };
-    // const handleRemoveTime = (index: number) => {
-    //     const updatedTimes = selectedTimes.filter(
-    //         (time: Time, i: number) => i !== index
-    //     );
-    //     setSelectedTimes(updatedTimes);
-    //     const existDetail = schedule.listScheduleDetails.find(
-    //         (detail: DoctorScheduleDetail) =>
-    //             detail.timeId === selectedTimes[index].id
-    //     );
-    //     if (existDetail) {
-    //         const newDeletedDetails = [...deleteDetails, existDetail];
-    //         setDeletedDetails(newDeletedDetails);
-    //     }
-    // };
+    const handleRemoveTime = (index: number) => {
+        const updatedTimes = selectedTimes.filter(
+            (time: Time, i: number) => i !== index
+        );
+        setSelectedTimes(updatedTimes);
+        const existsSchedule = schedules.find(
+            (schedule: Schedules) => schedule.timeId === selectedTimes[index].id
+        );
+        if (existsSchedule) {
+            setDeletedIds([...deletedIds, existsSchedule.id]);
+        }
+    };
+    useEffect(() => {
+        console.log('deletedIds', deletedIds);
+    }, [deletedIds]);
     // const handleRemoveAllTimes = () => {
     //     setSelectedTimes([]);
     //     const newDeletedDetails = [...schedule.listScheduleDetails];
@@ -252,112 +191,122 @@ export const ListTime = ({
                 className="border border-start-0 border-bottom-0 pe-3 border-top-0 "
             >
                 <h6 className="mb-3">Chọn thời gian làm việc cho hôm nay</h6>
-                <Skeleton active loading={isFetching}>
-                    <Row gutter={[24, 24]}>
-                        {times.map((time: Time) => {
-                            if (selectedTimes?.length > 0) {
-                                const existTime = selectedTimes?.find(
-                                    (selectedTime: Time) =>
-                                        time?.id === selectedTime?.id
-                                );
-                                return (
-                                    <Col
-                                        span={6}
-                                        className="time-item"
-                                        key={time?.id}
-                                    >
-                                        <Button
-                                            className={`${
-                                                time?.disable ? 'pe-none' : ''
-                                            }`}
-                                            key={time?.id}
-                                            onClick={() => handleAddTime(time)}
-                                            type={
-                                                existTime
-                                                    ? 'primary'
-                                                    : 'default'
-                                            }
-                                        >
-                                            {time.startTime}
-                                            <PlusOutlined />
-                                        </Button>
-                                    </Col>
-                                );
-                            } else {
-                                return (
-                                    <Col
-                                        span={6}
-                                        className="time-item"
-                                        key={time?.id}
-                                    >
-                                        <Button
-                                            className={`${
-                                                time?.disable ? 'pe-none' : ''
-                                            }`}
-                                            key={time?.id}
-                                            onClick={() => handleAddTime(time)}
-                                            type={'default'}
-                                        >
-                                            {time?.startTime}
-                                            <PlusOutlined />
-                                        </Button>
-                                    </Col>
-                                );
-                            }
-                        })}
-                    </Row>
-                </Skeleton>
+                <Row gutter={[24, 24]}>
+                    {isFetchingTime
+                        ? Array(3)
+                              .fill(null)
+                              .map((_, index) => (
+                                  <Col span={24} key={index}>
+                                      <Skeleton
+                                          active
+                                          style={{ width: '100%' }}
+                                      />
+                                  </Col>
+                              ))
+                        : times.map((time: Time) => {
+                              if (selectedTimes?.length > 0) {
+                                  const existTime = selectedTimes?.find(
+                                      (selectedTime: Time) =>
+                                          time?.id === selectedTime?.id
+                                  );
+                                  return (
+                                      <Col
+                                          span={6}
+                                          className="time-item"
+                                          key={time?.id}
+                                      >
+                                          <Button
+                                              className={`${
+                                                  time?.disable ? 'pe-none' : ''
+                                              }`}
+                                              key={time?.id}
+                                              onClick={() =>
+                                                  handleAddTime(time)
+                                              }
+                                              type={
+                                                  existTime
+                                                      ? 'primary'
+                                                      : 'default'
+                                              }
+                                          >
+                                              {time.startTime}
+                                              <PlusOutlined />
+                                          </Button>
+                                      </Col>
+                                  );
+                              } else {
+                                  return (
+                                      <Col
+                                          span={6}
+                                          className="time-item"
+                                          key={time?.id}
+                                      >
+                                          <Button
+                                              className={`${
+                                                  time?.disable ? 'pe-none' : ''
+                                              }`}
+                                              key={time?.id}
+                                              onClick={() =>
+                                                  handleAddTime(time)
+                                              }
+                                              type={'default'}
+                                          >
+                                              {time?.startTime}
+                                              <PlusOutlined />
+                                          </Button>
+                                      </Col>
+                                  );
+                              }
+                          })}
+                </Row>
             </Col>
             <Col span={12} className="selected-time">
                 <h6 className="mb-3">Thời gian đã chọn</h6>
-                <Skeleton active loading={isFetchingSchedules}>
-                    <Row
-                        gutter={[24, 24]}
-                        className="border border-top-0 border-start-0 border-end-0 pb-2"
-                    >
-                        {selectedTimes?.length > 0 ? (
-                            selectedTimes?.map((time: Time) => {
-                                return (
-                                    <Col
-                                        span={6}
-                                        className="select-time"
-                                        key={time?.id}
-                                    >
-                                        <Button
-                                            key={time?.id}
-                                            className={`${
-                                                time?.disable ? 'pe-none' : ''
-                                            }`}
-                                            type="primary"
-                                            // onClick={() => {
-                                            //     handleRemoveTime(index);
-                                            // }}
-                                        >
-                                            {time?.startTime}
-                                            <CloseOutlined />
-                                        </Button>
-                                    </Col>
-                                );
-                            })
-                        ) : (
-                            <></>
-                        )}
-                    </Row>
-                </Skeleton>
+                <Row
+                    gutter={[24, 24]}
+                    className="border border-top-0 border-start-0 border-end-0 pb-2"
+                >
+                    {isFetchingTime ? (
+                        Array(3)
+                            .fill(null)
+                            .map((_, index) => (
+                                <Col span={24} key={index}>
+                                    <Skeleton
+                                        active
+                                        style={{ width: '100%' }}
+                                    />
+                                </Col>
+                            ))
+                    ) : selectedTimes?.length > 0 ? (
+                        selectedTimes.map((time: Time, index: number) => (
+                            <Col span={6} className="select-time" key={time.id}>
+                                <Button
+                                    key={time.id}
+                                    className={`${
+                                        time.disable ? 'pe-none' : ''
+                                    }`}
+                                    type="primary"
+                                    onClick={() => handleRemoveTime(index)}
+                                >
+                                    {time.startTime}
+                                    <CloseOutlined />
+                                </Button>
+                            </Col>
+                        ))
+                    ) : (
+                        <></>
+                    )}
+                </Row>
 
                 <Row gutter={24} className="p-3 justify-content-between">
                     <Button
                         className={`bg-dark text-light `}
-                        disabled={selectedTimes?.length > 0 ? false : true}
+                        disabled={disableSaveButton}
                         onClick={() => {
-                            // if (schedule?.listScheduleDetails?.length > 0) {
-                            //     handleUpdateSchedule();
-                            // } else {
-                            handleCreateSchedule();
-                            // }
+                            handleSubmit();
                         }}
                     >
-                        Lưu
+                        {isPending ? 'Đang cập nhập ...' : 'Lưu'}
                     </Button>
                     <Button
                         className={`border-danger text-danger `}

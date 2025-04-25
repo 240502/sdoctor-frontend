@@ -3,12 +3,12 @@ import { Breadcrumb, Divider, Flex, Select, notification } from 'antd';
 import { useEffect, useState } from 'react';
 import AppointmentTable from '../components/AppointmentTable';
 import { Appointment } from '../../../../models/appointment';
-import { AppointmentService } from '../../../../services/appointment.service';
+import { appointmentService } from '../../../../services';
 import { useRecoilValue } from 'recoil';
 import { userValue } from '../../../../stores/userAtom';
 const { Option } = Select;
 import { AppointmentStatus } from '../../../../models/appointment_status';
-import { AppointmentStatusService } from '../../../../services/appointment_status.service';
+import { appointmentStatusService } from '../../../../services';
 import { ViewAppointmentModal } from '../../../../components';
 type NotificationType = 'success' | 'warning' | 'error';
 const AppointmentManagement = () => {
@@ -39,7 +39,7 @@ const AppointmentManagement = () => {
     };
     const getAllAppointmentStatus = async () => {
         try {
-            const res = await AppointmentStatusService.getAll();
+            const res = await appointmentStatusService.getAll();
             console.log(res);
             setAppointmentStatuses(res);
         } catch (err: any) {
@@ -54,7 +54,7 @@ const AppointmentManagement = () => {
                 status: options.statusId,
                 doctorId: user.doctorId,
             };
-            const res = await AppointmentService.getAppointmentByType(data);
+            const res = await appointmentService.getAppointmentByType(data);
             console.log('appointments', res);
             setAppointments(res.data);
             setPageCount(res.pageCount);

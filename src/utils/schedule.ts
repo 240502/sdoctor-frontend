@@ -22,5 +22,7 @@ export const handleTimeOverRealTime = (times: any) => {
             return { ...time, disable: false };
         }
     });
+    console.log(newTimes);
+
     return newTimes;
 };
