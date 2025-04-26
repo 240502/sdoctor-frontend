@@ -7,9 +7,10 @@ const appointmentService = {
         pageIndex: number;
         pageSize: number;
         status: number;
+        userId: number;
     }): Promise<any> {
         const res = await apiClient.get(
-            `/appointment/get-appointment-with-options?pageIndex=${payload.pageIndex}&pageSize=${payload.pageSize}&status=${payload.status}`
+            `/appointment/get-appointment-with-options?userId=${payload.userId}&pageIndex=${payload.pageIndex}&pageSize=${payload.pageSize}&status=${payload.status}`
         );
         return res?.data;
     },

@@ -1,5 +1,6 @@
 import { useMutation, UseMutationResult } from '@tanstack/react-query';
 import { mailerService } from '../../services';
+import { SendBookingSuccessMailPayload } from '../../models';
 
 type SendBookingSuccessMailResponse = {
     success: boolean;
@@ -7,17 +8,6 @@ type SendBookingSuccessMailResponse = {
     sendBookingSuccessMail?: any;
 };
 
-interface SendBookingSuccessMailPayload {
-    patientName: string;
-    email: string;
-    doctorName: string;
-    time: string;
-    date: string;
-    location: string;
-    status: string;
-    fee: number;
-    serviceName: string;
-}
 export const useSendBookingSuccessMail = (): UseMutationResult<
     SendBookingSuccessMailResponse, // Response type
     Error, // Error type

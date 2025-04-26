@@ -4,10 +4,10 @@ import { appointmentStatusService } from '../../services';
 import { AppointmentStatus } from '../../models';
 
 export const useFetchAllAppointmentStatus = (): UseQueryResult<
-    AppointmentStatus,
+    AppointmentStatus[],
     Error
 > => {
-    return useQuery<AppointmentStatus, Error>({
+    return useQuery<AppointmentStatus[], Error>({
         queryKey: ['useFetchAllAppointmentStatus'],
         queryFn: () => appointmentStatusService.getAll(),
         refetchOnWindowFocus: false,

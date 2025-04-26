@@ -1,8 +1,9 @@
 import { useQuery, UseQueryResult } from '@tanstack/react-query';
 import { appointmentService } from '../../services';
+import { AppointmentResponseDto } from '../../models';
 
 interface AppointmentResponse {
-    appointments: AppointmentResponse[];
+    appointments: AppointmentResponseDto[];
     pageIndex: number;
     pageSize: number;
     pageCount: number;
@@ -12,6 +13,7 @@ export const useFetchAppointmentWithOptions = (payload: {
     pageIndex: number;
     pageSize: number;
     status: number;
+    userId:number;
 }): UseQueryResult<AppointmentResponse, Error> => {
     return useQuery<AppointmentResponse, Error>({
         queryKey: ['useFetchAppointmentWithOptions', payload],

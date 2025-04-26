@@ -1,11 +1,8 @@
 import Table, { ColumnsType } from 'antd/es/table';
-import {
-    Appointment,
-    AppointmentResponseDto,
-    AppointmentViewForPatient,
-} from '../../../../models/appointment';
+import { AppointmentResponseDto } from '../../../../models/appointment';
 import {
     Button,
+    Flex,
     Input,
     InputRef,
     Pagination,
@@ -24,21 +21,22 @@ import {
     EyeOutlined,
     SearchOutlined,
 } from '@ant-design/icons';
-import { appointmentService } from '../../../../services';
+
 import { ConfirmAppointmentModal } from '../../../../components';
-import { useRecoilValue } from 'recoil';
-import { configValue } from '../../../../stores/userAtom';
+const { Option } = Select;
 import { useFetchAppointmentWithOptions } from '../../../../hooks/appointments/useFetchAppointmentWithOptions';
 type DataIndex = keyof AppointmentResponseDto;
-
+import dayjs from 'dayjs';
+import {
+    useFetchAllAppointmentStatus,
+    useSendConfirmSuccessMail,
+    useSendRejectionSuccessMail,
+    useUpdateAppointmentStatus,
+} from '../../../../hooks';
 const AppointmentTable = ({
-    onPageChange,
-    pageCount,
-    pageSize,
-    pageIndex,
     openNotificationWithIcon,
-    getAppointmentByStatusId,
     handleClickViewDetail,
+    userId,
 }: any) => {
     const [searchText, setSearchText] = useState('');
     const [searchedColumn, setSearchedColumn] = useState('');
@@ -51,7 +49,9 @@ const AppointmentTable = ({
         pageIndex: number;
         pageSize: number;
         status: number;
+        userId: number;
     }>({
+        userId: userId,
         pageIndex: 1,
         pageSize: 8,
         status: 1,
@@ -63,46 +63,79 @@ const AppointmentTable = ({
         setOpenModalConfirm(false);
     };
     const rejectionReasonInputRef = useRef<any>(null);
-    const { data, error, isError, isFetching } =
+    const { data, error, isError, isFetching, refetch, isRefetching } =
         useFetchAppointmentWithOptions(options);
-    const ChangeAppointmentStatus = async (data: any) => {
-        try {
-            const res = await appointmentService.updateAppointmentStatus(data);
-            console.log(res);
-            openNotificationWithIcon(
-                'success',
-                'Thông báo!',
-                'Cập nhập trạng thái thành công!'
-            );
-            handleCancelModalConfirm();
-            getAppointmentByStatusId();
-        } catch (err: any) {
-            console.log(err.message);
-            openNotificationWithIcon(
-                'error',
-                'Thông báo!',
-                'Cập nhập trạng thái không thành công!'
-            );
-            handleCancelModalConfirm();
-        }
-    };
+    const { data: appointmentStatusRes } = useFetchAllAppointmentStatus();
+    const updateAppointmentStatus = useUpdateAppointmentStatus();
+    const sendRejectionMail = useSendRejectionSuccessMail();
+    const sendConfirmSuccessMail = useSendConfirmSuccessMail();
 
     const handleOk = () => {
+        let payload: any = {};
         if (type === 'delete') {
-            const data = {
-                id: appointment.id,
-                status: appointment.statusId,
-                reason: rejectionReasonInputRef.current?.resizableTextArea
-                    ?.textArea.value,
+            payload = {
+                appointment: {
+                    ...appointment,
+                    rejectionReason:
+                        rejectionReasonInputRef.current?.resizableTextArea
+                            ?.textArea.value,
+                },
+                requirementObject: 'doctor',
             };
-            ChangeAppointmentStatus(data);
         } else {
-            const data = {
-                id: appointment.id,
-                status: appointment.statusId,
+            payload = {
+                appointment: {
+                    ...appointment,
+                },
+                requirementObject: 'doctor',
             };
-            ChangeAppointmentStatus(data);
         }
+        updateAppointmentStatus.mutate(payload, {
+            onSuccess() {
+                openNotificationWithIcon(
+                    'success',
+                    'Thông báo!',
+                    'Cập nhập trạng thái thành công!'
+                );
+                handleCancelModalConfirm();
+                if (type === 'delete') {
+                    const payload = {
+                        email: appointment.patientEmail,
+                        doctorName: appointment.doctorName,
+                        patientName: appointment.patientName,
+                        date: dayjs(
+                            appointment.appointmentDate.toString().split('T')[0]
+                        ).format('DD-MM-YYYY'),
+                        rejectionReason:
+                            rejectionReasonInputRef.current?.resizableTextArea
+                                ?.textArea.value,
+                        requirementObject: 'doctor',
+                    };
+                    sendRejectionMail.mutate(payload);
+                } else {
+                    const payload = {
+                        patientName: appointment.patientName,
+                        email: appointment.patientEmail,
+                        doctorName: appointment.doctorName,
+                        date: dayjs(
+                            appointment.appointmentDate.toString().split('T')[0]
+                        ).format('DD-MM-YYYY'),
+                        time: `${appointment.startTime} - ${appointment.endTime}`,
+                        location: appointment.location,
+                    };
+                    sendConfirmSuccessMail.mutate(payload);
+                }
+                refetch();
+            },
+            onError() {
+                openNotificationWithIcon(
+                    'error',
+                    'Thông báo!',
+                    'Cập nhập trạng thái không thành công!'
+                );
+                handleCancelModalConfirm();
+            },
+        });
     };
     const handleSearch = (
         selectedKeys: string[],
@@ -241,19 +274,21 @@ const AppointmentTable = ({
             title: 'Ngày hẹn',
             dataIndex: 'appointmentDate',
             render: (_, record) => {
-                const appointmentDate = new Date(
-                    record.appointmentDate.toString().slice(0, 10)
-                );
                 return (
-                    <>{`${appointmentDate.getDate()}-${
-                        appointmentDate.getMonth() + 1
-                    }-${appointmentDate.getFullYear()}`}</>
+                    <>
+                        {dayjs(
+                            record.appointmentDate.toString().split('T')[0]
+                        ).format('DD-MM-YYYY')}
+                    </>
                 );
             },
         },
         {
             title: 'Giờ hẹn',
             dataIndex: 'timeValue',
+            render: (_, record) => {
+                return <>{record.startTime + '-' + record.endTime}</>;
+            },
         },
         {
             title: 'Trạng thái',
@@ -346,7 +381,6 @@ const AppointmentTable = ({
                                 danger
                                 onClick={() => {
                                     setOpenModalConfirm(true);
-                                    //handleConfirmAppointment(record);
                                     setAppointment({ ...record, statusId: 3 });
                                     setMessage(
                                         'Bạn chắc chắn hủy lịch hẹn này!'
@@ -363,51 +397,87 @@ const AppointmentTable = ({
         },
     ];
     const onChangePage = (current: number, size: number) => {
-        console.log(size, options.pageSize);
         if (Number(size) !== options.pageSize) {
-            console.log('set lại page size');
-
             setOptions({ ...options, pageIndex: 1, pageSize: size });
         } else {
             setOptions({ ...options, pageIndex: current });
         }
     };
+
     return (
-        <Skeleton active loading={isFetching}>
-            {isError ? (
-                <p className="fw-bold text-center">{error.message}</p>
-            ) : (
-                <>
-                    <Table
-                        bordered
-                        columns={columns}
-                        dataSource={data?.appointments}
-                        pagination={false}
-                    />
-                    <Pagination
-                        className="mt-3"
-                        showSizeChanger
-                        align="center"
-                        defaultCurrent={1}
-                        current={pageIndex}
-                        pageSize={pageSize}
-                        total={pageCount * pageSize}
-                        pageSizeOptions={['5', '10', '20', '50']}
-                        onChange={onChangePage}
-                    />
-                    {openModalConfirm && (
-                        <ConfirmAppointmentModal
-                            type={type}
-                            message={message}
-                            openModalConfirm={openModalConfirm}
-                            handleCancelModalConfirm={handleCancelModalConfirm}
-                            handleOk={handleOk}
-                            rejectionReasonInputRef={rejectionReasonInputRef}
+        <>
+            <Flex className="mb-3">
+                <div className="col-4">
+                    <Select
+                        className="w-50"
+                        value={options.status}
+                        onChange={(value) => {
+                            setOptions({ ...options, status: value });
+                        }}
+                    >
+                        {appointmentStatusRes &&
+                            appointmentStatusRes?.map((status) => {
+                                return (
+                                    <Option
+                                        key={status.id}
+                                        value={status.id}
+                                        label={status.name}
+                                    >
+                                        {status.name}
+                                    </Option>
+                                );
+                            })}
+                    </Select>
+                </div>
+            </Flex>
+            <Skeleton active loading={isFetching || isRefetching}>
+                {isError ? (
+                    <p className="fw-bold text-center">
+                        {error.message.includes('404')
+                            ? 'Không có dữ liệu !'
+                            : 'Có lỗi khi lấy dữ liệu !'}
+                    </p>
+                ) : (
+                    <>
+                        <Table
+                            bordered
+                            columns={columns}
+                            dataSource={data?.appointments}
+                            pagination={false}
                         />
-                    )}
-                </>
-            )}
-        </Skeleton>
+                        <Pagination
+                            className="mt-3"
+                            showSizeChanger
+                            align="center"
+                            defaultCurrent={1}
+                            current={data?.pageIndex}
+                            pageSize={data?.pageSize}
+                            total={
+                                data?.pageCount
+                                    ? data?.pageCount * data?.pageSize
+                                    : 1
+                            }
+                            pageSizeOptions={['5', '10', '20', '50']}
+                            onChange={onChangePage}
+                        />
+                        {openModalConfirm && (
+                            <ConfirmAppointmentModal
+                                type={type}
+                                message={message}
+                                openModalConfirm={openModalConfirm}
+                                handleCancelModalConfirm={
+                                    handleCancelModalConfirm
+                                }
+                                handleOk={handleOk}
+                                rejectionReasonInputRef={
+                                    rejectionReasonInputRef
+                                }
+                            />
+                        )}
+                    </>
+                )}
+            </Skeleton>
+        </>
     );
 };
 

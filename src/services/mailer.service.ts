@@ -11,13 +11,13 @@ const mailerService = {
 
     async sendConfirmingSuccessMail(data: any): Promise<any> {
         const res = await apiClient.post(
-            '/mailer/send-confirming-success',
+            '/mailer/send-confirm-success-mail',
             data
         );
         return res;
     },
     async sendRejectionMail(data: any): Promise<any> {
-        const res = await apiClient.post('/mailer/send-rejection', data);
+        const res = await apiClient.post('/mailer/send-rejection-mail', data);
         return res;
     },
 };

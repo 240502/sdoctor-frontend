@@ -20,3 +20,4 @@ export * from './post';
 export * from './medical_package';
 export * from './user';
 export * from './department';
+export * from './mail';
