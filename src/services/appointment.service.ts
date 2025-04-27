@@ -1,8 +1,20 @@
-import { AxiosResponse } from 'axios';
 import { apiClient } from '../constants/api';
 import { Appointment } from '../models';
 
 const appointmentService = {
+    async getWaitingPatientsCount(doctorId: number) {
+        const res = await apiClient.get(
+            '/appointment/get-waitting-patients-count/' + doctorId
+        );
+        return res?.data;
+    },
+
+    async getAppointmentsInDay(doctorId: number) {
+        const res = await apiClient.get(
+            '/appointment/get-appointments-in-day/' + doctorId
+        );
+        return res?.data;
+    },
     async getAppointmentWithOptions(payload: {
         pageIndex: number;
         pageSize: number;
@@ -40,9 +52,9 @@ const appointmentService = {
         );
         return res.data;
     },
-    async getTotalPatientExaminedInDay(doctorId: number): Promise<any> {
+    async getTotalAppointmentsCompleted(doctorId: number): Promise<any> {
         const res = await apiClient.get(
-            '/appointment/get-total-examined-patient-in-day/' + doctorId
+            '/appointment/get-total-appointments-completed/' + doctorId
         );
         return res.data;
     },
@@ -50,6 +62,8 @@ const appointmentService = {
         const res = await apiClient.get(
             '/appointment/get-total-patient-in-day/' + doctorId
         );
+        console.log(res.data);
+
         return res.data;
     },
 

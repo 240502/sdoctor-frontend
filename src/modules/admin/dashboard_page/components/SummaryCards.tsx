@@ -1,40 +1,47 @@
 import React, { useEffect } from 'react';
 import { Card, Flex } from 'antd';
+import {
+    useFetchAppointmentsCompleted,
+    useFetchTotalAppointmentInDay,
+    useFetchWaitingPatientsCount,
+} from '../../../../hooks';
 
 interface SummaryCardsProps {
-    totalPatientInDay: number;
-    totalPatientExaminedInDay: number;
+    doctorId: number;
 }
 
-const SummaryCards: React.FC<SummaryCardsProps> = ({
-    totalPatientInDay,
-    totalPatientExaminedInDay,
-}) => {
+const SummaryCards: React.FC<SummaryCardsProps> = ({ doctorId }) => {
+    const { data: totalPatientResponse } =
+        useFetchTotalAppointmentInDay(doctorId);
+    const { data: appointmentComletedResponse } =
+        useFetchAppointmentsCompleted(doctorId);
+    const { data: waitionPatientsCountResponse } =
+        useFetchWaitingPatientsCount(doctorId);
     useEffect(() => {
-        console.log('totalPatientExaminedInDay', totalPatientExaminedInDay);
-        console.log('totalPatientInDay', totalPatientInDay);
+        console.log(appointmentComletedResponse?.totalPatient);
     }, []);
     return (
         <Flex vertical gap="middle">
             <Card className="shadow">
                 <h6 className="box__title d-flex justify-content-between ">
                     <span className="text-center col-8">
-                        Đã khám hôm nay
+                        Tổng số bệnh nhân
                         <p className="total__patient text-center m-0 mt-2">
-                            {totalPatientExaminedInDay}
+                            {totalPatientResponse?.totalPatient}
                         </p>
                     </span>
-                    <span className="text-center col-3">
-                        <i className="fa-solid fa-user-injured fs-3"></i>
+                    <span className="col-3 text-center">
+                        <i className="fa-solid fa-bed fs-3"></i>
                     </span>
                 </h6>
             </Card>
+
             <Card className="shadow">
                 <h6 className="box__title d-flex justify-content-between ">
                     <span className="text-center col-8">
-                        Bệnh nhân hôm nay
+                        Bệnh nhân chờ khám
                         <p className="total__patient text-center m-0 mt-2">
-                            {totalPatientInDay}
+                            {waitionPatientsCountResponse?.totalPatient}
                         </p>
                     </span>
                     <span className="col-3 text-center">
@@ -45,13 +52,13 @@ const SummaryCards: React.FC<SummaryCardsProps> = ({
             <Card className="shadow">
                 <h6 className="box__title d-flex justify-content-between ">
                     <span className="text-center col-8">
-                        Lịch hẹn hôm nay
+                        Bệnh nhân đã khám
                         <p className="total__patient text-center m-0 mt-2">
-                            {totalPatientInDay}
+                            {appointmentComletedResponse?.totalPatient}
                         </p>
                     </span>
-                    <span className="col-3 text-center">
-                        <i className="fa-solid fa-calendar-days fs-3"></i>
+                    <span className="text-center col-3">
+                        <i className="fa-solid fa-check fs-3"></i>
                     </span>
                 </h6>
             </Card>

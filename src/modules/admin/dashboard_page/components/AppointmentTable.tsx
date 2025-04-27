@@ -1,11 +1,8 @@
 import Table, { ColumnsType } from 'antd/es/table';
-import {
-    Appointment,
-    AppointmentViewForPatient,
-} from '../../../../models/appointment';
-import { Button, Input, InputRef, Pagination, Space, Tag, Tooltip } from 'antd';
+import { AppointmentResponseDto } from '../../../../models/appointment';
+import { Button, Input, InputRef, Skeleton, Space, Tag, Tooltip } from 'antd';
 import Highlighter from 'react-highlight-words';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { FilterDropdownProps } from 'antd/es/table/interface';
 import {
     CheckOutlined,
@@ -13,104 +10,127 @@ import {
     EyeOutlined,
     SearchOutlined,
 } from '@ant-design/icons';
-import { appointmentService } from '../../../../services';
 import { ConfirmAppointmentModal } from '../../../../components';
+
 import {
-    sendConfirmingSuccessMail,
-    sendRejectionMail,
-} from '../../../../utils/mail';
-import { useRecoilValue } from 'recoil';
-import { configValue } from '../../../../stores/userAtom';
-type DataIndex = keyof AppointmentViewForPatient;
-const AppointmentTable = ({
-    data,
-    onPageChange,
-    pageIndex,
-    pageSize,
-    setPageSize,
-    handleClickViewDetail,
-    openNotificationWithIcon,
-    fetchData,
-}: any) => {
-    const config = useRecoilValue(configValue);
+    useFetchAppointmentsInDay,
+    useSendConfirmSuccessMail,
+    useSendRejectionSuccessMail,
+    useUpdateAppointmentStatus,
+} from '../../../../hooks';
+import dayjs from 'dayjs';
+import AppointmentDetailModal from './AppointmentDetailModal';
+type DataIndex = keyof AppointmentResponseDto;
+type NotificationType = 'success' | 'error';
+interface AppointmentTableProps {
+    doctorId: number;
+    openNotification: (
+        type: NotificationType,
+        title: string,
+        des: string
+    ) => void;
+}
+const AppointmentTable: React.FC<AppointmentTableProps> = ({
+    doctorId,
+    openNotification,
+}: AppointmentTableProps): JSX.Element => {
     const [searchText, setSearchText] = useState('');
     const [searchedColumn, setSearchedColumn] = useState('');
     const searchInput = useRef<InputRef>(null);
     const [openModalConfirm, setOpenModalConfirm] = useState<boolean>(false);
-    const [appointment, setAppointment] = useState<Appointment>(
-        {} as Appointment
+    const [appointment, setAppointment] = useState<AppointmentResponseDto>(
+        {} as AppointmentResponseDto
     );
+    const [isOpenDetailModal, setIsOpenDetailModal] = useState<boolean>(false);
     const [type, setType] = useState<string>('');
     const [message, setMessage] = useState<string>('');
     const handleCancelModalConfirm = () => {
-        setAppointment({} as Appointment);
+        setAppointment({} as AppointmentResponseDto);
         setOpenModalConfirm(false);
     };
     const rejectionReasonInputRef = useRef<any>(null);
-
-    const ChangeAppointmentStatus = async (data: any) => {
-        try {
-            const res = await appointmentService.updateAppointmentStatus(data);
-            console.log(data);
-            openNotificationWithIcon(
-                'success',
-                'Thông báo!',
-                'Xác nhận lịch hẹn thành công!'
-            );
-            fetchData();
-            handleCancelModalConfirm();
-            if (data?.reason) {
-                const mailBody = {
-                    email: appointment.patientEmail,
-                    doctorName: appointment.doctorName,
-                    patientName: appointment.patientName,
-                    time: appointment.timeValue,
-                    date: appointment.appointmentDate,
-                    rejectionReason: data?.reason,
-                    requirementObject: 'Bác sĩ',
-                };
-                sendRejectionMail(mailBody);
-            } else {
-                const mailBody = {
-                    patientName: appointment.patientName,
-                    email: appointment.patientEmail,
-                    doctorName: appointment.doctorName,
-                    time: appointment.timeValue,
-                    date: appointment.appointmentDate,
-                    location: appointment.location,
-                    status: 'Chờ khám',
-                    fee: appointment.price,
-                    serviceName: appointment.serviceName,
-                };
-                sendConfirmingSuccessMail(mailBody);
-            }
-        } catch (err: any) {
-            console.log(err.message);
-            openNotificationWithIcon(
-                'error',
-                'Thông báo!',
-                'Xác nhận lịch hẹn không thành công!'
-            );
-            handleCancelModalConfirm();
-        }
+    const updateAppointmentStatus = useUpdateAppointmentStatus();
+    const sendRejectionMail = useSendRejectionSuccessMail();
+    const sendConfirmSuccessMail = useSendConfirmSuccessMail();
+    const {
+        data: appointmentsResponse,
+        isError,
+        error,
+        isFetching,
+        refetch,
+        isRefetching,
+    } = useFetchAppointmentsInDay(doctorId);
+    useEffect(() => {}, [appointmentsResponse]);
+    const cancelDetailModal = () => {
+        setIsOpenDetailModal(false);
     };
 
     const handleOk = () => {
+        let payload: any = {};
         if (type === 'delete') {
-            const data = {
-                id: appointment.id,
-                status: appointment.statusId,
-                reason: rejectionReasonInputRef.current?.resizableTextArea
-                    ?.textArea.value,
+            payload = {
+                appointment: {
+                    ...appointment,
+                    rejectionReason:
+                        rejectionReasonInputRef.current?.resizableTextArea
+                            ?.textArea.value,
+                },
+                requirementObject: 'doctor',
             };
-            ChangeAppointmentStatus(data);
         } else {
-            const data = {
-                id: appointment.id,
-                status: appointment.statusId,
+            payload = {
+                appointment: {
+                    ...appointment,
+                },
+                requirementObject: 'doctor',
             };
-            ChangeAppointmentStatus(data);
         }
+        updateAppointmentStatus.mutate(payload, {
+            onSuccess() {
+                openNotification(
+                    'success',
+                    'Thông báo!',
+                    'Cập nhập trạng thái thành công!'
+                );
+                handleCancelModalConfirm();
+                if (type === 'delete') {
+                    const payload = {
+                        email: appointment.patientEmail,
+                        doctorName: appointment.doctorName,
+                        patientName: appointment.patientName,
+                        date: dayjs(
+                            appointment.appointmentDate.toString().split('T')[0]
+                        ).format('DD-MM-YYYY'),
+                        rejectionReason:
+                            rejectionReasonInputRef.current?.resizableTextArea
+                                ?.textArea.value,
+                        requirementObject: 'doctor',
+                    };
+                    sendRejectionMail.mutate(payload);
+                } else {
+                    const payload = {
+                        patientName: appointment.patientName,
+                        email: appointment.patientEmail,
+                        doctorName: appointment.doctorName,
+                        date: dayjs(
+                            appointment.appointmentDate.toString().split('T')[0]
+                        ).format('DD-MM-YYYY'),
+                        time: `${appointment.startTime} - ${appointment.endTime}`,
+                        location: appointment.location,
+                    };
+                    sendConfirmSuccessMail.mutate(payload);
+                }
+                refetch();
+            },
+            onError() {
+                openNotification(
+                    'error',
+                    'Thông báo!',
+                    'Cập nhập trạng thái không thành công!'
+                );
+                handleCancelModalConfirm();
+            },
+        });
     };
     const handleSearch = (
         selectedKeys: string[],
@@ -212,7 +232,7 @@ const AppointmentTable = ({
                 text
             ),
     });
-    const columns: ColumnsType<AppointmentViewForPatient> = [
+    const columns: ColumnsType<AppointmentResponseDto> = [
         {
             title: 'Họ và tên',
             dataIndex: 'patientName',
@@ -275,7 +295,8 @@ const AppointmentTable = ({
                         <Button
                             className="border-info me-2"
                             onClick={() => {
-                                handleClickViewDetail(record);
+                                setIsOpenDetailModal(true);
+                                setAppointment(record);
                             }}
                         >
                             <EyeOutlined className="text-info" />
@@ -343,14 +364,24 @@ const AppointmentTable = ({
         },
     ];
 
-    return data.length > 0 ? (
+    return (
         <>
-            <Table
-                bordered
-                columns={columns}
-                dataSource={data}
-                pagination={false}
-            />
+            <Skeleton active loading={isFetching || isRefetching}>
+                {isError ? (
+                    <p>
+                        {error.message.includes('404')
+                            ? 'Không có lịch hẹn nào!'
+                            : 'Có lỗi khi lấy dữ liệu !'}
+                    </p>
+                ) : (
+                    <Table
+                        bordered
+                        columns={columns}
+                        dataSource={appointmentsResponse}
+                        pagination={false}
+                    />
+                )}
+            </Skeleton>
 
             {openModalConfirm && (
                 <ConfirmAppointmentModal
@@ -362,9 +393,14 @@ const AppointmentTable = ({
                     rejectionReasonInputRef={rejectionReasonInputRef}
                 />
             )}
+            {isOpenDetailModal && (
+                <AppointmentDetailModal
+                    appointment={appointment}
+                    isModalOpen={isOpenDetailModal}
+                    cancelModal={cancelDetailModal}
+                />
+            )}
         </>
-    ) : (
-        <p className="text-center">Tất cả lịch hẹn đã được xác nhận!</p>
     );
 };
 
