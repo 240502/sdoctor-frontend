@@ -1,4 +1,4 @@
-import { apiClient } from '../constants/api';
+import apiClient from '../constants/api';
 
 export const HomeDirectoryService = {
     async getHomeDirectory(): Promise<any> {

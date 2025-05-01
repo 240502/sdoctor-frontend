@@ -1,10 +1,27 @@
-import { apiClient } from '../constants/api';
-
+import { AxiosResponse } from 'axios';
+import apiClient from '../constants/api';
+import { LoginResponse, RefreshTokenResponse } from '../models';
+import { User } from 'ckeditor5-premium-features';
+let cachedCsrfToken: string | null = null;
 const userService = {
     async login(data: any): Promise<any> {
-        const res = await apiClient.post('/user/login', data);
+        const res: AxiosResponse<LoginResponse> = await apiClient.post(
+            '/user/login',
+            data
+        );
         return res?.data;
     },
+    async refreshToken(): Promise<RefreshTokenResponse> {
+        const response: AxiosResponse<RefreshTokenResponse> =
+            await apiClient.post('/refresh-token');
+        return response.data;
+    },
+    // Đăng xuất
+    async logout(): Promise<void> {
+        await apiClient.post('/auth/logout');
+        cachedCsrfToken = null; // Xóa cache CSRF token khi đăng xuất
+    },
+
     async createUser(data: any, config: any): Promise<any> {
         const res = await apiClient.post('/api/user/create', data, config);
         return res;
@@ -56,6 +73,15 @@ const userService = {
             config
         );
         return res;
+    },
+    async getProtectedData(accessToken: string): Promise<User> {
+        const response: AxiosResponse<User> = await apiClient.get(
+            '/protected',
+            {
+                headers: { Authorization: `Bearer ${accessToken}` },
+            }
+        );
+        return response.data;
     },
 };
 

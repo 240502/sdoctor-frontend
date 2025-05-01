@@ -1,5 +1,5 @@
 import { AxiosResponse } from 'axios';
-import { apiClient } from '../constants/api';
+import apiClient from '../constants/api';
 import { CreateSchedulesResponse, Schedules } from '../models';
 
 const scheduleService = {

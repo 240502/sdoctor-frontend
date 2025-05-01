@@ -1,4 +1,4 @@
-import { apiClient } from '../constants/api';
+import apiClient from '../constants/api';
 import { Doctor, DoctorOptions } from '../models/doctor';
 
 const doctorService = {

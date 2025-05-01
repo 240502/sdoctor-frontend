@@ -1,17 +1,24 @@
 import { Button, Input, notification, Form } from 'antd';
-// import { UserService } from '../../../services/user.service';
-import { userService } from '../../../services';
+import { useLogin } from '../../../hooks';
 import { useSetRecoilState } from 'recoil';
-import { requestConfig, userState } from '../../../stores/userAtom';
+import {
+    accessTokenState,
+    refreshTokenState,
+    isAuthenticatedState,
+} from '../../../stores/userAtom';
 import { useNavigate } from 'react-router-dom';
 import socket from '../../../socket';
+
 type NotificationType = 'success' | 'error';
+
 export const FormLogin = () => {
     const [form] = Form.useForm();
     const [api, contextHolder] = notification.useNotification();
-    const setUser = useSetRecoilState(userState);
+    const { mutate: login, isPending, error } = useLogin();
+    const setAccessToken = useSetRecoilState(accessTokenState);
+    const setRefreshToken = useSetRecoilState(refreshTokenState);
+    const setIsAuthenticated = useSetRecoilState(isAuthenticatedState);
     const navigate = useNavigate();
-    const setRequestConfig = useSetRecoilState(requestConfig);
 
     const openNotification = (
         type: NotificationType,
@@ -23,26 +30,41 @@ export const FormLogin = () => {
             description: message,
         });
     };
-    const Login = async (values: any) => {
+
+    const handleLogin = async (values: any) => {
         const { email, password } = values;
-        try {
-            const res = await userService.login({ email, password });
-            sessionStorage.setItem('user', JSON.stringify(res));
-            setUser(res);
-            const config = {
-                headers: { authorization: 'Bearer ' + res.token },
-            };
-            setRequestConfig(config);
-            socket?.emit('joinRoom', { userId: res.userId });
-            if (res.roleId === 2) {
-                navigate('/admin/dashboard');
-            } else {
-                navigate('/admin/profile');
+        login(
+            { email, password },
+            {
+                onSuccess: (data) => {
+                    setIsAuthenticated(true);
+                    // Giả sử API trả về user info trong response
+                    const user = {
+                        userId: data?.user.userId,
+                        roleId: data?.user.roleId,
+                    }; // Điều chỉnh theo response thực tế
+                    socket?.emit('joinRoom', { userId: user.userId });
+
+                    if (user.roleId === 2) {
+                        navigate('/admin/dashboard');
+                    } else {
+                        navigate('/admin/profile');
+                    }
+                    openNotification(
+                        'success',
+                        'Thông báo',
+                        'Đăng nhập thành công!'
+                    );
+                },
+                onError: (err: any) => {
+                    openNotification(
+                        'error',
+                        'Thông báo',
+                        err.message || 'Đăng nhập thất bại!'
+                    );
+                },
             }
-        } catch (err: any) {
-            openNotification('error', 'Thông báo', err.response.data.message);
-            console.log(err.response.data.message);
-        }
+        );
     };
 
     return (
@@ -52,19 +74,13 @@ export const FormLogin = () => {
                 form={form}
                 className="form-group mt-3"
                 layout="vertical"
-                onFinish={Login}
+                onFinish={handleLogin}
             >
                 <Form.Item
                     label="Email"
                     rules={[
-                        {
-                            required: true,
-                            message: 'Vui lòng nhập email!',
-                        },
-                        {
-                            type: 'email',
-                            message: 'Email không hợp lệ!',
-                        },
+                        { required: true, message: 'Vui lòng nhập email!' },
+                        { type: 'email', message: 'Email không hợp lệ!' },
                     ]}
                     name={'email'}
                 >
@@ -73,28 +89,23 @@ export const FormLogin = () => {
                 <Form.Item
                     label="Password"
                     rules={[
-                        {
-                            required: true,
-                            message: 'Vui lòng nhập password',
-                        },
-                        {
-                            min: 8,
-                            message: 'Mật khẩu có ít nhất 8 ký tự ',
-                        },
+                        { required: true, message: 'Vui lòng nhập password!' },
+                        { min: 8, message: 'Mật khẩu có ít nhất 8 ký tự!' },
                     ]}
                     name={'password'}
                 >
                     <Input.Password id="user-password" />
                 </Form.Item>
+                <Form.Item className="text-center">
+                    <Button
+                        className="w-25 bg-success text-white fs-6 p-3"
+                        onClick={() => form.submit()}
+                        disabled={isPending}
+                    >
+                        {isPending ? 'Đang đăng nhập...' : 'Login'}
+                    </Button>
+                </Form.Item>
             </Form>
-            <Form.Item className="text-center">
-                <Button
-                    className="w-25 bg-success text-white fs-6 p-3"
-                    onClick={() => form.submit()}
-                >
-                    Login
-                </Button>
-            </Form.Item>
         </div>
     );
 };

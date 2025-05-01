@@ -1,4 +1,4 @@
-import { apiClient } from '../constants/api';
+import apiClient from '../constants/api';
 const commentService = {
     async createComment(data: any): Promise<any> {
         const res = await apiClient.post('/comment/create', data);

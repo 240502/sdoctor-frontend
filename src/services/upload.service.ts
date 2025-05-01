@@ -1,4 +1,4 @@
-import { apiClient } from '../constants/api';
+import apiClient from '../constants/api';
 
 const uploadService = {
     async uploadImage(formData: any): Promise<any> {

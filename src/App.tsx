@@ -2,33 +2,13 @@ import { privateRoutes, publicRoutes } from './routes';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import PrivateRoutes from './routes/private_router';
 import { Fragment, Suspense, useEffect } from 'react';
-import { useSetRecoilState } from 'recoil';
 import './assets/fontawesome/css/all.min.css';
-import { patientProfileState } from './stores/patientAtom';
-import { patientProfileService } from './services';
+import AuthInitializer from './components/AuthInitializer';
 
 function App() {
-    const setPatientProfile = useSetRecoilState(patientProfileState);
-
-    const getPatientProfile = async () => {
-        try {
-            const uuid: string = await JSON.parse(
-                localStorage.getItem('uuid') || 'null'
-            );
-            if (uuid) {
-                const patientProfile =
-                    await patientProfileService.getPatientProfileByUuid(uuid);
-                setPatientProfile(patientProfile);
-            }
-        } catch (err: any) {
-            console.log(err.message);
-        }
-    };
-    useEffect(() => {
-        getPatientProfile();
-    }, []);
     return (
         <div className="App">
+            <AuthInitializer />
             <Router>
                 <Suspense>
                     <Routes>

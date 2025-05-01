@@ -1,4 +1,4 @@
-import { apiClient } from '../constants/api';
+import apiClient from '../constants/api';
 
 const invoicesService = {
     async createInvoice(data: any): Promise<any> {

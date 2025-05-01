@@ -1,4 +1,4 @@
-import { apiClient } from '../constants/api';
+import apiClient from '../constants/api';
 
 const medicalPackageService = {
     async createService(data: any, config: any): Promise<any> {

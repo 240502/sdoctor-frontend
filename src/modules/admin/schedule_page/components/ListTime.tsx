@@ -6,41 +6,107 @@ import { handleGetDateByActiveDay } from '../../../../utils/schedule_management'
 import { Schedules, SchedulesCreate } from '../../../../models';
 import {
     useCreateSchedules,
-    useDeleteSchedules,
+    useFetchSchedulesByEntityIdForDoctor,
 } from '../../../../hooks/schedules';
 import dayjs from 'dayjs';
 import {
     useUpdateSchedules,
     UseUpdateSchedulesReturn,
 } from '../../../../hooks/schedules/useUpdateSchedules';
+import { NoticeType } from 'antd/es/message/interface';
+interface ListTimeProps {
+    activeDay: number;
+    doctorId: number;
+    headerConfig: any;
+    openMessage: (type: NoticeType, des: string) => void;
+    interval: number;
+    times: Time[];
+    isFetchingTime: boolean;
+    date: string;
+}
 export const ListTime = ({
     activeDay,
-    user,
-    config,
+    doctorId,
+    headerConfig,
     openMessage,
     interval,
-    selectedTimes,
-    setSelectedTimes,
-    isFetchingSchedules,
     times,
     isFetchingTime,
-    schedules,
-    refetch,
-}: any) => {
+    date,
+}: ListTimeProps) => {
+    const [selectedTimes, setSelectedTimes] = useState<Time[]>([]);
     const [disableSaveButton, setDisableSaveButton] = useState<boolean>(false);
     const [deletedIds, setDeletedIds] = useState<number[]>([]);
+
+    const { data: scheduleResponse, refetch } =
+        useFetchSchedulesByEntityIdForDoctor({
+            entityId: doctorId,
+            date,
+            entityType: 'doctor',
+        });
+
+    const createSchedules = useCreateSchedules(headerConfig);
+
     const handleOverTime = (day: number) => {
         if (day < dayjs().day() && day !== 0) {
             setDisableSaveButton(true);
-        } else setDisableSaveButton(false);
+        } else if (
+            scheduleResponse?.data &&
+            scheduleResponse?.data.length > 0
+        ) {
+            setDisableSaveButton(true);
+        } else if (selectedTimes.length > 0) {
+            setDisableSaveButton(false);
+        } else {
+            setDisableSaveButton(true);
+        }
     };
+    const getSelectedTimes = (schedules: Schedules[]) => {
+        const now = dayjs();
+        let selectedTimes: Time[] = [];
+        if (dayjs(date).day() !== 0 && dayjs(date).day() < dayjs().day()) {
+            schedules.forEach((schedule: Schedules) => {
+                selectedTimes.push({
+                    id: schedule.timeId,
+                    disable: true,
+                    startTime: schedule.startTime,
+                    endTime: schedule.endTime,
+                    interval: null,
+                });
+            });
+        } else {
+            schedules.forEach((schedule: Schedules) => {
+                const [startHour, startMinute] = schedule.startTime
+                    .split(':')
+                    .map(Number);
+                const startTime = dayjs()
+                    .hour(startHour)
+                    .minute(startMinute)
+                    .second(0);
 
-    useEffect(() => {
-        handleOverTime(activeDay);
-        console.log('Times', times);
-    }, []);
+                const diffMinutes = now.diff(startTime, 'minute');
+                if (diffMinutes > -20) {
+                    selectedTimes.push({
+                        id: schedule.timeId,
+                        disable: true,
+                        startTime: schedule.startTime,
+                        endTime: schedule.endTime,
+                        interval: null,
+                    });
+                } else {
+                    selectedTimes.push({
+                        id: schedule.timeId,
+                        disable: false,
+                        startTime: schedule.startTime,
+                        endTime: schedule.endTime,
+                        interval: null,
+                    });
+                }
+            });
+        }
 
-    const createSchedules = useCreateSchedules(config);
+        setSelectedTimes(selectedTimes);
+    };
     const handleCreateSchedule = () => {
         const now = dayjs();
         let dateOfWeek: string = now.format('YYYY-MM-DD');
@@ -50,7 +116,7 @@ export const ListTime = ({
         let schedules: SchedulesCreate[] = [];
         selectedTimes.forEach((time: Time) => {
             const schedule: SchedulesCreate = {
-                entityId: user.userId,
+                entityId: doctorId,
                 date: dateOfWeek,
                 entityType: 'Doctor',
                 timeId: time.id,
@@ -58,10 +124,10 @@ export const ListTime = ({
             schedules.push(schedule);
         });
         createSchedules.mutate(schedules, {
-            onSuccess(data) {
-                console.log('created schedules successfully', data);
+            onSuccess() {
                 openMessage('success', 'Thêm lịch làm việc thành công!');
                 refetch();
+                setDisableSaveButton(true);
             },
             onError(error) {
                 console.log('Created schedules error', error);
@@ -69,12 +135,8 @@ export const ListTime = ({
             },
         });
     };
-    const {
-        updateSchedules,
-        isPending,
-        isError,
-        error,
-    }: UseUpdateSchedulesReturn = useUpdateSchedules(config);
+    const { updateSchedules, isPending }: UseUpdateSchedulesReturn =
+        useUpdateSchedules(headerConfig);
     const handleUpdateSchedules = async () => {
         try {
             const now = dayjs();
@@ -85,26 +147,25 @@ export const ListTime = ({
             const schedulesToCreate: SchedulesCreate[] = selectedTimes
                 .filter(
                     (time: Time) =>
-                        !schedules.some(
+                        !scheduleResponse?.data.some(
                             (schedule: Schedules) => schedule.timeId === time.id
                         )
                 )
                 .map((time: Time) => ({
-                    entityId: user.userId,
+                    entityId: doctorId,
                     date: dateOfWeek,
                     entityType: 'Doctor',
                     timeId: time.id,
                 }));
             await updateSchedules(deletedIds, schedulesToCreate);
             openMessage('success', 'Cập nhập thành công !');
+            setDisableSaveButton(true);
         } catch (err: any) {
             openMessage('error', 'Cập nhập không thành công !');
         }
     };
     const handleSubmit = async () => {
-        console.log(schedules && schedules?.length > 0);
-
-        if (schedules && schedules?.length > 0) {
+        if (scheduleResponse?.data && scheduleResponse?.data?.length > 0) {
             handleUpdateSchedules();
         } else {
             handleCreateSchedule();
@@ -150,40 +211,36 @@ export const ListTime = ({
             }
         }
     };
-    // const handleSelectAllTime = () => {
-    //     if (selectedTimes.length > 0) {
-    //         const notAddedTimes = times.filter(
-    //             (time: Time) => !selectedTimes.includes(time)
-    //         );
-    //         setSelectedTimes([...selectedTimes, ...notAddedTimes]);
-    //     } else {
-    //         setSelectedTimes([...times]);
-    //     }
-    // };
     const handleRemoveTime = (index: number) => {
         const updatedTimes = selectedTimes.filter(
             (time: Time, i: number) => i !== index
         );
         setSelectedTimes(updatedTimes);
-        const existsSchedule = schedules.find(
+        const existsSchedule = scheduleResponse?.data.find(
             (schedule: Schedules) => schedule.timeId === selectedTimes[index].id
         );
         if (existsSchedule) {
             setDeletedIds([...deletedIds, existsSchedule.id]);
         }
     };
+
+    // useEffect(() => {
+    //     handleOverTime(activeDay);
+    // }, []);
     useEffect(() => {
-        console.log('deletedIds', deletedIds);
-    }, [deletedIds]);
-    // const handleRemoveAllTimes = () => {
-    //     setSelectedTimes([]);
-    //     const newDeletedDetails = [...schedule.listScheduleDetails];
-    //     setDeletedDetails(newDeletedDetails);
-    // };
+        if (scheduleResponse?.data && scheduleResponse?.data?.length > 0) {
+            getSelectedTimes(scheduleResponse?.data ?? []);
+        } else {
+            setSelectedTimes([]);
+        }
+    }, [scheduleResponse]);
     useEffect(() => {
         handleOverTime(activeDay);
-    }, [activeDay, interval]);
+    }, [activeDay, interval, scheduleResponse]);
 
+    useEffect(() => {
+        console.log('disabled', disableSaveButton);
+    }, [disableSaveButton]);
     return (
         <Row gutter={[24, 24]} className="time-slots">
             <Col
@@ -220,9 +277,14 @@ export const ListTime = ({
                                                   time?.disable ? 'pe-none' : ''
                                               }`}
                                               key={time?.id}
-                                              onClick={() =>
-                                                  handleAddTime(time)
-                                              }
+                                              onClick={() => {
+                                                  handleAddTime(time);
+                                                  if (disableSaveButton) {
+                                                      setDisableSaveButton(
+                                                          false
+                                                      );
+                                                  }
+                                              }}
                                               type={
                                                   existTime
                                                       ? 'primary'
@@ -286,7 +348,12 @@ export const ListTime = ({
                                         time.disable ? 'pe-none' : ''
                                     }`}
                                     type="primary"
-                                    onClick={() => handleRemoveTime(index)}
+                                    onClick={() => {
+                                        handleRemoveTime(index);
+                                        if (disableSaveButton) {
+                                            setDisableSaveButton(false);
+                                        }
+                                    }}
                                 >
                                     {time.startTime}
                                     <CloseOutlined />

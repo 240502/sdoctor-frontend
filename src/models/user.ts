@@ -20,3 +20,11 @@ export interface User {
     doctorId: number;
     active: number;
 }
+
+export interface LoginResponse {
+    user: User;
+}
+
+export interface RefreshTokenResponse {
+    accessToken: string;
+}

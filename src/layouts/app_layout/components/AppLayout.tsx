@@ -39,12 +39,12 @@ export const AppLayout = ({ children }: any) => {
                         <Button
                             className="border-0"
                             onClick={() => {
-                                user?.token
+                                user?.userId
                                     ? navigate('/admin/dashboard')
                                     : navigate('/login');
                             }}
                         >
-                            {user?.token ? 'Dashboard' : 'Đăng nhập'}
+                            {user?.userId ? 'Dashboard' : 'Đăng nhập'}
                         </Button>
                     </div>
                 </div>

@@ -1,4 +1,4 @@
-import { apiClient } from '../constants/api';
+import apiClient from '../constants/api';
 import { Department } from '../models';
 
 const departmentSerivce = {

@@ -1,4 +1,4 @@
-import { apiClient } from '../constants/api';
+import apiClient from '../constants/api';
 const postService = {
     async getCommonPost(): Promise<any> {
         const res = await apiClient.get('/post/get-common-post');

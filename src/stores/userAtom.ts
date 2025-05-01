@@ -23,3 +23,18 @@ export const configValue = selector({
         return get(requestConfig);
     },
 });
+
+export const accessTokenState = atom<string | null>({
+    key: 'accessTokenState',
+    default: localStorage.getItem('accessToken') || null,
+});
+
+export const refreshTokenState = atom<string | null>({
+    key: 'refreshTokenState',
+    default: localStorage.getItem('refreshToken') || null,
+});
+
+export const isAuthenticatedState = atom<boolean>({
+    key: 'isAuthenticatedState',
+    default: !!localStorage.getItem('accessToken'),
+});

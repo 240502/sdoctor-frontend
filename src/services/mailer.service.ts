@@ -1,4 +1,4 @@
-import { apiClient } from '../constants/api';
+import apiClient from '../constants/api';
 
 const mailerService = {
     async sendBookingSuccessMail(data: any): Promise<any> {

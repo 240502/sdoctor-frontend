@@ -32,7 +32,7 @@ const AdminLayout: React.FC = ({ children }: any) => {
     const getUser = async () => {
         try {
             const userSession = await JSON.parse(
-                sessionStorage.getItem('user') || '{}'
+                localStorage.getItem('user') || '{}'
             );
             if (userSession?.userId) {
                 setUser(userSession);

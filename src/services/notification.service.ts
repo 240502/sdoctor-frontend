@@ -1,4 +1,4 @@
-import { apiClient } from '../constants/api';
+import apiClient from '../constants/api';
 
 const notificationService = {
     async getNotificationByUserId(userId: number): Promise<any> {
