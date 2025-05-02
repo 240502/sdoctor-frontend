@@ -7,10 +7,11 @@ import { userValue } from '../../../../stores/userAtom';
 import { WeeklyOverview } from '../components/WeeklyOverview';
 import { RecentInvoicesTable } from '../components/RecentInvoicesTable';
 import { useNavigate } from 'react-router-dom';
+import { User } from '../../../../models';
 type NotificationType = 'success' | 'error';
 
 const DashBoard = () => {
-    const user = useRecoilValue(userValue);
+    const user: User = useRecoilValue<User>(userValue);
     const navigate = useNavigate();
     const [api, contextHolder] = notification.useNotification();
     const openNotificationWithIcon = (
@@ -32,7 +33,7 @@ const DashBoard = () => {
             {contextHolder}
             <Flex gap="middle">
                 <div className="col-3">
-                    <SummaryCards doctorId={4} />
+                    <SummaryCards doctorId={user.userId} />
                 </div>
                 <div className="col-9">
                     <Card

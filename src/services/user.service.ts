@@ -1,9 +1,13 @@
 import { AxiosResponse } from 'axios';
 import apiClient from '../constants/api';
-import { LoginResponse, RefreshTokenResponse } from '../models';
-import { User } from 'ckeditor5-premium-features';
+import { LoginResponse, RefreshTokenResponse, User } from '../models';
 let cachedCsrfToken: string | null = null;
 const userService = {
+    async getCurrentUser(): Promise<User> {
+        const response: AxiosResponse<{ message: string; result: User }> =
+            await apiClient.get('/user/me');
+        return response?.data?.result;
+    },
     async login(data: any): Promise<any> {
         const res: AxiosResponse<LoginResponse> = await apiClient.post(
             '/user/login',
@@ -13,7 +17,7 @@ const userService = {
     },
     async refreshToken(): Promise<RefreshTokenResponse> {
         const response: AxiosResponse<RefreshTokenResponse> =
-            await apiClient.post('/refresh-token');
+            await apiClient.post('/user/refresh-token');
         return response.data;
     },
     // Đăng xuất

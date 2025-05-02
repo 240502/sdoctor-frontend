@@ -9,7 +9,7 @@ import { useEffect, useState } from 'react';
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import { BlockCalendar, InputAppointmentModal } from '../components';
 import { patientProfileValue } from '../../../../stores/patientAtom';
-import socket from '../../../../socket';
+import { getSocket } from '../../../../socket';
 import { newAppointmentState } from '../../../../stores/appointmentAtom';
 import { invoiceState } from '../../../../stores/invoice';
 import { useSearchParams } from 'react-router-dom';
@@ -189,11 +189,11 @@ const BookingAppointment = () => {
     }, [scheduleReponse]);
 
     useEffect(() => {
+        const socket = getSocket();
         socket?.on('newAppointment', (newAppointment) => {
             console.log('newAppointment', newAppointment);
             refetch();
         });
-
         return () => {
             socket?.off('newAppointment');
         };

@@ -5,30 +5,19 @@ import { useRecoilValue } from 'recoil';
 import { newAppointmentValue } from '../stores/appointmentAtom';
 import { useEffect } from 'react';
 import { invoiceValue } from '../stores/invoice';
-import { Invoices } from '../models/invoices';
-import { paymentService } from '../services';
 const { Title, Text } = Typography;
 import dayjs from 'dayjs';
 import { useCreatePayment } from '../hooks';
+import { useSearchParams } from 'react-router-dom';
 const BookingSuccess = () => {
+    const [searchParams] = useSearchParams();
     const navigate = useNavigate();
     const newAppointment = useRecoilValue(newAppointmentValue);
-    const invoice = useRecoilValue(invoiceValue);
-    const handleCreateOnlinePayment = async (invoice: Invoices) => {
-        try {
-            const res = await paymentService.create(invoice.appointment_id);
-            console.log(res);
-            window.location.href = res?.data?.order_url;
-        } catch (err: any) {
-            console.log(err.message);
-        }
-    };
     const createPayment = useCreatePayment();
+    const payment = Number(searchParams.get('payment'));
+    const appointmentId = Number(searchParams.get('appointment'));
 
-    useEffect(() => {
-        console.log(invoice);
-        console.log(newAppointment.createdAt);
-    }, []);
+    useEffect(() => {}, []);
     return (
         <div
             style={{
@@ -55,7 +44,7 @@ const BookingSuccess = () => {
                     Đặt lịch thành công!
                 </Title>
                 <Text>Chúc mừng, bạn đã đặt lịch hẹn khám thành công.</Text>
-                {invoice.paymentMethod === 2 && (
+                {payment === 2 && (
                     <p>
                         Bạn cần thanh toán hóa đơn phí khám trước
                         <br></br>
@@ -68,16 +57,16 @@ const BookingSuccess = () => {
                 )}
 
                 <Space style={{ marginTop: '24px' }}>
-                    {
+                    {payment === 2 && (
                         <Button
                             type="primary"
                             onClick={() => {
-                                createPayment.mutate(invoice?.appointment_id);
+                                createPayment.mutate(appointmentId);
                             }}
                         >
                             Thanh toán
                         </Button>
-                    }
+                    )}
                     <Button onClick={() => navigate('/patient/appointment')}>
                         Xem chi tiết
                     </Button>

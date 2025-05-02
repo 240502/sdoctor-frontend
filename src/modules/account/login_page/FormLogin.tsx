@@ -1,13 +1,9 @@
 import { Button, Input, notification, Form } from 'antd';
 import { useLogin } from '../../../hooks';
 import { useSetRecoilState } from 'recoil';
-import {
-    accessTokenState,
-    refreshTokenState,
-    isAuthenticatedState,
-} from '../../../stores/userAtom';
+import { isAuthenticatedState } from '../../../stores/userAtom';
 import { useNavigate } from 'react-router-dom';
-import socket from '../../../socket';
+import { joinRoom } from '../../../socket';
 
 type NotificationType = 'success' | 'error';
 
@@ -15,11 +11,8 @@ export const FormLogin = () => {
     const [form] = Form.useForm();
     const [api, contextHolder] = notification.useNotification();
     const { mutate: login, isPending, error } = useLogin();
-    const setAccessToken = useSetRecoilState(accessTokenState);
-    const setRefreshToken = useSetRecoilState(refreshTokenState);
     const setIsAuthenticated = useSetRecoilState(isAuthenticatedState);
     const navigate = useNavigate();
-
     const openNotification = (
         type: NotificationType,
         title: string,
@@ -43,7 +36,7 @@ export const FormLogin = () => {
                         userId: data?.user.userId,
                         roleId: data?.user.roleId,
                     }; // Điều chỉnh theo response thực tế
-                    socket?.emit('joinRoom', { userId: user.userId });
+                    joinRoom(data?.user.userId);
 
                     if (user.roleId === 2) {
                         navigate('/admin/dashboard');

@@ -27,4 +27,5 @@ export interface LoginResponse {
 
 export interface RefreshTokenResponse {
     accessToken: string;
+    result: User;
 }

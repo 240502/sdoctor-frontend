@@ -12,7 +12,6 @@ import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { userState, userValue } from '../../../stores/userAtom';
 import NotificationList from './NotificationList';
 import { Link } from 'react-router-dom';
-import socket from '../../../socket';
 const Header = ({ collapsed, setCollapsed }: any) => {
     const navigate = useNavigate();
     const setUser = useSetRecoilState(userState);
@@ -47,9 +46,8 @@ const Header = ({ collapsed, setCollapsed }: any) => {
                 key="3"
                 className="bg-danger text-light"
                 onClick={() => {
-                    socket?.emit('leaveRoom', `user:${user.userId}`);
                     setUser({} as User);
-                    sessionStorage.removeItem('user');
+                    localStorage.removeItem('user');
                     navigate('/');
                 }}
             >
@@ -96,9 +94,7 @@ const Header = ({ collapsed, setCollapsed }: any) => {
                     marginRight: '16px',
                 }}
             >
-                {/* Bell Icon */}
                 {<NotificationList />}
-                {/* User Info */}
                 <Dropdown overlay={userMenu} trigger={['click']}>
                     <div
                         style={{
@@ -110,7 +106,7 @@ const Header = ({ collapsed, setCollapsed }: any) => {
                     >
                         <Avatar icon={<UserOutlined />} />
                         <span style={{ marginLeft: '8px' }}>
-                            {user.fullName}
+                            {user?.fullName ?? ''}
                         </span>
                     </div>
                 </Dropdown>

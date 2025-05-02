@@ -6,11 +6,15 @@ import { UserOutlined } from '@ant-design/icons';
 import '@/assets/scss/app.scss';
 import { useRecoilValue } from 'recoil';
 import { userValue } from '../../../stores/userAtom';
+import { useEffect } from 'react';
 
 const { Header, Content, Footer } = Layout;
 export const AppLayout = ({ children }: any) => {
     const navigate = useNavigate();
     const user = useRecoilValue(userValue);
+    useEffect(() => {
+        console.log('user', user);
+    }, [user]);
     return (
         <Layout>
             <Header

@@ -15,7 +15,7 @@ export const RecentInvoicesTable = ({ user }: { user: User }) => {
     const [invoice, setInvoice] = useState<Invoices>({} as Invoices);
     const getRecentInvoices = async () => {
         try {
-            const res = await invoicesService.getRecentInvoice(user.doctorId);
+            const res = await invoicesService.getRecentInvoice(user?.doctorId);
             console.log('getRecentInvoices', res);
             setRecentInvoices(res);
         } catch (err: any) {

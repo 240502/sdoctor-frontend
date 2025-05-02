@@ -1,34 +1,45 @@
-// src/socket.ts
 import { io, Socket } from 'socket.io-client';
 import { baseURL } from './constants/api';
+
 let socket: Socket | null = null;
 
-if (!socket) {
-    socket = io(baseURL); // Khởi tạo chỉ một lần
-}
-
-// Trạng thái đã join room
-let hasJoinedRoom = false;
-
-// Kết nối tới server
-socket.on('connect', () => {
-    const currentUser = JSON.parse(sessionStorage.getItem('user') || '{}');
-    if (currentUser?.userId && !hasJoinedRoom) {
-        hasJoinedRoom = true; // Đánh dấu đã tham gia room
-        console.log('join room');
-        socket.emit('joinRoom', { userId: currentUser.userId });
+export const getSocket = (): Socket => {
+    if (!socket) {
+        socket = io(baseURL, {
+            withCredentials: true, // Gửi cookie (accessToken, refreshToken, _csrf)
+            autoConnect: false, // Không tự động kết nối
+        });
+        socket.on('connect', () => {
+            console.log('Socket connected:', socket?.id);
+        });
+        socket.on('connect_error', (err) => {
+            console.error('Connection Error:', err.message);
+        });
+        socket.on('disconnect', () => {
+            console.log('Socket disconnected');
+        });
     }
-    console.log('Connected to Socket.io server');
-});
+    return socket;
+};
 
-// Xử lý kết nối lỗi
-socket.on('connect_error', (err) => {
-    console.error('Connection Error:', err.message);
-});
+export const connectSocket = () => {
+    const socket = getSocket();
+    if (!socket.connected) {
+        socket.connect();
+    }
+};
 
-// Xử lý disconnect
-socket.on('disconnect', () => {
-    hasJoinedRoom = false; // Reset trạng thái khi bị ngắt kết nối
-});
+export const disconnectSocket = () => {
+    const socket = getSocket();
+    if (socket.connected) {
+        socket.disconnect();
+    }
+};
 
-export default socket;
+export const joinRoom = (userId: number) => {
+    const socket = getSocket();
+    if (socket.connected) {
+        console.log('Joining room for user:', userId);
+        socket.emit('joinRoom', { userId });
+    }
+};

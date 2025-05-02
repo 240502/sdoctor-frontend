@@ -24,6 +24,7 @@ import { PaymentMethod } from '../../../../models/payment_method';
 import { invoicesService, paymentMethodService } from '../../../../services';
 import { useCreateAppointment } from '../../../../hooks/appointments';
 import {
+    useCreateNotification,
     useSendBookingSuccessMail,
     useUpdateScheduleStatus,
 } from '../../../../hooks';
@@ -95,6 +96,7 @@ const InputAppointmentModal = ({
     };
     const [paymentMethod, setPaymentMethod] = useState<number>(1);
     const { mutate: updateScheduleStatus } = useUpdateScheduleStatus(refetch);
+    const { mutate: createNotification } = useCreateNotification();
     const handleUpdateScheduleStatus = (
         newAppointment: AppointmentResponseDto
     ) => {
@@ -112,6 +114,7 @@ const InputAppointmentModal = ({
             location: doctor.location,
             uuid: patientProfile.uuid,
             scheduleId: schedule.id,
+
             type: 'doctor',
         };
         createAppointment(newAppointment, {
@@ -121,7 +124,10 @@ const InputAppointmentModal = ({
                 console.log('data.appointment', data.data.result);
                 handleSendBookingSuccessMail();
                 openMessage('Success', 'Đặt lịch hẹn thành công !');
-                navigate('/booking-success');
+                const queryParams = new URLSearchParams();
+                queryParams.append('appointment', appointment.id.toString());
+                queryParams.append('payment', values.payment_method.toString());
+                navigate(`/booking-success?${queryParams}`);
                 const newInvoice = {
                     appointmentId: appointment.id,
                     doctorId: doctor.doctorId,
@@ -129,15 +135,13 @@ const InputAppointmentModal = ({
                     amount: doctor.price,
                     paymentMethod: paymentMethod,
                 };
-                console.log('newInvoice', newInvoice);
-
                 CreateInvoice(newInvoice);
-                // const newNotification = {
-                //     userId: doctorResponse.doctorId,
-                //     message: 'Bạn có một lịch hẹn mới!',
-                //     appointmentId: newAppointment.id,
-                // };
-                // CreateNotification(newNotification);
+                const newNotification = {
+                    userId: doctor.doctorId,
+                    message: 'Bạn có một lịch hẹn mới!',
+                    appointmentId: appointment.id,
+                };
+                createNotification(newNotification);
             },
             onError: (err) => {
                 openMessage('Error', 'Đặt lịch hẹn không thành công !');

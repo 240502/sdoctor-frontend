@@ -11,8 +11,7 @@ import {
     notificationsState,
     notificationsValue,
 } from '../../stores/notification';
-import socket from '../../socket';
-import { User } from '../../models/user';
+import { getSocket } from '../../socket';
 
 const { Sider, Content } = Layout;
 
@@ -20,38 +19,11 @@ const AdminLayout: React.FC = ({ children }: any) => {
     const [collapsed, setCollapsed] = useState(false);
     const [current, setCurrent] = useState<string[]>([]);
     const [messageApi, contextHolder] = message.useMessage();
-    const [user, setUser] = useRecoilState(userState);
-    const setRequestConfig = useSetRecoilState(requestConfig);
     const setNotifications = useSetRecoilState(notificationsState);
     const notificationsSelector = useRecoilValue(notificationsValue);
-    const handleWindowLoad = (user: User) => {
-        if (user?.userId) {
-            socket?.emit('joinRoom', { userId: user.userId });
-        }
-    };
-    const getUser = async () => {
-        try {
-            const userSession = await JSON.parse(
-                localStorage.getItem('user') || '{}'
-            );
-            if (userSession?.userId) {
-                setUser(userSession);
-                const config = {
-                    headers: { authorization: 'Bearer ' + userSession.token },
-                };
-                setRequestConfig(config);
-                handleWindowLoad(userSession);
-            }
-        } catch (e: any) {
-            console.error(e.message);
-        }
-    };
-    useEffect(() => {
-        console.log('user', user);
 
-        if (!user?.userId) {
-            getUser();
-        }
+    useEffect(() => {
+        const socket = getSocket();
         socket?.on('newNotification', (newNotification) => {
             messageApi.info('Có thông báo mới');
             console.log('newNotification', newNotification);
@@ -90,11 +62,7 @@ const AdminLayout: React.FC = ({ children }: any) => {
                         </Link>
                     </h3>
                 </div>
-                <Sidenav
-                    current={current}
-                    // setCurrent={setCurrent}
-                    // user={user}
-                />
+                <Sidenav current={current} />
             </Sider>
             <Layout style={{ width: '200vh' }}>
                 <Header collapsed={collapsed} setCollapsed={setCollapsed} />

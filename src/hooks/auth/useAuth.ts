@@ -2,12 +2,7 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import { userService } from '../../services';
 import { User, LoginResponse, RefreshTokenResponse } from '../../models';
-import {
-    accessTokenState,
-    refreshTokenState,
-    isAuthenticatedState,
-    userState,
-} from '../../stores/userAtom';
+import { isAuthenticatedState, userState } from '../../stores/userAtom';
 import { authSelector } from '../../stores/authSelector';
 export const useLogin = () => {
     const setIsAuthenticated = useSetRecoilState(isAuthenticatedState);
@@ -69,21 +64,11 @@ export const useRefreshToken = () => {
 
 export const useAuth = () => {
     const authState = useRecoilValue(authSelector);
-    const setAccessToken = useSetRecoilState(accessTokenState);
-    const setRefreshToken = useSetRecoilState(refreshTokenState);
     const setIsAuthenticated = useSetRecoilState(isAuthenticatedState);
-
     const logout = () => {
-        setAccessToken(null);
-        setRefreshToken(null);
         setIsAuthenticated(false);
-        localStorage.removeItem('accessToken');
-        localStorage.removeItem('refreshToken');
     };
-
     return {
-        accessToken: authState.accessToken,
-        refreshToken: authState.refreshToken,
         isAuthenticated: authState.isAuthenticated,
         logout,
     };

@@ -13,7 +13,7 @@ const invoicesService = {
         const res = await apiClient.delete('/api/invoice/delete/' + id);
         return res;
     },
-    async getRecentInvoice(doctorId: number): Promise<any> {
+    async getRecentInvoice(doctorId: number | null): Promise<any> {
         const res = await apiClient.get('/invoice/get-recent/' + doctorId);
         return res?.data;
     },

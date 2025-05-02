@@ -19,10 +19,17 @@ dayjs.extend(timezone);
 dayjs.extend(relativeTime);
 dayjs.locale('vi');
 import { Notifications } from '../../../models/notification';
+import { useFetchNotificationByUserId } from '../../../hooks';
 const NotificationList = () => {
     const user = useRecoilValue(userValue);
     const notificationSelector = useRecoilValue(notificationsValue);
     const setNotifications = useSetRecoilState(notificationsState);
+    const { data, error, isFetching } = useFetchNotificationByUserId(
+        user.userId
+    );
+    useEffect(() => {
+        console.log('data', data);
+    }, [data]);
     const deleteNotification = async (notificationId: number) => {
         try {
             const res = await notificationService.deleteNotification(
@@ -40,7 +47,9 @@ const NotificationList = () => {
     };
     const markAllAsRead = async () => {
         try {
-            const res = await notificationService.markAllRead(user.userId);
+            const res = await notificationService.markAllRead(
+                user?.userId ?? 0
+            );
             getNotificationByUserId();
         } catch (e: any) {
             console.log(e.message);
@@ -68,7 +77,7 @@ const NotificationList = () => {
                             </span>
                         </div>
                     }
-                    dataSource={notificationSelector.notifications}
+                    dataSource={data?.notifications}
                     renderItem={(item) => (
                         <List.Item
                             className={`${
@@ -106,7 +115,7 @@ const NotificationList = () => {
     const getNotificationByUserId = async () => {
         try {
             const res = await notificationService.getNotificationByUserId(
-                user?.userId
+                user?.userId ?? 0
             );
 
             setNotifications(res);
@@ -120,7 +129,7 @@ const NotificationList = () => {
     }, [user]);
     return (
         <Dropdown overlay={menu} trigger={['click']}>
-            <Badge count={notificationSelector?.notifications?.length}>
+            <Badge count={data?.totalItems}>
                 <BellOutlined style={{ fontSize: '24px', cursor: 'pointer' }} />
             </Badge>
         </Dropdown>
