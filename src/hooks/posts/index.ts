@@ -3,3 +3,7 @@ export * from './useFetchNewPosts';
 export * from './useUpdatePostViews';
 export * from './useFetchPostById';
 export * from './useFetchRelatedPosts';
+export * from './useConfirmPost';
+export * from './useCreatePost';
+export * from './useDeletePost';
+export * from './useUpdatePost';

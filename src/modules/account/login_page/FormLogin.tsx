@@ -36,6 +36,8 @@ export const FormLogin = () => {
                         userId: data?.user.userId,
                         roleId: data?.user.roleId,
                     }; // Điều chỉnh theo response thực tế
+                    console.log('gọi join room');
+
                     joinRoom(data?.user.userId);
 
                     if (user.roleId === 2) {

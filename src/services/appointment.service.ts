@@ -2,6 +2,7 @@ import apiClient from '../constants/api';
 import { Appointment } from '../models';
 
 const appointmentService = {
+    async useStatisticAppointmentByDay
     async getWaitingPatientsCount(doctorId: number) {
         const res = await apiClient.get(
             '/appointment/get-waitting-patients-count/' + doctorId

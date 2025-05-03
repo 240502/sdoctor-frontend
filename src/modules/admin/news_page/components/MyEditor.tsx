@@ -8,7 +8,7 @@ const MyEditor = ({
     setEditorData,
     labelContentRef,
     post,
-    setPost,
+    handleChangePostContent,
     isUpdate,
 }: any) => {
     const editorRef = useRef<any>(null);
@@ -58,10 +58,9 @@ const MyEditor = ({
                 showSuccess(labelContentRef.current);
             }}
             onChange={(event, editor) => {
-                console.log(editor.isReadOnly);
                 const data = editor.getData();
                 if (isUpdate) {
-                    setPost({ ...post, content: data });
+                    handleChangePostContent({ ...post, content: data });
                 } else {
                     setEditorData(data);
                 }

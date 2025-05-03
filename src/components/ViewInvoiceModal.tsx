@@ -92,7 +92,8 @@ const ViewInvoiceModal = ({
                 </Row>
                 <Row gutter={24}>
                     <Col span={12} className="mb-2">
-                        <strong>Thời gian khám:</strong> {invoice?.timeValue}
+                        <strong>Thời gian khám:</strong>{' '}
+                        {invoice?.startTime + ' - ' + invoice.endTime}
                     </Col>
                     <Col span={12} className="mb-2 text-end">
                         <strong>Tổng thanh toán:</strong>{' '}

@@ -6,42 +6,36 @@ import {
     Pagination,
     Flex,
     Button,
-    Select,
     Input,
+    Skeleton,
 } from 'antd';
 import { useEffect, useState } from 'react';
 import { ModalAddNews } from '../components/ModalAddNews';
-import { Post } from '../../../../models/post';
-import { PostService } from '../../../../services/post.service';
+import { FetchPostPayload, Post } from '../../../../models/post';
 type NotificationType = 'success' | 'error';
 import { useRecoilValue } from 'recoil';
-import { configValue, userValue } from '../../../../stores/userAtom';
+import { userValue } from '../../../../stores/userAtom';
 import '@/assets/scss/new_management.scss';
 import { NewsCards } from '../components/NewsCards';
 import { ModalConfirmDeleteNews } from '../components/ModalConfirmDeleteNews';
-import { PostCategory } from '../../../../models/post_category';
-import { PostCategoryService } from '../../../../services/post_category.service';
 import { SearchProps } from 'antd/es/input';
-const { Option } = Select;
+import { useFetchPostWithPagination } from '../../../../hooks/posts/useFetchPostWithPagination';
 const { Search } = Input;
 const NewsManagement = () => {
     const user = useRecoilValue(userValue);
-    const config = useRecoilValue(configValue);
     const [api, contextHolder] = notification.useNotification();
     const [isShowModal, setIsShowModal] = useState<boolean>(false);
     const [isUpdate, setIsUpdate] = useState<boolean>(false);
     const [isShowModalConfirm, setIsShowModalConfirm] =
         useState<boolean>(false);
-    const [pageIndex, setPageIndex] = useState<number>(1);
-    const [pageSize, setPageSize] = useState<number>(5);
-    const [pageCount, setPageCount] = useState<number>(0);
-    const [posts, setPosts] = useState<Post[]>([]);
     const [post, setPost] = useState<Post>({} as Post);
-    const [postCategories, setPostCategories] = useState<PostCategory[]>([]);
-    const [searchOptions, setSearchOptions] = useState<any>({
+    const [searchOptions, setSearchOptions] = useState<FetchPostPayload>({
         categoryId: null,
-        searchContent: null,
+        searchContent: '',
         status: 'Chờ duyệt',
+        authorId: user.userId,
+        pageIndex: 1,
+        pageSize: 8,
     });
     const openNotificationWithIcon = (
         type: NotificationType,
@@ -53,48 +47,34 @@ const NewsManagement = () => {
             description: des,
         });
     };
-    const getAllPostCategory = async () => {
-        try {
-            const res = await PostCategoryService.getAllPostCategory();
-            setPostCategories(res);
-        } catch (err: any) {
-            console.log(err.message);
-            setPostCategories([]);
-        }
-    };
+
+    const {
+        data: postResponse,
+        error,
+        isError,
+        isFetching,
+        refetch,
+        isRefetching,
+    } = useFetchPostWithPagination(searchOptions);
+
     const onSearch: SearchProps['onSearch'] = (value, _e, _) => {
         setSearchOptions({
             ...searchOptions,
-            title: value !== '' ? value : null,
+            searchContent: value,
         });
     };
-    const loadData = async () => {
-        try {
-            const data = {
-                pageIndex: pageIndex,
-                pageSize: pageSize,
-                authorId: user?.roleId === 2 ? user.userId : null,
-                ...searchOptions,
-            };
-            const res = await PostService.viewPost(data);
-            console.log('post data', res);
-            setPageCount(res.pageCount);
-            setPosts(res.data);
-        } catch (err: any) {
-            setPageCount(0);
-            setPosts([]);
-            console.log(err.message);
-        }
+
+    const closeInputPostModal = () => {
+        setIsShowModal(false);
+        setPost({} as Post);
     };
-    const handleCloseModalConfirm = () => {
+    const handleChangePostContent = (content: string) => {
+        setPost({ ...post, content: content });
+    };
+    const handleCloseConfirmModal = () => {
         setIsShowModalConfirm(false);
+        setPost({} as Post);
     };
-    useEffect(() => {
-        getAllPostCategory();
-    }, []);
-    useEffect(() => {
-        loadData();
-    }, [pageIndex, pageSize, searchOptions]);
 
     return (
         <div className="">
@@ -104,7 +84,7 @@ const NewsManagement = () => {
                     <Breadcrumb
                         items={[
                             {
-                                href: '',
+                                href: 'http://localhost:5173/admin/dashboard',
                                 title: <HomeOutlined />,
                             },
                             {
@@ -160,36 +140,7 @@ const NewsManagement = () => {
                         </Button>
                     </Flex>
                 </Flex>
-                <Flex className="justify-content-between ps-2 pe-2 mb-3">
-                    <div className="col-4">
-                        <Select
-                            allowClear
-                            showSearch
-                            value={searchOptions.categoryId}
-                            className="w-50"
-                            onChange={(value: number) => {
-                                setSearchOptions({
-                                    ...searchOptions,
-                                    categoryId: value,
-                                });
-                                setPageIndex(1);
-                            }}
-                            optionFilterProp="children"
-                            placeholder="Chọn loại bài viết"
-                        >
-                            {postCategories.map((category: PostCategory) => {
-                                return (
-                                    <Option
-                                        key={category.postCategoryId}
-                                        value={category.postCategoryId}
-                                        label={category.name}
-                                    >
-                                        {category.name}
-                                    </Option>
-                                );
-                            })}
-                        </Select>
-                    </div>
+                <Flex className="justify-content-end ps-2 pe-2 mb-3">
                     <div>
                         <Search
                             onSearch={onSearch}
@@ -197,31 +148,52 @@ const NewsManagement = () => {
                         />
                     </div>
                 </Flex>
-                <NewsCards
-                    posts={posts}
-                    setIsShowModal={setIsShowModal}
-                    setPost={setPost}
-                    setIsUpdate={setIsUpdate}
-                    openNotificationWithIcon={openNotificationWithIcon}
-                    loadData={loadData}
-                    setIsShowModalConfirm={setIsShowModalConfirm}
-                />
-                {pageCount > 1 && (
+                <Skeleton active loading={isFetching || isRefetching}>
+                    {isError ? (
+                        <p className="fw-bold text-center">
+                            {error.message.includes('404')
+                                ? 'Không có bài viết nào !'
+                                : error.message}
+                        </p>
+                    ) : (
+                        <NewsCards
+                            posts={postResponse?.posts}
+                            setIsShowModal={setIsShowModal}
+                            setPost={setPost}
+                            setIsUpdate={setIsUpdate}
+                            openNotificationWithIcon={openNotificationWithIcon}
+                            setIsShowModalConfirm={setIsShowModalConfirm}
+                        />
+                    )}
+                </Skeleton>
+
+                {postResponse?.pageCount && (
                     <Pagination
                         className="mt-3"
                         showSizeChanger
                         align="center"
                         defaultCurrent={1}
-                        current={pageIndex}
-                        pageSize={pageSize}
-                        total={pageCount * pageSize}
+                        current={searchOptions.pageIndex}
+                        pageSize={searchOptions.pageSize}
+                        total={
+                            postResponse?.pageCount
+                                ? postResponse?.pageCount *
+                                  searchOptions.pageSize
+                                : 0
+                        }
                         pageSizeOptions={['5', '10', '20', '50']}
                         onChange={(current: number, size: number) => {
-                            if (size !== pageSize) {
-                                setPageIndex(1);
-                                setPageSize(size);
+                            if (size !== searchOptions.pageSize) {
+                                setSearchOptions({
+                                    ...searchOptions,
+                                    pageIndex: 1,
+                                    pageSize: size,
+                                });
                             } else {
-                                setPageIndex(current);
+                                setSearchOptions({
+                                    ...searchOptions,
+                                    pageIndex: current,
+                                });
                             }
                         }}
                     />
@@ -230,24 +202,21 @@ const NewsManagement = () => {
             {isShowModal && (
                 <ModalAddNews
                     isShowModal={isShowModal}
-                    setIsShowModal={setIsShowModal}
+                    closeInputPostModal={closeInputPostModal}
                     isUpdate={isUpdate}
-                    openNotificationWithIcon={openNotificationWithIcon}
-                    loadData={loadData}
+                    openNotification={openNotificationWithIcon}
+                    refetch={refetch}
                     post={post}
-                    setPost={setPost}
-                    setIsUpdate={setIsUpdate}
-                    config={config}
+                    handleChangePostContent={handleChangePostContent}
                 />
             )}
             {isShowModalConfirm && (
                 <ModalConfirmDeleteNews
                     isShowModalConfirm={isShowModalConfirm}
-                    handleCloseModalConfirm={handleCloseModalConfirm}
+                    handleCloseConfirmModal={handleCloseConfirmModal}
                     post={post}
-                    header={config}
-                    openNotificationWithIcon={openNotificationWithIcon}
-                    loadData={loadData}
+                    openNotification={openNotificationWithIcon}
+                    refetch={refetch}
                 />
             )}
         </div>

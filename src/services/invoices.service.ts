@@ -17,11 +17,10 @@ const invoicesService = {
         const res = await apiClient.get('/invoice/get-recent/' + doctorId);
         return res?.data;
     },
-    async getTotalRevenueByDateInNowWeek(data: any, config: any): Promise<any> {
+    async getTotalRevenueByDateInNowWeek(data: any): Promise<any> {
         const res = await apiClient.post(
             '/invoice/get-total-revenue-by-date-in-now-week',
-            data,
-            config
+            data
         );
         return res.data;
     },

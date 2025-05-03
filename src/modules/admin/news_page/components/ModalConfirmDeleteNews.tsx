@@ -1,41 +1,46 @@
 import { Button, Modal } from 'antd';
-import { PostService } from '../../../../services/post.service';
+import { useDeletePost } from '../../../../hooks';
+import { Post } from '../../../../models';
+
+interface ConfirmDeletePostModalProps {
+    isShowModalConfirm: boolean;
+    handleCloseConfirmModal: () => void;
+    post: Post;
+    openNotification: (type: any, title: string, des: string) => void;
+    refetch: () => void;
+}
 
 export const ModalConfirmDeleteNews = ({
     isShowModalConfirm,
-    handleCloseModalConfirm,
+    handleCloseConfirmModal,
     post,
-    header,
-    openNotificationWithIcon,
-    loadData,
-}: any) => {
+    openNotification,
+    refetch,
+}: ConfirmDeletePostModalProps) => {
+    const { mutate: DeletePost } = useDeletePost();
     const handleDelete = async () => {
-        try {
-            const res = await PostService.deletePost(post.id, header);
-            console.log(res);
-            openNotificationWithIcon(
-                'success',
-                'Thông báo!',
-                'Xóa thành công!'
-            );
-            handleCloseModalConfirm();
-            loadData();
-        } catch (err: any) {
-            console.log(err.message);
-            handleCloseModalConfirm();
-
-            openNotificationWithIcon(
-                'error',
-                'Thông báo!',
-                'Xóa không thành công!'
-            );
-        }
+        DeletePost(post.id, {
+            onSuccess() {
+                openNotification('success', 'Thông báo!', 'Xóa thành công!');
+                handleCloseConfirmModal();
+                refetch();
+            },
+            onError() {
+                openNotification(
+                    'error',
+                    'Thông báo!',
+                    'Xóa không thành công!'
+                );
+                handleCloseConfirmModal();
+            },
+        });
     };
     return (
         <Modal
             title="Thông báo"
             open={isShowModalConfirm}
-            onCancel={handleCloseModalConfirm}
+            onCancel={handleCloseConfirmModal}
+            maskClosable={false}
             footer={[
                 <Button
                     danger
@@ -44,7 +49,7 @@ export const ModalConfirmDeleteNews = ({
                 >
                     Xác nhận
                 </Button>,
-                <Button onClick={handleCloseModalConfirm}> Đóng</Button>,
+                <Button onClick={handleCloseConfirmModal}> Đóng</Button>,
             ]}
         >
             Bạn chắc chắn muốn xóa bài viết này?

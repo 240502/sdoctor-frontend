@@ -7,6 +7,7 @@ import { EyeOutlined } from '@ant-design/icons';
 import { ViewInvoiceModal } from '../../../../components';
 import { User } from '../../../../models/user';
 import { useNavigate } from 'react-router-dom';
+import { useFetchRecentInvoice } from '../../../../hooks';
 export const RecentInvoicesTable = ({ user }: { user: User }) => {
     const navigate = useNavigate();
     const [recentInvoices, setRecentInvoices] = useState<Invoices[]>([]);
@@ -22,6 +23,10 @@ export const RecentInvoicesTable = ({ user }: { user: User }) => {
             console.log(err.message);
         }
     };
+    const { data, error, isFetching } = useFetchRecentInvoice(user.userId);
+    useEffect(() => {
+        console.log('invoice data', data);
+    }, [data]);
     const cancelViewInvoiceModal = () => {
         setInvoice({} as Invoices);
         setOpenViewInvoiceModal(false);
@@ -34,13 +39,13 @@ export const RecentInvoicesTable = ({ user }: { user: User }) => {
         {
             title: 'Tên bệnh nhân',
             dataIndex: 'patientName',
-            key: 'patient_name',
+            key: 'patientName',
             render: (text) => <a>{text}</a>,
         },
         {
             title: 'Dịch vụ',
             dataIndex: 'serviceName',
-            key: 'service_name',
+            key: 'serviceName',
             render: (text) => <a>{text}</a>,
         },
         {
@@ -98,8 +103,9 @@ export const RecentInvoicesTable = ({ user }: { user: User }) => {
             }
         >
             <Table
+                size="small"
                 pagination={false}
-                dataSource={recentInvoices}
+                dataSource={data}
                 columns={columns}
                 bordered
             />

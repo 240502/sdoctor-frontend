@@ -9,6 +9,7 @@ import {
 import { appointmentService, invoicesService } from '../../../../services';
 import { useRecoilValue } from 'recoil';
 import { userValue } from '../../../../stores/userAtom';
+import { useFetchRevenueByWeek } from '../../../../hooks';
 
 // Register the components of Chart.js that are needed
 Chart.register(BarController, BarElement, CategoryScale, LinearScale);
@@ -18,23 +19,6 @@ const BarChart = ({ type }: any) => {
     const [figures, setFigures] = useState<number[]>([] as number[]);
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const chartRef = useRef<Chart | null>(null); // Ref lưu trữ instance của biểu đồ
-
-    function getStartOfWeek(date: Date) {
-        const givenDate = new Date(date);
-        const dayOfWeek = givenDate.getDay();
-        const diff = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
-        const startOfWeek = new Date(givenDate);
-        startOfWeek.setDate(givenDate.getDate() - diff);
-        return startOfWeek;
-    }
-
-    const getEndOfWeek = (date: Date) => {
-        const dayOfWeek = date.getDay();
-        const diff = dayOfWeek === 0 ? 6 : 7 - dayOfWeek;
-        const endOfWeek = date;
-        endOfWeek.setDate(endOfWeek.getDate() + diff);
-        return endOfWeek;
-    };
 
     const findMaxFigure = (figures: number[]): number => {
         let max = figures[0];
@@ -61,8 +45,7 @@ const BarChart = ({ type }: any) => {
     const getTotalPriceAppointmentByWeek = async (data: any, config: any) => {
         try {
             const res = await invoicesService.getTotalRevenueByDateInNowWeek(
-                data,
-                config
+                data
             );
             const weekDays = ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'];
             const pricesMap = new Map<string, number>();
@@ -104,6 +87,25 @@ const BarChart = ({ type }: any) => {
             console.error(err.message);
         }
     };
+    const [series, setSeries] =
+        useState<{ name: string; type: string; data: number[] }[]>();
+    let categories = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
+    function getStartOfWeek(date: Date) {
+        const givenDate = new Date(date);
+        const dayOfWeek = givenDate.getDay();
+        const diff = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+        const startOfWeek = new Date(givenDate);
+        startOfWeek.setDate(givenDate.getDate() - diff);
+        return startOfWeek;
+    }
+
+    const getEndOfWeek = (date: Date) => {
+        const dayOfWeek = date.getDay();
+        const diff = dayOfWeek === 0 ? 6 : 7 - dayOfWeek;
+        const endOfWeek = date;
+        endOfWeek.setDate(endOfWeek.getDate() + diff);
+        return endOfWeek;
+    };
 
     useEffect(() => {
         const now = new Date();
@@ -113,7 +115,7 @@ const BarChart = ({ type }: any) => {
         const data = {
             startWeek: startOfWeek,
             endWeek: endOfWeek,
-            doctorId: user.doctorId,
+            doctorId: user.userId,
         };
         if (type === 'appointment') {
             statisticsAppointmentsByDay(data, header);

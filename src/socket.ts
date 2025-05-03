@@ -39,7 +39,6 @@ export const disconnectSocket = () => {
 export const joinRoom = (userId: number) => {
     const socket = getSocket();
     if (socket.connected) {
-        console.log('Joining room for user:', userId);
         socket.emit('joinRoom', { userId });
     }
 };

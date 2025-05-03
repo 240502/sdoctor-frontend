@@ -17,7 +17,6 @@ export const NewsCards = ({
     setIsShowModalConfirm,
 }: any) => {
     const user = useRecoilValue(userValue);
-
     return (
         <Flex wrap>
             {posts?.length > 0 ? (

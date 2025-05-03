@@ -1,6 +1,16 @@
 import Table, { ColumnsType } from 'antd/es/table';
 import { AppointmentResponseDto } from '../../../../models/appointment';
-import { Button, Input, InputRef, Skeleton, Space, Tag, Tooltip } from 'antd';
+import {
+    Button,
+    Col,
+    Input,
+    InputRef,
+    Row,
+    Skeleton,
+    Space,
+    Tag,
+    Tooltip,
+} from 'antd';
 import Highlighter from 'react-highlight-words';
 import { useEffect, useRef, useState } from 'react';
 import { FilterDropdownProps } from 'antd/es/table/interface';
@@ -236,33 +246,20 @@ const AppointmentTable: React.FC<AppointmentTableProps> = ({
         {
             title: 'Họ và tên',
             dataIndex: 'patientName',
-            ...getColumnSearchProps('patientName'),
         },
         {
             title: 'Số điện thoại',
             dataIndex: 'patientPhone',
-            ...getColumnSearchProps('patientPhone'),
         },
         {
             title: 'Tuổi',
             dataIndex: 'birthday',
-
             render: (_, record) => {
                 const now = new Date();
                 return (
                     now.getFullYear() -
                     Number(record.birthday.toString().slice(0, 4))
                 );
-            },
-            sorter: (a, b) => {
-                const now = new Date();
-                const ageA =
-                    now.getFullYear() -
-                    Number(a.birthday.toString().slice(0, 4));
-                const ageB =
-                    now.getFullYear() -
-                    Number(b.birthday.toString().slice(0, 4));
-                return ageA - ageB;
             },
         },
         {
@@ -273,48 +270,32 @@ const AppointmentTable: React.FC<AppointmentTableProps> = ({
                     {record.statusName.toUpperCase()}
                 </Tag>
             ),
-            filters: [
-                {
-                    text: 'Chờ xác nhận',
-                    value: 'Chờ xác nhận',
-                },
-                {
-                    text: 'Đã xác nhận',
-                    value: 'Đã xác nhận',
-                },
-            ],
-            onFilter: (value, record) =>
-                record.statusName.indexOf(value as string) === 0,
         },
         {
             title: 'Chức năng',
             key: 'action',
             render: (_, record) => (
-                <>
-                    <Tooltip placement="top" title="Xem chi tiết">
-                        <Button
-                            className="border-info me-2"
-                            onClick={() => {
-                                setIsOpenDetailModal(true);
-                                setAppointment(record);
-                            }}
-                        >
-                            <EyeOutlined className="text-info" />
-                        </Button>
-                    </Tooltip>
-                    {(record.statusId === 2 || record.statusId === 1) && (
-                        <Tooltip
-                            placement="top"
-                            title={
-                                record.statusId === 1
-                                    ? 'Xác nhận'
-                                    : 'Hoàn thành'
-                            }
-                        >
+                <Row gutter={24}>
+                    <Col span={8}>
+                        <Tooltip placement="top" title="Xem chi tiết">
                             <Button
-                                className="border-success me-2"
+                                size="small"
+                                className="border-info me-2 "
                                 onClick={() => {
-                                    console.log(record);
+                                    setIsOpenDetailModal(true);
+                                    setAppointment(record);
+                                }}
+                            >
+                                <EyeOutlined className="text-info" />
+                            </Button>
+                        </Tooltip>
+                    </Col>
+                    <Col span={8}>
+                        <Tooltip placement="top" title={'Xác nhận'}>
+                            <Button
+                                size="small"
+                                className="border-success me-2 "
+                                onClick={() => {
                                     setOpenModalConfirm(true);
                                     setType('confirm');
 
@@ -340,11 +321,12 @@ const AppointmentTable: React.FC<AppointmentTableProps> = ({
                                 <CheckOutlined className="text-success" />
                             </Button>
                         </Tooltip>
-                    )}
-                    {(record.statusId === 2 || record.statusId === 1) && (
+                    </Col>
+                    <Col span={8}>
                         <Tooltip placement="top" title="Từ chối">
                             <Button
                                 danger
+                                size="small"
                                 onClick={() => {
                                     setOpenModalConfirm(true);
                                     //handleConfirmAppointment(record);
@@ -358,8 +340,8 @@ const AppointmentTable: React.FC<AppointmentTableProps> = ({
                                 <CloseOutlined className="text-danger" />
                             </Button>{' '}
                         </Tooltip>
-                    )}
-                </>
+                    </Col>
+                </Row>
             ),
         },
     ];
@@ -375,6 +357,7 @@ const AppointmentTable: React.FC<AppointmentTableProps> = ({
                     </p>
                 ) : (
                     <Table
+                        size="small"
                         bordered
                         columns={columns}
                         dataSource={appointmentsResponse}

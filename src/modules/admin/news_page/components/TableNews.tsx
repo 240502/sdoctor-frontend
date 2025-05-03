@@ -8,13 +8,10 @@ import {
     PlusOutlined,
     SearchOutlined,
 } from '@ant-design/icons';
-import { News } from '../../../../models/post';
-import { NewsService } from '../../../../services/post.service';
+import { Post } from '../../../../models';
 import { FilterDropdownProps } from 'antd/es/table/interface';
 import Highlighter from 'react-highlight-words';
-
-type DataIndex = keyof News;
-
+type DataIndex = keyof Post;
 const TableNews = ({
     setIsUpdate,
     setIsShowModal,
@@ -23,7 +20,6 @@ const TableNews = ({
     setIsView,
     openNotificationWithIcon,
     loadData,
-    config,
 }: any) => {
     const [searchText, setSearchText] = useState('');
     const [searchedColumn, setSearchedColumn] = useState('');
@@ -137,7 +133,7 @@ const TableNews = ({
     const handleOk = async () => {
         console.log(postId);
         try {
-            await NewsService.deleteNews(postId, config);
+            // await postService.deleteNews
             openNotificationWithIcon(
                 'success',
                 'Thông báo!',
@@ -155,7 +151,7 @@ const TableNews = ({
             );
         }
     };
-    const columns: TableColumnsType<News> = [
+    const columns: TableColumnsType<Post> = [
         {
             title: 'Tiêu đề bài viết',
             dataIndex: 'title',
@@ -176,12 +172,12 @@ const TableNews = ({
         {
             title: 'Tên danh mục',
             dataIndex: 'category_name',
-            ...getColumnSearchProps('category_name'),
+            ...getColumnSearchProps('categoryName'),
         },
         {
             title: 'Tên tác giả',
             dataIndex: 'author_name',
-            ...getColumnSearchProps('author_name'),
+            ...getColumnSearchProps('authorName'),
         },
         {
             title: 'Trạng thái',
@@ -208,7 +204,7 @@ const TableNews = ({
         {
             title: 'Action',
             key: 'action',
-            render: (text: string, record: News) => (
+            render: (text: string, record: Post) => (
                 <>
                     <Tooltip placement="topLeft" title={'Xem chi tiết'}>
                         <Button
@@ -271,7 +267,7 @@ const TableNews = ({
                         </Button>
                     </div>
                 </Flex>
-                <Table<News>
+                <Table<Post>
                     bordered
                     dataSource={news}
                     columns={columns}
