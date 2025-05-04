@@ -15,12 +15,8 @@ import { Time } from '../../../../models/time';
 import { useRecoilValue } from 'recoil';
 import { configValue, userValue } from '../../../../stores/userAtom';
 import '@/assets/scss/schedule_management.scss';
-import {
-    useFetchSchedulesByEntityIdForDoctor,
-    useFetchTimeByType,
-} from '../../../../hooks';
+import { useFetchTimeByType } from '../../../../hooks';
 import { NoticeType } from 'antd/es/message/interface';
-import { Schedules } from '../../../../models';
 import { handleTimeOverRealTime } from '../../../../utils/schedule';
 const tabs: TabsProps['items'] = [
     {
@@ -58,7 +54,6 @@ const ScheduleManagement = () => {
     const config = useRecoilValue(configValue);
     const [activeDay, setActiveDay] = useState<string>(String(now.getDay()));
     const [messageApi, contextHolder] = message.useMessage();
-    const [selectedTimes, setSelectedTimes] = useState<Time[]>([]);
     const [intervalTime, setIntervalTime] = useState<number>(30);
     const [times, setTimes] = useState<Time[]>([]);
     const [isUpdate, setIsUpdate] = useState<boolean>(false);

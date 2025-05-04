@@ -30,6 +30,7 @@ import {
 } from '../../../../hooks';
 import dayjs from 'dayjs';
 import AppointmentDetailModal from './AppointmentDetailModal';
+import { useNavigate } from 'react-router-dom';
 type DataIndex = keyof AppointmentResponseDto;
 type NotificationType = 'success' | 'error';
 interface AppointmentTableProps {
@@ -44,6 +45,7 @@ const AppointmentTable: React.FC<AppointmentTableProps> = ({
     doctorId,
     openNotification,
 }: AppointmentTableProps): JSX.Element => {
+    const navigate = useNavigate();
     const [searchText, setSearchText] = useState('');
     const [searchedColumn, setSearchedColumn] = useState('');
     const searchInput = useRef<InputRef>(null);
@@ -284,6 +286,14 @@ const AppointmentTable: React.FC<AppointmentTableProps> = ({
                                 onClick={() => {
                                     setIsOpenDetailModal(true);
                                     setAppointment(record);
+                                    const queryParams = new URLSearchParams();
+                                    queryParams.append(
+                                        'appointment',
+                                        record.id.toString()
+                                    );
+                                    navigate(
+                                        `/admin/appointment-detail?${queryParams}`
+                                    );
                                 }}
                             >
                                 <EyeOutlined className="text-info" />

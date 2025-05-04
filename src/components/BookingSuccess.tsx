@@ -43,7 +43,7 @@ const BookingSuccess = () => {
                 <Title level={3} style={{ marginTop: '16px' }}>
                     Đặt lịch thành công!
                 </Title>
-                <Text>Chúc mừng, bạn đã đặt lịch hẹn khám thành công.</Text>
+                <Text>Bạn sẽ nhận được xác nhận chi tiết qua email..</Text>
                 {payment === 2 && (
                     <p>
                         Bạn cần thanh toán hóa đơn phí khám trước

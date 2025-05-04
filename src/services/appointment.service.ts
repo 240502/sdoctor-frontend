@@ -2,7 +2,23 @@ import apiClient from '../constants/api';
 import { Appointment } from '../models';
 
 const appointmentService = {
-    async useStatisticAppointmentByDay
+    async getRecentAppointments(payload: {
+        entityId: number;
+        limit: number;
+        withoutId: number;
+    }) {
+        const res = await apiClient.get(
+            `/appointment/get-recent-appointments?entityId=${payload.entityId}&limit=${payload.limit}&withoutId=${payload.withoutId}`
+        );
+        return res?.data;
+    },
+    async useStatisticAppointmentByDay(payload: any) {
+        const res = await apiClient.get(
+            `/appointment/statistics-appointments-by-day?startWeek=${payload.startWeek}&endWeek=${payload.endWeek}&doctorId=${payload.doctorId}`
+        );
+
+        return res?.data;
+    },
     async getWaitingPatientsCount(doctorId: number) {
         const res = await apiClient.get(
             '/appointment/get-waitting-patients-count/' + doctorId

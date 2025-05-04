@@ -71,4 +71,5 @@ export interface AppointmentResponseDto {
     commune: string;
     rejectionReason: string;
     serviceName: string;
+    clinicName: string;
 }

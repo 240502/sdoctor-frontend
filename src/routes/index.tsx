@@ -61,7 +61,9 @@ import {
     INVOICE_MANAGEMENT_PATH,
     PROFILE_PATH,
     SERVICE_MANAGEMENT_PATH,
+    APPOINTMENT_DETAIL_PATH,
 } from './path';
+import AppointmentDetailPage from '../modules/admin/appointment_detail_page';
 
 export const publicRoutes = [
     {
@@ -157,6 +159,11 @@ export const publicRoutes = [
 ];
 
 export const privateRoutes = [
+    {
+        path: APPOINTMENT_DETAIL_PATH,
+        component: AppointmentDetailPage,
+        layout: AdminLayout,
+    },
     {
         path: DASHBOARD_PATH,
         component: DashBoard,

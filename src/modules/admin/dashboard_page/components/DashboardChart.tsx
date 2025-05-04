@@ -16,10 +16,23 @@ const DashboardChart: React.FC<ColumnChartProps> = ({
 }) => {
     const options: ApexOptions = {
         chart: {
-            type: 'bar',
+            type: 'line',
             height: 350,
             toolbar: {
                 show: true,
+            },
+            fontFamily: 'Roboto, sans-serif',
+            animations: {
+                enabled: true,
+                animateGradually: {
+                    enabled: true,
+                },
+                dynamicAnimation: {
+                    enabled: false,
+                },
+            },
+            zoom: {
+                enabled: false,
             },
         },
         plotOptions: {
@@ -28,6 +41,10 @@ const DashboardChart: React.FC<ColumnChartProps> = ({
                 columnWidth: '55%',
                 borderRadius: 4,
             },
+        },
+        stroke: {
+            width: [0, 4],
+            curve: 'smooth',
         },
         dataLabels: {
             enabled: false,
@@ -50,7 +67,7 @@ const DashboardChart: React.FC<ColumnChartProps> = ({
             {
                 tickAmount: 4,
                 title: {
-                    text: 'Doanh thu',
+                    text: 'Doanh thu (VND)',
                 },
                 labels: {
                     formatter: function (val) {
@@ -83,6 +100,8 @@ const DashboardChart: React.FC<ColumnChartProps> = ({
                 formatter: (val: number) => `${val.toLocaleString(undefined)}`,
             },
         },
+
+        colors: ['#008FFB', '#FF4560'], // Thêm màu cho Bar và Line
     };
 
     return (
@@ -90,7 +109,7 @@ const DashboardChart: React.FC<ColumnChartProps> = ({
             <Chart
                 options={options}
                 series={series}
-                type="bar"
+                type="line"
                 height={280}
                 width="100%"
             />

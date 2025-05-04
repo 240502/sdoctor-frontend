@@ -5,3 +5,4 @@ export * from './useFetchAppointmentsCompleted';
 export * from './useFetchTotalAppointmentInDay';
 export * from './useFetchAppointmentsInDay';
 export * from './useFetchWaitingPatientsCount';
+export * from './useFetchAppointmentById';
