@@ -6,12 +6,11 @@ import {
 import { Breadcrumb, Col, Row, message } from 'antd';
 import 'dayjs/locale/vi';
 import { useEffect, useState } from 'react';
-import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
+import { useRecoilState, useRecoilValue } from 'recoil';
 import { BlockCalendar, InputAppointmentModal } from '../components';
 import { patientProfileValue } from '../../../../stores/patientAtom';
 import { getSocket } from '../../../../socket';
 import { newAppointmentState } from '../../../../stores/appointmentAtom';
-import { invoiceState } from '../../../../stores/invoice';
 import { useSearchParams } from 'react-router-dom';
 import SchedulesComp from '../components/SchedulesComp';
 import { Schedules } from '../../../../models';
@@ -21,7 +20,6 @@ import {
 } from '../../../../hooks';
 import dayjs from 'dayjs';
 import { NoticeType } from 'antd/es/message/interface';
-type NotificationType = 'success' | 'error';
 
 const BookingAppointment = () => {
     const [searchParams] = useSearchParams();
@@ -31,8 +29,6 @@ const BookingAppointment = () => {
     const [date, setDate] = useState<string>(now.format('YYYY-MM-DD'));
     const patientProfile = useRecoilValue(patientProfileValue);
 
-    const [newAppointment, setNewAppointment] =
-        useRecoilState(newAppointmentState);
     const [openInputModal, setOpenInputModal] = useState<boolean>(false);
     const [paymentMethod, setPaymentMethod] = useState<number>(1);
     const openMessage = (type: NoticeType, content: string) => {

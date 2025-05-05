@@ -16,20 +16,18 @@ import {
     Flex,
     Skeleton,
 } from 'antd';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { Doctor } from '../../../../models/doctor';
 import { baseURL } from '../../../../constants/api';
 import parse from 'html-react-parser';
 import { useSetRecoilState } from 'recoil';
 import { doctorState } from '../../../../stores/doctorAtom';
 import { useNavigate } from 'react-router-dom';
-import { commentService } from '../../../../services';
-import socket from '../../../../socket';
 import { Comment } from '../../../../models/comment';
 import { useFetchDoctorDetail } from '../../../../hooks';
 import { BlockComment } from '../components/BlockComment';
 import BlockCommonDoctors from '../components/BlockCommonDoctors';
+import { getSocket } from '../../../../socket';
 type DataParams = {
     id: string;
 };
@@ -58,6 +56,7 @@ const ViewDetailDoctor = () => {
     ];
 
     const handleOnNewComment = () => {
+        const socket = getSocket();
         socket?.on('newComment', (newComment: Comment) => {
             // getCommentByDoctorId(Number(newComment.doctorId));
         });

@@ -1,4 +1,4 @@
-import { Button, Image } from 'antd';
+import { Button, Image, Row } from 'antd';
 import '@/assets/scss/home.scss';
 import { useEffect } from 'react';
 import { BlockCommonService } from '../components/BlockCommonService';
@@ -16,7 +16,7 @@ const Home = () => {
     }, []);
     return (
         <>
-            <div className="slide__container  position-relative">
+            <Row className="banner  position-relative">
                 <Image
                     preview={false}
                     src="http://localhost:5173/img/093216-bc.jpg"
@@ -48,7 +48,7 @@ const Home = () => {
                         </Button>
                     </div>
                 </div>
-            </div>
+            </Row>
             <div className="container home__content mt-4 ">
                 {/* <BlockSearchDoctor /> */}
                 <BlockSpecialization />

@@ -29,7 +29,6 @@ const ViewDoctor = () => {
     const doctors = useMemo(() => {
         return data?.pages.flatMap((page) => page.data) ?? [];
     }, [data]);
-    // ======= Infinite Scroll Logic =======
     const observerRef = useRef<HTMLDivElement | null>(null);
     useEffect(() => {
         window.scrollTo(0, 0);
@@ -43,10 +42,8 @@ const ViewDoctor = () => {
             }
         }
     }, []);
-
     useEffect(() => {
         if (!observerRef.current || !hasNextPage || isFetchingNextPage) return;
-
         const observer = new IntersectionObserver(
             (entries) => {
                 if (entries[0].isIntersecting) {
@@ -55,15 +52,13 @@ const ViewDoctor = () => {
             },
             { threshold: 1.0 }
         );
-
         observer.observe(observerRef.current);
-
         return () => {
             if (observerRef.current) observer.unobserve(observerRef.current);
         };
     }, [hasNextPage, isFetchingNextPage]);
     return (
-        <div className="doctor-list mt-4 mb-4">
+        <div className="doctor-list mt-4 mb-4 container">
             <Breadcrumb
                 items={[
                     {
@@ -105,10 +100,7 @@ const ViewDoctor = () => {
                                     {doctors && (
                                         <DoctorCard doctors={doctors} />
                                     )}
-                                    <div
-                                        ref={observerRef}
-                                        // style={{ height: 20, marginBottom: 20 }}
-                                    />
+                                    <div ref={observerRef} />
                                 </>
                             )}
                         </Skeleton>

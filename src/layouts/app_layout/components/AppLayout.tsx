@@ -53,9 +53,7 @@ export const AppLayout = ({ children }: any) => {
                     </div>
                 </div>
             </Header>
-            <Content className="bg-body">
-                <div className="container">{children}</div>
-            </Content>
+            <Content className="bg-body">{children}</Content>
             <Footer>
                 <HomeFooter />
             </Footer>

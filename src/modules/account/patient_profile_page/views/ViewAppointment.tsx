@@ -3,15 +3,12 @@ import { PatientProfileLayout } from '../components/PatientProfileLayout';
 import { useRecoilValue } from 'recoil';
 import { patientProfileValue } from '../../../../stores/patientAtom';
 import {
-    Appointment,
     AppointmentResponseDto,
     AppointmentViewForPatient,
 } from '../../../../models/appointment';
 import {
-    appointmentService,
     appointmentStatusService,
     invoicesService,
-    paymentService,
 } from '../../../../services';
 import {
     Button,
@@ -46,14 +43,9 @@ import { SearchOutlined } from '@ant-design/icons';
 import Highlighter from 'react-highlight-words';
 import '@/assets/scss/patient_profile.scss';
 import dayjs from 'dayjs';
-import { Invoices } from '../../../../models/invoices';
-import { InputCommentModal } from '../components/InputCommentModal';
 import { ViewAppointmentModal } from '../../../../components';
 import { useFetchAppointmentByUuid } from '../../../../hooks/appointments/useFetchAppointmentByUuid';
-import {
-    useCreatePayment,
-    useFetchInoivceByAppointmentId,
-} from '../../../../hooks';
+import { useCreatePayment } from '../../../../hooks';
 type DataIndex = keyof AppointmentViewForPatient;
 const { Option } = Select;
 const ViewAppointment = () => {
@@ -221,344 +213,288 @@ const ViewAppointment = () => {
             ),
     });
     const getInvoiceByAppointment = async (appointmentId: number) => {
-        try {
-            const res = await invoicesService.getInvoiceByAppointmentId(
-                appointmentId
-            );
-            console.log(res);
-            // handleCreateOnlinePayment(res);
-        } catch (err: any) {}
-    };
-    // const handleCreateOnlinePayment = async (invoice: Invoices) => {
-    //     try {
-    //         const res = await paymentService.create(invoice);
-    //         console.log(res);
-    //         window.location.href = res?.data?.orderurl;
-    //     } catch (err: any) {
-    //         console.log(err.message);
-    //     }
-    // };
-    const handleCancelInputModal = () => {
-        setOpenInputCommentModal(false);
-    };
-    const columns: TableColumnsType<AppointmentResponseDto> = [
-        {
-            title: 'Bác sĩ',
-            className: 'patient-name',
-            dataIndex: 'doctorName',
-            ...getColumnSearchProps('doctorName'),
-        },
-        {
-            title: 'Ngày hẹn',
-            dataIndex: 'appointmentDate',
-            render: (_, record) => (
-                <>{dayjs(record.appointmentDate).format('DD-MM-YYYY')}</>
-            ),
-        },
-        {
-            title: 'Thời gian',
-            dataIndex: 'timeValue',
-            render: (_, record) => (
-                <>{record.startTime + '-' + record.endTime}</>
-            ),
-        },
-        {
-            title: 'Trạng thái lịch hẹn',
-            className: 'status',
-            dataIndex: 'statusName',
-            render: (_, record) => (
-                <Tag
-                    color={
-                        record.statusId === 1
-                            ? 'geekblue'
-                            : record.statusId === 2
-                            ? 'green'
-                            : record.statusId === 3
-                            ? 'error'
-                            : 'cyan'
-                    }
-                >
-                    {record?.statusName?.toUpperCase()}
-                </Tag>
-            ),
+        const handleCancelInputModal = () => {
+            setOpenInputCommentModal(false);
+        };
+        const columns: TableColumnsType<AppointmentResponseDto> = [
+            {
+                title: 'Bác sĩ',
+                className: 'patient-name',
+                dataIndex: 'doctorName',
+                ...getColumnSearchProps('doctorName'),
+            },
+            {
+                title: 'Ngày hẹn',
+                dataIndex: 'appointmentDate',
+                render: (_, record) => (
+                    <>{dayjs(record.appointmentDate).format('DD-MM-YYYY')}</>
+                ),
+            },
+            {
+                title: 'Thời gian',
+                dataIndex: 'timeValue',
+                render: (_, record) => (
+                    <>{record.startTime + '-' + record.endTime}</>
+                ),
+            },
+            {
+                title: 'Trạng thái lịch hẹn',
+                className: 'status',
+                dataIndex: 'statusName',
+                render: (_, record) => (
+                    <Tag
+                        color={
+                            record.statusId === 1
+                                ? 'geekblue'
+                                : record.statusId === 2
+                                ? 'green'
+                                : record.statusId === 3
+                                ? 'error'
+                                : 'cyan'
+                        }
+                    >
+                        {record?.statusName?.toUpperCase()}
+                    </Tag>
+                ),
 
-            filters: [
-                {
-                    text: 'Chờ xác nhận',
-                    value: 'Chờ xác nhận',
-                },
-                {
-                    text: 'Đã xác nhận',
-                    value: 'Đã xác nhận',
-                },
-                {
-                    text: 'Hoàn thành',
-                    value: 'Hoàn thành',
-                },
-            ],
-            onFilter: (value, record) =>
-                record.statusName.indexOf(value as string) === 0,
-        },
-        {
-            title: 'Trạng thái hóa đơn',
-            className: 'status',
+                filters: [
+                    {
+                        text: 'Chờ xác nhận',
+                        value: 'Chờ xác nhận',
+                    },
+                    {
+                        text: 'Đã xác nhận',
+                        value: 'Đã xác nhận',
+                    },
+                    {
+                        text: 'Hoàn thành',
+                        value: 'Hoàn thành',
+                    },
+                ],
+                onFilter: (value, record) =>
+                    record.statusName.indexOf(value as string) === 0,
+            },
+            {
+                title: 'Trạng thái hóa đơn',
+                className: 'status',
 
-            dataIndex: 'invoice_status',
-            render: (_, record) => (
-                <Tag
-                    color={
-                        record.invoiceStatus === 'Đã thanh toán'
-                            ? 'success'
-                            : 'blue'
-                    }
-                >
-                    {record?.invoiceStatus?.toUpperCase()}
-                </Tag>
-            ),
-        },
-        {
-            title: 'Action',
-            key: 'action',
-            render: (text: string, record: AppointmentResponseDto) => (
-                <Row gutter={24} className="">
-                    {record.statusId === 4 && (
-                        <Col span={6} className="text-center">
-                            <Tooltip placement="topLeft" title={'Đặt lại'}>
-                                <Button
-                                    className="mb-2"
-                                    onClick={() => {
-                                        navigate(
-                                            '/doctor/detail/' + record.doctorId
-                                        );
-                                    }}
-                                >
-                                    <RedoOutlined />
-                                </Button>
-                            </Tooltip>
-                        </Col>
-                    )}
-                    <Col span={6}>
-                        <Tooltip placement="topLeft" title={'Xem chi tiết'}>
-                            <Button
-                                className="mb-2 border border-info"
-                                onClick={() => {
-                                    setIsModalOpen(true);
-                                    setAppointment(record);
-                                    setIsView(true);
-                                    console.log('appointment', record);
-                                }}
-                            >
-                                <EyeOutlined className="text-info" />
-                            </Button>
-                        </Tooltip>
-                    </Col>
-                    {record.statusId === 1 && (
-                        <Col span={6}>
-                            <Tooltip placement="topLeft" title={'Hủy lịch hẹn'}>
-                                <Button
-                                    className=""
-                                    danger
-                                    onClick={() => {
-                                        console.log(record);
-                                        setIsOpenModalConfirm(true);
-                                        setAppointment(record);
-                                    }}
-                                >
-                                    <CloseOutlined className="text-danger" />
-                                </Button>
-                            </Tooltip>
-                        </Col>
-                    )}
-                    {record.statusId === 4 && record.isEvaluate === 0 && (
-                        <Tooltip title="Đánh giá" placement="top">
-                            <Button
-                                onClick={() => {
-                                    setOpenInputCommentModal(true);
-                                    setAppointment(record);
-                                }}
-                            >
-                                <EditOutlined />
-                            </Button>
-                        </Tooltip>
-                    )}
-                    {record.invoiceStatus === 'Chưa thanh toán' &&
-                        record.paymentMethod === 2 && (
-                            <Col span={6}>
-                                <Tooltip
-                                    placement="topLeft"
-                                    title={'Thanh toán'}
-                                >
+                dataIndex: 'invoice_status',
+                render: (_, record) => (
+                    <Tag
+                        color={
+                            record.invoiceStatus === 'Đã thanh toán'
+                                ? 'success'
+                                : 'blue'
+                        }
+                    >
+                        {record?.invoiceStatus?.toUpperCase()}
+                    </Tag>
+                ),
+            },
+            {
+                title: 'Action',
+                key: 'action',
+                render: (text: string, record: AppointmentResponseDto) => (
+                    <Row gutter={24} className="">
+                        {record.statusId === 4 && (
+                            <Col span={6} className="text-center">
+                                <Tooltip placement="topLeft" title={'Đặt lại'}>
                                     <Button
-                                        className=""
+                                        className="mb-2"
                                         onClick={() => {
-                                            console.log(record);
-                                            // getInvoiceByAppointment(record.id);
-                                            createPayment.mutate(record.id);
+                                            navigate(
+                                                '/doctor/detail/' +
+                                                    record.doctorId
+                                            );
                                         }}
                                     >
-                                        <DollarOutlined className="" />
+                                        <RedoOutlined />
                                     </Button>
                                 </Tooltip>
                             </Col>
                         )}
-                </Row>
-            ),
-        },
-    ];
-
-    const handleCancelModal = () => {
-        setIsModalOpen(false);
-    };
-    const handleCancelModalConfirm = () => {
-        setIsOpenModalConfirm(false);
-        setAppointment({} as AppointmentResponseDto);
-    };
-    const handleCancelModalInput = () => {
-        setOpenInputCommentModal(false);
-        setAppointment({} as AppointmentResponseDto);
-    };
-    const openNotificationWithIcon = (
-        type: NotificationType,
-        title: string,
-        des: string
-    ) => {
-        api[type]({
-            message: title,
-            description: des,
-        });
-    };
-
-    useEffect(() => {
-        window.scrollTo(0, 0);
-        getAllAppointmentStatus();
-    }, []);
-    useEffect(() => {
-        console.log('appointment', appointment);
-    }, [appointment]);
-    return (
-        <PatientProfileLayout breadcrumb={'Lịch hẹn'}>
-            <Flex className="mb-3">
-                {contextHolder}
-                <div className="col-4">
-                    <Select
-                        className="w-50"
-                        value={options.statusId}
-                        onChange={(value) => {
-                            setOptions({ ...options, statusId: value });
-                        }}
-                    >
-                        {appointmentStatuses.map((status) => {
-                            return (
-                                <Option
-                                    key={status.id}
-                                    value={status.id}
-                                    label={status.name}
+                        <Col span={6}>
+                            <Tooltip placement="topLeft" title={'Xem chi tiết'}>
+                                <Button
+                                    className="mb-2 border border-info"
+                                    onClick={() => {
+                                        setIsModalOpen(true);
+                                        setAppointment(record);
+                                        setIsView(true);
+                                        console.log('appointment', record);
+                                    }}
                                 >
-                                    {status.name}
-                                </Option>
-                            );
-                        })}
-                    </Select>
-                </div>
-            </Flex>
-            <Skeleton active loading={isFetching || isRefetching}>
-                {error ? (
-                    <p className="fw-bold text-center">{error.message}</p>
-                ) : (
-                    <>
-                        {' '}
-                        <Table<AppointmentResponseDto>
-                            className="table-appointment"
-                            bordered
-                            columns={columns}
-                            dataSource={data?.appointments}
-                            pagination={false}
-                        />
-                        <Pagination
-                            pageSize={data?.pageSize}
-                            current={data?.pageIndex}
-                            total={
-                                data?.appointments
-                                    ? data?.pageCount * data?.pageSize
-                                    : 0
-                            }
-                            align="center"
-                            className="mt-3"
-                            showSizeChanger
-                            pageSizeOptions={['5', '10', '20', '30']}
-                            onChange={onChangePage}
-                        />
-                        {isModalOpen && (
-                            <ViewAppointmentModal
-                                handleCancelModal={handleCancelModal}
-                                isModalOpen
-                                appointment={appointment}
-                            />
+                                    <EyeOutlined className="text-info" />
+                                </Button>
+                            </Tooltip>
+                        </Col>
+                        {record.statusId === 1 && (
+                            <Col span={6}>
+                                <Tooltip
+                                    placement="topLeft"
+                                    title={'Hủy lịch hẹn'}
+                                >
+                                    <Button
+                                        className=""
+                                        danger
+                                        onClick={() => {
+                                            console.log(record);
+                                            setIsOpenModalConfirm(true);
+                                            setAppointment(record);
+                                        }}
+                                    >
+                                        <CloseOutlined className="text-danger" />
+                                    </Button>
+                                </Tooltip>
+                            </Col>
                         )}
-                        {isOpenModalConfirm && (
-                            <ModalConfirmCancelAppointment
-                                isOpenModalConfirm
-                                handleCancelModalConfirm={
-                                    handleCancelModalConfirm
-                                }
-                                appointment={appointment}
-                                setIsOpenModalConfirm={setIsOpenModalConfirm}
-                                openNotificationWithIcon={
-                                    openNotificationWithIcon
-                                }
-                                refetch={refetch}
-                            />
+                        {record.statusId === 4 && record.isEvaluate === 0 && (
+                            <Tooltip title="Đánh giá" placement="top">
+                                <Button
+                                    onClick={() => {
+                                        setOpenInputCommentModal(true);
+                                        setAppointment(record);
+                                    }}
+                                >
+                                    <EditOutlined />
+                                </Button>
+                            </Tooltip>
                         )}
-                    </>
-                )}
-            </Skeleton>
+                        {record.invoiceStatus === 'Chưa thanh toán' &&
+                            record.paymentMethod === 2 && (
+                                <Col span={6}>
+                                    <Tooltip
+                                        placement="topLeft"
+                                        title={'Thanh toán'}
+                                    >
+                                        <Button
+                                            className=""
+                                            onClick={() => {
+                                                console.log(record);
+                                                // getInvoiceByAppointment(record.id);
+                                                createPayment.mutate(record.id);
+                                            }}
+                                        >
+                                            <DollarOutlined className="" />
+                                        </Button>
+                                    </Tooltip>
+                                </Col>
+                            )}
+                    </Row>
+                ),
+            },
+        ];
 
-            {/* {appointments.length > 0 ? (
-                <>
-                    {contextHolder}{' '}
-                    {pageCount > 1 && (
-                        <Pagination
-                            pageSize={pageSize}
-                            current={pageIndex}
-                            total={pageCount * pageSize}
-                            align="center"
-                            className="mt-3"
-                            showSizeChanger
-                            pageSizeOptions={['5', '10', '20', '30']}
-                            onChange={onChangePage}
-                        />
+        const handleCancelModal = () => {
+            setIsModalOpen(false);
+        };
+        const handleCancelModalConfirm = () => {
+            setIsOpenModalConfirm(false);
+            setAppointment({} as AppointmentResponseDto);
+        };
+        const handleCancelModalInput = () => {
+            setOpenInputCommentModal(false);
+            setAppointment({} as AppointmentResponseDto);
+        };
+        const openNotificationWithIcon = (
+            type: NotificationType,
+            title: string,
+            des: string
+        ) => {
+            api[type]({
+                message: title,
+                description: des,
+            });
+        };
+
+        useEffect(() => {
+            window.scrollTo(0, 0);
+            getAllAppointmentStatus();
+        }, []);
+        useEffect(() => {
+            console.log('appointment', appointment);
+        }, [appointment]);
+        return (
+            <PatientProfileLayout breadcrumb={'Lịch hẹn'}>
+                <Flex className="mb-3 ">
+                    {contextHolder}
+                    <div className="col-4">
+                        <Select
+                            className="w-50"
+                            value={options.statusId}
+                            onChange={(value) => {
+                                setOptions({ ...options, statusId: value });
+                            }}
+                        >
+                            {appointmentStatuses.map((status) => {
+                                return (
+                                    <Option
+                                        key={status.id}
+                                        value={status.id}
+                                        label={status.name}
+                                    >
+                                        {status.name}
+                                    </Option>
+                                );
+                            })}
+                        </Select>
+                    </div>
+                </Flex>
+                <Skeleton active loading={isFetching || isRefetching}>
+                    {error ? (
+                        <p className="fw-bold text-center">{error.message}</p>
+                    ) : (
+                        <>
+                            {' '}
+                            <Table<AppointmentResponseDto>
+                                className="table-appointment"
+                                bordered
+                                columns={columns}
+                                dataSource={data?.appointments}
+                                pagination={false}
+                            />
+                            <Pagination
+                                pageSize={data?.pageSize}
+                                current={data?.pageIndex}
+                                total={
+                                    data?.appointments
+                                        ? data?.pageCount * data?.pageSize
+                                        : 0
+                                }
+                                align="center"
+                                className="mt-3"
+                                showSizeChanger
+                                pageSizeOptions={['5', '10', '20', '30']}
+                                onChange={onChangePage}
+                            />
+                            {isModalOpen && (
+                                <ViewAppointmentModal
+                                    handleCancelModal={handleCancelModal}
+                                    isModalOpen
+                                    appointment={appointment}
+                                />
+                            )}
+                            {isOpenModalConfirm && (
+                                <ModalConfirmCancelAppointment
+                                    isOpenModalConfirm
+                                    handleCancelModalConfirm={
+                                        handleCancelModalConfirm
+                                    }
+                                    appointment={appointment}
+                                    setIsOpenModalConfirm={
+                                        setIsOpenModalConfirm
+                                    }
+                                    openNotificationWithIcon={
+                                        openNotificationWithIcon
+                                    }
+                                    refetch={refetch}
+                                />
+                            )}
+                        </>
                     )}
-                    {isModalOpen && (
-                        <ViewAppointmentModal
-                            handleCancelModal={handleCancelModal}
-                            isModalOpen
-                            appointment={appointment}
-                        />
-                    )}
-                    {isOpenModalConfirm && (
-                        <ModalConfirmCancelAppointment
-                            isOpenModalConfirm
-                            handleCancelModalConfirm={handleCancelModalConfirm}
-                            appointment={appointment}
-                            setIsOpenModalConfirm={setIsOpenModalConfirm}
-                            openNotificationWithIcon={openNotificationWithIcon}
-                            getAppointmentByPatientPhone={
-                                getAppointmentByPatientPhone
-                            }
-                        />
-                    )}
-                    {openInputCommentModal && (
-                        <InputCommentModal
-                            openInputModal={openInputCommentModal}
-                            handleCancelInputModal={handleCancelInputModal}
-                            appointment={appointment}
-                            setAppointments={setAppointments}
-                            openNotificationWithIcon={openNotificationWithIcon}
-                            handleCancelModalInput={handleCancelModalInput}
-                        />
-                    )}
-                </> */}
-        </PatientProfileLayout>
-    );
+                </Skeleton>
+            </PatientProfileLayout>
+        );
+    };
 };
 export default ViewAppointment;

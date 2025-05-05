@@ -1,11 +1,9 @@
 import { CheckCircleOutlined } from '@ant-design/icons';
 import { Button, Skeleton } from 'antd';
 import { useState, useEffect, useMemo, useRef } from 'react';
-import { commentService } from '../../../../services';
 import { Comment } from '../../../../models/comment';
-import socket from '../../../../socket';
 import { useFetchCommentsByCommentableIdAndType } from '../../../../hooks/comment';
-import { configConsumerProps } from 'antd/es/config-provider';
+import { getSocket } from '../../../../socket';
 export const BlockComment = ({ commentableId, setIsModalCommentOpen }: any) => {
     // const [comments, setComments] = useState<Comment[]>();
     const {
@@ -60,6 +58,7 @@ export const BlockComment = ({ commentableId, setIsModalCommentOpen }: any) => {
     //     }
     // };
     const handleOnNewComment = () => {
+        const socket = getSocket();
         socket?.on('newComment', (newComment: Comment) => {
             // getCommentByUserId(Number(newComment.doctorId));
         });

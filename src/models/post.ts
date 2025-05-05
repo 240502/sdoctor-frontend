@@ -37,7 +37,7 @@ export interface FetchPostPayload {
     categoryId: number | null;
     pageIndex: number;
     pageSize: number;
-    status: string;
+    status: string | null;
     authorId: number | null;
 }
 

@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 import NextArrow from './NextArrow';
@@ -11,6 +11,7 @@ import { useSetRecoilState } from 'recoil';
 import { postCategoryState } from '../../../../stores/scheduleAtom';
 import { useFetchAllPostCategories } from '../../../../hooks';
 export const BlockNewCategories = () => {
+    const navigate = useNavigate();
     var settings = {
         dots: false,
         infinite: true,
@@ -49,27 +50,54 @@ export const BlockNewCategories = () => {
                                         key={item.postCategoryId}
                                     >
                                         <div className="item  border rounded p-3 text-center  ">
-                                            <Link
-                                                to={'/list/post/category'}
-                                                className="text-decoration-none"
+                                            <Image
+                                                className="item__image rounded-circle"
+                                                preview={false}
+                                                src={baseURL + item.image}
+                                                onClick={() => {
+                                                    const queryParams =
+                                                        new URLSearchParams();
+                                                    queryParams.append(
+                                                        'categoryId',
+                                                        item.postCategoryId.toString()
+                                                    );
+
+                                                    // Log để kiểm tra
+                                                    console.log(
+                                                        'Navigating to:',
+                                                        `/list/post/category?${queryParams.toString()}`
+                                                    );
+
+                                                    // Chuyển trang
+                                                    navigate(
+                                                        `/list/post/category?${queryParams.toString()}`
+                                                    );
+                                                }}
+                                            ></Image>
+                                            <p
+                                                className="item__text mt-3 text-center text-dark fw-bold fs-6 text-capitalize"
+                                                onClick={() => {
+                                                    const queryParams =
+                                                        new URLSearchParams();
+                                                    queryParams.append(
+                                                        'category',
+                                                        item.postCategoryId.toString()
+                                                    );
+
+                                                    // Log để kiểm tra
+                                                    console.log(
+                                                        'Navigating to:',
+                                                        `/list/post/category?${queryParams.toString()}`
+                                                    );
+
+                                                    // Chuyển trang
+                                                    navigate(
+                                                        `/list/post/category?${queryParams.toString()}`
+                                                    );
+                                                }}
                                             >
-                                                <Image
-                                                    className="item__image rounded-circle"
-                                                    preview={false}
-                                                    src={baseURL + item.image}
-                                                    onClick={() => {
-                                                        setPostCategory(item);
-                                                    }}
-                                                ></Image>
-                                                <p
-                                                    className="item__text mt-3 text-center text-dark fw-bold fs-6 text-capitalize"
-                                                    onClick={() => {
-                                                        setPostCategory(item);
-                                                    }}
-                                                >
-                                                    {item.name}
-                                                </p>
-                                            </Link>
+                                                {item.name}
+                                            </p>
                                         </div>
                                     </div>
                                 );

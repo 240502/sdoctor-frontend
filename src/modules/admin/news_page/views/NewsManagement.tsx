@@ -9,7 +9,7 @@ import {
     Input,
     Skeleton,
 } from 'antd';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { ModalAddNews } from '../components/ModalAddNews';
 import { FetchPostPayload, Post } from '../../../../models/post';
 type NotificationType = 'success' | 'error';

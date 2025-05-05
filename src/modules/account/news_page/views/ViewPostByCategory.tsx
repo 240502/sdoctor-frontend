@@ -1,54 +1,46 @@
 import { useState, useEffect } from 'react';
-import { Post } from '../../../../models/post';
-import { Breadcrumb, Flex, Select, Input, Pagination } from 'antd';
-import { HomeOutlined } from '@ant-design/icons';
-import { PostCategoryService } from '../../../../services/post_category.service';
+import { FetchPostPayload, Post } from '../../../../models/post';
+import { Breadcrumb, Flex, Select, Input, Skeleton, Pagination } from 'antd';
+import { HomeOutlined, ItalicOutlined } from '@ant-design/icons';
 import { PostCategory } from '../../../../models/post_category';
 import { SearchProps } from 'antd/es/input';
 import { PostCards } from '../components/PostCards';
 import { useRecoilState } from 'recoil';
 import { postCategoryState } from '../../../../stores/scheduleAtom';
-import { useFetchDataWithPaginationProps } from '../../../../hooks';
+import { useFetchPostWithPagination } from '../../../../hooks/posts/useFetchPostWithPagination';
+import { useSearchParams } from 'react-router-dom';
+import { useFetchAllPostCategories } from '../../../../hooks';
 
 const { Option } = Select;
 const { Search } = Input;
 
 const ViewPostByCategory = () => {
-    const [pagination, setPagination] = useRecoilState(paginationState);
+    const [searchParams, setSearchParams] = useSearchParams();
+
     const [postCategory, setPostCategory] = useRecoilState(postCategoryState);
-    const [searchOptions, setSearchOptions] = useState<any>({
-        searchContent: null,
-        categoryId: postCategory?.postCategoryId
-            ? postCategory?.postCategoryId
-            : null,
+
+    const [options, setOptions] = useState<FetchPostPayload>({
+        searchContent: '',
+        categoryId: Number(searchParams.get('categoryId')) ?? null,
+        pageIndex: 1,
+        pageSize: 8,
+        status: null,
+        authorId: null,
     });
-    const [posts, setPosts] = useState<Post[]>([]);
-    const [postCategories, setPostCategories] = useState<PostCategory[]>([]);
-
     const onSearch: SearchProps['onSearch'] = (value, _e) => {
-        setSearchOptions({ ...searchOptions, searchContent: value });
-    };
-    const apiEndpoint = '/post/view';
-    const { data, loading, error, changePage } =
-        useFetchDataWithPaginationProps<Post>(apiEndpoint, searchOptions);
-
-    const getAllPostCategory = async () => {
-        try {
-            const res = await PostCategoryService.getAllPostCategory();
-            setPostCategories(res);
-        } catch (err: any) {
-            console.log(err.message);
-            setPostCategories([]);
-        }
+        setOptions({ ...options, searchContent: value });
     };
 
+    const { data: postCategories } = useFetchAllPostCategories();
+    const { data, isError, error, isFetching } =
+        useFetchPostWithPagination(options);
     useEffect(() => {
-        getAllPostCategory();
+        console.log(Number(searchParams.get('category')));
+
         window.scrollTo(0, 0);
     }, []);
     useEffect(() => {
         console.log('changed data', data);
-        setPosts(data);
     }, [data]);
 
     return (
@@ -77,9 +69,11 @@ const ViewPostByCategory = () => {
                     <Select
                         className="w-75"
                         value={
-                            searchOptions.categoryId !== null
-                                ? searchOptions.categoryId
-                                : postCategory.postCategoryId
+                            options.categoryId !== null
+                                ? options.categoryId
+                                : Number(searchParams.get('category'))
+                                ? Number(searchParams.get('category'))
+                                : null
                         }
                         optionFilterProp="children"
                         allowClear
@@ -89,11 +83,23 @@ const ViewPostByCategory = () => {
                                 (item: PostCategory) =>
                                     item.postCategoryId === value
                             );
-                            setSearchOptions({
-                                ...searchOptions,
-                                categoryId: value,
-                            });
+                            const newSearchParams = new URLSearchParams(
+                                searchParams
+                            );
+                            if (value) {
+                                newSearchParams.set(
+                                    'categoryId',
+                                    value.toString()
+                                );
+                            } else {
+                                newSearchParams.delete('categoryId'); // Xóa nếu không chọn
+                            }
+                            setSearchParams(newSearchParams);
                             setPostCategory(category);
+                            setOptions({
+                                ...options,
+                                categoryId: value ?? null,
+                            });
                         }}
                         placeholder="Chọn loại bài viết"
                     >
@@ -117,33 +123,42 @@ const ViewPostByCategory = () => {
                     ></Search>
                 </div>
             </Flex>
-            {loading ? (
-                <p className="fs-6 fw-bold text-center mt-4">
-                    Đang tải dữ liệu ...
-                </p>
-            ) : error ? (
-                <p className="fs-6 fw-bold text-center mt-4"> {error}</p>
-            ) : data?.length > 0 ? (
-                <PostCards posts={posts} />
-            ) : (
-                <p className="fs-6 fw-bold text-center mt-4">
-                    {' '}
-                    Không có dữ liệu!
-                </p>
-            )}
+            <Skeleton active loading={isFetching}>
+                {isError ? (
+                    <p className="fw-bold text-center">
+                        {error.message.includes('404')
+                            ? 'Không có bài viết nào !'
+                            : error.message}
+                    </p>
+                ) : (
+                    <PostCards posts={data?.posts} />
+                )}
+            </Skeleton>
 
-            {/* {pagination.pageCount > 0 && (
+            {data?.pageCount && data?.pageCount > 0 && (
                 <Pagination
                     align="center"
                     className="mt-3 mb-3"
-                    current={pagination.pageIndex}
-                    pageSize={pagination.pageSize}
-                    total={pagination.pageCount * pagination.pageSize}
+                    current={options.pageIndex}
+                    pageSize={options.pageSize}
+                    total={
+                        data.pageCount ? data.pageCount * options.pageSize : 0
+                    }
                     showSizeChanger
                     pageSizeOptions={['4', '8', '12', '16']}
-                    onChange={changePage}
+                    onChange={(current: number, size: number) => {
+                        if (size !== options.pageSize) {
+                            setOptions({
+                                ...options,
+                                pageIndex: 1,
+                                pageSize: size,
+                            });
+                        } else {
+                            setOptions({ ...options, pageIndex: current });
+                        }
+                    }}
                 />
-            )} */}
+            )}
         </div>
     );
 };
