@@ -2,14 +2,17 @@ import Table, { ColumnsType } from 'antd/es/table';
 import { AppointmentResponseDto } from '../../../../models/appointment';
 import {
     Button,
+    Col,
     Flex,
     Input,
     InputRef,
     Pagination,
+    Row,
     Select,
     Skeleton,
     Space,
     Tag,
+    DatePicker,
     Tooltip,
 } from 'antd';
 import Highlighter from 'react-highlight-words';
@@ -26,18 +29,24 @@ import { ConfirmAppointmentModal } from '../../../../components';
 const { Option } = Select;
 import { useFetchAppointmentWithOptions } from '../../../../hooks/appointments/useFetchAppointmentWithOptions';
 type DataIndex = keyof AppointmentResponseDto;
-import dayjs from 'dayjs';
+const { RangePicker } = DatePicker;
+import dayjs, { Dayjs } from 'dayjs';
+import 'dayjs/locale/vi'; // Nếu cần định dạng ngày bằng tiếng Việt
+import isoWeek from 'dayjs/plugin/isoWeek'; // Plugin để làm việc với tuần ISO
+// Kích hoạt plugin isoWeek
+dayjs.extend(isoWeek);
+// Thiết lập locale tiếng Việt
+dayjs.locale('vi');
 import {
     useFetchAllAppointmentStatus,
     useSendConfirmSuccessMail,
     useSendRejectionSuccessMail,
     useUpdateAppointmentStatus,
 } from '../../../../hooks';
-const AppointmentTable = ({
-    openNotificationWithIcon,
-    handleClickViewDetail,
-    userId,
-}: any) => {
+import { useNavigate } from 'react-router-dom';
+const AppointmentTable = ({ openNotificationWithIcon, userId }: any) => {
+    const navigate = useNavigate();
+
     const [searchText, setSearchText] = useState('');
     const [searchedColumn, setSearchedColumn] = useState('');
     const searchInput = useRef<InputRef>(null);
@@ -50,11 +59,15 @@ const AppointmentTable = ({
         pageSize: number;
         status: number;
         userId: number;
+        fromDate: Dayjs;
+        toDate: Dayjs;
     }>({
         userId: userId,
         pageIndex: 1,
         pageSize: 8,
         status: 1,
+        fromDate: dayjs().startOf('isoWeek'),
+        toDate: dayjs().endOf('isoWeek'),
     });
     const [type, setType] = useState<string>('');
     const [message, setMessage] = useState<string>('');
@@ -331,7 +344,14 @@ const AppointmentTable = ({
                         <Button
                             className="border-info me-2"
                             onClick={() => {
-                                handleClickViewDetail(record);
+                                const queryParams = new URLSearchParams();
+                                queryParams.append(
+                                    'appointment',
+                                    record.id.toString()
+                                );
+                                navigate(
+                                    `/admin/appointment-detail?${queryParams}`
+                                );
                             }}
                         >
                             <EyeOutlined className="text-info" />
@@ -403,20 +423,35 @@ const AppointmentTable = ({
             setOptions({ ...options, pageIndex: current });
         }
     };
+    const onDateRangeChange = (
+        dates: [Dayjs | null, Dayjs | null] | null,
+        dateStrings: [string, string]
+    ) => {
+        if (dates && dates[0] && dates[1]) {
+            setOptions({ ...options, fromDate: dates[0], toDate: dates[1] });
+        } else {
+            // Nếu dates là null hoặc có giá trị null, đặt lại về tuần hiện tại
+            setOptions({
+                ...options,
+                fromDate: dayjs().startOf('isoWeek'),
+                toDate: dayjs().endOf('isoWeek'),
+            });
+        }
+    };
 
     return (
         <>
-            <Flex className="mb-3">
-                <div className="col-4">
+            <Row gutter={24} className="mb-3 ">
+                <Col span={12}>
                     <Select
-                        className="w-50"
+                        className="w-25"
                         value={options.status}
                         onChange={(value) => {
                             setOptions({ ...options, status: value });
                         }}
                     >
                         {appointmentStatusRes &&
-                            appointmentStatusRes?.map((status) => {
+                            appointmentStatusRes.map((status) => {
                                 return (
                                     <Option
                                         key={status.id}
@@ -428,8 +463,16 @@ const AppointmentTable = ({
                                 );
                             })}
                     </Select>
-                </div>
-            </Flex>
+                </Col>
+                <Col span={12} className="text-end">
+                    <RangePicker
+                        placeholder={['Từ ngày', 'Đến ngày']}
+                        value={[options.fromDate, options.toDate]}
+                        format={'DD-MM-YYYY'}
+                        onChange={onDateRangeChange}
+                    />
+                </Col>
+            </Row>
             <Skeleton active loading={isFetching || isRefetching}>
                 {isError ? (
                     <p className="fw-bold text-center">

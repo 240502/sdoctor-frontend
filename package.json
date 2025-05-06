@@ -23,7 +23,6 @@
         "apexcharts": "^4.7.0",
         "axios": "^1.7.7",
         "bootstrap": "^5.3.3",
-        "chart.js": "^4.4.3",
         "cheerio": "^1.0.0",
         "ckeditor5-premium-features": "^43.2.0",
         "html-react-parser": "^5.1.16",

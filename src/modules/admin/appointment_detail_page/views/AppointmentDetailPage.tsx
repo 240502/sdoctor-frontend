@@ -283,6 +283,17 @@ const AppointmentDetailPage = () => {
                                                 style={{
                                                     background: '#E6E8EE',
                                                 }}
+                                                onClick={() => {
+                                                    const queryParams =
+                                                        new URLSearchParams();
+                                                    queryParams.append(
+                                                        'appointment',
+                                                        appointment.id.toString()
+                                                    );
+                                                    navigate(
+                                                        `/admin/appointment-detail?${queryParams}`
+                                                    );
+                                                }}
                                             >
                                                 <EyeOutlined className="fw-medium fs-6" />
                                             </Button>

@@ -13,7 +13,7 @@ import {
 import { ColumnsType } from 'antd/es/table';
 import { useRef, useState } from 'react';
 import { Invoices } from '../../../../models/invoices';
-import { invoicesService } from '../../../../services/invoices.service';
+import { invoicesService } from '../../../../services';
 import {
     DeleteOutlined,
     EditOutlined,
@@ -270,7 +270,7 @@ export const InvoiceTable = ({
                 id: id,
                 status: status,
             };
-            const res = await invoicesService.updateInvoiceStatus(data, config);
+            const res = await invoicesService.updateInvoiceStatus(data);
 
             getInvoices();
             openNotification(

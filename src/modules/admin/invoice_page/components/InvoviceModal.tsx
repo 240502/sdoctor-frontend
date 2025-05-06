@@ -1,10 +1,13 @@
 import { Modal, Button, Row, Col, Form, Input, Select, DatePicker } from 'antd';
 import { useEffect, useState } from 'react';
-import { DoctorServiceService } from '../../../../services/doctor_service.service';
 import { DoctorService } from '../../../../models/doctor_service';
 import dayjs from 'dayjs';
-import { invoicesService } from '../../../../services/invoices.service';
-import { AppointmentService } from '../../../../services/appointment.service';
+import {
+    invoicesService,
+    appointmentService,
+    doctorServiceService,
+} from '../../../../services';
+import { useFetchAppointmentAtInvoice } from '../../../../hooks';
 
 export const InvoiceModal = ({
     invoice,
@@ -53,9 +56,10 @@ export const InvoiceModal = ({
             }
         }
     };
+    // const { data: appointment } = useFetchAppointmentAtInvoice();
     const getAppointment = async (data: any) => {
         try {
-            const res = await AppointmentService.getAppointmentAtInvoice(data);
+            const res = await appointmentService.getAppointmentAtInvoice(data);
             console.log(res);
             const newInvoice = {
                 appointment_id: res?.id,
@@ -113,7 +117,7 @@ export const InvoiceModal = ({
 
     const getAllDoctorService = async () => {
         try {
-            const res = await DoctorServiceService.getAll();
+            const res = await doctorServiceService.getAll();
             setDoctorServices(res);
         } catch (err: any) {}
     };

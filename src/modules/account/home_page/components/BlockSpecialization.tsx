@@ -47,7 +47,7 @@ const BlockSpecialization = (): JSX.Element => {
                                             className="category-image rounded"
                                             src={baseURL + major.image}
                                         ></Image>
-                                        <p className="category-name pb-0 text-center fw-bold">
+                                        <p className="category-name pb-0 text-center fw-bold fs-md-5">
                                             {major.name}
                                         </p>
                                     </div>

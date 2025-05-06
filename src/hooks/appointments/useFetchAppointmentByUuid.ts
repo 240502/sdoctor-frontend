@@ -1,12 +1,14 @@
 import { useQuery, UseQueryResult } from '@tanstack/react-query';
 import { appointmentService } from '../../services';
 import { AppointmentResponseDto } from '../../models';
-
+import { Dayjs } from 'dayjs';
 interface PayloadType {
     uuid: string;
     pageIndex?: number;
     pageSize?: number;
     status?: number;
+    fromDate?: Dayjs;
+    toDate?: Dayjs;
 }
 interface AppointmentResponse {
     appointments: AppointmentResponseDto[];

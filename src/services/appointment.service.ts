@@ -1,6 +1,6 @@
 import apiClient from '../constants/api';
 import { Appointment } from '../models';
-
+import { Dayjs } from 'dayjs';
 const appointmentService = {
     async getRecentAppointments(payload: {
         entityId: number;
@@ -37,15 +37,29 @@ const appointmentService = {
         pageSize: number;
         status: number;
         userId: number;
+        fromDate: Dayjs;
+        toDate: Dayjs;
     }): Promise<any> {
         const res = await apiClient.get(
-            `/appointment/get-appointment-with-options?userId=${payload.userId}&pageIndex=${payload.pageIndex}&pageSize=${payload.pageSize}&status=${payload.status}`
+            `/appointment/get-appointment-with-options?fromDate=${payload.fromDate.format(
+                'YYYY-MM-DD'
+            )}&toDate=${payload.toDate.format('YYYY-MM-DD')}&userId=${
+                payload.userId
+            }&pageIndex=${payload.pageIndex}&pageSize=${
+                payload.pageSize
+            }&status=${payload.status}`
         );
         return res?.data;
     },
     async getAppointmentByUuid(payload: any): Promise<Appointment[] | any> {
         const res = await apiClient.get(
-            `/appointment/get-appointment-by-uuid?uuid=${payload.uuid}&pageIndex=${payload.pageIndex}&pageSize=${payload.pageSize}&statusId=${payload.statusId}`,
+            `/appointment/get-appointment-by-uuid?fromDate=${payload.fromDate.format(
+                'YYYY-MM-DD'
+            )}&toDate=${payload.toDate.format('YYYY-MM-DD')}&uuid=${
+                payload.uuid
+            }&pageIndex=${payload.pageIndex}&pageSize=${
+                payload.pageSize
+            }&statusId=${payload.statusId}`,
             payload
         );
         return res.data;
