@@ -1,6 +1,6 @@
-import { DoctorSchedule } from './schedule';
+import { Schedules } from './schedule';
 
-export interface Pagination {
+interface Pagination {
     pageIndex?: number;
     pageSize?: number;
 }
@@ -40,7 +40,7 @@ export interface Doctor {
     clinicName: string;
     location: string;
     majorName: string;
-    schedule: DoctorSchedule;
+    schedule: Schedules[];
     introduction: string;
     birthday: Date;
     serviceId: number;

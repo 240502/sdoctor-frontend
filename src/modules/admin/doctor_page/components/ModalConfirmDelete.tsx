@@ -1,5 +1,5 @@
 import { Button, Modal } from 'antd';
-import { doctorService } from '../../../../services/doctor.service';
+import { doctorService } from '../../../../services';
 export const ModalConfirmDelete = ({
     showModalConfirm,
     handleCloseModalConfirm,

@@ -6,28 +6,48 @@ import {
     Divider,
     Breadcrumb,
     notification,
+    message,
     Select,
     Input,
+    Upload,
+    Row,
+    Card,
+    Col,
+    Tooltip,
 } from 'antd';
-import { HomeOutlined, PlusOutlined, SearchOutlined } from '@ant-design/icons';
-import { doctorService } from '../../../../services/doctor.service';
+import {
+    HomeOutlined,
+    PlusOutlined,
+    SearchOutlined,
+    UploadOutlined,
+} from '@ant-design/icons';
+import {
+    doctorService,
+    clinicService,
+    majorService,
+    doctorServiceService,
+} from '../../../../services';
 import { DoctorCards } from '../components/DoctorCards';
 import { DoctorModal } from '../components/DoctorModal';
 import { ModalConfirmDelete } from '../components/ModalConfirmDelete';
 import { Major } from '../../../../models/major';
 import { Clinic } from '../../../../models/clinic';
-import { ClinicService } from '../../../../services/clinic.service';
-import { MajorService } from '../../../../services/major.service';
 import { useRecoilValue } from 'recoil';
 import { configValue } from '../../../../stores/userAtom';
-import { DoctorServiceService } from '../../../../services/doctor_service.service';
 import { DoctorService } from '../../../../models/doctor_service';
+import {
+    useFetchClinicsWithPagination,
+    useFetchSpecializationsWithPagination,
+} from '../../../../hooks';
+import { useFetchAllDoctorService } from '../../../../hooks/doctor_service/useFetchAllDoctorService';
+import { RcFile } from 'antd/es/upload';
+import { NoticeType } from 'antd/es/message/interface';
 type NotificationType = 'success' | 'warning' | 'error';
 const { Option } = Select;
 
 const DoctorManagement = () => {
     const config = useRecoilValue(configValue);
-    const [api, contextHolder] = notification.useNotification();
+    const [messageApi, contextHolder] = message.useMessage();
     const [options, setOptions] = useState({ clinicId: null, majorId: null });
     const [doctors, setDoctors] = useState<Doctor[]>([]);
     const [doctor, setDoctor] = useState<Doctor>({} as Doctor);
@@ -43,41 +63,19 @@ const DoctorManagement = () => {
     const [searchContent, setSearchContent] = useState<string>('');
     const [filteredDoctors, setFilteredDoctors] = useState<Doctor[]>([]);
     const [totalItem, setTotalItem] = useState<number>(0);
-    const getAllClinic = async () => {
-        try {
-            const res = await ClinicService.viewClinic({});
-            setClinics(res.data);
-        } catch (err: any) {
-            console.log(err.message);
-        }
-    };
-    const getAllService = async () => {
-        try {
-            const res = await DoctorServiceService.getAll();
-            console.log(res);
-            setDoctorServices(res);
-        } catch (err: any) {
-            console.log(err.message);
-        }
-    };
-    const getAllMajor = async () => {
-        try {
-            const res = await MajorService.getAllMajor();
-            setMajors(res);
-        } catch (err: any) {
-            console.log(err.message);
-        }
-    };
-    const openNotificationWithIcon = (
-        type: NotificationType,
-        title: string,
-        des: string
-    ) => {
-        api[type]({
-            message: title,
-            description: des,
+    const { data: clinicResponse } = useFetchClinicsWithPagination({});
+    const { data: doctorServiceResponse } = useFetchAllDoctorService();
+    const { data: specializationRes } = useFetchSpecializationsWithPagination(
+        {}
+    );
+
+    const openMessage = (type: NoticeType, content: string) => {
+        messageApi.open({
+            type: type,
+            content: content,
         });
     };
+
     const handleClickEditBtn = (doctor: Doctor) => {
         setDoctor(doctor);
         setShowDoctorModal(true);
@@ -129,9 +127,6 @@ const DoctorManagement = () => {
 
     useEffect(() => {
         getDoctors();
-        getAllClinic();
-        getAllMajor();
-        getAllService();
         window.scrollTo(0, 0);
     }, [pageIndex, pageSize, options]);
 
@@ -139,7 +134,7 @@ const DoctorManagement = () => {
         if (searchContent !== '') {
             const newDoctors = doctors.filter(
                 (doctor: Doctor) =>
-                    doctor.full_name
+                    doctor.fullName
                         .toLocaleLowerCase()
                         .includes(searchContent.toLocaleLowerCase()) ||
                     doctor.title
@@ -153,6 +148,18 @@ const DoctorManagement = () => {
             setFilteredDoctors(doctors);
         }
     }, [searchContent, doctors]);
+    const beforeUpload = (file: RcFile) => {
+        // Kiểm tra định dạng file
+        const isExcel =
+            file.type ===
+                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' ||
+            file.type === 'application/vnd.ms-excel';
+        if (!isExcel) {
+            openMessage('error', 'Chỉ hỗ trợ file Excel (.xlsx, .xls)!');
+            return Upload.LIST_IGNORE;
+        }
+        return true;
+    };
     return (
         <div className=" doctor-management">
             {contextHolder}
@@ -172,83 +179,101 @@ const DoctorManagement = () => {
             </div>
             <Flex className="justify-content-between ps-2 pe-2 mb-3">
                 <h5>Danh sách bác sĩ</h5>
-                <Button
-                    className="border-0 text-white bg-primary"
-                    onClick={handleShowDoctorModal}
-                >
-                    <PlusOutlined /> Thêm mới
-                </Button>
             </Flex>
-            <Divider></Divider>
-            <Flex gap={'middle'} className="mb-5 justify-content-between">
-                <Flex className="col-5" gap={'middle'}>
-                    <div className="col">
-                        <Select
-                            className="d-block"
-                            placeholder="Chọn cơ sở y tế"
-                            optionFilterProp="children"
-                            allowClear
-                            showSearch
-                            value={options.clinicId}
-                            onChange={(value: any) => {
-                                setOptions({
-                                    ...options,
-                                    clinicId: value ?? null,
-                                });
-                            }}
+            <Row gutter={24} className="mb-5">
+                <Col span={8}>
+                    <Card className="shadow " title="Thao tác nhanh">
+                        <Tooltip placement="top" title="Thêm mới">
+                            <Button onClick={handleShowDoctorModal}>
+                                <PlusOutlined />
+                            </Button>
+                        </Tooltip>
+                        <Upload
+                            className="ms-3"
+                            beforeUpload={beforeUpload}
+                            // customRequest={({ file }) => mutate(file as RcFile)}
+                            showUploadList={false}
                         >
-                            {clinics.map((clinic: Clinic) => (
-                                <Option
-                                    key={clinic.id}
-                                    value={clinic.id}
-                                    label={clinic.name}
-                                >
-                                    {clinic.name}
-                                </Option>
-                            ))}
-                        </Select>
-                    </div>
-                    <div className="col">
-                        <Select
-                            className="d-block"
-                            placeholder="Chọn chuyên ngành"
-                            optionFilterProp="children"
-                            allowClear
-                            showSearch
-                            value={options.majorId}
-                            onChange={(value: any) => {
-                                console.log(value);
-                                setOptions({
-                                    ...options,
-                                    majorId: value ?? null,
-                                });
-                            }}
+                            <Tooltip placement="top" title="Tải lên">
+                                <Button>
+                                    <UploadOutlined />
+                                </Button>
+                            </Tooltip>
+                        </Upload>
+                    </Card>
+                </Col>
+                <Col span={16}>
+                    <Card className="shadow" title="Tìm kiếm">
+                        <Flex
+                            gap={'middle'}
+                            className="justify-content-between"
                         >
-                            {majors.map((major: Major) => (
-                                <Option
-                                    key={major.id}
-                                    value={major.id}
-                                    label={major.name}
-                                >
-                                    {major.name}
-                                </Option>
-                            ))}
-                        </Select>
-                    </div>
-                </Flex>
-                <Flex className="col-5 justify-content-end position-relative">
-                    <Input
-                        className="w-50"
-                        placeholder="Tìm kiếm"
-                        onChange={(e) => {
-                            setSearchContent(e.target.value);
-                        }}
-                    ></Input>
-                    <Button className="border-0 position-absolute bg-transparent">
-                        <SearchOutlined />
-                    </Button>
-                </Flex>
-            </Flex>
+                            <Select
+                                className="d-block col-3"
+                                placeholder="Chọn cơ sở y tế"
+                                optionFilterProp="children"
+                                allowClear
+                                showSearch
+                                value={options.clinicId}
+                                onChange={(value: any) => {
+                                    setOptions({
+                                        ...options,
+                                        clinicId: value ?? null,
+                                    });
+                                }}
+                            >
+                                {clinics.map((clinic: Clinic) => (
+                                    <Option
+                                        key={clinic.id}
+                                        value={clinic.id}
+                                        label={clinic.name}
+                                    >
+                                        {clinic.name}
+                                    </Option>
+                                ))}
+                            </Select>
+                            <Select
+                                className="d-block col-3"
+                                placeholder="Chọn chuyên ngành"
+                                optionFilterProp="children"
+                                allowClear
+                                showSearch
+                                value={options.majorId}
+                                onChange={(value: any) => {
+                                    console.log(value);
+                                    setOptions({
+                                        ...options,
+                                        majorId: value ?? null,
+                                    });
+                                }}
+                            >
+                                {majors.map((major: Major) => (
+                                    <Option
+                                        key={major.id}
+                                        value={major.id}
+                                        label={major.name}
+                                    >
+                                        {major.name}
+                                    </Option>
+                                ))}
+                            </Select>
+                            <Flex className="col-4 justify-content-end position-relative">
+                                <Input
+                                    className="col-12"
+                                    placeholder="Tìm kiếm"
+                                    onChange={(e) => {
+                                        setSearchContent(e.target.value);
+                                    }}
+                                ></Input>
+                                <Button className="border-0 position-absolute bg-transparent">
+                                    <SearchOutlined />
+                                </Button>
+                            </Flex>
+                        </Flex>
+                    </Card>
+                </Col>
+            </Row>
+
             <DoctorCards
                 doctors={filteredDoctors}
                 pageIndex={pageIndex}
@@ -264,7 +289,7 @@ const DoctorManagement = () => {
                     handleCloseDoctorModal={handleCloseDoctorModal}
                     doctor={doctor}
                     setDoctor={setDoctor}
-                    openNotificationWithIcon={openNotificationWithIcon}
+                    openMessage={openMessage}
                     getDoctor={getDoctors}
                     isUpdate={isUpdate}
                     clinics={clinics}
@@ -277,8 +302,8 @@ const DoctorManagement = () => {
                 <ModalConfirmDelete
                     showModalConfirm={showModalConfirm}
                     handleCloseModalConfirm={handleCloseModalConfirm}
-                    doctorId={doctor?.doctor_id}
-                    openNotificationWithIcon={openNotificationWithIcon}
+                    doctorId={doctor?.doctorId}
+                    openMessage={openMessage}
                     getDoctors={getDoctors}
                     config={config}
                 />

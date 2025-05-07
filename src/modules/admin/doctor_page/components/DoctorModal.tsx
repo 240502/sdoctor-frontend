@@ -21,8 +21,7 @@ import { Major } from '../../../../models/major';
 const { Option } = Select;
 import { PlusOutlined } from '@ant-design/icons';
 import type { DatePickerProps, GetProp, UploadFile, UploadProps } from 'antd';
-import { doctorService } from '../../../../services/doctor.service';
-import { UploadService } from '../../../../services/upload.service';
+import { doctorService, uploadService } from '../../../../services';
 type FileType = Parameters<GetProp<UploadProps, 'beforeUpload'>>[0];
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
@@ -139,7 +138,7 @@ export const DoctorModal = ({
         try {
             const formData = new FormData();
             formData.append('file', file);
-            const response = await UploadService.uploadImage(formData);
+            const response = await uploadService.uploadImage(formData);
             const { url } = response.data;
             file.url = url;
             onSuccess?.({}, file);

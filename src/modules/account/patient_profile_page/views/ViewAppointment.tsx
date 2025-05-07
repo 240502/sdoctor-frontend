@@ -48,6 +48,7 @@ const { Option } = Select;
 const { RangePicker } = DatePicker;
 import 'dayjs/locale/vi'; // Nếu cần định dạng ngày bằng tiếng Việt
 import isoWeek from 'dayjs/plugin/isoWeek'; // Plugin để làm việc với tuần ISO
+import { InputCommentModal } from '../components/InputCommentModal';
 // Kích hoạt plugin isoWeek
 dayjs.extend(isoWeek);
 // Thiết lập locale tiếng Việt
@@ -316,7 +317,6 @@ const ViewAppointment = () => {
                                     setIsModalOpen(true);
                                     setAppointment(record);
                                     setIsView(true);
-                                    console.log('appointment', record);
                                 }}
                             >
                                 <EyeOutlined className="text-info" />
@@ -330,7 +330,6 @@ const ViewAppointment = () => {
                                     className=""
                                     danger
                                     onClick={() => {
-                                        console.log(record);
                                         setIsOpenModalConfirm(true);
                                         setAppointment(record);
                                     }}
@@ -501,6 +500,13 @@ const ViewAppointment = () => {
                                     openNotificationWithIcon
                                 }
                                 refetch={refetch}
+                            />
+                        )}
+                        {openInputCommentModal && (
+                            <InputCommentModal
+                                openInputModal={openInputCommentModal}
+                                handleCancelInputModal={handleCancelInputModal}
+                                appointment={appointment}
                             />
                         )}
                     </>

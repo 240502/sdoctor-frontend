@@ -15,7 +15,7 @@ export interface MedicalPackage {
     coverImage: string;
 }
 
-export interface Pagination {
+interface Pagination {
     pageIndex?: number;
     pageSize?: number | null;
 }

@@ -24,3 +24,4 @@ export { default as userService } from './user.service';
 export { default as majorService } from './major.service';
 export { default as departmentSerivce } from './department.service';
 export { default as degreesService } from './degrees.service';
+export { default as doctorExpertisesService } from './doctor_expertises.service';

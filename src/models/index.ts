@@ -21,3 +21,7 @@ export * from './medical_package';
 export * from './user';
 export * from './department';
 export * from './mail';
+
+export * from './doctor_expertises';
+export * from './education';
+export * from './work_experience';
