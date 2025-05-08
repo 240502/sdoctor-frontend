@@ -1,4 +1,5 @@
 import apiClient from '../constants/api';
+import { PatientProfile } from '../models';
 
 const patientProfileService = {
     async createPatientProfile(data: any): Promise<any> {
@@ -23,6 +24,13 @@ const patientProfileService = {
             data
         );
         return res.data;
+    },
+    async getPatientProfiles(uuids: string[]): Promise<PatientProfile[]> {
+        const res = await apiClient.post(
+            `/patient-profile/get-patient-profiles`,
+            { uuids: uuids }
+        );
+        return res?.data;
     },
 };
 export default patientProfileService;

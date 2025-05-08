@@ -5,8 +5,7 @@ import { Link } from 'react-router-dom';
 
 import { Sidenav } from './components/Sidenav';
 import Header from './components/Header';
-import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
-import { requestConfig, userState } from '../../stores/userAtom';
+import { useRecoilValue, useSetRecoilState } from 'recoil';
 import {
     notificationsState,
     notificationsValue,
@@ -17,7 +16,6 @@ const { Sider, Content } = Layout;
 
 const AdminLayout: React.FC = ({ children }: any) => {
     const [collapsed, setCollapsed] = useState(false);
-    const [current, setCurrent] = useState<string[]>([]);
     const [messageApi, contextHolder] = message.useMessage();
     const setNotifications = useSetRecoilState(notificationsState);
     const notificationsSelector = useRecoilValue(notificationsValue);
@@ -62,7 +60,7 @@ const AdminLayout: React.FC = ({ children }: any) => {
                         </Link>
                     </h3>
                 </div>
-                <Sidenav current={current} />
+                <Sidenav />
             </Sider>
             <Layout style={{ width: '200vh' }}>
                 <Header collapsed={collapsed} setCollapsed={setCollapsed} />

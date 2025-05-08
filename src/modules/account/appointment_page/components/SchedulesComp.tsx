@@ -1,11 +1,5 @@
-import {
-    useFetchSchedulesByEntityIdAndDate,
-    useUpdateScheduleStatus,
-} from '../../../../hooks';
 import { Button, Col, Row, Skeleton } from 'antd';
 import { Schedules } from '../../../../models';
-import { useEffect, useState } from 'react';
-import dayjs from 'dayjs';
 const SchedulesComp = (props: {
     schedules: Schedules[];
     isFetching: boolean;

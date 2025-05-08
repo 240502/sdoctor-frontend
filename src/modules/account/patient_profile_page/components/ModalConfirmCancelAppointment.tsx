@@ -4,20 +4,21 @@ import { appointmentService } from '../../../../services';
 import TextArea from 'antd/es/input/TextArea';
 import { useUpdateAppointmentStatus } from '../../../../hooks/appointments/useUpdateAppointment';
 import { AppointmentResponseDto } from '../../../../models';
+import { NoticeType } from 'antd/es/message/interface';
 
 export const ModalConfirmCancelAppointment = ({
     isOpenModalConfirm,
     handleCancelModalConfirm,
     appointment,
     setIsOpenModalConfirm,
-    openNotificationWithIcon,
+    openNotification,
     refetch,
 }: {
     isOpenModalConfirm: any;
     handleCancelModalConfirm: any;
     appointment: AppointmentResponseDto;
     setIsOpenModalConfirm: any;
-    openNotificationWithIcon: any;
+    openNotification: (type: NoticeType, content: string) => void;
     refetch: any;
 }) => {
     const rejectionReasonInputRef = useRef<any>(null);
@@ -47,20 +48,12 @@ export const ModalConfirmCancelAppointment = ({
             };
             // const res = await appointmentService.createAppointment(data);
 
-            openNotificationWithIcon(
-                'success',
-                'Thông báo!',
-                'Hủy lịch hẹn thành công!'
-            );
+            openNotification('success', 'Hủy lịch hẹn thành công!');
             setIsOpenModalConfirm(false);
             refetch();
         } catch (err: any) {
             console.log(err.message);
-            openNotificationWithIcon(
-                'error',
-                'Thông báo!',
-                'Hủy lịch hẹn không thành công!'
-            );
+            openNotification('error', 'Hủy lịch hẹn không thành công!');
         }
     };
     useEffect(() => focusTextArea(), []);
@@ -95,9 +88,8 @@ export const ModalConfirmCancelAppointment = ({
                         updateAppointmentStatus(data, {
                             onSuccess: (data) => {
                                 console.log('Thành công:', data);
-                                openNotificationWithIcon(
+                                openNotification(
                                     'success',
-                                    'Thông báo!',
                                     'Hủy lịch hẹn thành công!'
                                 );
                                 setIsOpenModalConfirm(false);
@@ -105,9 +97,8 @@ export const ModalConfirmCancelAppointment = ({
                             },
                             onError: (err) => {
                                 console.error('Lỗi:', err.message);
-                                openNotificationWithIcon(
+                                openNotification(
                                     'error',
-                                    'Thông báo!',
                                     'Hủy lịch hẹn không thành công!'
                                 );
                             },

@@ -21,7 +21,7 @@ import {
     Tag,
     Tooltip,
     DatePicker,
-    notification,
+    message,
 } from 'antd';
 import { TableColumnsType } from 'antd';
 import {
@@ -34,7 +34,6 @@ import {
 import { ModalConfirmCancelAppointment } from '../components/ModalConfirmCancelAppointment';
 import { useNavigate } from 'react-router-dom';
 import { AppointmentStatus } from '../../../../models/appointment_status';
-type NotificationType = 'success' | 'error';
 import { FilterDropdownProps } from 'antd/es/table/interface';
 import { SearchOutlined } from '@ant-design/icons';
 import Highlighter from 'react-highlight-words';
@@ -46,20 +45,20 @@ import { useCreatePayment } from '../../../../hooks';
 type DataIndex = keyof AppointmentViewForPatient;
 const { Option } = Select;
 const { RangePicker } = DatePicker;
-import 'dayjs/locale/vi'; // Nếu cần định dạng ngày bằng tiếng Việt
-import isoWeek from 'dayjs/plugin/isoWeek'; // Plugin để làm việc với tuần ISO
+import 'dayjs/locale/vi';
+import isoWeek from 'dayjs/plugin/isoWeek';
 import { InputCommentModal } from '../components/InputCommentModal';
-// Kích hoạt plugin isoWeek
+import { NoticeType } from 'antd/es/message/interface';
 dayjs.extend(isoWeek);
-// Thiết lập locale tiếng Việt
 dayjs.locale('vi');
 const ViewAppointment = () => {
+    const [messageApi, contextHolder] = message.useMessage();
+
     const [searchText, setSearchText] = useState('');
     const [searchedColumn, setSearchedColumn] = useState('');
     const searchInput = useRef<InputRef>(null);
     const navigate = useNavigate();
     const [isView, setIsView] = useState<boolean>(false);
-    const [api, contextHolder] = notification.useNotification();
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
     const [isOpenModalConfirm, setIsOpenModalConfirm] =
         useState<boolean>(false);
@@ -383,29 +382,19 @@ const ViewAppointment = () => {
         setIsOpenModalConfirm(false);
         setAppointment({} as AppointmentResponseDto);
     };
-    const handleCancelModalInput = () => {
-        setOpenInputCommentModal(false);
-        setAppointment({} as AppointmentResponseDto);
-    };
-    const openNotificationWithIcon = (
-        type: NotificationType,
-        title: string,
-        des: string
+
+    const openNotification = (
+        type: NoticeType,
+
+        content: string
     ) => {
-        api[type]({
-            message: title,
-            description: des,
-        });
+        messageApi.open({ type, content });
     };
     // Sửa hàm onDateRangeChange để khớp với chữ ký của RangePicker
-    const onDateRangeChange = (
-        dates: [Dayjs | null, Dayjs | null] | null,
-        dateStrings: [string, string]
-    ) => {
+    const onDateRangeChange = (dates: [Dayjs | null, Dayjs | null] | null) => {
         if (dates && dates[0] && dates[1]) {
             setOptions({ ...options, fromDate: dates[0], toDate: dates[1] });
         } else {
-            // Nếu dates là null hoặc có giá trị null, đặt lại về tuần hiện tại
             setOptions({
                 ...options,
                 fromDate: dayjs().startOf('isoWeek'),
@@ -417,9 +406,7 @@ const ViewAppointment = () => {
         window.scrollTo(0, 0);
         getAllAppointmentStatus();
     }, []);
-    useEffect(() => {
-        console.log('appointment', appointment);
-    }, [appointment]);
+
     return (
         <PatientProfileLayout breadcrumb={'Lịch hẹn'}>
             <Row gutter={24} className="mb-3 ">
@@ -456,10 +443,13 @@ const ViewAppointment = () => {
             </Row>
             <Skeleton active loading={isFetching || isRefetching}>
                 {error ? (
-                    <p className="fw-bold text-center">{error.message}</p>
+                    <p className="fw-bold text-center">
+                        {error.message.includes('404')
+                            ? 'Không có lịch hẹn nào!'
+                            : 'Có lỗi vui lòng thử lại sau!'}
+                    </p>
                 ) : (
                     <>
-                        {' '}
                         <Table<AppointmentResponseDto>
                             className="table-appointment"
                             bordered
@@ -496,9 +486,7 @@ const ViewAppointment = () => {
                                 }
                                 appointment={appointment}
                                 setIsOpenModalConfirm={setIsOpenModalConfirm}
-                                openNotificationWithIcon={
-                                    openNotificationWithIcon
-                                }
+                                openNotification={openNotification}
                                 refetch={refetch}
                             />
                         )}
@@ -507,6 +495,8 @@ const ViewAppointment = () => {
                                 openInputModal={openInputCommentModal}
                                 handleCancelInputModal={handleCancelInputModal}
                                 appointment={appointment}
+                                openNotification={openNotification}
+                                refetch={refetch}
                             />
                         )}
                     </>

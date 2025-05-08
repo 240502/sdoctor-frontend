@@ -18,3 +18,4 @@ export * from './specialization';
 export * from './payment';
 export * from './time';
 export * from './auth';
+export * from './patient_profile';

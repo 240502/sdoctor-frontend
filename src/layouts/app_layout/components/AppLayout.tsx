@@ -44,11 +44,11 @@ export const AppLayout = ({ children }: any) => {
                             className="border-0"
                             onClick={() => {
                                 user?.userId
-                                    ? navigate('/admin/dashboard')
+                                    ? navigate('/admin/profile')
                                     : navigate('/login');
                             }}
                         >
-                            {user?.userId ? 'Dashboard' : 'Đăng nhập'}
+                            {user?.userId ? 'Profile' : 'Đăng nhập'}
                         </Button>
                     </div>
                 </div>

@@ -38,7 +38,7 @@ export const FormLogin = () => {
                     }; // Điều chỉnh theo response thực tế
                     console.log('gọi join room');
 
-                    joinRoom(data?.user.userId);
+                    joinRoom(data?.user.userId, `doctor_${data?.user.userId}`);
 
                     if (user.roleId === 2) {
                         navigate('/admin/dashboard');

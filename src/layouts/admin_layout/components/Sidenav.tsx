@@ -6,10 +6,10 @@ import { Link } from 'react-router-dom';
 import { useRecoilValue } from 'recoil';
 import { userValue } from '../../../stores/userAtom';
 
-export const Sidenav = ({ current }: any) => {
+export const Sidenav = () => {
     const user = useRecoilValue(userValue);
     return (
-        <Menu theme="dark" selectedKeys={[current]} mode="inline">
+        <Menu theme="dark" mode="inline">
             {user?.functions?.map((item: Functions, index: number) => {
                 return (
                     <Menu.Item key={index}>

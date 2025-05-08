@@ -23,25 +23,17 @@ import parse from 'html-react-parser';
 import { useSetRecoilState } from 'recoil';
 import { doctorState } from '../../../../stores/doctorAtom';
 import { useNavigate } from 'react-router-dom';
-import { Comment } from '../../../../models/comment';
 import { useFetchDoctorDetail } from '../../../../hooks';
 import { BlockComment } from '../components/BlockComment';
 import BlockCommonDoctors from '../components/BlockCommonDoctors';
-import { getSocket } from '../../../../socket';
+import { joinRoom } from '../../../../socket';
 type DataParams = {
     id: string;
 };
 const ViewDetailDoctor = () => {
     const navigate = useNavigate();
     const { id } = useParams<DataParams>();
-    const [totalComment, setTotalComment] = useState<number>(0);
-    const setDoctorGlobal = useSetRecoilState(doctorState);
-    const [pageComment, setPageComment] = useState<number>(1);
-    const [pageCommentSize, setPageCommentSize] = useState<number>(4);
-    const [pageCommentCount, setPageCommentCount] = useState<number>(0);
-
     const { data, error, isFetching } = useFetchDoctorDetail(Number(id));
-
     const items: TabsProps['items'] = [
         {
             key: '1',
@@ -55,17 +47,8 @@ const ViewDetailDoctor = () => {
         },
     ];
 
-    const handleOnNewComment = () => {
-        const socket = getSocket();
-        socket?.on('newComment', (newComment: Comment) => {
-            // getCommentByDoctorId(Number(newComment.doctorId));
-        });
-    };
     useEffect(() => {
-        handleOnNewComment();
-        console.log('data', data);
-    }, [data]);
-    useEffect(() => {
+        joinRoom(Number(id), `view_doctor_${Number(id)}`);
         window.scrollTo(0, 0);
     }, [id]);
 

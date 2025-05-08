@@ -64,7 +64,7 @@ const AuthInitializer = () => {
     useEffect(() => {
         // Gọi joinRoom khi user thay đổi và chưa được join
         if (user?.userId && user.userId !== joinedUserIdRef.current) {
-            joinRoom(user.userId);
+            joinRoom(user.userId, `doctor_${user.userId}`);
             joinedUserIdRef.current = user.userId;
             console.log(`User ${user.userId} joined room`);
         }
@@ -72,7 +72,7 @@ const AuthInitializer = () => {
         const socket = getSocket();
         const handleConnect = () => {
             if (user?.userId && user.userId !== joinedUserIdRef.current) {
-                joinRoom(user.userId);
+                joinRoom(user.userId, `doctor_${user.userId}`);
                 joinedUserIdRef.current = user.userId;
                 console.log(
                     `User ${user.userId} rejoined room after reconnect`

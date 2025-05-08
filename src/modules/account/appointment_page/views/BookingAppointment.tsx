@@ -6,11 +6,10 @@ import {
 import { Breadcrumb, Col, Row, message } from 'antd';
 import 'dayjs/locale/vi';
 import { useEffect, useState } from 'react';
-import { useRecoilState, useRecoilValue } from 'recoil';
+import { useRecoilValue } from 'recoil';
 import { BlockCalendar, InputAppointmentModal } from '../components';
 import { patientProfileValue } from '../../../../stores/patientAtom';
 import { getSocket } from '../../../../socket';
-import { newAppointmentState } from '../../../../stores/appointmentAtom';
 import { useSearchParams } from 'react-router-dom';
 import SchedulesComp from '../components/SchedulesComp';
 import { Schedules } from '../../../../models';
@@ -20,9 +19,11 @@ import {
 } from '../../../../hooks';
 import dayjs from 'dayjs';
 import { NoticeType } from 'antd/es/message/interface';
+import ProfileSelectionModal from '../components/ProfileSelectionModal';
 
 const BookingAppointment = () => {
     const [searchParams] = useSearchParams();
+    const [uuids, setUuids] = useState<string[]>([]);
 
     const [messageApi, contextHolder] = message.useMessage();
     const now = dayjs();
@@ -30,7 +31,6 @@ const BookingAppointment = () => {
     const patientProfile = useRecoilValue(patientProfileValue);
 
     const [openInputModal, setOpenInputModal] = useState<boolean>(false);
-    const [paymentMethod, setPaymentMethod] = useState<number>(1);
     const openMessage = (type: NoticeType, content: string) => {
         messageApi.open({
             type: type,
@@ -38,67 +38,19 @@ const BookingAppointment = () => {
         });
     };
 
+    const [visibleProfileSelectionModal, setVisibleProfileSelectionModal] =
+        useState<boolean>(false);
     const [schedule, setSchedule] = useState<Schedules>({} as Schedules);
 
     const handleClickTimeButton = (schedule: Schedules) => {
-        setOpenInputModal(true);
+        // setOpenInputModal(true);
+        setVisibleProfileSelectionModal(true);
         setSchedule(schedule);
     };
     const cancelInputModal = () => {
         setOpenInputModal(false);
     };
 
-    // const getDoctorSchedule = async () => {
-    //     try {
-    //         const data = {
-    //             date: date,
-    //             doctorId: doctor.doctorId,
-    //         };
-    //         const result = await scheduleService.viewSchedule(data);
-    //         setSchedule(result);
-    //     } catch (err: any) {
-    //         setSchedule({} as DoctorSchedule);
-    //     }
-    // };
-    // const handleTimeOverRealTime = () => {
-    //     schedule.doctorScheduleDetails.forEach(
-    //         (detail: DoctorScheduleDetail) => {
-    //             if (detail.available === 1) {
-    //                 const now = new Date();
-    //                 const hours = now.getHours();
-    //                 const minutes = now.getMinutes();
-    //                 let startMinute = detail?.startTime?.split(':')[1];
-    //                 let startHour = detail?.startTime?.split(':')[0];
-    //                 if (Number(startHour) === Number(hours)) {
-    //                     if (Number(startMinute) === 0) {
-    //                         updateAvailableScheduleDetail(Number(detail?.id));
-    //                     }
-    //                     if (
-    //                         Math.abs(Number(startHour) - Number(minutes)) >= 20
-    //                     ) {
-    //                         updateAvailableScheduleDetail(Number(detail?.id));
-    //                     }
-    //                     if (Number(minutes) >= Number(startHour)) {
-    //                         updateAvailableScheduleDetail(Number(detail?.id));
-    //                     }
-    //                 }
-
-    //                 if (
-    //                     Number(startHour) > Number(hours) &&
-    //                     Math.abs(Number(startHour) - Number(hours)) === 1 &&
-    //                     Number(startMinute) === 0
-    //                 ) {
-    //                     if (Math.abs(60 - Number(minutes)) <= 20) {
-    //                         updateAvailableScheduleDetail(Number(detail?.id));
-    //                     }
-    //                 }
-    //                 if (Number(startHour) < Number(hours)) {
-    //                     updateAvailableScheduleDetail(Number(detail?.id));
-    //                 }
-    //             }
-    //         }
-    //     );
-    // };
     const doctorId = searchParams.get('doctorId');
 
     const {
@@ -147,6 +99,9 @@ const BookingAppointment = () => {
             updatedScheduleIds: updatedScheduleIds,
         };
     }
+    const onCloseProfileSelectionModa = () => {
+        setVisibleProfileSelectionModal(false);
+    };
     useEffect(() => {
         let intervalId: any;
         if (date === dayjs().format('YYYY-MM-DD')) {
@@ -184,6 +139,10 @@ const BookingAppointment = () => {
         };
     }, [scheduleReponse]);
 
+    const getUuids = () => {
+        const uuids = JSON.parse(localStorage.getItem('uuids') || `[]`);
+        setUuids(uuids);
+    };
     useEffect(() => {
         const socket = getSocket();
         socket?.on('newAppointment', (newAppointment) => {
@@ -254,9 +213,14 @@ const BookingAppointment = () => {
                     doctor={doctorResponse}
                     openMessage={openMessage}
                     patientProfile={patientProfile}
-                    setPaymentMethod={setPaymentMethod}
                     schedule={schedule}
                     refetch={refetch}
+                />
+            )}
+            {visibleProfileSelectionModal && (
+                <ProfileSelectionModal
+                    visible={visibleProfileSelectionModal}
+                    onClose={onCloseProfileSelectionModa}
                 />
             )}
         </div>

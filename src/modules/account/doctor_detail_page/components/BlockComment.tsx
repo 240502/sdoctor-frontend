@@ -1,8 +1,9 @@
 import { CheckCircleOutlined } from '@ant-design/icons';
 import { Comment } from '../../../../models/comment';
-import { Col, Row, Rate, Button, Skeleton } from 'antd';
+import { Col, Row, Rate, Skeleton } from 'antd';
 import { useEffect, useMemo, useRef } from 'react';
 import { useFetchCommentsByCommentableIdAndType } from '../../../../hooks/comment';
+import { getSocket } from '../../../../socket';
 export const BlockComment = ({ doctorId }: { doctorId: number }) => {
     const {
         data,
@@ -11,6 +12,7 @@ export const BlockComment = ({ doctorId }: { doctorId: number }) => {
         fetchNextPage,
         isFetching,
         isFetchingNextPage,
+        refetch,
     } = useFetchCommentsByCommentableIdAndType({
         pageSize: 6,
         commentableId: doctorId,
@@ -19,7 +21,6 @@ export const BlockComment = ({ doctorId }: { doctorId: number }) => {
     const comments = useMemo(() => {
         return data?.pages.flatMap((page) => page.comments) ?? [];
     }, [data]);
-    // ======= Infinite Scroll Logic =======
     const observerRef = useRef<HTMLDivElement | null>(null);
     useEffect(() => {
         if (!observerRef.current || !hasNextPage || isFetchingNextPage) return;
@@ -39,6 +40,16 @@ export const BlockComment = ({ doctorId }: { doctorId: number }) => {
             if (observerRef.current) observer.unobserve(observerRef.current);
         };
     }, [hasNextPage, isFetchingNextPage]);
+    useEffect(() => {
+        const socket = getSocket();
+        socket?.on('newComment', () => {
+            console.log('newComment');
+            refetch();
+        });
+        return () => {
+            socket.off('newComment');
+        };
+    }, []);
     return (
         <>
             <h6 className="fs-5 mb-3">

@@ -26,10 +26,8 @@ import { useCreateAppointment } from '../../../../hooks/appointments';
 import {
     useCreateNotification,
     useSendBookingSuccessMail,
-    useUpdateScheduleStatus,
 } from '../../../../hooks';
 import { invoiceState } from '../../../../stores/invoice';
-import { AppointmentResponseDto } from '../../../../models';
 
 const InputAppointmentModal = ({
     openModal,
@@ -69,19 +67,15 @@ const InputAppointmentModal = ({
 
     const sendBookingSuccessMail = useSendBookingSuccessMail();
     const { mutate: createAppointment } = useCreateAppointment();
-    const handleSendBookingSuccessMail = () => {
-        const mailPayload = {
-            patientName: patientProfile.patientName,
-            email: patientProfile.patientEmail,
-            doctorName: doctor.fullName,
-            time: `${schedule.startTime}-${schedule.endTime}`,
-            date: date,
-            location: doctor.location,
-            status: 'Chờ xác nhận',
-            fee: 10000,
-            serviceName: doctor.serviceName,
-        };
-        sendBookingSuccessMail.mutate(mailPayload);
+    const handleSendBookingSuccessMail = (payload: any) => {
+        sendBookingSuccessMail.mutate(payload, {
+            onSuccess() {
+                console.log('send mail successful');
+            },
+            onError(error) {
+                console.log('error:', error);
+            },
+        });
     };
     const setInvoice = useSetRecoilState(invoiceState);
     const CreateInvoice = async (data: any) => {
@@ -95,16 +89,8 @@ const InputAppointmentModal = ({
         }
     };
     const [paymentMethod, setPaymentMethod] = useState<number>(1);
-    const { mutate: updateScheduleStatus } = useUpdateScheduleStatus(refetch);
     const { mutate: createNotification } = useCreateNotification();
-    const handleUpdateScheduleStatus = (
-        newAppointment: AppointmentResponseDto
-    ) => {
-        const payload = [
-            { scheduleId: newAppointment.scheduleId, status: 'booked' },
-        ];
-        updateScheduleStatus(payload);
-    };
+
     const onFinish = (values: any) => {
         setPaymentMethod(values.payment_method);
         const newAppointment = {
@@ -114,15 +100,24 @@ const InputAppointmentModal = ({
             location: doctor.location,
             uuid: patientProfile.uuid,
             scheduleId: schedule.id,
-
             type: 'doctor',
         };
         createAppointment(newAppointment, {
             onSuccess: (data) => {
-                console.log('Create appointment success', data);
                 const appointment = data.data.result;
                 console.log('data.appointment', data.data.result);
-                handleSendBookingSuccessMail();
+                const mailPayload = {
+                    patientName: values.patientName,
+                    email: values.email,
+                    doctorName: doctor.fullName,
+                    time: `${schedule.startTime}-${schedule.endTime}`,
+                    date: date,
+                    location: doctor.location,
+                    status: 'Chờ xác nhận',
+                    fee: 10000,
+                    serviceName: doctor.serviceName,
+                };
+                handleSendBookingSuccessMail(mailPayload);
                 openMessage('Success', 'Đặt lịch hẹn thành công !');
                 const queryParams = new URLSearchParams();
                 queryParams.append('appointment', appointment.id.toString());

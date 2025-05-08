@@ -12,6 +12,7 @@ import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { userState, userValue } from '../../../stores/userAtom';
 import NotificationList from './NotificationList';
 import { Link } from 'react-router-dom';
+import { useLogout } from '../../../hooks/user';
 const Header = ({ collapsed, setCollapsed }: any) => {
     const navigate = useNavigate();
     const setUser = useSetRecoilState(userState);
@@ -20,7 +21,7 @@ const Header = ({ collapsed, setCollapsed }: any) => {
     const {
         token: { colorBgContainer, borderRadiusLG },
     } = theme.useToken();
-
+    const { mutate: Logout } = useLogout();
     const userMenu = (
         <Menu className="">
             <Menu.Item key="1">
@@ -49,6 +50,7 @@ const Header = ({ collapsed, setCollapsed }: any) => {
                     setUser({} as User);
                     localStorage.removeItem('user');
                     navigate('/');
+                    Logout();
                 }}
             >
                 Đăng xuất

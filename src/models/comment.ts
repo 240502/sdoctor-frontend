@@ -10,9 +10,10 @@ export interface Comment {
 }
 
 export interface CommentCreate {
-    doctorId: number;
     content: string;
     fullName: string;
+    commentableId: number;
     starCount: number;
     dateBooking: string;
+    commentableType: string;
 }

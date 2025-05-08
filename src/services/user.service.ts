@@ -22,8 +22,8 @@ const userService = {
     },
     // Đăng xuất
     async logout(): Promise<void> {
-        await apiClient.post('/auth/logout');
-        cachedCsrfToken = null; // Xóa cache CSRF token khi đăng xuất
+        await apiClient.post('/user/logout');
+        cachedCsrfToken = null;
     },
 
     async createUser(data: any, config: any): Promise<any> {
