@@ -1,0 +1,12 @@
+.ant-list-item-action {
+    li {
+        width: 50%;
+    }
+    li:first-child {
+        text-align: start !important;
+    }
+    li:nth-child(2) {
+        padding-right: 0 !important;
+        text-align: end !important;
+    }
+}

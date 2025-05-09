@@ -19,7 +19,7 @@ import { useEffect, useState } from 'react';
 import { Doctor } from '../../../../models/doctor';
 import { useRecoilValue } from 'recoil';
 import { configValue, userValue } from '../../../../stores/userAtom';
-import { doctorService } from '../../../../services';
+import { doctorService, otherService } from '../../../../services';
 import { Clinic } from '../../../../models/clinic';
 import { Major } from '../../../../models/major';
 import { DoctorService } from '../../../../models/doctor_service';
@@ -205,8 +205,9 @@ const Profile = () => {
     const getWards = async (districtId: any) => {
         try {
             const res = await axios.get(
-                `https://vapi.vnappmob.com//api/province/ward/${districtId}`
+                `https://vapi.vnappmob.com//api/v2/province/ward/${districtId}`
             );
+
             setWards(res.data.results);
         } catch (err) {
             console.log(err);
@@ -215,7 +216,7 @@ const Profile = () => {
     const getListDistrict = async (provinceId: any) => {
         try {
             const res = await axios.get(
-                `https://vapi.vnappmob.com//api/province/district/${provinceId}`
+                `https://vapi.vnappmob.com//api/v2/province/district/${provinceId}`
             );
 
             setDistricts(res.data.results);
@@ -296,8 +297,10 @@ const Profile = () => {
     }, [provinces.length]);
 
     useEffect(() => {
+        console.log(user);
+
         if (user?.roleId === 2) {
-            getDoctorById(user.doctorId);
+            getDoctorById(user.userId);
             getAllClinic();
             getAllMajor();
             getAllService();
@@ -311,7 +314,7 @@ const Profile = () => {
         const getProvinces = async () => {
             try {
                 const res = await axios.get(
-                    'https://vapi.vnappmob.com/api/province'
+                    'https://vapi.vnappmob.com/api/v2/province'
                 );
                 setProvinces(res.data.results);
             } catch (err) {
@@ -388,7 +391,7 @@ const Profile = () => {
                                 <Col span={12}>
                                     <Form.Item
                                         label="Cơ sở y tế"
-                                        name="clinic_id"
+                                        name="clinicId"
                                         rules={[
                                             {
                                                 required: true,
@@ -417,7 +420,7 @@ const Profile = () => {
                                 <Col span={12}>
                                     <Form.Item
                                         label="Chuyên ngành"
-                                        name="major_id"
+                                        name="majorId"
                                         rules={[
                                             {
                                                 required: true,
@@ -449,7 +452,7 @@ const Profile = () => {
                             <Col span={12}>
                                 <Form.Item
                                     label="Họ và tên"
-                                    name="full_name"
+                                    name="fullName"
                                     rules={[
                                         {
                                             required: true,
@@ -724,7 +727,7 @@ const Profile = () => {
                                 <Col span={12}>
                                     <Form.Item
                                         label="Dịch vụ"
-                                        name="service_id"
+                                        name="serviceId"
                                         rules={[
                                             {
                                                 required: true,

@@ -1,77 +1,171 @@
-import { Card, Typography, Button, Space } from 'antd';
-import { CheckCircleOutlined } from '@ant-design/icons';
-import { useNavigate } from 'react-router-dom';
-import { useRecoilValue } from 'recoil';
-import { newAppointmentValue } from '../stores/appointmentAtom';
-import { useEffect } from 'react';
-import { invoiceValue } from '../stores/invoice';
-const { Title, Text } = Typography;
+import { Button, Typography, Space, Card, Skeleton } from 'antd';
+import { useFetchAppointmentById } from '../hooks';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import dayjs from 'dayjs';
-import { useCreatePayment } from '../hooks';
-import { useSearchParams } from 'react-router-dom';
-const BookingSuccess = () => {
+const { Title, Text } = Typography;
+import Barcode from 'react-barcode';
+const BookingSuccess = ({ receiptData }: any) => {
     const [searchParams] = useSearchParams();
+
+    // const {
+    //     receiptId,
+    //     hospital,
+    //     address,
+    //     examinationTime,
+    //     doctor,
+    //     service,
+    //     cost,
+    //     patient,
+    //     dob,
+    //     patientReceiptId,
+    // } = receiptData;
+    const { data, isError, error, isFetching } = useFetchAppointmentById(
+        Number(searchParams.get('appointment'))
+    );
+    console.log('data', data);
     const navigate = useNavigate();
-    const newAppointment = useRecoilValue(newAppointmentValue);
-    const createPayment = useCreatePayment();
-    const payment = Number(searchParams.get('payment'));
-    const appointmentId = Number(searchParams.get('appointment'));
-
-    useEffect(() => {}, []);
     return (
-        <div
-            style={{
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                height: '100vh',
-                backgroundColor: '#f6f9fc',
-            }}
-        >
-            <Card
-                style={{
-                    width: 400,
-                    textAlign: 'center',
-                    borderRadius: '8px',
-                    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
-                }}
-                bodyStyle={{ padding: '24px' }}
-            >
-                <CheckCircleOutlined
-                    style={{ fontSize: '64px', color: '#52c41a' }}
-                />
-                <Title level={3} style={{ marginTop: '16px' }}>
-                    Đặt lịch thành công!
-                </Title>
-                <Text>Bạn sẽ nhận được xác nhận chi tiết qua email..</Text>
-                {payment === 2 && (
-                    <p>
-                        Bạn cần thanh toán hóa đơn phí khám trước
-                        <br></br>
-                        {dayjs(
-                            newAppointment.createdAt.toString().split('Z')[0]
-                        )
-                            .add(60, 'minute')
-                            .format('HH:mm:ss DD-MM-YYYY')}
-                    </p>
-                )}
+        <div className="container my-4">
+            {isError ? (
+                <p className="fw-bold text-center">
+                    {'Có lỗi khi tải dữ liệu vui lòng thử lại sau !'}
+                </p>
+            ) : (
+                <Skeleton active loading={isFetching}>
+                    <Card
+                        className=" shadow p-3 mx-auto"
+                        style={{ maxWidth: '400px' }}
+                    >
+                        <Title level={4} className="text-center mb-0">
+                            Phiếu Khám Bệnh
+                        </Title>
+                        <Text strong className="d-block text-center">
+                            {data?.clinicName}
+                        </Text>
+                        <Text
+                            type="secondary"
+                            className="d-block text-center mb-3"
+                        >
+                            {data?.location}
+                        </Text>
 
-                <Space style={{ marginTop: '24px' }}>
-                    {payment === 2 && (
+                        {/* Receipt ID and Barcode Placeholder */}
+                        <div className="d-flex justify-content-between align-items-center mb-3">
+                            <div>
+                                <p className="fw-bold text-center mb-2">
+                                    Mã phiếu
+                                </p>
+                                <div>
+                                    {data?.id && (
+                                        <Barcode
+                                            value={'#Apt' + data?.id.toString()}
+                                            height={40}
+                                            width={1}
+                                            margin={0}
+                                            displayValue={false} // Ẩn giá trị text bên dưới mã vạch
+                                        />
+                                    )}
+                                </div>
+                                <p className="text-center fs-6 fw-bold mb-0">
+                                    {'#Apt' + data?.id}
+                                </p>
+                            </div>
+                            <div className="border border-primary rounded px-2 py-1 mt-1 text-center">
+                                <p className="mb-2"> Giờ khám dự kiến:</p>
+                                <span className="fw-bold">
+                                    {data?.startTime + '-' + data?.endTime}
+                                </span>
+                            </div>
+                        </div>
+
+                        {/* Button */}
+                        <div className="text-center mb-3">
+                            <Button
+                                type="primary"
+                                shape="round"
+                                style={{
+                                    backgroundColor: '#f5a623',
+                                    borderColor: '#f5a623',
+                                }}
+                            >
+                                Đặt Khám Thành Công
+                            </Button>
+                        </div>
+
+                        {/* Cost */}
+                        <Text className="d-block text-center mb-1">
+                            {data?.paymentMethod === 1
+                                ? ' Số tiền phải thanh toán:'
+                                : 'Số tiền đã thanh toán: '}{' '}
+                            <Text strong>
+                                {data?.amount.toLocaleString(undefined)} VNĐ
+                            </Text>
+                        </Text>
+                        <Text
+                            type="secondary"
+                            className="d-block text-center mb-3"
+                        >
+                            (Đã bao gồm phí khám + phí tiện ích)
+                        </Text>
+
+                        {/* Details */}
+                        <Space direction="vertical" size={4} className="w-100">
+                            <div>
+                                <Text strong>Mã phiếu: </Text>
+                                <Text>{'#Apt' + data?.id}</Text>
+                            </div>
+                            <div>
+                                <Text strong>Bác sĩ: </Text>
+                                <Text>{data?.doctorName}</Text>
+                            </div>
+                            <div>
+                                <Text strong>Dịch vụ: </Text>
+                                <Text>{data?.serviceName}</Text>
+                            </div>
+                            {/* <div>
+                        <Text strong>Hình thức khám: </Text>
+                        <Text>Không có BHYT</Text>
+                    </div> */}
+                            <div>
+                                <Text strong>Thời gian khám: </Text>
+                                <Text>
+                                    {data?.startTime + '-' + data?.endTime} -
+                                    8/5/2025
+                                </Text>
+                            </div>
+                            <div>
+                                <Text strong>Phí khám: </Text>
+                                <Text>
+                                    {data?.amount.toLocaleString(undefined)} VNĐ
+                                </Text>
+                            </div>
+                            <div>
+                                <Text strong>Bệnh nhân: </Text>
+                                <Text>{data?.patientName}</Text>
+                            </div>
+                            <div>
+                                <Text strong>Ngày sinh: </Text>
+                                <Text>
+                                    {dayjs(data?.birthday).format('DD-MM-YYYY')}
+                                </Text>
+                            </div>
+                            <div>
+                                <Text strong>Mã bệnh nhân: </Text>
+                                <Text>{data?.uuid}</Text>
+                            </div>
+                        </Space>
+                    </Card>
+                    <div className="text-center mt-3">
                         <Button
-                            type="primary"
                             onClick={() => {
-                                createPayment.mutate(appointmentId);
+                                navigate('/');
                             }}
                         >
-                            Thanh toán
+                            Trang chủ
                         </Button>
-                    )}
-                    <Button onClick={() => navigate('/patient/appointment')}>
-                        Xem chi tiết
-                    </Button>
-                </Space>
-            </Card>
+                    </div>
+                </Skeleton>
+            )}
         </div>
     );
 };

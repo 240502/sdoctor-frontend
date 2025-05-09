@@ -63,86 +63,106 @@ const DashBoard = () => {
         doctorId: user.userId,
     });
     useEffect(() => {
+        console.log('chart', chartSeries);
+    }, [chartSeries]);
+    useEffect(() => {
         // Kiểm tra dữ liệu đầu vào
-        if (
-            !Array.isArray(revenueRecords) ||
-            !Array.isArray(appointmentRecords)
-        ) {
-            console.warn('Invalid revenue or appointment records');
-            setChartSeries([
-                {
-                    name: 'Revenue',
-                    type: 'bar',
-                    data: new Array(weekdayLabels.length).fill(0),
-                    yAxisIndex: 0,
-                },
-                {
-                    name: 'Appointment',
-                    type: 'line',
-                    data: new Array(weekdayLabels.length).fill(0),
-                    yAxisIndex: 1,
-                },
-            ]);
-            return;
-        }
-
+        const series = [];
         // Khởi tạo Map để lưu trữ dữ liệu theo ngày
         const revenueByDay = new Map<string, number>();
-        const appointmentsByDay = new Map<string, number>();
-
-        // Xử lý dữ liệu doanh thu
-        revenueRecords.forEach((record) => {
-            if (!record?.appointmentDate || record.totalPrice == null) return;
-            const appointmentDate = new Date(record.appointmentDate);
-            if (isNaN(appointmentDate.getTime())) return; // Bỏ qua ngày không hợp lệ
-            const dayIndex = appointmentDate.getDay();
-            // Ánh xạ: T2 (1) -> T2, T3 (2) -> T3, ..., CN (0) -> CN
-            const dayLabel = weekdayLabels[dayIndex === 0 ? 6 : dayIndex - 1];
-            if (dayLabel) {
-                revenueByDay.set(dayLabel, Number(record.totalPrice));
-            }
-        });
-
-        // Xử lý dữ liệu lịch hẹn
-        appointmentRecords.forEach((record) => {
-            if (!record?.appointmentDate || record.totalAppointments == null)
-                return;
-            const appointmentDate = new Date(record.appointmentDate);
-            if (isNaN(appointmentDate.getTime())) return; // Bỏ qua ngày không hợp lệ
-            const dayIndex = appointmentDate.getDay();
-            const dayLabel = weekdayLabels[dayIndex === 0 ? 6 : dayIndex - 1];
-            if (dayLabel) {
-                appointmentsByDay.set(
-                    dayLabel,
-                    Number(record.totalAppointments)
-                );
-            }
-        });
-
-        // Tạo dữ liệu cho series
-        const revenueSeriesData = weekdayLabels.map(
-            (label) => revenueByDay.get(label) || 0
-        );
-        const appointmentSeriesData = weekdayLabels.map(
-            (label) => appointmentsByDay.get(label) || 0
-        );
-
-        // Cập nhật series
-        const newSeries = [
-            {
+        let isEmpty = false;
+        if (!Array.isArray(revenueRecords)) {
+            console.warn('Invalid revenue or appointment records');
+            series.push({
+                name: 'Revenue',
+                type: 'bar',
+                data: new Array(weekdayLabels.length).fill(0),
+                yAxisIndex: 0,
+            });
+            isEmpty = true;
+        } else {
+            // Xử lý dữ liệu doanh thu
+            revenueRecords.forEach((record: any) => {
+                if (!record?.appointmentDate || record.totalPrice == null)
+                    return;
+                const appointmentDate = new Date(record.appointmentDate);
+                if (isNaN(appointmentDate.getTime())) return; // Bỏ qua ngày không hợp lệ
+                const dayIndex = appointmentDate.getDay();
+                // Ánh xạ: T2 (1) -> T2, T3 (2) -> T3, ..., CN (0) -> CN
+                const dayLabel =
+                    weekdayLabels[dayIndex === 0 ? 6 : dayIndex - 1];
+                if (dayLabel) {
+                    revenueByDay.set(dayLabel, Number(record.totalPrice));
+                }
+            });
+            // Tạo dữ liệu cho series
+            const revenueSeriesData = weekdayLabels.map(
+                (label) => revenueByDay.get(label) || 0
+            );
+            series.push({
                 name: 'Revenue',
                 type: 'bar',
                 data: revenueSeriesData,
                 yAxisIndex: 0,
-            },
-            {
+            });
+        }
+
+        const appointmentsByDay = new Map<string, number>();
+
+        if (!Array.isArray(appointmentRecords)) {
+            series.push({
                 name: 'Appointment',
                 type: 'line',
-                data: appointmentSeriesData,
+                data: new Array(weekdayLabels.length).fill(0),
                 yAxisIndex: 1,
-            },
-        ];
-        setChartSeries(newSeries);
+            });
+        } else {
+            // Xử lý dữ liệu lịch hẹn
+            appointmentRecords.forEach((record: any) => {
+                if (
+                    !record?.appointmentDate ||
+                    record.totalAppointments == null
+                )
+                    return;
+                const appointmentDate = new Date(record.appointmentDate);
+                if (isNaN(appointmentDate.getTime())) return; // Bỏ qua ngày không hợp lệ
+                const dayIndex = appointmentDate.getDay();
+                const dayLabel =
+                    weekdayLabels[dayIndex === 0 ? 6 : dayIndex - 1];
+                if (dayLabel) {
+                    appointmentsByDay.set(
+                        dayLabel,
+                        Number(record.totalAppointments)
+                    );
+                }
+            });
+            const appointmentSeriesData = weekdayLabels.map(
+                (label) => appointmentsByDay.get(label) || 0
+            );
+            series.push({
+                name: 'Revenue',
+                type: 'bar',
+                data: appointmentSeriesData,
+                yAxisIndex: 0,
+            });
+        }
+
+        // // Cập nhật series
+        // const newSeries = [
+        //     {
+        //         name: 'Revenue',
+        //         type: 'bar',
+        //         data: revenueSeriesData,
+        //         yAxisIndex: 0,
+        //     },
+        //     {
+        //         name: 'Appointment',
+        //         type: 'line',
+        //         data: appointmentSeriesData,
+        //         yAxisIndex: 1,
+        //     },
+        // ];
+        setChartSeries(series);
     }, [revenueRecords, appointmentRecords]);
 
     return (

@@ -2,7 +2,7 @@ import apiClient from '../constants/api';
 
 const doctorServiceService = {
     async getAll(): Promise<any> {
-        const res = await apiClient.get('/api/doctor-service/get-all');
+        const res = await apiClient.get('/doctor-service/get-all');
         return res?.data;
     },
 };

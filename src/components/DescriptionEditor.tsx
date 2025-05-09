@@ -7,7 +7,7 @@ const DescriptionEditor = ({ handleChangeDoctorEditor, doctor }: any) => {
     return (
         <CKEditor
             editor={ClassicEditor}
-            data={doctor?.doctor_id !== undefined ? doctor?.introduction : ''}
+            data={doctor?.doctorId !== undefined ? doctor?.introduction : ''}
             config={{
                 extraPlugins: [CustomUploadAdapterPlugin],
                 // Các cấu hình khác nếu cần

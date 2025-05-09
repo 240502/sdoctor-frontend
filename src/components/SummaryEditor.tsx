@@ -8,7 +8,7 @@ const SummaryEditor = ({ doctor, handleChangeSummaryEditor }: any) => {
     return (
         <CKEditor
             editor={ClassicEditor}
-            data={doctor?.doctor_id !== undefined ? doctor?.summary : ''}
+            data={doctor?.doctorId !== undefined ? doctor?.summary : ''}
             config={{
                 extraPlugins: [CustomUploadAdapterPlugin],
                 // Các cấu hình khác nếu cần

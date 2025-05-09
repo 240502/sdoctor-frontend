@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Clinic } from '../../../../models/clinic';
-import { ClinicService } from '../../../../services/clinic.service';
+import { clinicService, otherService } from '../../../../services';
 import {
     Breadcrumb,
     Button,
@@ -17,7 +17,6 @@ import { useRecoilValue } from 'recoil';
 import { configValue } from '../../../../stores/userAtom';
 import { ConfirmModal } from '../../../../components';
 import { ProvinceType } from '../../../../models/other';
-import { OtherService } from '../../../../services/other.service';
 import { SearchProps } from 'antd/es/input';
 const { Option } = Select;
 const { Search } = Input;
@@ -42,7 +41,7 @@ const ClinicManagement = () => {
     const [provinces, setProvinces] = useState<ProvinceType[]>([]);
     const getProvinces = async () => {
         try {
-            const res = await OtherService.getProvinces();
+            const res = await otherService.getProvinces();
             setProvinces(res);
         } catch (err) {
             console.log(err);
@@ -54,7 +53,7 @@ const ClinicManagement = () => {
     };
     const DeleteClinic = async () => {
         try {
-            const res = await ClinicService.deleteClinic(clinic?.id, config);
+            const res = await clinicService.deleteClinic(clinic?.id, config);
             console.log(res);
             openNotification('success', 'Thông báo', 'Xóa thành công!');
             handleCancelModalConfirm();
@@ -119,7 +118,7 @@ const ClinicManagement = () => {
                 pageSize: pageSize,
                 ...options,
             };
-            const res = await ClinicService.viewClinic(data);
+            const res = await clinicService.viewClinic(data);
             console.log(res);
             setClinics(res.data);
             setPageCount(res.pageCount);

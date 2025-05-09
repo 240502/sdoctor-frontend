@@ -19,7 +19,6 @@ const BlockGenderOptions = () => {
                         ...doctorOptions,
                         gender: e.target.value,
                     });
-                    console.log(e.target.value);
                 }}
                 value={doctorOptions.gender}
                 options={[

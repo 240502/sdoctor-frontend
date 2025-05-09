@@ -12,11 +12,10 @@ import {
     InputRef,
 } from 'antd';
 type FileType = Parameters<GetProp<UploadProps, 'beforeUpload'>>[0];
-import { UploadService } from '../../../../services/upload.service';
+import { uploadService, clinicService } from '../../../../services';
 import { useState, useEffect, useRef } from 'react';
 import { isEmpty, showSuccess } from '../../../../utils/global';
 import ClinicEditor from './ClinicEditor';
-import { ClinicService } from '../../../../services/clinic.service';
 export const InputClinicModal = ({
     openModalInputClinic,
     handleCloseInputModal,
@@ -73,7 +72,7 @@ export const InputClinicModal = ({
         try {
             const formData = new FormData();
             formData.append('file', file);
-            const response = await UploadService.uploadImage(formData);
+            const response = await uploadService.uploadImage(formData);
             const { url } = response.data;
             file.url = url;
             onSuccess?.({}, file);
@@ -111,7 +110,7 @@ export const InputClinicModal = ({
     const CreateClinic = async (data: any) => {
         try {
             console.log('new clinic', data);
-            const res = await ClinicService.createClinic(data, config);
+            const res = await clinicService.createClinic(data, config);
             console.log(res);
             handleCloseInputModal();
             openNotification('success', 'Thông báo', 'Thêm thành công!');
@@ -125,7 +124,7 @@ export const InputClinicModal = ({
     const UpdateClinic = async (data: any) => {
         try {
             console.log('new clinic', data);
-            const res = await ClinicService.updateClinic(data, config);
+            const res = await clinicService.updateClinic(data, config);
             handleCloseInputModal();
             openNotification('success', 'Thông báo', 'Sửa thành công!');
             getClinics();

@@ -6,13 +6,16 @@ import {
 import { Breadcrumb, Col, Row, message } from 'antd';
 import 'dayjs/locale/vi';
 import { useEffect, useState } from 'react';
-import { useRecoilValue } from 'recoil';
+import { useRecoilState, useRecoilValue } from 'recoil';
 import { BlockCalendar, InputAppointmentModal } from '../components';
-import { patientProfileValue } from '../../../../stores/patientAtom';
+import {
+    patientProfileState,
+    patientProfileValue,
+} from '../../../../stores/patientAtom';
 import { getSocket } from '../../../../socket';
 import { useSearchParams } from 'react-router-dom';
 import SchedulesComp from '../components/SchedulesComp';
-import { Schedules } from '../../../../models';
+import { PatientProfile, Schedules } from '../../../../models';
 import {
     useFetchDoctorDetail,
     useFetchSchedulesByEntityIdAndDate,
@@ -23,12 +26,11 @@ import ProfileSelectionModal from '../components/ProfileSelectionModal';
 
 const BookingAppointment = () => {
     const [searchParams] = useSearchParams();
-    const [uuids, setUuids] = useState<string[]>([]);
-
     const [messageApi, contextHolder] = message.useMessage();
     const now = dayjs();
     const [date, setDate] = useState<string>(now.format('YYYY-MM-DD'));
-    const patientProfile = useRecoilValue(patientProfileValue);
+    const [patientProfile, setPatientProfile] =
+        useRecoilState(patientProfileState);
 
     const [openInputModal, setOpenInputModal] = useState<boolean>(false);
     const openMessage = (type: NoticeType, content: string) => {
@@ -139,10 +141,6 @@ const BookingAppointment = () => {
         };
     }, [scheduleReponse]);
 
-    const getUuids = () => {
-        const uuids = JSON.parse(localStorage.getItem('uuids') || `[]`);
-        setUuids(uuids);
-    };
     useEffect(() => {
         const socket = getSocket();
         socket?.on('newAppointment', (newAppointment) => {
@@ -157,7 +155,15 @@ const BookingAppointment = () => {
     useEffect(() => {
         window.scrollTo(0, 0);
     }, []);
+    const onSelectProfile = (profile: PatientProfile) => {
+        setPatientProfile(profile);
+        setVisibleProfileSelectionModal(false);
+        setOpenInputModal(true);
+    };
 
+    useEffect(() => {
+        console.log('profile', patientProfile);
+    }, [patientProfile]);
     return (
         <div className="container mt-4 mb-4">
             {contextHolder}
@@ -221,6 +227,7 @@ const BookingAppointment = () => {
                 <ProfileSelectionModal
                     visible={visibleProfileSelectionModal}
                     onClose={onCloseProfileSelectionModa}
+                    onSelectProfile={onSelectProfile}
                 />
             )}
         </div>

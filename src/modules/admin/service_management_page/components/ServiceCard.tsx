@@ -6,7 +6,7 @@ import {
     EditOutlined,
     EnvironmentOutlined,
 } from '@ant-design/icons';
-import { Service } from '../../../../models/medical_package';
+import { MedicalPackage } from '../../../../models/medical_package';
 
 const ServiceCard = ({
     services,
@@ -16,7 +16,7 @@ const ServiceCard = ({
     const navigate = useNavigate();
     return (
         <Row gutter={[24, 24]} className="cards">
-            {services?.map((service: Service) => {
+            {services?.map((service: MedicalPackage) => {
                 return (
                     <Col span={6} className="card-item" key={service?.name}>
                         <div className="card-container rounded border border-1 ">

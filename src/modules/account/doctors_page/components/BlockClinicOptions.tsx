@@ -28,7 +28,7 @@ const BlockClinicOptions = () => {
                     console.log('value', value);
                     setDoctorOptions({
                         ...doctocOptions,
-                        clinicId: value ?? 0,
+                        clinicId: value ?? null,
                     });
                 }}
             >

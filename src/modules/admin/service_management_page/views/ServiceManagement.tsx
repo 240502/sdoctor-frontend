@@ -9,16 +9,19 @@ import {
     Pagination,
 } from 'antd';
 import { HomeOutlined, PlusOutlined } from '@ant-design/icons';
-import { ServiceService } from '../../../../services/medical_package.service';
+import {
+    medicalPackageService,
+    clinicService,
+    serviceCategoryService,
+} from '../../../../services';
 import { useState, useEffect } from 'react';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { configValue } from '../../../../stores/userAtom';
-import { Service } from '../../../../models/medical_package';
+import { MedicalPackage } from '../../../../models/medical_package';
 import { InputServiceModal } from '../components/InputServiceModal';
-import ClinicService from '$services';
 import { Clinic } from '../../../../models/clinic';
 import { ServiceCategory } from '../../../../models/category_services';
-import { ServiceCategoryService } from '../../../../services/service_category.service';
+// import { s } from '../../../../services/service_category.service';
 import { serviceListState } from '../../../../stores/medical_packageAtom';
 import ServiceCard from '../components/ServiceCard';
 import { ConfirmModal } from '../../../../components';
@@ -35,7 +38,9 @@ const ServiceManagement = () => {
     });
     const [api, contextHolder] = notification.useNotification();
     const [openInputModal, setOpenInputModal] = useState<boolean>(false);
-    const [service, setService] = useState<Service>({} as Service);
+    const [service, setService] = useState<MedicalPackage>(
+        {} as MedicalPackage
+    );
     const [clinics, setClinics] = useState<Clinic[]>([]);
     const [categories, setCategories] = useState<ServiceCategory[]>([]);
     const [isUpdate, setIsUpdate] = useState<boolean>(false);
@@ -50,7 +55,7 @@ const ServiceManagement = () => {
                 clinicId: filterOptions.clinicId,
                 categoryId: filterOptions.categoryId,
             };
-            const res = await ServiceService.viewService(data);
+            const res = await medicalPackageService.viewService(data);
             console.log('services', res);
             console.log('call api');
             setPageCount(res.pageCount);
@@ -69,27 +74,27 @@ const ServiceManagement = () => {
             setPageIndex(current);
         }
     };
-    const onClickEditButton = (service: Service) => {
+    const onClickEditButton = (service: MedicalPackage) => {
         setOpenInputModal(true);
         setService(service);
         setIsUpdate(true);
     };
-    const onClickDeleteButton = (service: Service) => {
+    const onClickDeleteButton = (service: MedicalPackage) => {
         setOpenConfirmModal(true);
         setService(service);
     };
     const cancelModal = () => {
-        setService({} as Service);
+        setService({} as MedicalPackage);
         setOpenInputModal(false);
         setIsUpdate(true);
     };
     const cancelConfirmModal = () => {
-        setService({} as Service);
+        setService({} as MedicalPackage);
         setOpenConfirmModal(false);
     };
     const getAllClinic = async () => {
         try {
-            const res = await ClinicService.viewClinic({});
+            const res = await clinicService.viewClinic({});
             setClinics(res.data);
         } catch (err: any) {
             console.log(err.message);
@@ -98,7 +103,7 @@ const ServiceManagement = () => {
     };
     const getAllServiceCategory = async () => {
         try {
-            const res = await ServiceCategoryService.getAll();
+            const res = await serviceCategoryService.getAll();
             setCategories(res);
         } catch (err: any) {
             console.log(err.message);
@@ -108,11 +113,14 @@ const ServiceManagement = () => {
     const DeleteService = async () => {
         try {
             openNotification(api, 'success', 'Thông báo', 'Xóa thành công!');
-            const res = await ServiceService.deleteService(service?.id, config);
+            const res = await medicalPackageService.deleteService(
+                service?.id,
+                config
+            );
             cancelConfirmModal();
-            setServices((prvServices: Service[]) =>
+            setServices((prvServices: MedicalPackage[]) =>
                 prvServices.filter(
-                    (prvService: Service) => service.id !== prvService.id
+                    (prvService: MedicalPackage) => service.id !== prvService.id
                 )
             );
         } catch (err: any) {

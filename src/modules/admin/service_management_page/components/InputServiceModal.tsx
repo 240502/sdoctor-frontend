@@ -14,12 +14,11 @@ import { SummaryEditor } from './SummaryEditor';
 import { PreparationProcessEditor } from './PreparationProcessEditor';
 import type { GetProp, UploadFile, UploadProps } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
-import { UploadService } from '../../../../services/upload.service';
+import { medicalPackageService, uploadService } from '../../../../services';
 type FileType = Parameters<GetProp<UploadProps, 'beforeUpload'>>[0];
 import { Clinic } from '../../../../models/clinic';
 import { ServiceDetailEditor } from './ServiceDetailEditor';
-import { MedicalPackageService } from '../../../../services';
-import { Service } from '../../../../models/medical_package';
+import { MedicalPackage } from '../../../../models/medical_package';
 import { openNotification } from '../../../../utils/notification';
 export const InputServiceModal = ({
     openInputModal,
@@ -67,7 +66,7 @@ export const InputServiceModal = ({
         try {
             const formData = new FormData();
             formData.append('file', file);
-            const response = await UploadService.uploadImage(formData);
+            const response = await uploadService.uploadImage(formData);
             const { url } = response.data;
             file.url = url;
             onSuccess?.({}, file);
@@ -107,9 +106,9 @@ export const InputServiceModal = ({
     };
     const CreateService = async (data: any) => {
         try {
-            const res = await ServiceService.createService(data, config);
+            const res = await medicalPackageService.createService(data, config);
             console.log(res.data.result[0]);
-            setServices((prvServices: Service[]) => [
+            setServices((prvServices: MedicalPackage[]) => [
                 ...prvServices,
                 res.data.result[0],
             ]);
@@ -132,14 +131,14 @@ export const InputServiceModal = ({
     };
     const UpdateService = async (data: any) => {
         try {
-            const res = await ServiceService.updateService(data, config);
-            setServices((prvServices: Service[]) => {
-                return prvServices.map((service: Service) => {
+            const res = await medicalPackageService.updateService(data, config);
+            setServices((prvServices: MedicalPackage[]) => {
+                return prvServices.map((service: MedicalPackage) => {
                     return service.id === data?.id
                         ? {
                               ...data,
-                              clinic_name: service.clinic_name,
-                              category_name: service.clinic_name,
+                              clinic_name: service.clinicName,
+                              category_name: service.categoryName,
                               location: service.location,
                           }
                         : service;
