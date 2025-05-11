@@ -30,6 +30,7 @@ const INVOICE_MANAGEMENT_PATH = '/admin/invoice';
 const PROFILE_PATH = '/admin/profile';
 const SERVICE_MANAGEMENT_PATH = '/admin/service';
 const APPOINTMENT_DETAIL_PATH = '/admin/appointment-detail';
+const ADD_DOCTOR_PATH = '/admin/add-doctor';
 export {
     SERVICE_MANAGEMENT_PATH,
     PROFILE_PATH,
@@ -63,4 +64,5 @@ export {
     VIEW_WATCHED_SERVICE,
     VIEW_PATIENT_APPOINTMENT,
     APPOINTMENT_DETAIL_PATH,
+    ADD_DOCTOR_PATH,
 };

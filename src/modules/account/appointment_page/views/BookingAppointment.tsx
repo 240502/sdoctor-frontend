@@ -8,10 +8,7 @@ import 'dayjs/locale/vi';
 import { useEffect, useState } from 'react';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { BlockCalendar, InputAppointmentModal } from '../components';
-import {
-    patientProfileState,
-    patientProfileValue,
-} from '../../../../stores/patientAtom';
+import { patientProfileState } from '../../../../stores/patientAtom';
 import { getSocket } from '../../../../socket';
 import { useSearchParams } from 'react-router-dom';
 import SchedulesComp from '../components/SchedulesComp';
@@ -55,11 +52,7 @@ const BookingAppointment = () => {
 
     const doctorId = searchParams.get('doctorId');
 
-    const {
-        data: doctorResponse,
-        error: doctorError,
-        isFetching: isFetchingDoctor,
-    } = useFetchDoctorDetail(Number(doctorId));
+    const { data: doctorResponse } = useFetchDoctorDetail(Number(doctorId));
     const {
         data: scheduleReponse,
         error: scheduleError,

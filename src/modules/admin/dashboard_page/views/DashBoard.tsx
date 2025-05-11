@@ -140,31 +140,18 @@ const DashBoard = () => {
                 (label) => appointmentsByDay.get(label) || 0
             );
             series.push({
-                name: 'Revenue',
-                type: 'bar',
+                name: 'Appointment',
+                type: 'line',
                 data: appointmentSeriesData,
                 yAxisIndex: 0,
             });
         }
 
-        // // Cập nhật series
-        // const newSeries = [
-        //     {
-        //         name: 'Revenue',
-        //         type: 'bar',
-        //         data: revenueSeriesData,
-        //         yAxisIndex: 0,
-        //     },
-        //     {
-        //         name: 'Appointment',
-        //         type: 'line',
-        //         data: appointmentSeriesData,
-        //         yAxisIndex: 1,
-        //     },
-        // ];
         setChartSeries(series);
     }, [revenueRecords, appointmentRecords]);
-
+    useEffect(() => {
+        console.log('Series', chartSeries);
+    }, [chartSeries]);
     return (
         <div className="pe-3">
             {contextHolder}

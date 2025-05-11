@@ -129,24 +129,29 @@ const InputAppointmentModal = ({
                 queryParams.append('appointment', appointment.id.toString());
                 queryParams.append('payment', values.payment_method.toString());
                 const newInvoice = {
-                    appointmentId: appointment.id,
+                    appointmentId: appointment?.id,
                     doctorId: doctor.doctorId,
                     serviceId: doctor.serviceId,
                     amount: doctor.price,
-                    paymentMethod: paymentMethod,
+                    paymentMethod: values.payment_method,
                 };
+                console.log('new invoice', newInvoice);
+
                 CreateInvoice(newInvoice);
                 const newNotification = {
                     userId: doctor.doctorId,
                     message: 'Bạn có một lịch hẹn mới!',
                     appointmentId: appointment.id,
                 };
-                createNotification(newNotification);
-                if (values.payment_method === 1) {
-                    navigate(`/booking-success?${queryParams}`);
-                } else {
-                    createPayment.mutate(appointment.id);
-                }
+                createNotification(newNotification, {
+                    onSuccess() {
+                        if (values.payment_method === 1) {
+                            navigate(`/booking-success?${queryParams}`);
+                        } else {
+                            createPayment.mutate(appointment.id);
+                        }
+                    },
+                });
             },
             onError: (err) => {
                 openMessage('Error', 'Đặt lịch hẹn không thành công !');

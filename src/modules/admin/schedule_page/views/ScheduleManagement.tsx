@@ -70,7 +70,6 @@ const ScheduleManagement = () => {
         const dayNow = dayjs(date).day();
         const diff = activeDate === 0 ? dayNow - dayNow : activeDate - dayNow;
 
-        // Ví dụ: Cập nhật date thành ngày tiếp theo
         const newDate = dayjs(date).add(diff, 'day').format('YYYY-MM-DD');
         setDate(newDate); // Cập nhật state date
     };
@@ -85,21 +84,29 @@ const ScheduleManagement = () => {
 
     const handleTimes = async (times: Time[]) => {
         if (Number(activeDay) === dayjs().day()) {
-            const newTimes = handleTimeOverRealTime(timesResponse);
+            console.log('if 1');
 
+            const newTimes = handleTimeOverRealTime(timesResponse);
             setTimes(newTimes);
         }
 
         if (Number(activeDay) !== 0 && Number(activeDay) < dayjs().day()) {
+            console.log('if 2');
+
             const newTimes = times.map((time: Time) => {
                 return { ...time, disable: true };
             });
             setTimes(newTimes);
         }
-        if (Number(activeDay) === 0 || Number(activeDay) > dayjs().day()) {
+        if (Number(activeDay) > dayjs().day()) {
+            console.log('if 3');
+
             setTimes(times);
         }
     };
+    useEffect(() => {
+        console.log('times', times);
+    }, [times]);
 
     return (
         <div className="schedule-management">

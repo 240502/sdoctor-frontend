@@ -25,7 +25,7 @@ import ViewService from '../modules/account/medical_package_page';
 import { AppointmentManagement } from '../modules/admin/appointment_page';
 import { ClinicManagement } from '../modules/admin/clinic_page';
 import { DashBoard } from '../modules/admin/dashboard_page';
-import { DoctorManagement } from '../modules/admin/doctor_page';
+import { DoctorManagement, AddDoctor } from '../modules/admin/doctor_page';
 import { InvoiceManagement } from '../modules/admin/invoice_page';
 import { NewsManagement } from '../modules/admin/news_page';
 import { Profile } from '../modules/admin/profile_page';
@@ -62,9 +62,9 @@ import {
     PROFILE_PATH,
     SERVICE_MANAGEMENT_PATH,
     APPOINTMENT_DETAIL_PATH,
+    ADD_DOCTOR_PATH,
 } from './path';
 import AppointmentDetailPage from '../modules/admin/appointment_detail_page';
-
 export const publicRoutes = [
     {
         path: BOOKING_SUCCESS_PATH,
@@ -212,6 +212,11 @@ export const privateRoutes = [
     {
         path: SERVICE_MANAGEMENT_PATH,
         component: ServiceManagement,
+        layout: AdminLayout,
+    },
+    {
+        path: ADD_DOCTOR_PATH,
+        component: AddDoctor,
         layout: AdminLayout,
     },
 ];

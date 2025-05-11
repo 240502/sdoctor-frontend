@@ -21,12 +21,7 @@ import {
     SearchOutlined,
     UploadOutlined,
 } from '@ant-design/icons';
-import {
-    doctorService,
-    clinicService,
-    majorService,
-    doctorServiceService,
-} from '../../../../services';
+import { doctorService } from '../../../../services';
 import { DoctorCards } from '../components/DoctorCards';
 import { DoctorModal } from '../components/DoctorModal';
 import { ModalConfirmDelete } from '../components/ModalConfirmDelete';
@@ -42,10 +37,11 @@ import {
 import { useFetchAllDoctorService } from '../../../../hooks/doctor_service/useFetchAllDoctorService';
 import { RcFile } from 'antd/es/upload';
 import { NoticeType } from 'antd/es/message/interface';
-type NotificationType = 'success' | 'warning' | 'error';
+import { useNavigate } from 'react-router-dom';
 const { Option } = Select;
 
 const DoctorManagement = () => {
+    const navigate = useNavigate();
     const config = useRecoilValue(configValue);
     const [messageApi, contextHolder] = message.useMessage();
     const [options, setOptions] = useState({ clinicId: null, majorId: null });

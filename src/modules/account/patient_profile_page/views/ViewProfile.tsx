@@ -19,10 +19,11 @@ import { useRecoilState } from 'recoil';
 import { patientProfileState } from '../../../../stores/patientAtom';
 import { patientProfileService } from '../../../../services';
 import { PatientProfileLayout } from '../components/PatientProfileLayout';
-import { ModalConfirmDeletePatientProfile } from '../components/ModalConfirmDeletePatientProfile';
 import { PatientProfile } from '../../../../models/patient_profile';
 import { ProvinceType, DistrictType, WardType } from '../../../../models/other';
 import { ConfirmModal } from '../../../../components';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useQueryClient } from '@tanstack/react-query';
 type NotificationType = 'success' | 'error';
 const ViewProfile = () => {
     const [messageApi, messageContextHolder] = message.useMessage();
@@ -93,9 +94,9 @@ const ViewProfile = () => {
                 })
             ) {
                 const newProfile = {
-                    patient_name: values.patient_name,
-                    patient_phone: values.patient_phone,
-                    patient_email: values.patient_email,
+                    patientName: values.patientName,
+                    patientPhone: values.patientPhone,
+                    patientEmail: values.patientEmail,
                     birthday: dayjs(values.birthday).format('YYYY-MM-DD'),
                     province: values.province,
                     district: values.district,
@@ -135,6 +136,10 @@ const ViewProfile = () => {
             );
         }
     };
+    const [searchParams] = useSearchParams();
+    const queryClient = useQueryClient();
+
+    const navigate = useNavigate();
     const UpdateProfile = async (newProfile: any) => {
         try {
             const res = await patientProfileService.updatePatientProfile(
@@ -147,6 +152,12 @@ const ViewProfile = () => {
                 'Cập nhật thông tin thành công!'
             );
             setPatientProfile(newProfile);
+            const queryParams = new URLSearchParams();
+            queryParams.append('doctorId', searchParams.get('index') ?? '');
+            queryClient.invalidateQueries({
+                queryKey: ['useFetchProfiles', [newProfile.uuid]],
+            });
+            navigate(`/booking-appointment?${queryParams}`);
         } catch (err: any) {
             console.log(err.message);
             openNotificationWithIcon(

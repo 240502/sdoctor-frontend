@@ -95,8 +95,8 @@ const BookingSuccess = ({ receiptData }: any) => {
                         {/* Cost */}
                         <Text className="d-block text-center mb-1">
                             {data?.paymentMethod === 1
-                                ? ' Số tiền phải thanh toán:'
-                                : 'Số tiền đã thanh toán: '}{' '}
+                                ? ' Chi phí:'
+                                : 'Chi phí: '}{' '}
                             <Text strong>
                                 {data?.amount.toLocaleString(undefined)} VNĐ
                             </Text>

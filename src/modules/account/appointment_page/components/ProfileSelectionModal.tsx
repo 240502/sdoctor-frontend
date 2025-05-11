@@ -12,6 +12,7 @@ import {
     UserOutlined,
 } from '@ant-design/icons';
 import dayjs from 'dayjs';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 interface ProfileSelectionModalProps {
     visible: boolean;
     onClose: () => void;
@@ -33,8 +34,6 @@ const ProfileSelectionModal = ({
         error,
         isFetching,
     } = useFetchProfiles(JSON.parse(localStorage.getItem('uuids') || `[]`));
-    console.log(JSON.parse(localStorage.getItem('uuids') || `[]`));
-
     useEffect(() => {
         console.log('profiles', profiles);
     }, [profiles]);
@@ -85,6 +84,7 @@ const ProfileSelectionModal = ({
         setEditingProfile(profile);
         form.setFieldsValue(profile);
     };
+    const navigate = useNavigate();
 
     // // Xử lý gửi form (thêm hoặc chỉnh sửa)
     // const handleSubmit = (values: Profile) => {
@@ -94,6 +94,7 @@ const ProfileSelectionModal = ({
     //         createMutation.mutate(values);
     //     }
     // };
+    const [searchParams] = useSearchParams();
 
     return (
         <Modal
@@ -230,7 +231,25 @@ const ProfileSelectionModal = ({
                                                                 'rgba(54,153,255,.1)',
                                                         }}
                                                         className="ms-3 border-0"
-                                                        onClick={onClose}
+                                                        onClick={() => {
+                                                            const queryParams =
+                                                                new URLSearchParams();
+                                                            queryParams.append(
+                                                                'profile',
+                                                                profile.uuid.toString()
+                                                            );
+
+                                                            queryParams.append(
+                                                                'index',
+                                                                searchParams.get(
+                                                                    'doctorId'
+                                                                ) ?? ''
+                                                            );
+                                                            navigate(
+                                                                `/patient/profile?${queryParams.toString()}`
+                                                            );
+                                                            onClose();
+                                                        }}
                                                     >
                                                         <EditOutlined /> Chỉnh
                                                         sửa

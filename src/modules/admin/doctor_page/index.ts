@@ -1,3 +1,4 @@
 import React from 'react';
 const DoctorManagement = React.lazy(() => import('./views/DoctorManagement'));
-export { DoctorManagement };
+const AddDoctor = React.lazy(() => import('./components/AddDoctor'));
+export { DoctorManagement, AddDoctor };

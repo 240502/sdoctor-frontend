@@ -81,7 +81,7 @@ const BlockCalendar = ({ date, setDate }: any) => {
                 ) {
                     return true;
                 }
-                if (date.year() < now.year() || date.year() < now.month()) {
+                if (date.year() < now.year() || date.month() < now.month()) {
                     return true;
                 }
                 return false;
