@@ -19,3 +19,7 @@ export * from './payment';
 export * from './time';
 export * from './auth';
 export * from './patient_profile';
+export * from './others';
+export * from './doctor_expertise';
+export * from './doctor_experience';
+export * from './education';

@@ -7,12 +7,12 @@ import { useRecoilState } from 'recoil';
 import { doctorFilterOptions } from '../../../../stores';
 const BlockSpecialization = (): JSX.Element => {
     const navigate = useNavigate();
-    const { data, error, isFetching } = useFetchCommonSpecialization();
+    // const { data, error, isFetching } = useFetchCommonSpecialization();
     const [doctorOptions, setDoctorOptions] =
         useRecoilState(doctorFilterOptions);
     return (
         <div className="row block-category mt-4">
-            <Skeleton active loading={isFetching}>
+            {/* <Skeleton active loading={isFetching}>
                 <Row className="category-list" gutter={[16, 16]}>
                     {error ? (
                         <p className="fw-bold text-center mt-4 w-100">
@@ -56,7 +56,7 @@ const BlockSpecialization = (): JSX.Element => {
                         })
                     )}
                 </Row>
-            </Skeleton>
+            </Skeleton> */}
         </div>
     );
 };

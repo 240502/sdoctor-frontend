@@ -30,11 +30,6 @@ import { Clinic } from '../../../../models/clinic';
 import { useRecoilValue } from 'recoil';
 import { configValue } from '../../../../stores/userAtom';
 import { DoctorService } from '../../../../models/doctor_service';
-import {
-    useFetchClinicsWithPagination,
-    useFetchSpecializationsWithPagination,
-} from '../../../../hooks';
-import { useFetchAllDoctorService } from '../../../../hooks/doctor_service/useFetchAllDoctorService';
 import { RcFile } from 'antd/es/upload';
 import { NoticeType } from 'antd/es/message/interface';
 import { useNavigate } from 'react-router-dom';
@@ -42,6 +37,7 @@ const { Option } = Select;
 
 const DoctorManagement = () => {
     const navigate = useNavigate();
+
     const config = useRecoilValue(configValue);
     const [messageApi, contextHolder] = message.useMessage();
     const [options, setOptions] = useState({ clinicId: null, majorId: null });
@@ -59,11 +55,6 @@ const DoctorManagement = () => {
     const [searchContent, setSearchContent] = useState<string>('');
     const [filteredDoctors, setFilteredDoctors] = useState<Doctor[]>([]);
     const [totalItem, setTotalItem] = useState<number>(0);
-    const { data: clinicResponse } = useFetchClinicsWithPagination({});
-    const { data: doctorServiceResponse } = useFetchAllDoctorService();
-    const { data: specializationRes } = useFetchSpecializationsWithPagination(
-        {}
-    );
 
     const openMessage = (type: NoticeType, content: string) => {
         messageApi.open({

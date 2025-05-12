@@ -1,22 +1,42 @@
-import React, { useState } from 'react';
-import { Timeline, Button, Input, DatePicker, Form, Typography } from 'antd';
+import {
+    Timeline,
+    Button,
+    Input,
+    DatePicker,
+    Form,
+    Typography,
+    Row,
+    Col,
+} from 'antd';
+const { RangePicker } = DatePicker;
 import { Dayjs } from 'dayjs';
+import { useEffect } from 'react';
 
-interface Experience {
-    label: string;
-    children: string;
+interface DoctorExperienceTimelineProps {
+    experiences: any[];
+    handleChangeExperience: (experinece: any) => void;
 }
 
-const DoctorExperienceTimeline: React.FC = () => {
-    const [experiences, setExperiences] = useState<Experience[]>([]);
+const DoctorExperienceTimeline = ({
+    experiences,
+    handleChangeExperience,
+}: DoctorExperienceTimelineProps) => {
     const [form] = Form.useForm();
-
-    const onFinish = (values: { date: Dayjs; description: string }) => {
-        const newExperience: Experience = {
-            label: values.date.format('DD-MM-YYYY'),
-            children: values.description,
+    useEffect(() => {
+        console.log(experiences);
+    }, [experiences]);
+    const onFinish = (values: {
+        date: Dayjs[];
+        workplace: string;
+        position: string;
+    }) => {
+        const newExperience: any = {
+            position: values.position,
+            fromDate: values.date[0],
+            toDate: values.date[1],
+            workplace: values.workplace,
         };
-        setExperiences([...experiences, newExperience]);
+        handleChangeExperience(newExperience);
         form.resetFields();
     };
 
@@ -25,41 +45,88 @@ const DoctorExperienceTimeline: React.FC = () => {
             <Form
                 form={form}
                 onFinish={onFinish}
-                layout="inline"
+                layout="vertical"
                 style={{ marginBottom: 20 }}
             >
-                <Form.Item
-                    name="date"
-                    label="Ngày"
-                    rules={[{ required: true, message: 'Vui lòng chọn ngày!' }]}
-                >
-                    <DatePicker
-                        format="DD-MM-YYYY"
-                        placeholder="Chọn thời gian"
-                    />
-                </Form.Item>
-                <Form.Item
-                    name="description"
-                    label="Mô tả"
-                    rules={[
-                        { required: true, message: 'Vui lòng nhập mô tả!' },
-                    ]}
-                >
-                    <Input placeholder="Ví dụ: Làm việc tại Bệnh viện Chợ Rẫy" />
-                </Form.Item>
-                <Form.Item>
-                    <Button type="primary" htmlType="submit">
-                        Thêm kinh nghiệm
-                    </Button>
-                </Form.Item>
+                <Row gutter={24}>
+                    <Col span={12}>
+                        <Form.Item
+                            name="position"
+                            label="Vị trí"
+                            rules={[
+                                {
+                                    required: true,
+                                    message: 'Vui lòng vị trí!',
+                                },
+                            ]}
+                        >
+                            <Input placeholder="Ví dụ: Bác sĩ răng hàm mặt" />
+                        </Form.Item>
+                    </Col>
+                    <Col span={12}>
+                        <Form.Item
+                            name="workplace"
+                            label="Nơi làm việc"
+                            rules={[
+                                {
+                                    required: true,
+                                    message: 'Vui lòng nhập nơi làm việc!',
+                                },
+                            ]}
+                        >
+                            <Input placeholder="Ví dụ: Bệnh viện đại học y Hà Nội" />
+                        </Form.Item>
+                    </Col>
+                    <Col span={12}>
+                        <Form.Item
+                            name="date"
+                            label="Ngày bắt đầu - kết thúc"
+                            rules={[
+                                {
+                                    required: true,
+                                    message: 'Vui lòng chọn ngày!',
+                                },
+                            ]}
+                        >
+                            <RangePicker
+                                placeholder={['Từ năm', 'Đến năm']}
+                                className="w-100"
+                                picker="year"
+                            />
+                        </Form.Item>
+                    </Col>
+                    <Col span={24} className="text-center">
+                        <Form.Item>
+                            <Button type="primary" htmlType="submit">
+                                Thêm kinh nghiệm
+                            </Button>
+                        </Form.Item>
+                    </Col>
+                </Row>
             </Form>
 
-            {/* Hiển thị Timeline hoặc thông báo nếu chưa có kinh nghiệm */}
             {experiences.length > 0 ? (
-                <Timeline mode={'alternate'} items={experiences} />
+                <Timeline
+                    mode="alternate"
+                    items={experiences.map((experience: any) => ({
+                        children: (
+                            <>
+                                <Typography.Text className="fw-medium">
+                                    {experience.institution}
+                                </Typography.Text>
+                                <p>
+                                    {experience.position} tại{' '}
+                                    {experience.workplace}
+                                </p>
+                            </>
+                        ),
+                        label: ` ${experience.fromDate.format('DD-MM-YYYY')} -
+                                    ${experience.toDate.format('DD-MM-YYYY')}`,
+                    }))}
+                />
             ) : (
                 <Typography.Text>
-                    Chưa có kinh nghiệm nào. Vui lòng thêm kinh nghiệm mới.
+                    Chưa có quá trình đào tạo. Vui lòng thêm mới.
                 </Typography.Text>
             )}
         </>

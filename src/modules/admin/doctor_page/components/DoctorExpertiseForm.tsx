@@ -1,31 +1,25 @@
-import React, { useState } from 'react';
-import {
-    Timeline,
-    Button,
-    Input,
-    DatePicker,
-    Form,
-    Typography,
-    Row,
-    Col,
-    Tag,
-    Flex,
-} from 'antd';
+import { Button, Input, Form, Typography, Col, Tag, Flex } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
-interface Expertise {
-    label: string;
+import { useEffect } from 'react';
+
+interface DoctorExpertiseFormProps {
+    expertises: any[];
+    handleChangeExpertise: (experinece: any) => void;
 }
-const DoctorExpertiseForm = () => {
-    const [expertises, setExpertises] = useState<Expertise[]>([]);
+
+const DoctorExpertiseForm = ({
+    expertises,
+    handleChangeExpertise,
+}: DoctorExpertiseFormProps) => {
     const [form] = Form.useForm();
 
     const onFinish = (values: { description: string }) => {
-        const newExperience: Expertise = {
-            label: values.description,
-        };
-        setExpertises([...expertises, newExperience]);
+        handleChangeExpertise(values.description);
         form.resetFields();
     };
+    useEffect(() => {
+        console.log('expertises', expertises);
+    }, [expertises]);
 
     return (
         <>
@@ -51,10 +45,9 @@ const DoctorExpertiseForm = () => {
                 </Form.Item>
             </Form>
 
-            {/* Hiển thị Timeline hoặc thông báo nếu chưa có kinh nghiệm */}
-            {expertises.length > 0 ? (
+            {expertises?.length > 0 ? (
                 <Flex wrap gap="middle" align="stretch">
-                    {expertises.map((expertise) => {
+                    {expertises?.map((expertise) => {
                         return (
                             <Col span={6} className="gutter-row">
                                 <Tag
@@ -62,7 +55,7 @@ const DoctorExpertiseForm = () => {
                                     className="text-dark p-2 fw-medium rounded-5 shadow w-100 text-center text-wrap"
                                 >
                                     <Typography.Text>
-                                        {expertise.label}
+                                        {expertise}
                                     </Typography.Text>
                                 </Tag>
                             </Col>

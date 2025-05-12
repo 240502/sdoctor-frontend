@@ -1,43 +1,21 @@
-import {
-    Button,
-    Select,
-    Flex,
-    Modal,
-    Input,
-    InputRef,
-    Image,
-    Upload,
-    DatePicker,
-    Form,
-    Row,
-    Col,
-    ConfigProvider,
-    Tabs,
-} from 'antd';
-import TextArea from 'antd/es/input/TextArea';
-import DescriptionEditor from './DescriptionEditor';
-import { useEffect, useRef, useState } from 'react';
-import { Clinic } from '../../../../models/clinic';
-import { Major } from '../../../../models/major';
-const { Option } = Select;
-import { PlusOutlined } from '@ant-design/icons';
-import type { DatePickerProps, GetProp, UploadFile, UploadProps } from 'antd';
-import { doctorService, uploadService } from '../../../../services';
-type FileType = Parameters<GetProp<UploadProps, 'beforeUpload'>>[0];
+import { Button, Modal, Form, Tabs } from 'antd';
+import { useEffect, useState } from 'react';
+import { doctorService } from '../../../../services';
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
-import SummaryEditor from './SummaryEditor';
-import { DoctorService } from '../../../../models/doctor_service';
-import viVN from 'antd/lib/locale/vi_VN';
 import 'dayjs/locale/vi';
-import { ProvinceType, DistrictType, WardType } from '../../../../models/other';
-import axios from 'axios';
 import useCreateDoctor from '../../../../hooks/doctors/useCreateDoctor';
 import { TabsProps } from 'antd/lib';
 import { OverviewForm } from './OverviewForm';
 import DoctorExperienceTimeline from './DoctorExperienceTimeLine';
 import DoctorExpertiseForm from './DoctorExpertiseForm';
 import DoctorEducationTimeLine from './DoctorEducationTimeline';
+import { EducationCreateDto } from '../../../../models';
+import {
+    useCreateDoctorExperience,
+    useCreateDoctorExpertise,
+    useCreateEducation,
+} from '../../../../hooks';
 dayjs.locale('vi');
 dayjs.extend(customParseFormat);
 
@@ -46,35 +24,104 @@ export const DoctorModal = ({
     handleCloseDoctorModal,
     doctor,
     setDoctor,
-    openNotificationWithIcon,
+
+    openMessage,
     getDoctor,
     isUpdate,
-    clinics,
-    majors,
     config,
     doctorServices,
 }: any) => {
-    const [fileList, setFileList] = useState<UploadFile[]>([]);
-    const [form] = Form.useForm();
-    const [birthDayError, setBirthDayError] = useState<any>('');
-
     const createDoctor = useCreateDoctor(config);
-    // test
+    const [educations, setEducations] = useState<EducationCreateDto[]>([]);
+    const [expertises, setExpertises] = useState<string[]>([]);
+    const [experiences, setExperiences] = useState<any>([]);
+    const { mutate: createEducation } = useCreateEducation();
+    const { mutate: createDoctorExperience } = useCreateDoctorExperience();
+    const { mutate: createDoctorExpertise } = useCreateDoctorExpertise();
+    useEffect(() => {
+        console.log(doctor);
+    }, [doctor]);
+    const handleChangeDoctor = (newDoctor: any) => {
+        setDoctor({ ...newDoctor });
+    };
+    const handleChangeExperiences = (experience: any) => {
+        setExperiences([...experiences, experience]);
+    };
+    const handleChangeExpertise = (expertise: string) => {
+        setExpertises([...expertises, expertise]);
+    };
+    const handleChangeEducationForm = (education: EducationCreateDto) => {
+        const newEducations = [...educations, education];
+        setEducations(newEducations);
+    };
+
     const handleCreateNewDoctor = () => {
-        const data = {
-            password: 'abc',
-            role_id: 1,
-            email: 'sanghip200@gmail.com',
-            gender: 1,
-            phone: '0777435783',
-            image: '',
-            full_name: 'Nguyễn Văn Sang',
-            birthday: '2002-05-24',
-            city: 'Tỉnh Hưng Yên',
-            district: 'Huyện Khoái Châu',
-            commune: 'Xã An Vĩ',
-        };
-        createDoctor.mutate(data);
+        const today = dayjs();
+        // const age = today.diff(values.birthday, 'year'); // Tính tuổi bằng year
+        // console.log(age);
+        // if (age < 22) {
+        // }
+
+        if (isUpdate) {
+            const newDoctor = {
+                doctorId: doctor.doctorId,
+                fullName: doctor.fullName,
+                clinicId: doctor.clinic_id,
+                majorId: doctor.major_id,
+                summary: doctor.summary,
+                image: doctor.image,
+                email: doctor.email,
+                phone: doctor.phone,
+                address: doctor.address,
+                gender: doctor.gender,
+                title: doctor.title,
+                serviceId: doctor.serviceId,
+                introduction: doctor.introduction,
+                city: doctor.city,
+                district: doctor.district,
+                commune: doctor.commune,
+                birthday: dayjs(doctor.birthday).format('YYYY-MM-DD'),
+            };
+            UpdateDoctor(newDoctor);
+        } else {
+            const newDoctor = {
+                fullName: doctor.fullName,
+                clinicId: doctor.clinicId,
+                summary: doctor.summary,
+                image: doctor.image,
+                email: doctor.email,
+                phone: doctor.phone,
+                // address: doctor.address,
+                gender: doctor.gender,
+                title: doctor.title,
+                serviceId: doctor.serviceId,
+                introduction: doctor.introduction,
+                city: doctor.city,
+                district: doctor.district,
+                commune: doctor.commune,
+                birthday: dayjs(doctor.birthday).format('YYYY-MM-DD'),
+                department: doctor.department,
+            };
+            console.log('education', educations);
+            console.log('expertise', expertises);
+            console.log('experience', experiences);
+            console.log('new doctor', newDoctor);
+
+            createDoctor.mutate(newDoctor, {
+                onSuccess(data) {
+                    openMessage('success', 'Thêm bác sĩ thành công!');
+                    const doctorExpertises = {
+                        doctorId: data?.result,
+                        expertises,
+                    };
+                    createDoctorExpertise(doctorExpertises);
+                },
+                onError(error) {
+                    openMessage('error', 'Thêm bác sĩ không thành công!');
+                },
+            });
+            // CreateDoctor(newDoctor);
+        }
     };
     const tabs: TabsProps['items'] = [
         {
@@ -83,88 +130,43 @@ export const DoctorModal = ({
             children: (
                 <OverviewForm
                     doctor={doctor}
-                    clinics={clinics}
-                    majors={majors}
                     doctorServices={doctorServices}
                     setDoctor={setDoctor}
+                    handleChangeDoctor={handleChangeDoctor}
                 />
             ),
         },
         {
             key: '2',
             label: <h6>Kinh nghiệm</h6>,
-            children: <DoctorExperienceTimeline />,
+            children: (
+                <DoctorExperienceTimeline
+                    experiences={experiences}
+                    handleChangeExperience={handleChangeExperiences}
+                />
+            ),
         },
         {
             key: '3',
             label: <h6>Thế mạnh</h6>,
-            children: <DoctorExpertiseForm />,
+            children: (
+                <DoctorExpertiseForm
+                    expertises={expertises}
+                    handleChangeExpertise={handleChangeExpertise}
+                />
+            ),
         },
         {
             key: '4',
             label: <h6>Học vấn</h6>,
-            children: <DoctorEducationTimeLine />,
+            children: (
+                <DoctorEducationTimeLine
+                    educations={educations}
+                    handleChangeEducations={handleChangeEducationForm}
+                />
+            ),
         },
     ];
-
-    const onFinish = (values: any) => {
-        console.log('values', values);
-        const today = dayjs();
-        const age = today.diff(values.birthday, 'year'); // Tính tuổi bằng year
-        console.log(age);
-        if (age < 22) {
-            setBirthDayError('Bác sĩ phải đủ 24 tuổi trở lên!');
-        }
-
-        if (isUpdate) {
-            const newDoctor = {
-                doctor_id: doctor.doctor_id,
-                full_name: values.full_name,
-                clinic_id: values.clinic_id,
-                major_id: values.major_id,
-                summary: doctor.summary,
-                image: fileList[0].url ?? '',
-                email: values.email,
-                phone: values.phone,
-                address: values.address,
-                gender: values.gender,
-                title: values.title,
-                service_id: values.service_id,
-                introduction: doctor.introduction,
-                city: values.city,
-                district: values.district,
-                commune: values.commune,
-                birthday: dayjs(values.birthday)
-                    .format()
-                    .toString()
-                    .slice(0, 10),
-            };
-            UpdateDoctor(newDoctor);
-        } else {
-            const newDoctor = {
-                full_name: values.full_name,
-                clinic_id: values.clinic_id,
-                major_id: values.major_id,
-                summary: doctor.summary,
-                image: fileList[0].url ?? '',
-                email: values.email,
-                phone: values.phone,
-                address: values.address,
-                gender: values.gender,
-                title: values.title,
-                service_id: values.service_id,
-                introduction: doctor.introduction,
-                city: values.city,
-                district: values.district,
-                commune: values.commune,
-                birthday: dayjs(values.birthday)
-                    .format()
-                    .toString()
-                    .slice(0, 10),
-            };
-            CreateDoctor(newDoctor);
-        }
-    };
 
     const CreateDoctor = async (newDoctor: any) => {
         try {
@@ -219,7 +221,7 @@ export const DoctorModal = ({
                 <Button
                     type="primary"
                     htmlType="submit"
-                    onClick={() => form.submit()}
+                    onClick={() => handleCreateNewDoctor()}
                 >
                     {isUpdate ? 'Lưu' : 'Thêm mới'}
                 </Button>,

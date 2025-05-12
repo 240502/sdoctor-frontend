@@ -21,8 +21,15 @@ interface Education {
     certificate: string;
 }
 
-const DoctorEducationTimeLine: React.FC = () => {
-    const [educations, setEducations] = useState<Education[]>([]);
+interface DoctorEducationTimeLineProps {
+    educations: any[];
+    handleChangeEducations: (education: any) => void;
+}
+
+const DoctorEducationTimeLine = ({
+    educations,
+    handleChangeEducations,
+}: DoctorEducationTimeLineProps) => {
     const [form] = Form.useForm();
 
     const onFinish = (values: {
@@ -38,7 +45,7 @@ const DoctorEducationTimeLine: React.FC = () => {
             toDate: values.date[1],
             certificate: values.certificate,
         };
-        setEducations([...educations, newEducation]);
+        handleChangeEducations(newEducation);
         form.resetFields();
     };
 
@@ -105,8 +112,9 @@ const DoctorEducationTimeLine: React.FC = () => {
                             ]}
                         >
                             <RangePicker
-                                placeholder={['Từ ngày', 'Đến ngày']}
-                                format={'DD-MM-YYYY'}
+                                placeholder={['Từ năm', 'Đến năm']}
+                                className="w-100"
+                                picker="year"
                             />
                         </Form.Item>
                     </Col>
