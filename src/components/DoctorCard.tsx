@@ -55,7 +55,7 @@ const DoctorCard = ({ doctors }: any) => {
                                     {doctor.fullName}
                                 </h6>
                                 <p className="mb-0 opacity-75 text-center mb-3">
-                                    {doctor.majorName}
+                                    {doctor.departmentName}
                                 </p>
                                 <div className="text-center mb-5">
                                     <Tag color="blue" title="Tư vấn trực tiêp">

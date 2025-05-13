@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Doctor } from '../../../../models/doctor';
 import {
     Button,
@@ -33,11 +33,15 @@ import { DoctorService } from '../../../../models/doctor_service';
 import { RcFile } from 'antd/es/upload';
 import { NoticeType } from 'antd/es/message/interface';
 import { useNavigate } from 'react-router-dom';
+import {
+    useFetchAllDegrees,
+    useFetchAllDepartments,
+    useFetchClinicsWithPagination,
+} from '../../../../hooks';
+import { Department } from '../../../../models';
 const { Option } = Select;
 
 const DoctorManagement = () => {
-    const navigate = useNavigate();
-
     const config = useRecoilValue(configValue);
     const [messageApi, contextHolder] = message.useMessage();
     const [options, setOptions] = useState({ clinicId: null, majorId: null });
@@ -49,13 +53,13 @@ const DoctorManagement = () => {
     const [showDoctorModal, setShowDoctorModal] = useState<boolean>(false);
     const [showModalConfirm, setShowModalConfirm] = useState<boolean>(false);
     const [isUpdate, setIsUpdate] = useState<boolean>(false);
-    const [majors, setMajors] = useState<Major[]>([]);
-    const [clinics, setClinics] = useState<Clinic[]>([]);
     const [doctorServices, setDoctorServices] = useState<DoctorService[]>([]);
     const [searchContent, setSearchContent] = useState<string>('');
     const [filteredDoctors, setFilteredDoctors] = useState<Doctor[]>([]);
     const [totalItem, setTotalItem] = useState<number>(0);
-
+    const { data: clinicsResponse } = useFetchClinicsWithPagination({});
+    const { data: departments } = useFetchAllDepartments();
+    const { data: titles } = useFetchAllDegrees();
     const openMessage = (type: NoticeType, content: string) => {
         messageApi.open({
             type: type,
@@ -116,7 +120,9 @@ const DoctorManagement = () => {
         getDoctors();
         window.scrollTo(0, 0);
     }, [pageIndex, pageSize, options]);
-
+    const clinics = useMemo(() => {
+        return clinicsResponse?.pages.flatMap((page) => page.data) ?? [];
+    }, [clinicsResponse]);
     useEffect(() => {
         if (searchContent !== '') {
             const newDoctors = doctors.filter(
@@ -234,15 +240,17 @@ const DoctorManagement = () => {
                                     });
                                 }}
                             >
-                                {majors.map((major: Major) => (
-                                    <Option
-                                        key={major.id}
-                                        value={major.id}
-                                        label={major.name}
-                                    >
-                                        {major.name}
-                                    </Option>
-                                ))}
+                                {departments?.departments?.map(
+                                    (department: Department) => (
+                                        <Option
+                                            key={department.id}
+                                            value={department.id}
+                                            label={department.name}
+                                        >
+                                            {department.name}
+                                        </Option>
+                                    )
+                                )}
                             </Select>
                             <Flex className="col-4 justify-content-end position-relative">
                                 <Input
@@ -279,10 +287,6 @@ const DoctorManagement = () => {
                     openMessage={openMessage}
                     getDoctor={getDoctors}
                     isUpdate={isUpdate}
-                    clinics={clinics}
-                    majors={majors}
-                    config={config}
-                    doctorServices={doctorServices}
                 />
             )}
             {showModalConfirm && (

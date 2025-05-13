@@ -1,6 +1,5 @@
 import { Button, Modal, Form, Tabs } from 'antd';
 import { useEffect, useState } from 'react';
-import { doctorService } from '../../../../services';
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import 'dayjs/locale/vi';
@@ -10,7 +9,7 @@ import { OverviewForm } from './OverviewForm';
 import DoctorExperienceTimeline from './DoctorExperienceTimeLine';
 import DoctorExpertiseForm from './DoctorExpertiseForm';
 import DoctorEducationTimeLine from './DoctorEducationTimeline';
-import { EducationCreateDto } from '../../../../models';
+import { DoctorCreateDto, EducationCreateDto } from '../../../../models';
 import {
     useCreateDoctorExperience,
     useCreateDoctorExpertise,
@@ -24,23 +23,17 @@ export const DoctorModal = ({
     handleCloseDoctorModal,
     doctor,
     setDoctor,
-
     openMessage,
-    getDoctor,
     isUpdate,
-    config,
-    doctorServices,
 }: any) => {
-    const createDoctor = useCreateDoctor(config);
+    const createDoctor = useCreateDoctor();
     const [educations, setEducations] = useState<EducationCreateDto[]>([]);
     const [expertises, setExpertises] = useState<string[]>([]);
     const [experiences, setExperiences] = useState<any>([]);
     const { mutate: createEducation } = useCreateEducation();
     const { mutate: createDoctorExperience } = useCreateDoctorExperience();
     const { mutate: createDoctorExpertise } = useCreateDoctorExpertise();
-    useEffect(() => {
-        console.log(doctor);
-    }, [doctor]);
+
     const handleChangeDoctor = (newDoctor: any) => {
         setDoctor({ ...newDoctor });
     };
@@ -54,7 +47,27 @@ export const DoctorModal = ({
         const newEducations = [...educations, education];
         setEducations(newEducations);
     };
-
+    const handleCreatedEducation = (doctorId: number) => {
+        const educationPayload = {
+            doctorId: doctorId,
+            education: educations,
+        };
+        createEducation(educationPayload);
+    };
+    const handleCreateWorkExpertise = (doctorId: number) => {
+        const doctorExpertises = {
+            doctorId: doctorId,
+            expertises,
+        };
+        createDoctorExpertise(doctorExpertises);
+    };
+    const handleCreateWorkExperience = (doctorId: number) => {
+        const workExperiencePayload = {
+            doctorId,
+            workExperience: experiences,
+        };
+        createDoctorExperience(workExperiencePayload);
+    };
     const handleCreateNewDoctor = () => {
         const today = dayjs();
         // const age = today.diff(values.birthday, 'year'); // Tính tuổi bằng year
@@ -80,49 +93,45 @@ export const DoctorModal = ({
                 city: doctor.city,
                 district: doctor.district,
                 commune: doctor.commune,
-                birthday: dayjs(doctor.birthday).format('YYYY-MM-DD'),
+                birthday: doctor.birthday,
             };
-            UpdateDoctor(newDoctor);
+            // UpdateDoctor(newDoctor);
         } else {
-            const newDoctor = {
+            const newDoctor: DoctorCreateDto = {
                 fullName: doctor.fullName,
                 clinicId: doctor.clinicId,
                 summary: doctor.summary,
                 image: doctor.image,
                 email: doctor.email,
                 phone: doctor.phone,
-                // address: doctor.address,
                 gender: doctor.gender,
                 title: doctor.title,
-                serviceId: doctor.serviceId,
                 introduction: doctor.introduction,
                 city: doctor.city,
                 district: doctor.district,
                 commune: doctor.commune,
-                birthday: dayjs(doctor.birthday).format('YYYY-MM-DD'),
+                birthday: doctor.birthday,
                 department: doctor.department,
+                servicePrice: doctor.servicePrice,
             };
-            console.log('education', educations);
-            console.log('expertise', expertises);
-            console.log('experience', experiences);
-            console.log('new doctor', newDoctor);
-
             createDoctor.mutate(newDoctor, {
                 onSuccess(data) {
+                    handleCreatedEducation(data?.result);
+                    handleCreateWorkExperience(data?.result);
+                    handleCreateWorkExpertise(data?.result);
                     openMessage('success', 'Thêm bác sĩ thành công!');
-                    const doctorExpertises = {
-                        doctorId: data?.result,
-                        expertises,
-                    };
-                    createDoctorExpertise(doctorExpertises);
+                    handleCloseDoctorModal();
                 },
                 onError(error) {
+                    console.log('error', error);
+
                     openMessage('error', 'Thêm bác sĩ không thành công!');
                 },
             });
             // CreateDoctor(newDoctor);
         }
     };
+
     const tabs: TabsProps['items'] = [
         {
             key: '1',
@@ -130,7 +139,6 @@ export const DoctorModal = ({
             children: (
                 <OverviewForm
                     doctor={doctor}
-                    doctorServices={doctorServices}
                     setDoctor={setDoctor}
                     handleChangeDoctor={handleChangeDoctor}
                 />
@@ -167,49 +175,6 @@ export const DoctorModal = ({
             ),
         },
     ];
-
-    const CreateDoctor = async (newDoctor: any) => {
-        try {
-            const res = await doctorService.createDoctor(newDoctor, config);
-            console.log(res);
-            openNotificationWithIcon(
-                'success',
-                'Thông báo!',
-                'Thêm bác sĩ thành công!'
-            );
-            getDoctor();
-            handleCloseDoctorModal();
-        } catch (err: any) {
-            console.log(err.message);
-            openNotificationWithIcon(
-                'error',
-                'Thông báo!',
-                'Thêm bác sĩ không thành công!'
-            );
-        }
-    };
-
-    const UpdateDoctor = async (newDoctor: any) => {
-        try {
-            const res = await doctorService.updateDoctor(newDoctor, config);
-            console.log(res);
-            openNotificationWithIcon(
-                'success',
-                'Thông báo!',
-                'Sửa thông tin bác sĩ thành công!'
-            );
-            getDoctor();
-            handleCloseDoctorModal();
-        } catch (err: any) {
-            console.log(err.message);
-            openNotificationWithIcon(
-                'error',
-                'Thông báo!',
-                'Sửa thông tin không thành công!'
-            );
-        }
-    };
-
     return (
         <Modal
             className="w-75 input-doctor-modal"

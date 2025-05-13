@@ -22,7 +22,6 @@ export interface Doctor {
     userId: number;
     fullName: string;
     clinicId: number;
-    majorId: number;
     summary: String;
     image: string;
     email: string;
@@ -35,16 +34,32 @@ export interface Doctor {
     commune: string;
     gender: number;
     title: string;
-    price: number;
+    servicePrice: number;
     views: number;
     clinicName: string;
     location: string;
-    majorName: string;
+    departmentName: string;
     schedule: Schedules[];
     introduction: string;
     birthday: Date;
-    serviceId: number;
-    serviceName: string;
     averageStar: number;
     titleName: string;
+}
+
+export interface DoctorCreateDto {
+    email: string;
+    gender: number;
+    phone: string;
+    image: string;
+    fullName: string;
+    birthday: string;
+    city: string;
+    district: string;
+    commune: string;
+    clinicId: number;
+    summary: string;
+    title: string;
+    introduction: string;
+    department: number;
+    servicePrice: number;
 }

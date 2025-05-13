@@ -25,7 +25,7 @@ const doctorService = {
         const res: any = await apiClient.post('/doctor/view', data);
         return res?.data;
     },
-    async getDoctorById(id: number): Promise<any> {
+    async getDoctorById(id: number | null): Promise<any> {
         const res: any = await apiClient.get('/doctor/get-by-id/' + id);
         return res?.data;
     },
@@ -36,9 +36,9 @@ const doctorService = {
         return res;
     },
 
-    async createDoctor(data: any, config: any): Promise<any> {
-        const res = await apiClient.post('/doctor/create', data, config);
-        return res;
+    async createDoctor(data: any): Promise<any> {
+        const res = await apiClient.post('/doctor/create', data);
+        return res.data;
     },
     async updateDoctor(data: any, config: any): Promise<any> {
         const res = await apiClient.put('/doctor/update', data, config);

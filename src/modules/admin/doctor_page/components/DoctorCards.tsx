@@ -2,6 +2,7 @@ import { Card, Button, Flex, Pagination } from 'antd';
 import { Doctor } from '../../../../models/doctor';
 import { baseURL } from '../../../../constants/api';
 import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
+import { useNavigate } from 'react-router-dom';
 
 export const DoctorCards = ({
     doctors,
@@ -12,6 +13,8 @@ export const DoctorCards = ({
     handleClickEditBtn,
     handleClickBtnDelete,
 }: any) => {
+    const navigate = useNavigate();
+
     return (
         <>
             <Flex wrap>
@@ -39,19 +42,28 @@ export const DoctorCards = ({
                                         />
                                     }
                                 >
-                                    <p className="mb-1">{doctor.title}</p>
                                     <h6>
                                         <h6 className="text-decoration-none text-dark">
                                             {doctor.fullName}
                                         </h6>
                                     </h6>
                                     <p style={{ height: '20px' }}>
-                                        {doctor.fullName}
+                                        {doctor.departmentName}
                                     </p>
                                     <Flex className="justify-content-between mt-2 ">
                                         <Button
                                             className="border-0 text-success p-0"
                                             onClick={() => {
+                                                const queryParams =
+                                                    new URLSearchParams();
+
+                                                queryParams.append(
+                                                    'doctorId',
+                                                    doctor.doctorId.toString()
+                                                );
+                                                navigate(
+                                                    `/admin/doctor?${queryParams}`
+                                                );
                                                 handleClickEditBtn(doctor);
                                             }}
                                         >

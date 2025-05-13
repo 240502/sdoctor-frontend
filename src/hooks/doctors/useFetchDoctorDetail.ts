@@ -1,8 +1,7 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { doctorService } from '../../services';
-import { Doctor } from '../../models';
 
-export const useFetchDoctorDetail = (doctorId: number) => {
+export const useFetchDoctorDetail = (doctorId: number | null) => {
     // const queryClient = useQueryClient();
     // const doctorsResponse: any = queryClient.getQueryData([
     //     'fetchDoctorsWithPaginationAndFilters',
@@ -18,12 +17,13 @@ export const useFetchDoctorDetail = (doctorId: number) => {
     //         return doctor;
     //     }
     // }
+
     return useQuery({
         queryKey: ['useFetchDoctorDetail', JSON.stringify(doctorId)],
         queryFn: async () => {
             return await doctorService.getDoctorById(doctorId);
         },
-        retry: 1,
+        retry: false,
         staleTime: 1000 * 60 * 5,
         gcTime: 1000 * 60 * 10,
         placeholderData: (previousData) => previousData ?? [],

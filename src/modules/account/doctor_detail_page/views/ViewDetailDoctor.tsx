@@ -95,7 +95,7 @@ const ViewDetailDoctor = () => {
                                             {data?.titleName} {data?.fullName}
                                         </h5>
                                         <Tag color="blue">
-                                            {data?.majorName}
+                                            {data?.departmentName}
                                         </Tag>
                                         <p className="doctor-location mt-2">
                                             <EnvironmentOutlined className="me-2"></EnvironmentOutlined>

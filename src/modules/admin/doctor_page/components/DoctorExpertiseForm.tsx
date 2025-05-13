@@ -1,6 +1,8 @@
 import { Button, Input, Form, Typography, Col, Tag, Flex } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { useEffect } from 'react';
+import { useFetchDoctorExpertiseByDoctorId } from '../../../../hooks';
+import { useSearchParams } from 'react-router-dom';
 
 interface DoctorExpertiseFormProps {
     expertises: any[];
@@ -11,8 +13,17 @@ const DoctorExpertiseForm = ({
     expertises,
     handleChangeExpertise,
 }: DoctorExpertiseFormProps) => {
-    const [form] = Form.useForm();
+    const [searchParams] = useSearchParams();
 
+    const { data } = useFetchDoctorExpertiseByDoctorId(
+        searchParams.get('doctorId')
+            ? Number(searchParams.get('doctorId'))
+            : null
+    );
+    const [form] = Form.useForm();
+    useEffect(() => {
+        console.log('useFetchDoctorExpertiseByDoctorId', data);
+    }, [data]);
     const onFinish = (values: { description: string }) => {
         handleChangeExpertise(values.description);
         form.resetFields();

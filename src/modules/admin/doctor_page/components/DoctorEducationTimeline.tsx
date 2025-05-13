@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     Timeline,
     Button,
@@ -8,16 +8,19 @@ import {
     Typography,
     Row,
     Col,
+    Skeleton,
 } from 'antd';
 const { RangePicker } = DatePicker;
 
-import { Dayjs } from 'dayjs';
+import dayjs, { Dayjs } from 'dayjs';
+import { useFetchEducationByDoctorId } from '../../../../hooks';
+import { useSearchParams } from 'react-router-dom';
 
 interface Education {
     degree: string;
     institution: string;
-    fromDate: Dayjs;
-    toDate: Dayjs;
+    fromYear: number;
+    toYear: number;
     certificate: string;
 }
 
@@ -30,6 +33,16 @@ const DoctorEducationTimeLine = ({
     educations,
     handleChangeEducations,
 }: DoctorEducationTimeLineProps) => {
+    const [searchParams] = useSearchParams();
+
+    const { data, isFetching, isError } = useFetchEducationByDoctorId(
+        searchParams.get('doctorId')
+            ? Number(searchParams.get('doctorId'))
+            : null
+    );
+    useEffect(() => {
+        console.log('educations', data);
+    }, [data]);
     const [form] = Form.useForm();
 
     const onFinish = (values: {
@@ -41,8 +54,8 @@ const DoctorEducationTimeLine = ({
         const newEducation: Education = {
             degree: values.degree,
             institution: values.institution,
-            fromDate: values.date[0],
-            toDate: values.date[1],
+            fromYear: values.date[0].year(),
+            toYear: values.date[1].year(),
             certificate: values.certificate,
         };
         handleChangeEducations(newEducation);
@@ -50,109 +63,106 @@ const DoctorEducationTimeLine = ({
     };
 
     return (
-        <>
-            <Form
-                form={form}
-                onFinish={onFinish}
-                layout="inline"
-                style={{ marginBottom: 20 }}
-            >
-                <Row gutter={[24, 24]}>
-                    <Col span={12}>
-                        <Form.Item
-                            name="degree"
-                            label="Loại bằng cấp"
-                            rules={[
-                                {
-                                    required: true,
-                                    message: 'Vui lòng nhập loại bằng cấp!',
-                                },
-                            ]}
-                        >
-                            <Input placeholder="Ví dụ: Thạc sĩ" />
-                        </Form.Item>
-                    </Col>
-                    <Col span={12}>
-                        <Form.Item
-                            name="institution"
-                            label="Cơ sở đào tạo"
-                            rules={[
-                                {
-                                    required: true,
-                                    message: 'Vui lòng nhập tên cơ sở đào tạo!',
-                                },
-                            ]}
-                        >
-                            <Input placeholder="Ví dụ: Trường Đại học Y Dược Tp. HCM" />
-                        </Form.Item>
-                    </Col>
-                    <Col span={12}>
-                        <Form.Item
-                            name="certificate"
-                            label="Chuyên khoa"
-                            rules={[
-                                {
-                                    required: true,
-                                    message: 'Vui lòng nhập chuyên khoa!',
-                                },
-                            ]}
-                        >
-                            <Input placeholder="Ví dụ: Sản Phụ Khoa" />
-                        </Form.Item>
-                    </Col>
-                    <Col span={12}>
-                        <Form.Item
-                            name="date"
-                            label="Ngày bắt đầu - kết thúc"
-                            rules={[
-                                {
-                                    required: true,
-                                    message: 'Vui lòng chọn ngày!',
-                                },
-                            ]}
-                        >
-                            <RangePicker
-                                placeholder={['Từ năm', 'Đến năm']}
-                                className="w-100"
-                                picker="year"
-                            />
-                        </Form.Item>
-                    </Col>
-                    <Col span={24} className="text-center">
-                        <Form.Item>
-                            <Button type="primary" htmlType="submit">
-                                Thêm kinh nghiệm
-                            </Button>
-                        </Form.Item>
-                    </Col>
-                </Row>
-            </Form>
+        <Skeleton loading={isFetching} active>
+            {!isFetching && (
+                <>
+                    <Form
+                        form={form}
+                        onFinish={onFinish}
+                        layout="inline"
+                        style={{ marginBottom: 20 }}
+                    >
+                        <Row gutter={[24, 24]}>
+                            <Col span={12}>
+                                <Form.Item
+                                    name="degree"
+                                    label="Loại bằng cấp"
+                                    rules={[
+                                        {
+                                            required: true,
+                                            message:
+                                                'Vui lòng nhập loại bằng cấp!',
+                                        },
+                                    ]}
+                                >
+                                    <Input placeholder="Ví dụ: Thạc sĩ" />
+                                </Form.Item>
+                            </Col>
+                            <Col span={12}>
+                                <Form.Item
+                                    name="institution"
+                                    label="Cơ sở đào tạo"
+                                    rules={[
+                                        {
+                                            required: true,
+                                            message:
+                                                'Vui lòng nhập tên cơ sở đào tạo!',
+                                        },
+                                    ]}
+                                >
+                                    <Input placeholder="Ví dụ: Trường Đại học Y Dược Tp. HCM" />
+                                </Form.Item>
+                            </Col>
 
-            {educations.length > 0 ? (
-                <Timeline
-                    mode="alternate"
-                    items={educations.map((education: Education) => ({
-                        children: (
-                            <>
-                                <Typography.Text className="fw-medium">
-                                    {education.institution}
-                                </Typography.Text>
-                                <p>
-                                    tốt nghiệp {education.degree}{' '}
-                                    {education.certificate}
-                                </p>
-                            </>
-                        ),
-                        label: ` ${education.fromDate.format('DD-MM-YYYY')} -
-                                    ${education.toDate.format('DD-MM-YYYY')}`,
-                    }))}
-                />
-            ) : (
-                <Typography.Text>
-                    Chưa có quá trình đào tạo. Vui lòng thêm mới.
-                </Typography.Text>
+                            <Col span={12}>
+                                <Form.Item
+                                    name="date"
+                                    label="Bắt đầu - kết thúc"
+                                    rules={[
+                                        {
+                                            required: true,
+                                            message: 'Vui lòng chọn ngày!',
+                                        },
+                                    ]}
+                                >
+                                    <RangePicker
+                                        placeholder={['Từ năm', 'Đến năm']}
+                                        className="w-100"
+                                        picker="year"
+                                    />
+                                </Form.Item>
+                            </Col>
+                            <Col span={24} className="text-center">
+                                <Form.Item>
+                                    <Button type="primary" htmlType="submit">
+                                        Thêm kinh nghiệm
+                                    </Button>
+                                </Form.Item>
+                            </Col>
+                        </Row>
+                    </Form>
+
+                    {educations.length > 0 || !isError ? (
+                        <Timeline
+                            mode="alternate"
+                            items={educations.map((education: Education) => ({
+                                children: (
+                                    <>
+                                        <Typography.Text className="fw-medium">
+                                            {education.institution}
+                                        </Typography.Text>
+                                        <p>
+                                            tốt nghiệp {education.degree}{' '}
+                                            {education.certificate}
+                                        </p>
+                                    </>
+                                ),
+                                label: ` ${education.fromYear} -
+                                    ${
+                                        education.toYear === dayjs().year()
+                                            ? 'Nay'
+                                            : education.toYear
+                                    }`,
+                            }))}
+                        />
+                    ) : (
+                        <Typography.Text>
+                            Chưa có quá trình đào tạo. Vui lòng thêm mới.
+                        </Typography.Text>
+                    )}
+                </>
             )}
-        </>
+        </Skeleton>
     );
 };
 
