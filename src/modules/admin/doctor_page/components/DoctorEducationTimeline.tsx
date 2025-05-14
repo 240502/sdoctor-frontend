@@ -9,12 +9,16 @@ import {
     Row,
     Col,
     Skeleton,
+    Popconfirm,
 } from 'antd';
 const { RangePicker } = DatePicker;
 
 import dayjs, { Dayjs } from 'dayjs';
-import { useFetchEducationByDoctorId } from '../../../../hooks';
-import { useSearchParams } from 'react-router-dom';
+import {
+    useCreateEducation,
+    useFetchEducationByDoctorId,
+} from '../../../../hooks';
+import { NoticeType } from 'antd/es/message/interface';
 
 interface Education {
     degree: string;
@@ -25,23 +29,21 @@ interface Education {
 }
 
 interface DoctorEducationTimeLineProps {
-    educations: any[];
-    handleChangeEducations: (education: any) => void;
+    doctorId: number | null;
+    openMessage: (type: NoticeType, content: string) => void;
 }
 
 const DoctorEducationTimeLine = ({
-    educations,
-    handleChangeEducations,
+    doctorId,
+    openMessage,
 }: DoctorEducationTimeLineProps) => {
-    const [searchParams] = useSearchParams();
+    const { data, isFetching, isError } = useFetchEducationByDoctorId(doctorId);
+    const [isUpdate, setIsUpdate] = useState<boolean>(false);
+    const [educations, setEducations] = useState<any>([]);
+    const { mutate: createEducation } = useCreateEducation();
 
-    const { data, isFetching, isError } = useFetchEducationByDoctorId(
-        searchParams.get('doctorId')
-            ? Number(searchParams.get('doctorId'))
-            : null
-    );
     useEffect(() => {
-        console.log('educations', data);
+        setEducations(data);
     }, [data]);
     const [form] = Form.useForm();
 
@@ -51,17 +53,123 @@ const DoctorEducationTimeLine = ({
         date: Dayjs[];
         certificate: string;
     }) => {
-        const newEducation: Education = {
-            degree: values.degree,
-            institution: values.institution,
-            fromYear: values.date[0].year(),
-            toYear: values.date[1].year(),
-            certificate: values.certificate,
-        };
-        handleChangeEducations(newEducation);
+        if (isUpdate) {
+        } else {
+            const newEducation: Education = {
+                degree: values.degree,
+                institution: values.institution,
+                fromYear: values.date[0].year(),
+                toYear: values.date[1].year(),
+                certificate: values.certificate,
+            };
+            if (educations?.length > 0) {
+                setEducations([...educations, newEducation]);
+            } else {
+                setEducations([newEducation]);
+            }
+            createEducation(
+                { doctorId, education: [newEducation] },
+                {
+                    onSuccess() {
+                        openMessage('success', 'Thêm thành công!');
+                    },
+                    onError() {
+                        openMessage('error', 'Thêm không thành công!');
+                    },
+                }
+            );
+        }
+
         form.resetFields();
     };
-
+    const handleTimeLineItemClick = (education: any) => {
+        setIsUpdate(true);
+        form.setFieldsValue({
+            degree: education.degree,
+            institution: education.institution,
+            date: [
+                dayjs(`${education.fromYear}-01-01`),
+                education.toYear ? dayjs(`${education.toYear}-01-01`) : dayjs(),
+            ],
+        });
+    };
+    const timelineItems =
+        data?.length > 0 && !isError
+            ? data.map((education: any) => ({
+                  children: (
+                      <div>
+                          <div
+                              style={{ cursor: 'pointer' }}
+                              onClick={() => handleTimeLineItemClick(education)}
+                          >
+                              <Typography.Text className="fw-medium">
+                                  {education.institution}
+                              </Typography.Text>
+                              <p>
+                                  tốt nghiệp {education.degree}{' '}
+                                  {education.certificate}
+                              </p>
+                          </div>
+                          <Popconfirm
+                              title="Bạn có chắc muốn xóa thông tin  này?"
+                              //   onConfirm={() =>
+                              //       handleDeleteExperience(
+                              //           experience.experience_id
+                              //       )
+                              //   }
+                              okText="Xóa"
+                              cancelText="Hủy"
+                          >
+                              <Button type="link" danger>
+                                  Xóa
+                              </Button>
+                          </Popconfirm>
+                      </div>
+                  ),
+                  label: `${education.fromYear} - ${
+                      education.toYear === dayjs().year() || !education.toYear
+                          ? 'Nay'
+                          : education.toYear
+                  }`,
+              }))
+            : educations?.length > 0 &&
+              educations?.map((education: any) => ({
+                  children: (
+                      <div>
+                          <div
+                              style={{ cursor: 'pointer' }}
+                              onClick={() => handleTimeLineItemClick(education)}
+                          >
+                              <Typography.Text className="fw-medium">
+                                  {education.institution}
+                              </Typography.Text>
+                              <p>
+                                  tốt nghiệp {education.degree}{' '}
+                                  {education.certificate}
+                              </p>
+                          </div>
+                          <Popconfirm
+                              title="Bạn có chắc muốn xóa thông tin  này?"
+                              //   onConfirm={() =>
+                              //       handleDeleteExperience(
+                              //           experience.experience_id
+                              //       )
+                              //   }
+                              okText="Xóa"
+                              cancelText="Hủy"
+                          >
+                              <Button type="link" danger>
+                                  Xóa
+                              </Button>
+                          </Popconfirm>
+                      </div>
+                  ),
+                  label: `${education.fromYear} - ${
+                      education.toYear === dayjs().year() || !education.toYear
+                          ? 'Nay'
+                          : education.toYear
+                  }`,
+              }));
     return (
         <Skeleton loading={isFetching} active>
             {!isFetching && (
@@ -132,29 +240,8 @@ const DoctorEducationTimeLine = ({
                         </Row>
                     </Form>
 
-                    {educations.length > 0 || !isError ? (
-                        <Timeline
-                            mode="alternate"
-                            items={educations.map((education: Education) => ({
-                                children: (
-                                    <>
-                                        <Typography.Text className="fw-medium">
-                                            {education.institution}
-                                        </Typography.Text>
-                                        <p>
-                                            tốt nghiệp {education.degree}{' '}
-                                            {education.certificate}
-                                        </p>
-                                    </>
-                                ),
-                                label: ` ${education.fromYear} -
-                                    ${
-                                        education.toYear === dayjs().year()
-                                            ? 'Nay'
-                                            : education.toYear
-                                    }`,
-                            }))}
-                        />
+                    {educations?.length > 0 || !isError ? (
+                        <Timeline mode="alternate" items={timelineItems} />
                     ) : (
                         <Typography.Text>
                             Chưa có quá trình đào tạo. Vui lòng thêm mới.

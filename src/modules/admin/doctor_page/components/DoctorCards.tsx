@@ -14,7 +14,6 @@ export const DoctorCards = ({
     handleClickBtnDelete,
 }: any) => {
     const navigate = useNavigate();
-
     return (
         <>
             <Flex wrap>
@@ -33,22 +32,22 @@ export const DoctorCards = ({
                                             className="object-fit-cover"
                                             alt="example"
                                             src={
-                                                doctor.image.includes(
+                                                doctor?.image?.includes(
                                                     'cloudinary'
                                                 )
-                                                    ? String(doctor.image)
-                                                    : baseURL + doctor.image
+                                                    ? String(doctor?.image)
+                                                    : baseURL + doctor?.image
                                             }
                                         />
                                     }
                                 >
                                     <h6>
                                         <h6 className="text-decoration-none text-dark">
-                                            {doctor.fullName}
+                                            {doctor?.fullName}
                                         </h6>
                                     </h6>
                                     <p style={{ height: '20px' }}>
-                                        {doctor.departmentName}
+                                        {doctor?.departmentName}
                                     </p>
                                     <Flex className="justify-content-between mt-2 ">
                                         <Button

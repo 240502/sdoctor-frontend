@@ -6,5 +6,6 @@ export const useFetchDoctorExperienceByDoctorId = (doctorId: number | null) => {
         queryKey: ['useFetchDoctorExperienceByDoctorId', doctorId],
         queryFn: () =>
             workExperienceService.getWorkExperienceByDoctorId(doctorId),
+        retry: false,
     });
 };

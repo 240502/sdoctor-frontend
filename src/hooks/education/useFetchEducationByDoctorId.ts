@@ -5,5 +5,6 @@ export const useFetchEducationByDoctorId = (doctorId: number | null) => {
     return useQuery({
         queryKey: ['useFetchEducationByDoctorId', doctorId],
         queryFn: () => educationService.getEducationByDoctorId(doctorId),
+        retry: false,
     });
 };

@@ -6,5 +6,6 @@ export const useFetchDoctorExpertiseByDoctorId = (doctorId: number | null) => {
         queryKey: ['useFetchDoctorExpertiseByDoctorId', doctorId],
         queryFn: () =>
             doctorExpertisesService.getDoctorExpertisesByDoctorId(doctorId),
+        retry: false,
     });
 };

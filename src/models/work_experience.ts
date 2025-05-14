@@ -3,14 +3,14 @@ export interface WorkExperience {
     doctorId: number;
     workplace: string;
     position: string;
-    startDate: Date;
-    endDate: Date;
+    fromYear: Date;
+    toYear: Date;
 }
 
 export interface WorkExperienceCreateDto {
     doctorId: number;
     workplace: string;
     position: string;
-    startDate: Date;
-    endDate: Date;
+    fromYear: Date;
+    toYear: Date;
 }

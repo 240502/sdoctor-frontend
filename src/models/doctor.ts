@@ -22,13 +22,13 @@ export interface Doctor {
     userId: number;
     fullName: string;
     clinicId: number;
-    summary: String;
+    summary: string;
     image: string;
     email: string;
     phone: string;
     password: string;
-    createdAt: Date;
-    updatedAt: Date;
+    createdAt: string;
+    updatedAt: string;
     city: string;
     district: string;
     commune: string;
@@ -41,9 +41,10 @@ export interface Doctor {
     departmentName: string;
     schedule: Schedules[];
     introduction: string;
-    birthday: Date;
+    birthday: string;
     averageStar: number;
     titleName: string;
+    department: number;
 }
 
 export interface DoctorCreateDto {

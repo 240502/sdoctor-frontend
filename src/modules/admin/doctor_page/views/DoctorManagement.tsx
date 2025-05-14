@@ -42,7 +42,8 @@ import { Department } from '../../../../models';
 const { Option } = Select;
 
 const DoctorManagement = () => {
-    const config = useRecoilValue(configValue);
+    const navigate = useNavigate();
+
     const [messageApi, contextHolder] = message.useMessage();
     const [options, setOptions] = useState({ clinicId: null, majorId: null });
     const [doctors, setDoctors] = useState<Doctor[]>([]);
@@ -53,13 +54,11 @@ const DoctorManagement = () => {
     const [showDoctorModal, setShowDoctorModal] = useState<boolean>(false);
     const [showModalConfirm, setShowModalConfirm] = useState<boolean>(false);
     const [isUpdate, setIsUpdate] = useState<boolean>(false);
-    const [doctorServices, setDoctorServices] = useState<DoctorService[]>([]);
     const [searchContent, setSearchContent] = useState<string>('');
     const [filteredDoctors, setFilteredDoctors] = useState<Doctor[]>([]);
     const [totalItem, setTotalItem] = useState<number>(0);
     const { data: clinicsResponse } = useFetchClinicsWithPagination({});
     const { data: departments } = useFetchAllDepartments();
-    const { data: titles } = useFetchAllDegrees();
     const openMessage = (type: NoticeType, content: string) => {
         messageApi.open({
             type: type,
@@ -77,6 +76,7 @@ const DoctorManagement = () => {
         setDoctor(doctor);
     };
     const handleCloseDoctorModal = () => {
+        navigate(`/admin/doctor`);
         setShowDoctorModal(false);
         setDoctor({} as Doctor);
         setIsUpdate(false);
@@ -296,7 +296,6 @@ const DoctorManagement = () => {
                     doctorId={doctor?.doctorId}
                     openMessage={openMessage}
                     getDoctors={getDoctors}
-                    config={config}
                 />
             )}
         </div>

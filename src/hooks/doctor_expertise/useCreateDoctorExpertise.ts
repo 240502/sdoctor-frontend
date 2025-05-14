@@ -6,5 +6,6 @@ export const useCreateDoctorExpertise = () => {
         mutationKey: ['useCreateDoctorExpertise'],
         mutationFn: (payload: any) =>
             doctorExpertisesService.createDoctorExpertises(payload),
+        retry: false,
     });
 };

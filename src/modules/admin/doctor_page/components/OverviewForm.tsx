@@ -10,6 +10,7 @@ import {
     ConfigProvider,
     Select,
     Skeleton,
+    Button,
 } from 'antd';
 import type { GetProp, UploadFile, UploadProps } from 'antd';
 import { useEffect, useMemo, useState } from 'react';
@@ -17,18 +18,14 @@ import {
     Clinic,
     Department,
     DistrictType,
+    Doctor,
+    DoctorCreateDto,
     ProvinceType,
     WardType,
 } from '../../../../models';
 import { uploadService } from '../../../../services';
 import dayjs from 'dayjs';
 type FileType = Parameters<GetProp<UploadProps, 'beforeUpload'>>[0];
-
-interface OverviewFormProps {
-    doctor: any;
-    setDoctor: any;
-    handleChangeDoctor: (doctor: any) => void;
-}
 
 import viVN from 'antd/lib/locale/vi_VN';
 import 'dayjs/locale/vi';
@@ -46,25 +43,30 @@ import {
 } from '../../../../hooks';
 import { Degrees } from '../../../../models/degrees';
 import { useSearchParams } from 'react-router-dom';
+import useCreateDoctor from '../../../../hooks/doctors/useCreateDoctor';
 
 dayjs.locale('vi');
 dayjs.extend(customParseFormat);
-export const OverviewForm = ({ doctor, setDoctor }: OverviewFormProps) => {
+export const OverviewForm = ({ openMessage, handleOverviewSaved }: any) => {
     const [searchParams] = useSearchParams();
+    const [doctor, setDoctor] = useState<Doctor>({} as Doctor);
+    const [isUpdate, setIsUpdate] = useState<boolean>(false);
     const { data: doctorDetail, isFetching } = useFetchDoctorDetail(
         searchParams.get('doctorId')
             ? Number(searchParams.get('doctorId'))
             : null
     );
-
+    useEffect(() => {
+        console.log('doctorDetail', doctorDetail);
+    }, [doctorDetail]);
     const [form] = Form.useForm();
+    const createDoctor = useCreateDoctor();
+
     const [birthDayError, setBirthDayError] = useState<any>('');
     const { data: clinicsResponse } = useFetchClinicsWithPagination({});
     const { data: departments } = useFetchAllDepartments();
     const { data: titles } = useFetchAllDegrees();
-    useEffect(() => {
-        console.log('doctor', doctor);
-    }, [doctor]);
+
     const handleChangeDoctorEditor = (data: any) => {
         setDoctor({ ...doctor, introduction: data });
     };
@@ -125,21 +127,78 @@ export const OverviewForm = ({ doctor, setDoctor }: OverviewFormProps) => {
     };
 
     useEffect(() => {
-        if (doctor?.image && doctor?.image?.includes('cloudinary')) {
+        if (
+            doctorDetail?.image &&
+            doctorDetail?.image?.includes('cloudinary')
+        ) {
             const file: UploadFile[] = [
                 {
                     uid: '-1',
                     name: 'image.png',
                     status: 'done',
-                    url: doctor?.image,
+                    url: doctorDetail?.image,
                 },
             ];
             setFileList(file);
         }
-    }, []);
+        setDoctor(doctorDetail);
+    }, [doctorDetail]);
+    const handleCreateNewDoctor = () => {
+        const today = dayjs();
+        if (isUpdate) {
+            const newDoctor = {
+                doctorId: doctor.doctorId,
+                fullName: doctor.fullName,
+                clinicId: doctor.clinicId,
+                summary: doctor.summary,
+                image: doctor.image,
+                email: doctor.email,
+                phone: doctor.phone,
+                gender: doctor.gender,
+                title: doctor.title,
+                introduction: doctor.introduction,
+                city: doctor.city,
+                district: doctor.district,
+                commune: doctor.commune,
+                birthday: doctor.birthday,
+            };
+            // UpdateDoctor(newDoctor);
+        } else {
+            const newDoctor: DoctorCreateDto = {
+                fullName: doctor.fullName,
+                clinicId: doctor.clinicId,
+                summary: doctor.summary,
+                image: doctor.image,
+                email: doctor.email,
+                phone: doctor.phone,
+                gender: doctor.gender,
+                title: doctor.title,
+                introduction: doctor.introduction,
+                city: doctor.city,
+                district: doctor.district,
+                commune: doctor.commune,
+                birthday: doctor.birthday,
+                department: doctor.department,
+                servicePrice: doctor.servicePrice,
+            };
+            createDoctor.mutate(newDoctor, {
+                onSuccess(data) {
+                    openMessage('success', 'Thêm bác sĩ thành công!');
+                    handleOverviewSaved(data?.result);
+                },
+                onError(error) {
+                    console.log('error', error);
+                    openMessage('error', 'Thêm bác sĩ không thành công!');
+                },
+            });
+        }
+    };
     const clinics = useMemo(() => {
         return clinicsResponse?.pages.flatMap((page) => page.data) ?? [];
     }, [clinicsResponse]);
+    useEffect(() => {
+        console.log('doctor', doctor);
+    }, [doctor]);
     return (
         <Skeleton active loading={isFetching}>
             {!isFetching && (
@@ -306,7 +365,10 @@ export const OverviewForm = ({ doctor, setDoctor }: OverviewFormProps) => {
                                 <Select
                                     placeholder="Chọn giới tính"
                                     onChange={(value: string) =>
-                                        setDoctor({ ...doctor, gender: value })
+                                        setDoctor({
+                                            ...doctor,
+                                            gender: Number(value),
+                                        })
                                     }
                                 >
                                     <Select.Option value="1">Nam</Select.Option>
@@ -609,6 +671,15 @@ export const OverviewForm = ({ doctor, setDoctor }: OverviewFormProps) => {
                             doctor={doctorDetail}
                         />
                     </Form.Item>
+                    <Row>
+                        <Button
+                            type="primary"
+                            htmlType="submit"
+                            onClick={() => handleCreateNewDoctor()}
+                        >
+                            {isUpdate ? 'Lưu' : 'Thêm mới'}
+                        </Button>
+                    </Row>
                 </Form>
             )}
         </Skeleton>

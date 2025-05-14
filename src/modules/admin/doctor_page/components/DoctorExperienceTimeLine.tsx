@@ -8,58 +8,134 @@ import {
     Row,
     Col,
     Skeleton,
+    Popconfirm,
 } from 'antd';
 const { RangePicker } = DatePicker;
 import dayjs, { Dayjs } from 'dayjs';
-import { useEffect } from 'react';
-import { useFetchDoctorExperienceByDoctorId } from '../../../../hooks';
-import { useSearchParams } from 'react-router-dom';
+import {
+    useCreateDoctorExperience,
+    useFetchDoctorExperienceByDoctorId,
+} from '../../../../hooks';
+import { WorkExperience } from '../../../../models';
+import { useEffect, useState } from 'react';
+import { NoticeType } from 'antd/es/message/interface';
 
 interface DoctorExperienceTimelineProps {
-    experiences: any[];
-    handleChangeExperience: (experinece: any) => void;
+    doctorId: number | null;
+    openMessage: (type: NoticeType, content: string) => void;
 }
 
 const DoctorExperienceTimeline = ({
-    experiences,
-    handleChangeExperience,
+    doctorId,
+    openMessage,
 }: DoctorExperienceTimelineProps) => {
-    const [searchParams] = useSearchParams();
-
-    const { data, isFetching, isError } = useFetchDoctorExperienceByDoctorId(
-        searchParams.get('doctorId')
-            ? Number(searchParams.get('doctorId'))
-            : null
-    );
+    const [experiences, setExperiences] = useState<any>([]);
+    const [isUpdate, setIsUpdate] = useState<boolean>(false);
+    const { data, isFetching, isError } =
+        useFetchDoctorExperienceByDoctorId(doctorId);
+    useEffect(() => {
+        setExperiences(data);
+    }, [data]);
     const [form] = Form.useForm();
+    const { mutate: createDoctorExperience } = useCreateDoctorExperience();
 
+    const handleTimeLineItemClick = (experience: WorkExperience) => {
+        setIsUpdate(true);
+        form.setFieldsValue({
+            position: experience.position,
+            workplace: experience.workplace,
+            date: [
+                dayjs(`${experience.fromYear}-01-01`),
+                experience.toYear
+                    ? dayjs(`${experience.toYear}-01-01`)
+                    : dayjs(),
+            ],
+        });
+    };
     const onFinish = (values: {
         date: Dayjs[];
         workplace: string;
         position: string;
     }) => {
-        const newExperience: any = {
-            position: values.position,
-            fromYear: values.date[0].year(),
-            toYear: values.date[1].year(),
-            workplace: values.workplace,
-        };
-        handleChangeExperience(newExperience);
+        if (isUpdate) {
+            const newExperience: any = {
+                id: 0,
+                doctorId: doctorId,
+                position: values.position,
+                fromYear: values.date[0].year(),
+                toYear: values.date[1].year(),
+                workplace: values.workplace,
+            };
+        } else {
+            const newExperience: any = {
+                doctorId: doctorId,
+                position: values.position,
+                fromYear: values.date[0].year(),
+                toYear: values.date[1].year(),
+                workplace: values.workplace,
+            };
+            if (experiences?.length > 0) {
+                setExperiences([...experiences, newExperience]);
+            } else {
+                setExperiences([newExperience]);
+            }
+            createDoctorExperience(
+                {
+                    doctorId,
+                    workExperience: [newExperience],
+                },
+                {
+                    onSuccess() {
+                        openMessage('success', 'Thêm kinh nghiệm thành công!');
+                    },
+                    onError() {
+                        openMessage(
+                            'error',
+                            'Thêm kinh nghiệm không thành công!'
+                        );
+                    },
+                }
+            );
+        }
         form.resetFields();
     };
-    // Chuẩn bị items cho Timeline
+    useEffect(() => {
+        console.log('ex', experiences);
+    }, [experiences]);
     const timelineItems =
-        data?.length > 0 && !isError
-            ? data.map((experience: any) => ({
+        data?.length > 0
+            ? data?.map((experience: any) => ({
                   children: (
-                      <>
-                          <Typography.Text className="fw-medium">
-                              {experience.workplace}
-                          </Typography.Text>
-                          <p>
-                              {experience.position} tại {experience.workplace}
-                          </p>
-                      </>
+                      <div>
+                          <div
+                              style={{ cursor: 'pointer' }}
+                              onClick={() =>
+                                  handleTimeLineItemClick(experience)
+                              }
+                          >
+                              <Typography.Text className="fw-medium">
+                                  {experience.workplace}
+                              </Typography.Text>
+                              <p>
+                                  {experience.position} tại{' '}
+                                  {experience.workplace}
+                              </p>
+                          </div>
+                          <Popconfirm
+                              title="Bạn có chắc muốn xóa kinh nghiệm này?"
+                              //   onConfirm={() =>
+                              //       handleDeleteExperience(
+                              //           experience.experience_id
+                              //       )
+                              //   }
+                              okText="Xóa"
+                              cancelText="Hủy"
+                          >
+                              <Button type="link" danger>
+                                  Xóa
+                              </Button>
+                          </Popconfirm>
+                      </div>
                   ),
                   label: `${experience.fromYear} - ${
                       experience.toYear === dayjs().year() || !experience.toYear
@@ -67,16 +143,39 @@ const DoctorExperienceTimeline = ({
                           : experience.toYear
                   }`,
               }))
-            : experiences.map((experience: any) => ({
+            : experiences?.length > 0 &&
+              experiences?.map((experience: any) => ({
                   children: (
-                      <>
-                          <Typography.Text className="fw-medium">
-                              {experience.workplace}
-                          </Typography.Text>
-                          <p>
-                              {experience.position} tại {experience.workplace}
-                          </p>
-                      </>
+                      <div>
+                          <div
+                              style={{ cursor: 'pointer' }}
+                              onClick={() =>
+                                  handleTimeLineItemClick(experience)
+                              }
+                          >
+                              <Typography.Text className="fw-medium">
+                                  {experience.workplace}
+                              </Typography.Text>
+                              <p>
+                                  {experience.position} tại{' '}
+                                  {experience.workplace}
+                              </p>
+                          </div>
+                          <Popconfirm
+                              title="Bạn có chắc muốn xóa kinh nghiệm này?"
+                              //   onConfirm={() =>
+                              //       handleDeleteExperience(
+                              //           experience.experience_id
+                              //       )
+                              //   }
+                              okText="Xóa"
+                              cancelText="Hủy"
+                          >
+                              <Button type="link" danger>
+                                  Xóa
+                              </Button>
+                          </Popconfirm>
+                      </div>
                   ),
                   label: `${experience.fromYear} - ${
                       experience.toYear === dayjs().year() || !experience.toYear
@@ -145,7 +244,9 @@ const DoctorExperienceTimeline = ({
                             <Col span={24} className="text-center">
                                 <Form.Item>
                                     <Button type="primary" htmlType="submit">
-                                        Thêm kinh nghiệm
+                                        {isUpdate
+                                            ? 'Cập nhật'
+                                            : 'Thêm kinh nghiệm'}
                                     </Button>
                                 </Form.Item>
                             </Col>
