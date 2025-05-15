@@ -8,11 +8,12 @@ import {
     Flex,
     Popconfirm,
 } from 'antd';
-import { PlusOutlined } from '@ant-design/icons';
 import { useEffect, useState } from 'react';
 import {
     useCreateDoctorExpertise,
+    useDeleteDoctorExpertise,
     useFetchDoctorExpertiseByDoctorId,
+    useUpdateDoctorExpertise,
 } from '../../../../hooks';
 import { NoticeType } from 'antd/es/message/interface';
 interface DoctorExpertiseFormProps {
@@ -25,8 +26,12 @@ const DoctorExpertiseForm = ({
     openMessage,
 }: DoctorExpertiseFormProps) => {
     const [expertises, setExpertises] = useState<string[]>([]);
+    const { mutate: updateExpertise } = useUpdateDoctorExpertise();
+    const { mutate: deleteExpertise } = useDeleteDoctorExpertise();
+    const [updatedId, setUpdatedId] = useState<number | null>(null);
     const [isUpdate, setIsUpdate] = useState<boolean>(false);
-    const { data, isError } = useFetchDoctorExpertiseByDoctorId(doctorId);
+    const { data, isError, refetch } =
+        useFetchDoctorExpertiseByDoctorId(doctorId);
     const [form] = Form.useForm();
     const { mutate: createDoctorExpertise } = useCreateDoctorExpertise();
 
@@ -35,13 +40,20 @@ const DoctorExpertiseForm = ({
     }, [data]);
     const onFinish = (values: { description: string }) => {
         if (isUpdate) {
+            const payload: any = {
+                id: updatedId,
+                expertise: values.description,
+            };
+            updateExpertise(payload, {
+                onSuccess() {
+                    openMessage('success', 'Cập nhật thành công!');
+                    refetch();
+                },
+                onError() {
+                    openMessage('error', 'Cập nhật không thành công!');
+                },
+            });
         } else {
-            if (expertises?.length > 0) {
-                const newExpertise = [...expertises, values.description];
-                setExpertises(newExpertise);
-            } else {
-                setExpertises([values.description]);
-            }
             handleCreateDoctorExpertise(values.description);
         }
         form.resetFields();
@@ -54,6 +66,7 @@ const DoctorExpertiseForm = ({
         createDoctorExpertise(doctorExpertises, {
             onSuccess() {
                 openMessage('success', 'Thêm thành công!');
+                refetch();
             },
             onError() {
                 openMessage('error', 'Thêm không thành công!');
@@ -62,6 +75,7 @@ const DoctorExpertiseForm = ({
     };
     const handleTimeLineItemClick = (expertise: any) => {
         setIsUpdate(true);
+        setUpdatedId(expertise.id);
         form.setFieldsValue({
             description: expertise.expertise,
         });
@@ -93,11 +107,23 @@ const DoctorExpertiseForm = ({
                     <Form.Item>
                         <Popconfirm
                             title="Bạn có chắc muốn xóa thông tin này?"
-                            //   onConfirm={() =>
-                            //       handleDeleteExperience(
-                            //           experience.experience_id
-                            //       )
-                            //   }
+                            onConfirm={() =>
+                                deleteExpertise(updatedId, {
+                                    onSuccess() {
+                                        openMessage(
+                                            'success',
+                                            'Xóa thành công!'
+                                        );
+                                        refetch();
+                                    },
+                                    onError() {
+                                        openMessage(
+                                            'error',
+                                            'Xóa không thành công!'
+                                        );
+                                    },
+                                })
+                            }
                             okText="Xóa"
                             cancelText="Hủy"
                         >

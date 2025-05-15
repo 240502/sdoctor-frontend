@@ -14,9 +14,11 @@ const { RangePicker } = DatePicker;
 import dayjs, { Dayjs } from 'dayjs';
 import {
     useCreateDoctorExperience,
+    useDeleteWorkExperience,
     useFetchDoctorExperienceByDoctorId,
+    useUpdateWorkExperience,
 } from '../../../../hooks';
-import { WorkExperience } from '../../../../models';
+import { WorkExperience, WorkExperienceUpdateDto } from '../../../../models';
 import { useEffect, useState } from 'react';
 import { NoticeType } from 'antd/es/message/interface';
 
@@ -30,8 +32,12 @@ const DoctorExperienceTimeline = ({
     openMessage,
 }: DoctorExperienceTimelineProps) => {
     const [experiences, setExperiences] = useState<any>([]);
+    const { mutate: updateExperience } = useUpdateWorkExperience();
+    const { mutate: deleteExperience } = useDeleteWorkExperience();
+
     const [isUpdate, setIsUpdate] = useState<boolean>(false);
-    const { data, isFetching, isError } =
+    const [updatedId, setUpdatedId] = useState<number | null>(null);
+    const { data, isFetching, refetch } =
         useFetchDoctorExperienceByDoctorId(doctorId);
     useEffect(() => {
         setExperiences(data);
@@ -41,6 +47,7 @@ const DoctorExperienceTimeline = ({
 
     const handleTimeLineItemClick = (experience: WorkExperience) => {
         setIsUpdate(true);
+        setUpdatedId(experience.experienceId);
         form.setFieldsValue({
             position: experience.position,
             workplace: experience.workplace,
@@ -58,14 +65,22 @@ const DoctorExperienceTimeline = ({
         position: string;
     }) => {
         if (isUpdate) {
-            const newExperience: any = {
-                id: 0,
-                doctorId: doctorId,
+            const newExperience: WorkExperienceUpdateDto = {
+                id: updatedId,
                 position: values.position,
                 fromYear: values.date[0].year(),
                 toYear: values.date[1].year(),
                 workplace: values.workplace,
             };
+            updateExperience(newExperience, {
+                onSuccess() {
+                    openMessage('success', 'Cập nhật thành công!');
+                    refetch();
+                },
+                onError() {
+                    openMessage('error', 'Cập nhật không thành công!');
+                },
+            });
         } else {
             const newExperience: any = {
                 doctorId: doctorId,
@@ -74,11 +89,6 @@ const DoctorExperienceTimeline = ({
                 toYear: values.date[1].year(),
                 workplace: values.workplace,
             };
-            if (experiences?.length > 0) {
-                setExperiences([...experiences, newExperience]);
-            } else {
-                setExperiences([newExperience]);
-            }
             createDoctorExperience(
                 {
                     doctorId,
@@ -87,6 +97,7 @@ const DoctorExperienceTimeline = ({
                 {
                     onSuccess() {
                         openMessage('success', 'Thêm kinh nghiệm thành công!');
+                        refetch();
                     },
                     onError() {
                         openMessage(
@@ -117,17 +128,29 @@ const DoctorExperienceTimeline = ({
                                   {experience.workplace}
                               </Typography.Text>
                               <p>
-                                  {experience.position} tại{' '}
+                                  {experience.position} tại
                                   {experience.workplace}
                               </p>
                           </div>
                           <Popconfirm
                               title="Bạn có chắc muốn xóa kinh nghiệm này?"
-                              //   onConfirm={() =>
-                              //       handleDeleteExperience(
-                              //           experience.experience_id
-                              //       )
-                              //   }
+                              onConfirm={() =>
+                                  deleteExperience(experience.experienceId, {
+                                      onSuccess() {
+                                          openMessage(
+                                              'success',
+                                              'Xóa thành công!'
+                                          );
+                                          refetch();
+                                      },
+                                      onError() {
+                                          openMessage(
+                                              'error',
+                                              'Xóa không thành công!'
+                                          );
+                                      },
+                                  })
+                              }
                               okText="Xóa"
                               cancelText="Hủy"
                           >

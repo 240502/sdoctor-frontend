@@ -14,3 +14,11 @@ export interface EducationCreateDto {
     startDate: Date;
     endDate: Date;
 }
+
+export interface EducationUpdateDto {
+    id: number | null;
+    degree: string;
+    institution: string;
+    fromYear: number;
+    toYear: number;
+}

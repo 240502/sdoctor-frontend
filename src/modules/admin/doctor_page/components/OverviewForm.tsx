@@ -20,6 +20,7 @@ import {
     DistrictType,
     Doctor,
     DoctorCreateDto,
+    DoctorUpdateDto,
     ProvinceType,
     WardType,
 } from '../../../../models';
@@ -44,13 +45,17 @@ import {
 import { Degrees } from '../../../../models/degrees';
 import { useSearchParams } from 'react-router-dom';
 import useCreateDoctor from '../../../../hooks/doctors/useCreateDoctor';
+import { useUpdateDoctor } from '../../../../hooks/doctors/useUpdateDoctor';
 
 dayjs.locale('vi');
 dayjs.extend(customParseFormat);
-export const OverviewForm = ({ openMessage, handleOverviewSaved }: any) => {
+export const OverviewForm = ({
+    openMessage,
+    handleOverviewSaved,
+    isUpdateDoctor,
+}: any) => {
     const [searchParams] = useSearchParams();
     const [doctor, setDoctor] = useState<Doctor>({} as Doctor);
-    const [isUpdate, setIsUpdate] = useState<boolean>(false);
     const { data: doctorDetail, isFetching } = useFetchDoctorDetail(
         searchParams.get('doctorId')
             ? Number(searchParams.get('doctorId'))
@@ -61,7 +66,7 @@ export const OverviewForm = ({ openMessage, handleOverviewSaved }: any) => {
     }, [doctorDetail]);
     const [form] = Form.useForm();
     const createDoctor = useCreateDoctor();
-
+    const { mutate: updateDoctor } = useUpdateDoctor();
     const [birthDayError, setBirthDayError] = useState<any>('');
     const { data: clinicsResponse } = useFetchClinicsWithPagination({});
     const { data: departments } = useFetchAllDepartments();
@@ -144,9 +149,8 @@ export const OverviewForm = ({ openMessage, handleOverviewSaved }: any) => {
         setDoctor(doctorDetail);
     }, [doctorDetail]);
     const handleCreateNewDoctor = () => {
-        const today = dayjs();
-        if (isUpdate) {
-            const newDoctor = {
+        if (isUpdateDoctor) {
+            const newDoctor: DoctorUpdateDto = {
                 doctorId: doctor.doctorId,
                 fullName: doctor.fullName,
                 clinicId: doctor.clinicId,
@@ -160,9 +164,20 @@ export const OverviewForm = ({ openMessage, handleOverviewSaved }: any) => {
                 city: doctor.city,
                 district: doctor.district,
                 commune: doctor.commune,
-                birthday: doctor.birthday,
+                birthday: doctor.birthday.split('T')[0],
+                department: doctor.department,
+                servicePrice: doctor.servicePrice,
             };
-            // UpdateDoctor(newDoctor);
+
+            updateDoctor(newDoctor, {
+                onSuccess() {
+                    openMessage('success', 'Cập nhật thành công!');
+                },
+                onError(error) {
+                    console.log('error', error);
+                    openMessage('error', 'Cập nhật không thành công!');
+                },
+            });
         } else {
             const newDoctor: DoctorCreateDto = {
                 fullName: doctor.fullName,
@@ -677,7 +692,7 @@ export const OverviewForm = ({ openMessage, handleOverviewSaved }: any) => {
                             htmlType="submit"
                             onClick={() => handleCreateNewDoctor()}
                         >
-                            {isUpdate ? 'Lưu' : 'Thêm mới'}
+                            {isUpdateDoctor ? 'Lưu' : 'Thêm mới'}
                         </Button>
                     </Row>
                 </Form>

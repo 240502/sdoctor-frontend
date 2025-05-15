@@ -125,14 +125,10 @@ const DoctorManagement = () => {
     }, [clinicsResponse]);
     useEffect(() => {
         if (searchContent !== '') {
-            const newDoctors = doctors.filter(
-                (doctor: Doctor) =>
-                    doctor.fullName
-                        .toLocaleLowerCase()
-                        .includes(searchContent.toLocaleLowerCase()) ||
-                    doctor.title
-                        .toLocaleLowerCase()
-                        .includes(searchContent.toLocaleLowerCase())
+            const newDoctors = doctors.filter((doctor: Doctor) =>
+                doctor.fullName
+                    .toLocaleLowerCase()
+                    .includes(searchContent.toLocaleLowerCase())
             );
             setFilteredDoctors(newDoctors);
             setPageCount(Math.ceil(newDoctors.length / pageSize));

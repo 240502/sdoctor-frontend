@@ -16,9 +16,12 @@ const { RangePicker } = DatePicker;
 import dayjs, { Dayjs } from 'dayjs';
 import {
     useCreateEducation,
+    useDeleteEducation,
     useFetchEducationByDoctorId,
+    useUpdateEducation,
 } from '../../../../hooks';
 import { NoticeType } from 'antd/es/message/interface';
+import { EducationUpdateDto } from '../../../../models';
 
 interface Education {
     degree: string;
@@ -37,11 +40,14 @@ const DoctorEducationTimeLine = ({
     doctorId,
     openMessage,
 }: DoctorEducationTimeLineProps) => {
-    const { data, isFetching, isError } = useFetchEducationByDoctorId(doctorId);
+    const { data, isFetching, isError, refetch } =
+        useFetchEducationByDoctorId(doctorId);
     const [isUpdate, setIsUpdate] = useState<boolean>(false);
     const [educations, setEducations] = useState<any>([]);
     const { mutate: createEducation } = useCreateEducation();
-
+    const { mutate: updateEducation } = useUpdateEducation();
+    const { mutate: deleteEducation } = useDeleteEducation();
+    const [updatedId, setUpdatedId] = useState<number | null>(null);
     useEffect(() => {
         setEducations(data);
     }, [data]);
@@ -54,6 +60,22 @@ const DoctorEducationTimeLine = ({
         certificate: string;
     }) => {
         if (isUpdate) {
+            const newEducation: EducationUpdateDto = {
+                id: updatedId,
+                degree: values.degree,
+                institution: values.institution,
+                fromYear: values.date[0].year(),
+                toYear: values.date[1].year(),
+            };
+            updateEducation(newEducation, {
+                onSuccess() {
+                    openMessage('success', 'Cập nhật thành công!');
+                    refetch();
+                },
+                onError() {
+                    openMessage('error', 'Cập nhật không thành công!');
+                },
+            });
         } else {
             const newEducation: Education = {
                 degree: values.degree,
@@ -62,16 +84,13 @@ const DoctorEducationTimeLine = ({
                 toYear: values.date[1].year(),
                 certificate: values.certificate,
             };
-            if (educations?.length > 0) {
-                setEducations([...educations, newEducation]);
-            } else {
-                setEducations([newEducation]);
-            }
+
             createEducation(
                 { doctorId, education: [newEducation] },
                 {
                     onSuccess() {
                         openMessage('success', 'Thêm thành công!');
+                        refetch();
                     },
                     onError() {
                         openMessage('error', 'Thêm không thành công!');
@@ -84,6 +103,7 @@ const DoctorEducationTimeLine = ({
     };
     const handleTimeLineItemClick = (education: any) => {
         setIsUpdate(true);
+        setUpdatedId(education.educationId);
         form.setFieldsValue({
             degree: education.degree,
             institution: education.institution,
@@ -112,11 +132,23 @@ const DoctorEducationTimeLine = ({
                           </div>
                           <Popconfirm
                               title="Bạn có chắc muốn xóa thông tin  này?"
-                              //   onConfirm={() =>
-                              //       handleDeleteExperience(
-                              //           experience.experience_id
-                              //       )
-                              //   }
+                              onConfirm={() =>
+                                  deleteEducation(education.educationId, {
+                                      onSuccess() {
+                                          openMessage(
+                                              'success',
+                                              'Xóa thành công!'
+                                          );
+                                          refetch();
+                                      },
+                                      onError() {
+                                          openMessage(
+                                              'error',
+                                              'Xóa không thành công!'
+                                          );
+                                      },
+                                  })
+                              }
                               okText="Xóa"
                               cancelText="Hủy"
                           >
@@ -150,11 +182,23 @@ const DoctorEducationTimeLine = ({
                           </div>
                           <Popconfirm
                               title="Bạn có chắc muốn xóa thông tin  này?"
-                              //   onConfirm={() =>
-                              //       handleDeleteExperience(
-                              //           experience.experience_id
-                              //       )
-                              //   }
+                              onConfirm={() =>
+                                  deleteEducation(education.educationId, {
+                                      onSuccess() {
+                                          openMessage(
+                                              'success',
+                                              'Xóa thành công!'
+                                          );
+                                          refetch();
+                                      },
+                                      onError() {
+                                          openMessage(
+                                              'error',
+                                              'Xóa không thành công!'
+                                          );
+                                      },
+                                  })
+                              }
                               okText="Xóa"
                               cancelText="Hủy"
                           >
@@ -233,7 +277,7 @@ const DoctorEducationTimeLine = ({
                             <Col span={24} className="text-center">
                                 <Form.Item>
                                     <Button type="primary" htmlType="submit">
-                                        Thêm kinh nghiệm
+                                        Lưu
                                     </Button>
                                 </Form.Item>
                             </Col>

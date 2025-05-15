@@ -42,6 +42,7 @@ const FormTabs = ({ openMessage, isUpdateDoctor }: any) => {
                 <OverviewForm
                     openMessage={openMessage}
                     handleOverviewSaved={handleOverviewSaved}
+                    isUpdateDoctor={isUpdateDoctor}
                 />
             ),
         },

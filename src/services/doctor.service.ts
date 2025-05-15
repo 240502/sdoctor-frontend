@@ -1,5 +1,5 @@
 import apiClient from '../constants/api';
-import { Doctor, DoctorOptions } from '../models/doctor';
+import { Doctor, DoctorOptions, DoctorUpdateDto } from '../models/doctor';
 
 const doctorService = {
     async getDoctorByUserId(userId: number): Promise<any> {
@@ -40,8 +40,8 @@ const doctorService = {
         const res = await apiClient.post('/doctor/create', data);
         return res.data;
     },
-    async updateDoctor(data: any, config: any): Promise<any> {
-        const res = await apiClient.put('/doctor/update', data, config);
+    async updateDoctor(data: DoctorUpdateDto): Promise<any> {
+        const res = await apiClient.put('/doctor/update', data);
         return res;
     },
     async deleteDoctor(id: any, config: any): Promise<any> {
