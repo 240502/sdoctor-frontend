@@ -6,13 +6,14 @@ interface Pagination {
 }
 export interface DoctorOptions extends Pagination {
     clinicId: number | null;
-    majorIds: number[];
-    doctorServiceIds: number[];
-    startPrice: number | null;
-    endPrice: number | null;
-    gender: string | null;
-    doctorTitles: string[];
-    departmentId: number;
+    majorIds?: number[] | null;
+    doctorServiceIds?: number[];
+    startPrice?: number | null;
+    endPrice?: number | null;
+    gender?: string | null;
+    doctorTitles?: string[];
+    departmentIds?: number[] | null;
+    searchContent: string | null;
 }
 export interface CommonDoctorOptions extends Pagination {
     withoutId?: number | null;

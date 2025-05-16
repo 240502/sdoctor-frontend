@@ -10,7 +10,7 @@ export const ModalConfirmDelete = ({
 }: any) => {
     const DeleteDoctor = async () => {
         try {
-            const res = await doctorService.deleteDoctor(doctorId, config);
+            const res = await doctorService.deleteDoctor(doctorId);
             console.log(res);
             openNotificationWithIcon('success', 'Thông báo', 'Xóa thành công');
             getDoctors();

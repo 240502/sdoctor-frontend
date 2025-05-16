@@ -46,6 +46,7 @@ import { Degrees } from '../../../../models/degrees';
 import { useSearchParams } from 'react-router-dom';
 import useCreateDoctor from '../../../../hooks/doctors/useCreateDoctor';
 import { useUpdateDoctor } from '../../../../hooks/doctors/useUpdateDoctor';
+import { useQueryClient } from '@tanstack/react-query';
 
 dayjs.locale('vi');
 dayjs.extend(customParseFormat);
@@ -53,7 +54,9 @@ export const OverviewForm = ({
     openMessage,
     handleOverviewSaved,
     isUpdateDoctor,
+    refetch,
 }: any) => {
+    const queryClient = useQueryClient();
     const [searchParams] = useSearchParams();
     const [doctor, setDoctor] = useState<Doctor>({} as Doctor);
     const { data: doctorDetail, isFetching } = useFetchDoctorDetail(
@@ -172,6 +175,13 @@ export const OverviewForm = ({
             updateDoctor(newDoctor, {
                 onSuccess() {
                     openMessage('success', 'Cập nhật thành công!');
+                    refetch();
+                    queryClient.invalidateQueries({
+                        queryKey: [
+                            'useFetchDoctorDetail',
+                            `${doctor.doctorId}`,
+                        ],
+                    });
                 },
                 onError(error) {
                     console.log('error', error);
@@ -200,6 +210,7 @@ export const OverviewForm = ({
                 onSuccess(data) {
                     openMessage('success', 'Thêm bác sĩ thành công!');
                     handleOverviewSaved(data?.result);
+                    refetch();
                 },
                 onError(error) {
                     console.log('error', error);

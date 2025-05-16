@@ -70,7 +70,7 @@ export const BlockCommonDoctor = (): JSX.Element => {
                                         ></Image>
                                         <Flex className="justify-content-between align-items-center ">
                                             <Tag color="blue" className="mt-2">
-                                                {doctor.majorName}
+                                                {doctor.departmentName}
                                             </Tag>
                                             {doctor?.averageStar && (
                                                 <div className="star text-end ">

@@ -44,8 +44,8 @@ const doctorService = {
         const res = await apiClient.put('/doctor/update', data);
         return res;
     },
-    async deleteDoctor(id: any, config: any): Promise<any> {
-        const res = await apiClient.delete('/doctor/delete/' + id, config);
+    async deleteDoctor(id: any): Promise<any> {
+        const res = await apiClient.delete('/doctor/delete/' + id);
         return res;
     },
 };

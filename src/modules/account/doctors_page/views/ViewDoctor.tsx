@@ -34,7 +34,7 @@ const ViewDoctor = () => {
         window.scrollTo(0, 0);
         const majorId = searchParams.get('majorId');
         if (majorId) {
-            if (doctorOptions.majorIds.length === 0) {
+            if (doctorOptions?.majorIds?.length === 0) {
                 setDoctocOptions({
                     ...doctorOptions,
                     majorIds: [Number(majorId)],

@@ -5,23 +5,11 @@ import DoctorEducationTimeLine from './DoctorEducationTimeline';
 import DoctorExperienceTimeline from './DoctorExperienceTimeLine';
 import DoctorExpertiseForm from './DoctorExpertiseForm';
 import { useEffect, useState } from 'react';
-import { EducationCreateDto } from '../../../../models';
 import { useSearchParams } from 'react-router-dom';
 
-const FormTabs = ({ openMessage, isUpdateDoctor }: any) => {
+const FormTabs = ({ openMessage, isUpdateDoctor, refetch }: any) => {
     const [searchParams] = useSearchParams();
-
-    const [educations, setEducations] = useState<EducationCreateDto[]>([]);
-    const [expertises, setExpertises] = useState<string[]>([]);
-    const handleChangeExpertise = (expertise: string) => {
-        setExpertises([...expertises, expertise]);
-    };
     const [activeTab, setActiveTab] = useState<string>('1');
-    const handleChangeEducationForm = (education: EducationCreateDto) => {
-        const newEducations = [...educations, education];
-        setEducations(newEducations);
-    };
-
     const handleOverviewSaved = (newDoctorId: number | null) => {
         setDoctorId(newDoctorId);
         setActiveTab('2');
@@ -43,6 +31,7 @@ const FormTabs = ({ openMessage, isUpdateDoctor }: any) => {
                     openMessage={openMessage}
                     handleOverviewSaved={handleOverviewSaved}
                     isUpdateDoctor={isUpdateDoctor}
+                    refetch={refetch}
                 />
             ),
         },

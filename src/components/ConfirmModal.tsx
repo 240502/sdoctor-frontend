@@ -1,16 +1,23 @@
 import { Modal, Button } from 'antd';
 
+interface ConfirmModalProps {
+    message: string;
+    isOpenModal: boolean;
+    onCloseModal: () => void;
+    handleOk: () => void;
+}
+
 const ConfirmModal = ({
     message,
-    openModal,
-    handleCancelModal,
+    isOpenModal,
+    onCloseModal,
     handleOk,
-}: any) => {
+}: ConfirmModalProps) => {
     return (
         <Modal
             title={'Thông báo'}
-            onCancel={handleCancelModal}
-            open={openModal}
+            onCancel={onCloseModal}
+            open={isOpenModal}
             maskClosable={false}
             footer={[
                 <Button
@@ -20,7 +27,7 @@ const ConfirmModal = ({
                 >
                     Xác nhận
                 </Button>,
-                <Button key={'cancel'} onClick={handleCancelModal}>
+                <Button key={'cancel'} onClick={onCloseModal}>
                     Đóng
                 </Button>,
             ]}
