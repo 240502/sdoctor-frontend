@@ -3,3 +3,7 @@ export * from './useFetchClinicsWithPagination';
 export * from './useFetchClinicById';
 export * from './useUpdateClinicViews';
 export * from './useFetchAllCinics';
+export * from './useCreateClinic';
+export * from './useDeleteClinic';
+export * from './useUpdateClinic';
+export * from './useFetchClinicForAdmin';

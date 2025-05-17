@@ -25,3 +25,7 @@ export * from './mail';
 export * from './doctor_expertises';
 export * from './education';
 export * from './work_experience';
+
+export * from './clinic_specialty';
+export * from './medical_equipment';
+export * from './working_hours';

@@ -10,6 +10,9 @@ import {
     Flex,
     Input,
     InputRef,
+    Form,
+    Row,
+    Col,
 } from 'antd';
 type FileType = Parameters<GetProp<UploadProps, 'beforeUpload'>>[0];
 import { uploadService, clinicService } from '../../../../services';
@@ -26,9 +29,6 @@ export const InputClinicModal = ({
     openNotification,
     getClinics,
 }: any) => {
-    useEffect(() => {
-        console.log('clinic', clinic);
-    }, [clinic]);
     const [previewOpen, setPreviewOpen] = useState(false);
     const [previewImage, setPreviewImage] = useState('');
     const [AvtFiles, setAvtFiles] = useState<UploadFile[]>([]);
@@ -145,13 +145,14 @@ export const InputClinicModal = ({
             ];
             setAvtFiles(file);
         }
+
         if (clinic?.coverImage && clinic?.coverImage?.includes('cloudinary')) {
             const file: UploadFile[] = [
                 {
                     uid: '-1',
                     name: 'image.png',
                     status: 'done',
-                    url: clinic?.cover_image,
+                    url: clinic?.coverImage,
                 },
             ];
             setCoverFiles(file);
@@ -170,107 +171,114 @@ export const InputClinicModal = ({
                 <Button onClick={handleCloseInputModal}>Đóng</Button>,
             ]}
         >
-            <Flex>
-                <div className="text-center">
-                    <Upload
-                        customRequest={UploadClinicImage}
-                        listType="picture-circle"
-                        fileList={AvtFiles}
-                        onPreview={handlePreview}
-                        onChange={handleChangeAvt}
-                        maxCount={1}
-                    >
-                        {AvtFiles.length === 0 && uploadButton}
-                    </Upload>
-                    <label>Ảnh đại diện</label>
-                    {previewImage && (
-                        <Image
-                            wrapperStyle={{ display: 'none' }}
-                            preview={{
-                                visible: previewOpen,
-                                onVisibleChange: (visible) =>
-                                    setPreviewOpen(visible),
-                                afterOpenChange: (visible) =>
-                                    !visible && setPreviewImage(''),
-                            }}
-                            src={previewImage}
-                        />
-                    )}
-                </div>
-                <div className="text-center ms-4">
-                    <Upload
-                        customRequest={UploadClinicImage}
-                        listType="picture-circle"
-                        fileList={CoverFiles}
-                        onPreview={handlePreview}
-                        onChange={handleChangeCoverImage}
-                        maxCount={1}
-                    >
-                        {CoverFiles.length === 0 && uploadButton}
-                    </Upload>
-                    <label>Ảnh bìa</label>
-                    {previewImage && (
-                        <Image
-                            wrapperStyle={{ display: 'none' }}
-                            preview={{
-                                visible: previewOpen,
-                                onVisibleChange: (visible) =>
-                                    setPreviewOpen(visible),
-                                afterOpenChange: (visible) =>
-                                    !visible && setPreviewImage(''),
-                            }}
-                            src={previewImage}
-                        />
-                    )}
-                </div>
-            </Flex>
-            <Flex className="mt-3">
-                <div className="col-6 pe-2">
-                    <label className="block mb-2">Tên cơ sở y tế</label>
-                    <Input
-                        ref={inputNameRef}
-                        value={clinic?.name}
-                        onFocus={(e) => showSuccess(e.target)}
-                        onChange={(e) => {
-                            setClinic({ ...clinic, name: e.target.value });
-                        }}
-                        id="clinic_name"
-                    />
-                    <div
-                        className="error_message mt-3"
-                        style={{ color: 'red' }}
-                    ></div>
-                </div>
-                <div className="col-6 ps-2">
-                    <label htmlFor="" className="block mb-2">
-                        Địa chỉ
-                    </label>
-                    <Input
-                        ref={inputLocationRef}
-                        value={clinic?.location}
-                        onChange={(e: any) => {
-                            setClinic({ ...clinic, location: e.target.value });
-                        }}
-                        onFocus={(e: any) => showSuccess(e.target)}
-                        id="location"
-                    />
-                    <div
-                        className="error_message mt-3"
-                        style={{ color: 'red' }}
-                    ></div>
-                </div>
-            </Flex>
-            <div className="mt-3">
-                <label>Giới thiệu chung</label>
-                <ClinicEditor
-                    handleChangeClinicEditor={handleChangeClinicEditor}
-                    clinic={clinic}
-                />
-                <div
-                    className="error_message mt-3"
-                    style={{ color: 'red' }}
-                ></div>
-            </div>
+            <Form layout="vertical">
+                <Row gutter={[24, 24]}>
+                    <Col span={24} className="d-flex">
+                        <Form.Item
+                            name={'avatar'}
+                            label="Ảnh đại diện"
+                            className="text-center"
+                        >
+                            <Upload
+                                customRequest={UploadClinicImage}
+                                listType="picture-circle"
+                                fileList={AvtFiles}
+                                onPreview={handlePreview}
+                                onChange={handleChangeAvt}
+                                maxCount={1}
+                            >
+                                {AvtFiles.length === 0 && uploadButton}
+                            </Upload>
+                            {previewImage && (
+                                <Image
+                                    wrapperStyle={{ display: 'none' }}
+                                    preview={{
+                                        visible: previewOpen,
+                                        onVisibleChange: (visible) =>
+                                            setPreviewOpen(visible),
+                                        afterOpenChange: (visible) =>
+                                            !visible && setPreviewImage(''),
+                                    }}
+                                    src={previewImage}
+                                />
+                            )}
+                        </Form.Item>
+                        <Form.Item
+                            name={'coverImage'}
+                            label="Ảnh bìa"
+                            className="ms-3"
+                        >
+                            <Upload
+                                customRequest={UploadClinicImage}
+                                listType="picture-circle"
+                                fileList={CoverFiles}
+                                onPreview={handlePreview}
+                                onChange={handleChangeCoverImage}
+                                maxCount={1}
+                            >
+                                {CoverFiles.length === 0 && uploadButton}
+                            </Upload>
+                            {previewImage && (
+                                <Image
+                                    wrapperStyle={{ display: 'none' }}
+                                    preview={{
+                                        visible: previewOpen,
+                                        onVisibleChange: (visible) =>
+                                            setPreviewOpen(visible),
+                                        afterOpenChange: (visible) =>
+                                            !visible && setPreviewImage(''),
+                                    }}
+                                    src={previewImage}
+                                />
+                            )}
+                        </Form.Item>
+                    </Col>
+                    <Col span={12}>
+                        <Form.Item
+                            name={'name'}
+                            label="Tên cơ sở y tế"
+                            required
+                        >
+                            <Input
+                                value={clinic?.name}
+                                onFocus={(e) => showSuccess(e.target)}
+                                onChange={(e) => {
+                                    setClinic({
+                                        ...clinic,
+                                        name: e.target.value,
+                                    });
+                                }}
+                                id="clinic_name"
+                            />
+                        </Form.Item>
+                    </Col>
+                    <Col span={12}>
+                        <Form.Item name={'location'} label="Địa chỉ" required>
+                            <Input
+                                value={clinic?.location}
+                                onChange={(e: any) => {
+                                    setClinic({
+                                        ...clinic,
+                                        location: e.target.value,
+                                    });
+                                }}
+                                onFocus={(e: any) => showSuccess(e.target)}
+                                id="location"
+                            />
+                        </Form.Item>
+                    </Col>
+                    <Col span={24}>
+                        <Form.Item name={'description'} label="Giới thiệu">
+                            <ClinicEditor
+                                handleChangeClinicEditor={
+                                    handleChangeClinicEditor
+                                }
+                                clinic={clinic}
+                            />
+                        </Form.Item>
+                    </Col>
+                </Row>
+            </Form>
         </Modal>
     );
 };

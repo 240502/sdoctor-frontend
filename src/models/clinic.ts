@@ -19,3 +19,12 @@ export interface ClinicOptions extends Pagination {
     location?: string | null;
     departmentIds?: number[];
 }
+
+export interface ClinicResponse {
+    id: number;
+    avatar: string;
+    coverImage: string;
+    name: string;
+    location: string;
+    description: string;
+}

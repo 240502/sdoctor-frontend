@@ -26,7 +26,7 @@ const ClinicManagement = () => {
     const [api, contextHolder] = notification.useNotification();
     const [clinics, setClinics] = useState<Clinic[]>([]);
     const [pageIndex, setPageIndex] = useState<number>(1);
-    const [pageSize, setPageSize] = useState<number>(5);
+    const [pageSize, setPageSize] = useState<number>(8);
     const [pageCount, setPageCount] = useState<number>(0);
     const [clinic, setClinic] = useState<Clinic>({} as Clinic);
     const [openModalInputClinic, setOpenModalInputClinic] =
@@ -218,8 +218,8 @@ const ClinicManagement = () => {
             {openModalConfirmDelete && (
                 <ConfirmModal
                     message="Bạn chắc chắn muốn xóa cơ sở y tế này?"
-                    openModal={openModalConfirmDelete}
-                    handleCancelModal={handleCancelModalConfirm}
+                    isOpenModal={openModalConfirmDelete}
+                    onCloseModal={handleCancelModalConfirm}
                     handleOk={DeleteClinic}
                 />
             )}

@@ -23,3 +23,6 @@ export * from './others';
 export * from './doctor_expertise';
 export * from './doctor_experience';
 export * from './education';
+export * from './clinic_specialty';
+export * from './medical_equipment';
+export * from './working_hours';
