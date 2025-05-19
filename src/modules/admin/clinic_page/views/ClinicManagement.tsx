@@ -7,7 +7,7 @@ import {
     Divider,
     Flex,
     Input,
-    notification,
+    message,
     Select,
 } from 'antd';
 import { HomeOutlined, PlusOutlined } from '@ant-design/icons';
@@ -18,12 +18,12 @@ import { configValue } from '../../../../stores/userAtom';
 import { ConfirmModal } from '../../../../components';
 import { ProvinceType } from '../../../../models/other';
 import { SearchProps } from 'antd/es/input';
+import { NoticeType } from 'antd/es/message/interface';
 const { Option } = Select;
 const { Search } = Input;
-type NotificationType = 'success' | 'error';
 const ClinicManagement = () => {
     const config = useRecoilValue(configValue);
-    const [api, contextHolder] = notification.useNotification();
+    const [api, contextHolder] = message.useMessage();
     const [clinics, setClinics] = useState<Clinic[]>([]);
     const [pageIndex, setPageIndex] = useState<number>(1);
     const [pageSize, setPageSize] = useState<number>(8);
@@ -55,13 +55,13 @@ const ClinicManagement = () => {
         try {
             const res = await clinicService.deleteClinic(clinic?.id, config);
             console.log(res);
-            openNotification('success', 'Thông báo', 'Xóa thành công!');
+            openMessage('success', 'Xóa thành công!');
             handleCancelModalConfirm();
             getClinics();
         } catch (err: any) {
             console.log(err.message);
             handleCancelModalConfirm();
-            openNotification('success', 'Thông báo', 'Xóa thành công!');
+            openMessage('success', 'Xóa không thành công!');
         }
     };
     const handleClickEditBtn = (clinic: Clinic) => {
@@ -74,16 +74,13 @@ const ClinicManagement = () => {
         setOpenModalConfirmDelete(true);
     };
 
-    const openNotification = (
-        type: NotificationType,
-        title: string,
-        description: string
-    ) => {
-        api[type]({
-            message: title,
-            description: description,
+    const openMessage = (type: NoticeType, content: string) => {
+        api.open({
+            type: type,
+            content: content,
         });
     };
+
     const handleChangeLocation = (value: string) => {
         let province: string = '';
         const cityStr = 'thành phố';
@@ -200,7 +197,7 @@ const ClinicManagement = () => {
                     pageCount={pageCount}
                     handleClickEditBtn={handleClickEditBtn}
                     handleClickDeleteBtn={handleClickDeleteBtn}
-                    openNotification={openNotification}
+                    openNotification={openMessage}
                 />
             </div>
             {openModalInputClinic && (
@@ -211,7 +208,7 @@ const ClinicManagement = () => {
                     clinic={clinic}
                     setClinic={setClinic}
                     config={config}
-                    openNotification={openNotification}
+                    openNotification={openMessage}
                     getClinics={getClinics}
                 />
             )}

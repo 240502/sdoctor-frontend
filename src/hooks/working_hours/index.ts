@@ -1,1 +1,1 @@
-export * from './useCreateWorkingHours';
+export * from './useWorkingHours';

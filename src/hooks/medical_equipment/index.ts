@@ -1,1 +1,1 @@
-export * from './useCreateMedicalEquipment';
+export * from './useMedicalEquipment';

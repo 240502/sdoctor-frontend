@@ -7,28 +7,79 @@ import {
     GetProp,
     UploadFile,
     UploadProps,
-    Flex,
     Input,
     InputRef,
     Form,
     Row,
     Col,
+    Tabs,
 } from 'antd';
+import { TabsProps } from 'antd/lib';
+
 type FileType = Parameters<GetProp<UploadProps, 'beforeUpload'>>[0];
 import { uploadService, clinicService } from '../../../../services';
 import { useState, useEffect, useRef } from 'react';
 import { isEmpty, showSuccess } from '../../../../utils/global';
 import ClinicEditor from './ClinicEditor';
+import InputOverviewTab from './InputOverviewTab';
+import InputWorkingHoursTab from './InputWorkingHoursTab';
+import { useSearchParams } from 'react-router-dom';
+import InputMedicalEquipmentTab from './InputMedicalEquipmentTab';
+import { NoticeType } from 'antd/es/message/interface';
+
+interface InputClinicModalProps{
+    openModal:boolean;
+    onCloseModal:() => void;
+    isUpdateClinic:boolean;
+    openMessage:(type:NoticeType,content:string);
+
+}
 export const InputClinicModal = ({
-    openModalInputClinic,
-    handleCloseInputModal,
+    openModal,
+    onCloseModal,
     isUpdate,
-    clinic,
-    setClinic,
-    config,
-    openNotification,
-    getClinics,
+    openMessage,
+    refetch,
 }: any) => {
+    const [searchParams] = useSearchParams();
+    const [clinicId, setClinicId] = useState<number | null>(
+        searchParams.get('clinicId')
+            ? Number(searchParams.get('clinicId'))
+            : null
+    );
+    const tabs: TabsProps['items'] = [
+        {
+            key: '1',
+            label: <h6>Tổng quan</h6>,
+            children: (
+                <InputOverviewTab
+                    openMessage={openMessage}
+                    isUpdateClinic={isUpdateClinic}
+                    refetch={refetch}
+                />
+            ),
+        },
+        {
+            key: '2',
+            label: <h6>Thời gian làm việc</h6>,
+            children: (
+                <InputWorkingHoursTab
+                    clinicId={clinicId}
+                    openMessage={openMessage}
+                />
+            ),
+        },
+        {
+            key: '3',
+            label: <h6>Trang thiết bị</h6>,
+            children: (
+                <InputMedicalEquipmentTab
+                    clinicId={clinicId}
+                    openMessage={openMessage}
+                />
+            ),
+        },
+    ];
     const [previewOpen, setPreviewOpen] = useState(false);
     const [previewImage, setPreviewImage] = useState('');
     const [AvtFiles, setAvtFiles] = useState<UploadFile[]>([]);

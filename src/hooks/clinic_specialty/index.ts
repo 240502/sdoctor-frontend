@@ -1,1 +1,1 @@
-export * from './useCreateClinicSpecialty';
+export * from './useClinicSpecialty';
