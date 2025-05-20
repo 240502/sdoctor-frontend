@@ -15,11 +15,11 @@ const workingHoursService = {
         return res;
     },
 
-    async getWorkingHoursByClinicId(clinicId: number): Promise<any> {
+    async getWorkingHoursByClinicId(clinicId: number | null): Promise<any> {
         const res = await apiClient.get(
             '/working-hours/get-working-hours-by-clinicid/' + clinicId
         );
-        return res;
+        return res?.data;
     },
 };
 export default workingHoursService;

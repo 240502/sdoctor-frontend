@@ -22,9 +22,10 @@ export const useDeleteWorkingHours = () => {
     });
 };
 
-export const useGetWorkingHoursByClinicId = (clinicId: number) => {
+export const useGetWorkingHoursByClinicId = (clinicId: number | null) => {
     return useQuery({
         queryKey: ['useGetWorkingHoursByClinicId', clinicId],
         queryFn: () => workingHoursService.getWorkingHoursByClinicId(clinicId),
+        retry: false,
     });
 };

@@ -16,20 +16,20 @@ const clinicService = {
         const res: any = await apiClient.put('/clinic/update-views/' + id);
         return res;
     },
-    async getClinicById(id: number): Promise<any> {
+    async getClinicById(id: number | null): Promise<any> {
         const res = await apiClient.get('/clinic/get-by-id/' + id);
         return res.data;
     },
-    async createClinic(data: any, config: any): Promise<any> {
-        const res = await apiClient.post('/clinic/create', data, config);
+    async createClinic(data: any): Promise<any> {
+        const res = await apiClient.post('/clinic/create', data);
+        return res?.data;
+    },
+    async updateClinic(data: any): Promise<any> {
+        const res = await apiClient.put('/clinic/update', data);
         return res;
     },
-    async updateClinic(data: any, config: any): Promise<any> {
-        const res = await apiClient.put('/clinic/update', data, config);
-        return res;
-    },
-    async deleteClinic(id: number, config: any): Promise<any> {
-        const res = await apiClient.delete('/clinic/delete/' + id, config);
+    async deleteClinic(id: number): Promise<any> {
+        const res = await apiClient.delete('/clinic/delete/' + id);
         return res;
     },
 };

@@ -6,7 +6,7 @@ export interface WorkingHours {
     endTime: string;
 }
 export interface WorkingHoursCreateDto {
-    clinicId: number;
+    clinicId: number | null;
     dayOfWeek: number;
     startTime: string;
     endTime: string;

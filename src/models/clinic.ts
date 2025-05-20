@@ -28,3 +28,20 @@ export interface ClinicResponse {
     location: string;
     description: string;
 }
+
+export interface ClinicCreate {
+    name: string;
+    description: string;
+    location: string;
+    avatar: string;
+    coverImage: string;
+}
+
+export interface ClinicUpdateDto {
+    id: number;
+    name: string;
+    description: string;
+    location: string;
+    avatar: string;
+    coverImage: string;
+}

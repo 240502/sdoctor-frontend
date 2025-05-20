@@ -42,5 +42,6 @@ export const useFetchNotificationByUserId = (
         queryKey: ['useFetchNotificationByUserId', userId],
         queryFn: async () =>
             notificationService.getNotificationByUserId(userId),
+        retry: false,
     });
 };

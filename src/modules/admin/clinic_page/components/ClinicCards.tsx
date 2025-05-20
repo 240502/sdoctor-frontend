@@ -6,7 +6,7 @@ import {
     EnvironmentOutlined,
 } from '@ant-design/icons';
 import { baseURL } from '../../../../constants/api';
-
+import { useNavigate } from 'react-router-dom';
 export const ClinicCards = ({
     clinics,
     pageIndex,
@@ -16,13 +16,17 @@ export const ClinicCards = ({
     handleClickEditBtn,
     handleClickDeleteBtn,
 }: any) => {
+    const navigate = useNavigate();
     return (
         <>
             <Flex wrap>
                 {clinics?.length > 0 ? (
                     clinics?.map((clinic: Clinic) => {
                         return (
-                            <div className="col-3 ps-2 pe-2 mb-3">
+                            <div
+                                className="col-3 ps-2 pe-2 mb-3"
+                                key={clinic.id}
+                            >
                                 <Card
                                     className="shadow"
                                     cover={
@@ -69,6 +73,16 @@ export const ClinicCards = ({
                                             className="border-0 text-success p-0"
                                             onClick={() => {
                                                 handleClickEditBtn(clinic);
+                                                const queryParams =
+                                                    new URLSearchParams();
+
+                                                queryParams.append(
+                                                    'clinicId',
+                                                    clinic.id.toString()
+                                                );
+                                                navigate(
+                                                    `/admin/clinic?${queryParams}`
+                                                );
                                             }}
                                         >
                                             <EditOutlined /> Sửa

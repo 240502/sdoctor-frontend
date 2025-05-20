@@ -13,18 +13,20 @@ import {
 import { HomeOutlined, PlusOutlined } from '@ant-design/icons';
 import { ClinicCards } from '../components/ClinicCards';
 import { InputClinicModal } from '../components/InputClinicModal';
-import { useRecoilValue } from 'recoil';
-import { configValue } from '../../../../stores/userAtom';
 import { ConfirmModal } from '../../../../components';
 import { ProvinceType } from '../../../../models/other';
 import { SearchProps } from 'antd/es/input';
 import { NoticeType } from 'antd/es/message/interface';
+import { useNavigate } from 'react-router-dom';
+import { useQueryClient } from '@tanstack/react-query';
 const { Option } = Select;
 const { Search } = Input;
 const ClinicManagement = () => {
-    const config = useRecoilValue(configValue);
+    const navigate = useNavigate();
+    const queryClient = useQueryClient();
     const [api, contextHolder] = message.useMessage();
     const [clinics, setClinics] = useState<Clinic[]>([]);
+    const [clinicId, setClinicId] = useState<number | null>(null);
     const [pageIndex, setPageIndex] = useState<number>(1);
     const [pageSize, setPageSize] = useState<number>(8);
     const [pageCount, setPageCount] = useState<number>(0);
@@ -53,8 +55,7 @@ const ClinicManagement = () => {
     };
     const DeleteClinic = async () => {
         try {
-            const res = await clinicService.deleteClinic(clinic?.id, config);
-            console.log(res);
+            const res = await clinicService.deleteClinic(clinic?.id);
             openMessage('success', 'Xóa thành công!');
             handleCancelModalConfirm();
             getClinics();
@@ -68,10 +69,12 @@ const ClinicManagement = () => {
         setClinic(clinic);
         setIsUpdate(true);
         setOpenModalInputClinic(true);
+        setClinicId(clinic.id);
     };
     const handleClickDeleteBtn = (clinic: Clinic) => {
         setClinic(clinic);
         setOpenModalConfirmDelete(true);
+        setClinicId(clinic.id);
     };
 
     const openMessage = (type: NoticeType, content: string) => {
@@ -99,6 +102,11 @@ const ClinicManagement = () => {
         setOpenModalInputClinic(false);
         setClinic({} as Clinic);
         setIsUpdate(false);
+        navigate(`/admin/clinic`);
+        queryClient.removeQueries({
+            queryKey: ['useFetchClinicById', JSON.stringify(clinicId)],
+            exact: true,
+        });
     };
     const changePage = (current: number, size: number) => {
         if (size !== pageSize) {
@@ -116,7 +124,6 @@ const ClinicManagement = () => {
                 ...options,
             };
             const res = await clinicService.viewClinic(data);
-            console.log(res);
             setClinics(res.data);
             setPageCount(res.pageCount);
         } catch (err: any) {
@@ -202,14 +209,11 @@ const ClinicManagement = () => {
             </div>
             {openModalInputClinic && (
                 <InputClinicModal
-                    openModalInputClinic={openModalInputClinic}
-                    handleCloseInputModal={handleCloseInputModal}
-                    isUpdate={isUpdate}
-                    clinic={clinic}
-                    setClinic={setClinic}
-                    config={config}
-                    openNotification={openMessage}
-                    getClinics={getClinics}
+                    openModal={openModalInputClinic}
+                    onCloseModal={handleCloseInputModal}
+                    isUpdateClinic={isUpdate}
+                    openMessage={openMessage}
+                    refetch={getClinics}
                 />
             )}
             {openModalConfirmDelete && (

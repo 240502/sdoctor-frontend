@@ -5,10 +5,10 @@ import { homeMenuService } from '../../../../services';
 import { HomeMenuModel } from '../../../../models/home_menu';
 import { useRecoilState, useSetRecoilState } from 'recoil';
 import { majorIdState } from '../../../../stores/majorAtom';
-
+import type { MenuProps } from 'antd';
 export const HomeMenu = () => {
     const setMajorId = useSetRecoilState(majorIdState);
-    const [homeMenus, setHomeMenus] = useState<HomeMenuModel[]>();
+    const [homeMenus, setHomeMenus] = useState<HomeMenuModel[]>([]);
     const [selectedKeys, setSelectedKeys] = useState<string[]>([]);
     const loadData = async () => {
         try {
@@ -22,6 +22,19 @@ export const HomeMenu = () => {
     useEffect(() => {
         loadData();
     }, []);
+    const menuItems: MenuProps['items'] = homeMenus.map((homeMenu) => ({
+        key: homeMenu.id.toString(), // Chuyển id thành string cho key
+        label: (
+            <Link
+                to={homeMenu.url}
+                className="text-decoration-none menu__item__text"
+                onClick={() => setMajorId(0)} // Gọi setMajorId khi click
+            >
+                {homeMenu.name}
+            </Link>
+        ),
+        className: 'home__menu__item', // Áp dụng class cho menu item
+    }));
 
     return (
         <Menu
@@ -29,26 +42,7 @@ export const HomeMenu = () => {
             mode="horizontal"
             selectedKeys={selectedKeys}
             style={{ maxHeight: '700px', zIndex: '99' }}
-        >
-            {homeMenus?.map((homeMenu: HomeMenuModel, index: number) => {
-                return (
-                    <Menu.Item
-                        onClick={() => {
-                            setMajorId(0);
-                        }}
-                        key={Number(homeMenu.id)}
-                        className="home__menu__item text-decoration-none"
-                    >
-                        <Link
-                            key={index}
-                            to={homeMenu.url}
-                            className="text-decoration-none menu__item__text"
-                        >
-                            {homeMenu.name}
-                        </Link>
-                    </Menu.Item>
-                );
-            })}
-        </Menu>
+            items={menuItems}
+        />
     );
 };
