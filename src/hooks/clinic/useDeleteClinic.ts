@@ -4,6 +4,6 @@ import { clinicService } from '../../services';
 export const useDeleteClinic = () => {
     return useMutation({
         mutationKey: ['useDeleteClinic'],
-        mutationFn: (id: number) => clinicService.deleteClinic(id),
+        mutationFn: (id: number | null) => clinicService.deleteClinic(id),
     });
 };

@@ -7,6 +7,7 @@ import { NoticeType } from 'antd/es/message/interface';
 import { TabsProps } from 'antd/lib';
 import { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import InputDepartmentTab from './InputDepartmentTab';
 
 interface InputClinicModalProps {
     openModal: boolean;
@@ -48,18 +49,27 @@ export const InputClinicModal = ({
         },
         {
             key: '2',
+            label: <h6>Chuyên khoa</h6>,
+            children: (
+                <InputDepartmentTab
+                    clinicId={clinicId}
+                    openMessage={openMessage}
+                />
+            ),
+        },
+        {
+            key: '3',
             label: <h6>Thời gian làm việc</h6>,
             children: (
                 <InputWorkingHoursTab
                     clinicId={clinicId}
                     openMessage={openMessage}
                     isUpdateClinic={isUpdateClinic}
-                    refetch={refetch}
                 />
             ),
         },
         {
-            key: '3',
+            key: '4',
             label: <h6>Trang thiết bị</h6>,
             children: <InputMedicalEquipmentTab />,
         },

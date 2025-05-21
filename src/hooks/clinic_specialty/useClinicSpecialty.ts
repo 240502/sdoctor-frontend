@@ -1,10 +1,10 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 import clinicSpecialtyService from '../../services/clinic_specialty.service';
-import { ClinicSpecialty } from '../../models';
+import { ClinicSpecialty, ClinicSpecialtyCreateDto } from '../../models';
 
 export const useCreateClinicSpecialty = () => {
     return useMutation({
-        mutationFn: (clinicSpecialty: ClinicSpecialty) =>
+        mutationFn: (clinicSpecialty: ClinicSpecialtyCreateDto) =>
             clinicSpecialtyService.createClinicSpecialty(clinicSpecialty),
     });
 };
@@ -22,11 +22,18 @@ export const useDeleteClinicSpecialty = () => {
             clinicSpecialtyService.deleteClinicSpecialty(id),
     });
 };
-
-export const useGetClinicSpecialtyByClinicId = (clinicId: number) => {
+export const useGetClinicSpecialtyByClinicId = (clinicId?: number | null) => {
     return useQuery({
         queryKey: ['useGetClinicSpecialtyByClinicId', clinicId],
-        queryFn: () =>
-            clinicSpecialtyService.getClinicSpecialtyByClinicId(clinicId),
+        queryFn: () => {
+            if (!clinicId) {
+                throw new Error('clinicId is required');
+            }
+            return clinicSpecialtyService.getClinicSpecialtyByClinicId(
+                clinicId
+            );
+        },
+        enabled: !!clinicId,
+        retry: false,
     });
 };

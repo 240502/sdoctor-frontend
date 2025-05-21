@@ -17,6 +17,7 @@ export const ClinicCards = ({
     handleClickDeleteBtn,
 }: any) => {
     const navigate = useNavigate();
+
     return (
         <>
             <Flex wrap>
@@ -116,7 +117,7 @@ export const ClinicCards = ({
                     current={pageIndex}
                     pageSize={pageSize}
                     total={pageCount * pageSize}
-                    pageSizeOptions={['5', '10', '20', '30']}
+                    pageSizeOptions={['4', '8', '12', '24']}
                     onChange={(current: number, size: number) => {
                         changePage(current, size);
                     }}

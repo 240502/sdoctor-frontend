@@ -28,7 +28,7 @@ const clinicService = {
         const res = await apiClient.put('/clinic/update', data);
         return res;
     },
-    async deleteClinic(id: number): Promise<any> {
+    async deleteClinic(id: number | null): Promise<any> {
         const res = await apiClient.delete('/clinic/delete/' + id);
         return res;
     },

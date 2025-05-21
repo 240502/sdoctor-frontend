@@ -9,6 +9,7 @@ import {
     Input,
     message,
     Select,
+    Skeleton,
 } from 'antd';
 import { HomeOutlined, PlusOutlined } from '@ant-design/icons';
 import { ClinicCards } from '../components/ClinicCards';
@@ -19,17 +20,17 @@ import { SearchProps } from 'antd/es/input';
 import { NoticeType } from 'antd/es/message/interface';
 import { useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
+import { useDeleteClinic, useFetchClinicForAdmin } from '../../../../hooks';
 const { Option } = Select;
 const { Search } = Input;
 const ClinicManagement = () => {
     const navigate = useNavigate();
+    const { mutate: deleteClinic } = useDeleteClinic();
     const queryClient = useQueryClient();
     const [api, contextHolder] = message.useMessage();
-    const [clinics, setClinics] = useState<Clinic[]>([]);
     const [clinicId, setClinicId] = useState<number | null>(null);
     const [pageIndex, setPageIndex] = useState<number>(1);
     const [pageSize, setPageSize] = useState<number>(8);
-    const [pageCount, setPageCount] = useState<number>(0);
     const [clinic, setClinic] = useState<Clinic>({} as Clinic);
     const [openModalInputClinic, setOpenModalInputClinic] =
         useState<boolean>(false);
@@ -53,18 +54,7 @@ const ClinicManagement = () => {
         setOpenModalConfirmDelete(false);
         setClinic({} as Clinic);
     };
-    const DeleteClinic = async () => {
-        try {
-            const res = await clinicService.deleteClinic(clinic?.id);
-            openMessage('success', 'Xóa thành công!');
-            handleCancelModalConfirm();
-            getClinics();
-        } catch (err: any) {
-            console.log(err.message);
-            handleCancelModalConfirm();
-            openMessage('success', 'Xóa không thành công!');
-        }
-    };
+
     const handleClickEditBtn = (clinic: Clinic) => {
         setClinic(clinic);
         setIsUpdate(true);
@@ -116,32 +106,27 @@ const ClinicManagement = () => {
             setPageIndex(current);
         }
     };
-    const getClinics = async () => {
-        try {
-            const data = {
-                pageIndex: pageIndex,
-                pageSize: pageSize,
-                ...options,
-            };
-            const res = await clinicService.viewClinic(data);
-            setClinics(res.data);
-            setPageCount(res.pageCount);
-        } catch (err: any) {
-            console.log(err.message);
-            setClinics([]);
-            setPageCount(0);
-        }
-    };
+
     const onSearch: SearchProps['onSearch'] = (value, _e, info) => {
         const newOptions = { ...options, name: value };
         setOptions(newOptions);
     };
-    useEffect(() => {
-        getClinics();
-    }, [pageIndex, pageSize, options]);
+
     useEffect(() => {
         getProvinces();
     }, []);
+    const { data, isError, error, isFetching, isRefetching, refetch } =
+        useFetchClinicForAdmin({ pageIndex, pageSize });
+
+    const handleConfirmDelete = () => {
+        deleteClinic(clinicId, {
+            onSuccess() {
+                openMessage('success', 'Xóa thành công!');
+                refetch();
+                handleCancelModalConfirm();
+            },
+        });
+    };
     return (
         <div className="">
             {contextHolder}
@@ -196,16 +181,27 @@ const ClinicManagement = () => {
                         />
                     </Flex>
                 </Flex>
-                <ClinicCards
-                    clinics={clinics}
-                    pageIndex={pageIndex}
-                    pageSize={pageSize}
-                    changePage={changePage}
-                    pageCount={pageCount}
-                    handleClickEditBtn={handleClickEditBtn}
-                    handleClickDeleteBtn={handleClickDeleteBtn}
-                    openNotification={openMessage}
-                />
+
+                <Skeleton active loading={isFetching || isRefetching}>
+                    {isError ? (
+                        <p className="fw-bold text-center">
+                            {error?.message.includes('404')
+                                ? 'Không có cơ sở y tế nào !'
+                                : 'Có lỗi khi lấy dữ liệu vui lòng thử lại sau'}
+                        </p>
+                    ) : (
+                        <ClinicCards
+                            clinics={data?.clinics}
+                            pageIndex={pageIndex}
+                            pageSize={pageSize}
+                            changePage={changePage}
+                            pageCount={data?.pageCount}
+                            handleClickEditBtn={handleClickEditBtn}
+                            handleClickDeleteBtn={handleClickDeleteBtn}
+                            openNotification={openMessage}
+                        />
+                    )}
+                </Skeleton>
             </div>
             {openModalInputClinic && (
                 <InputClinicModal
@@ -213,7 +209,7 @@ const ClinicManagement = () => {
                     onCloseModal={handleCloseInputModal}
                     isUpdateClinic={isUpdate}
                     openMessage={openMessage}
-                    refetch={getClinics}
+                    refetch={refetch}
                 />
             )}
             {openModalConfirmDelete && (
@@ -221,7 +217,7 @@ const ClinicManagement = () => {
                     message="Bạn chắc chắn muốn xóa cơ sở y tế này?"
                     isOpenModal={openModalConfirmDelete}
                     onCloseModal={handleCancelModalConfirm}
-                    handleOk={DeleteClinic}
+                    handleOk={handleConfirmDelete}
                 />
             )}
         </div>

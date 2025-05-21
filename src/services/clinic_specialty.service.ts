@@ -1,8 +1,11 @@
 import apiClient from '../constants/api';
-import { ClinicSpecialty } from '../models/clinic_specialty';
+import {
+    ClinicSpecialty,
+    ClinicSpecialtyCreateDto,
+} from '../models/clinic_specialty';
 
 const clinicSpecialtyService = {
-    async createClinicSpecialty(data: ClinicSpecialty): Promise<any> {
+    async createClinicSpecialty(data: ClinicSpecialtyCreateDto): Promise<any> {
         const res = await apiClient.post('/clinic-specialty/create', data);
         return res;
     },
@@ -21,7 +24,8 @@ const clinicSpecialtyService = {
         const res = await apiClient.get(
             '/clinic-specialty/get-clinic-specialty-by-clinicid/' + clinicId
         );
-        return res;
+        console.log(res?.data);
+        return res?.data;
     },
 };
 export default clinicSpecialtyService;
