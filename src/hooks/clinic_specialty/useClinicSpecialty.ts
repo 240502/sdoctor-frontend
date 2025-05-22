@@ -1,6 +1,10 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 import clinicSpecialtyService from '../../services/clinic_specialty.service';
-import { ClinicSpecialty, ClinicSpecialtyCreateDto } from '../../models';
+import {
+    ClinicSpecialty,
+    ClinicSpecialtyCreateDto,
+    ClinicSpecialtyUpdateDto,
+} from '../../models';
 
 export const useCreateClinicSpecialty = () => {
     return useMutation({
@@ -11,7 +15,7 @@ export const useCreateClinicSpecialty = () => {
 
 export const useUpdateClinicSpecialty = () => {
     return useMutation({
-        mutationFn: (clinicSpecialty: ClinicSpecialty) =>
+        mutationFn: (clinicSpecialty: ClinicSpecialtyUpdateDto) =>
             clinicSpecialtyService.updateClinicSpecialty(clinicSpecialty),
     });
 };

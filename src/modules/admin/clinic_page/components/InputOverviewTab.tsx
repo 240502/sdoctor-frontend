@@ -19,8 +19,7 @@ import {
     useFetchClinicById,
     useUpdateClinic,
 } from '../../../../hooks';
-import { useSearchParams } from 'react-router-dom';
-import { Clinic } from '../../../../models';
+import { Clinic, ClinicCreate, ClinicUpdateDto } from '../../../../models';
 import { clinicService, uploadService } from '../../../../services';
 import { NoticeType } from 'antd/es/message/interface';
 
@@ -160,15 +159,21 @@ const InputOverviewTab = ({
         avatar: UploadFile[];
     }) => {
         if (isUpdateClinic) {
-            const newClinic = {
-                id: clinic?.id,
+            const newClinic: ClinicUpdateDto = {
+                id: data?.id,
                 name: values.name,
                 location: values.location,
                 avatar: AvtFiles[0].url ?? '',
-                cover_image: CoverFiles[0].url ?? '',
-                description: clinic?.description,
+                coverImage: CoverFiles[0].url ?? '',
+                description: values?.description,
             };
-            UpdateClinic(newClinic);
+            updateClinic(newClinic, {
+                onSuccess() {
+                    handleOverviewSaved(data?.id);
+                    openMessage('success', 'Cập nhật thành công!');
+                    refetch();
+                },
+            });
         } else {
             const newClinic = {
                 name: values.name,
@@ -177,26 +182,14 @@ const InputOverviewTab = ({
                 coverImage: values.coverImage[0]?.url ?? '',
                 description: values?.description,
             };
-            console.log('values', values);
             createClinic(newClinic, {
                 onSuccess(data) {
                     handleOverviewSaved(data?.result[0].lastId);
-                    refetch();
                 },
             });
         }
     };
-    const UpdateClinic = async (data: any) => {
-        try {
-            console.log('new clinic', data);
-            const res = await clinicService.updateClinic(data);
-            openMessage('success', 'Sửa thành công!');
-            refetch();
-        } catch (err: any) {
-            console.log(err.message);
-            openMessage('error', 'Sửa không thành công!');
-        }
-    };
+
     const normFile = (e: any) => {
         if (Array.isArray(e)) {
             return e;

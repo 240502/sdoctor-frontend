@@ -57,19 +57,20 @@ apiClient.interceptors.response.use(
 
             try {
                 // Gọi API refresh token
-                
-                const response:RefreshTokenResponse = await userService.refreshToken();
-                localStorage.setItem(
-                    'user',
-                    JSON.stringify(response.result)
-                );
+
+                const response: RefreshTokenResponse =
+                    await userService.refreshToken();
+                localStorage.setItem('user', JSON.stringify(response.result));
                 processQueue(null);
                 return apiClient(originalRequest);
             } catch (refreshError) {
                 // Nếu refresh token thất bại, xóa queue và redirect
                 processQueue(refreshError as AxiosError);
                 // Chỉ redirect nếu không phải đang ở trang login
-                if (window.location.pathname !== '/login') {
+                if (
+                    window.location.pathname !== '/login' &&
+                    window.location.pathname === '/admin'
+                ) {
                     window.location.href = '/login';
                 }
                 return Promise.reject(refreshError);

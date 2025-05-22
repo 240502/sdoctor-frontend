@@ -2,6 +2,7 @@ import apiClient from '../constants/api';
 import {
     ClinicSpecialty,
     ClinicSpecialtyCreateDto,
+    ClinicSpecialtyUpdateDto,
 } from '../models/clinic_specialty';
 
 const clinicSpecialtyService = {
@@ -10,7 +11,7 @@ const clinicSpecialtyService = {
         return res;
     },
 
-    async updateClinicSpecialty(data: ClinicSpecialty): Promise<any> {
+    async updateClinicSpecialty(data: ClinicSpecialtyUpdateDto): Promise<any> {
         const res = await apiClient.put('/clinic-specialty/update', data);
         return res;
     },
