@@ -1,14 +1,33 @@
-import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
+import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
 import { userService } from '../services';
+import { RefreshTokenResponse } from '../models';
 
-// Mở rộng kiểu InternalAxiosRequestConfig để thêm thuộc tính _retry
+// Mở rộng kiểu AxiosRequestConfig để thêm _retry
 declare module 'axios' {
-    interface InternalAxiosRequestConfig {
+    interface AxiosRequestConfig {
         _retry?: boolean;
     }
 }
 
 export const baseURL = 'http://localhost:400/';
+
+// Biến để theo dõi trạng thái refresh token
+let isRefreshing = false;
+let failedQueue: Array<{
+    resolve: (value?: unknown) => void;
+    reject: (reason?: any) => void;
+}> = [];
+
+const processQueue = (error: AxiosError | null) => {
+    failedQueue.forEach((prom) => {
+        if (error) {
+            prom.reject(error);
+        } else {
+            prom.resolve();
+        }
+    });
+    failedQueue = [];
+};
 
 const apiClient = axios.create({
     baseURL: baseURL + 'api',
@@ -16,39 +35,16 @@ const apiClient = axios.create({
     withCredentials: true, // Cho phép gửi/nhận cookie
 });
 
-// Biến để theo dõi trạng thái refresh token
-let isRefreshing = false;
-let failedQueue: any[] = [];
-
-// Hàm xử lý queue các request thất bại
-const processQueue = (error: any) => {
-    failedQueue.forEach((prom) => {
-        if (!error) {
-            prom.resolve();
-        } else {
-            prom.reject(error);
-        }
-    });
-    failedQueue = [];
-};
-
-// Interceptor xử lý response
+// Thêm interceptor để xử lý response
 apiClient.interceptors.response.use(
-    (response) => response,
+    (response: AxiosResponse) => response,
     async (error: AxiosError) => {
-        const originalRequest = error.config as
-            | InternalAxiosRequestConfig
-            | undefined;
+        const originalRequest = error.config as AxiosRequestConfig;
 
-        if (
-            error.response?.status === 401 &&
-            originalRequest &&
-            !originalRequest._retry
-        ) {
-            originalRequest._retry = true; // Đánh dấu để tránh loop vô hạn
-
+        // Kiểm tra nếu là lỗi 401 và request chưa được retry
+        if (error.response?.status === 401 && !originalRequest._retry) {
             if (isRefreshing) {
-                // Nếu đang refresh, thêm request vào queue
+                // Nếu đang refresh, đưa request vào queue
                 return new Promise((resolve, reject) => {
                     failedQueue.push({ resolve, reject });
                 })
@@ -56,28 +52,33 @@ apiClient.interceptors.response.use(
                     .catch((err) => Promise.reject(err));
             }
 
+            originalRequest._retry = true; // Đánh dấu request đã được retry
             isRefreshing = true;
 
             try {
-                // Gọi refresh token
-                await userService.refreshToken();
-                // Không cần set localStorage hoặc header, server đã set cookie
-                // Xử lý các request trong queue
+                // Gọi API refresh token
+                
+                const response:RefreshTokenResponse = await userService.refreshToken();
+                localStorage.setItem(
+                    'user',
+                    JSON.stringify(response.result)
+                );
                 processQueue(null);
-                // Thử lại request ban đầu
                 return apiClient(originalRequest);
             } catch (refreshError) {
-                // Nếu refresh token thất bại, xóa cookie và chuyển hướng
-                processQueue(refreshError);
-                document.cookie =
-                    'accessToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT'; // Xóa cookie
-                window.location.href = '/login';
+                // Nếu refresh token thất bại, xóa queue và redirect
+                processQueue(refreshError as AxiosError);
+                // Chỉ redirect nếu không phải đang ở trang login
+                if (window.location.pathname !== '/login') {
+                    window.location.href = '/login';
+                }
                 return Promise.reject(refreshError);
             } finally {
                 isRefreshing = false;
             }
         }
 
+        // Nếu không phải lỗi 401 hoặc đã retry, reject error
         return Promise.reject(error);
     }
 );

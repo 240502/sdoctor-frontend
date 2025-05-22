@@ -16,9 +16,11 @@ import { NoticeType } from 'antd/es/message/interface';
 import dayjs, { Dayjs } from 'dayjs';
 import {
     useCreateWorkingHours,
+    useDeleteWorkingHours,
     useGetWorkingHoursByClinicId,
+    useUpdateWorkingHours,
 } from '../../../../hooks';
-import { WorkingHoursCreateDto } from '../../../../models';
+import { WorkingHours, WorkingHoursCreateDto } from '../../../../models';
 
 // Định nghĩa kiểu dữ liệu cho lịch làm việc
 interface Schedule {
@@ -45,10 +47,9 @@ interface InputWorkingHoursTabProps {
 const InputWorkingHoursTab = ({
     clinicId,
     openMessage,
-    isUpdateClinic,
 }: InputWorkingHoursTabProps) => {
     const [isModalVisible, setIsModalVisible] = useState(false);
-    const [editingSchedule, setEditingSchedule] = useState<Schedule | null>(
+    const [editingSchedule, setEditingSchedule] = useState<WorkingHours | null>(
         null
     );
     const {
@@ -59,14 +60,23 @@ const InputWorkingHoursTab = ({
     } = useGetWorkingHoursByClinicId(clinicId);
     const [form] = Form.useForm();
 
-    // Mở modal để thêm hoặc chỉnh sửa lịch
-    const showModal = (schedule?: Schedule) => {
+    const showModal = (schedule?: WorkingHours) => {
         setEditingSchedule(schedule || null);
         setIsModalVisible(true);
         if (schedule) {
+            const startTimeArr: string[] = schedule.startTime.split('-')
+            const endTimeArr:string[] = schedule.endTime.split('-')
+            
             form.setFieldsValue({
-                day: schedule.day,
-                timeSlots: schedule.timeSlots,
+                day: schedule.dayOfWeek,
+                timeSlots: [{
+                    start: dayjs(startTimeArr[0], 'HH:mm'),
+                    end: dayjs(startTimeArr[1], 'HH:mm'),
+                },
+                {
+                    start: dayjs(endTimeArr[0], 'HH:mm'),
+                    end: dayjs(endTimeArr[1], 'HH:mm'),
+                },],
             });
         } else {
             form.setFieldsValue({
@@ -85,17 +95,41 @@ const InputWorkingHoursTab = ({
         }
     };
 
-    // Đóng modal
     const handleCancel = () => {
         setIsModalVisible(false);
         setEditingSchedule(null);
         form.resetFields();
     };
     const { mutate: createWorkingHours } = useCreateWorkingHours();
+    const { mutate: updateWorkingHours } = useUpdateWorkingHours();
+    const { mutate: deleteWorkingHours } = useDeleteWorkingHours();
     const handleOk = () => {
         form.validateFields()
             .then((values) => {
-                if (editingSchedule) {
+                if (editingSchedule?.id) {
+                    const newSchedule: WorkingHours = {
+                        id:editingSchedule.id,
+                        clinicId: clinicId,
+                        dayOfWeek: values.day,
+                        startTime:
+                            dayjs(values.timeSlots[0].start).format('HH:mm') +
+                            '-' +
+                            dayjs(values.timeSlots[0].end).format('HH:mm'),
+                        endTime:
+                            dayjs(values.timeSlots[1].start).format('HH:mm') +
+                            '-' +
+                            dayjs(values.timeSlots[1].end).format('HH:mm'),
+                    }
+                    updateWorkingHours(newSchedule, {
+                        onSuccess() {
+                            openMessage('success', `Thêm thành công!`);
+                            refetch();
+                        },
+                        onError(error) {
+                            console.log(error);
+                            openMessage('error', `Cập nhật không thành công!`);
+                        },
+                    });
                 } else {
                     const newSchedule: WorkingHoursCreateDto = {
                         clinicId: clinicId,
@@ -114,17 +148,31 @@ const InputWorkingHoursTab = ({
                             openMessage('success', `Thêm thành công!`);
                             refetch();
                         },
+                         onError(error) {
+                            console.log(error);
+                            openMessage('success', `Thêm không thành công!`);
+                        },
                     });
                 }
                 handleCancel();
             })
             .catch((error) => {
                 openMessage('error', 'Vui lòng kiểm tra lại thông tin!');
+                
             });
     };
 
-    const handleDelete = (day: string) => {
-        message.success(`Xóa lịch làm việc cho ${day} thành công!`);
+    const handleDelete = (id: number) => {
+        deleteWorkingHours(id, {
+            onSuccess() {
+                openMessage('success', 'Xóa lịch làm việc thành công!');
+                refetch()
+            },
+            onError() {
+                openMessage('error', 'Xóa lịch làm việc không thành công!');
+                
+            }
+        })
     };
     useEffect(() => {
         console.log('workingHours', workingHours);
@@ -154,8 +202,8 @@ const InputWorkingHoursTab = ({
                                         Chỉnh sửa
                                     </Button>,
                                     <Popconfirm
-                                        title={`Bạn có chắc muốn xóa lịch cho ${item.day}?`}
-                                        onConfirm={() => handleDelete(item.day)}
+                                        title={`Bạn có chắc muốn xóa lịch cho ${item.dayOfWeek}?`}
+                                        onConfirm={() => handleDelete(item.id)}
                                         okText="Xóa"
                                         cancelText="Hủy"
                                     >
@@ -184,7 +232,7 @@ const InputWorkingHoursTab = ({
             <Modal
                 title={
                     editingSchedule
-                        ? `Chỉnh sửa lịch làm việc - ${editingSchedule.day}`
+                        ? `Chỉnh sửa lịch làm việc - ${editingSchedule.dayOfWeek}`
                         : 'Thêm lịch làm việc'
                 }
                 onOk={handleOk}

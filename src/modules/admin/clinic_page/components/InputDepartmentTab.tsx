@@ -42,6 +42,7 @@ const InputDepartmentTab = ({
             onSuccess() {
                 openMessage('success', 'Thêm thành công!');
                 refetch();
+                form.resetFields();
             },
             onError(error) {
                 console.log('có lỗi khi thêm clinic specialty', error);
@@ -51,9 +52,6 @@ const InputDepartmentTab = ({
     };
     const { mutate: createClinicSpecialty, isPending } =
         useCreateClinicSpecialty();
-    console.log(data);
-
-    useEffect(() => {}, [data]);
     return (
         <>
             <Form

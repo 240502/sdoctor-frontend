@@ -6,6 +6,11 @@ export interface MedicalEquipment {
 }
 
 export interface MedicalEquipmentCreateDto {
-    clinicId: number;
+    clinicId: number | null;
     name: string;
+}
+export interface MedicalEquipmentUpdateDto {
+    clinicId: number | null;
+    name: string;
+    id: number | null;
 }

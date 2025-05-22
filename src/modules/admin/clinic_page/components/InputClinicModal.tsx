@@ -71,7 +71,10 @@ export const InputClinicModal = ({
         {
             key: '4',
             label: <h6>Trang thiết bị</h6>,
-            children: <InputMedicalEquipmentTab />,
+            children: <InputMedicalEquipmentTab
+                clinicId={clinicId}
+                openMessage={openMessage}
+            />,
         },
     ];
 

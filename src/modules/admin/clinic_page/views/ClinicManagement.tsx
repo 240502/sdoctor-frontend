@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Clinic } from '../../../../models/clinic';
-import { clinicService, otherService } from '../../../../services';
+import {  otherService } from '../../../../services';
 import {
     Breadcrumb,
     Button,
@@ -95,6 +95,18 @@ const ClinicManagement = () => {
         navigate(`/admin/clinic`);
         queryClient.removeQueries({
             queryKey: ['useFetchClinicById', JSON.stringify(clinicId)],
+            exact: true,
+        });
+        queryClient.removeQueries({
+            queryKey: ['useGetWorkingHoursByClinicId',clinicId],
+            exact: true,
+        });
+        queryClient.removeQueries({
+            queryKey: ['useGetMedicalEquipmentByClinicId',clinicId],
+            exact: true,
+        });
+        queryClient.removeQueries({
+            queryKey: ['useGetClinicSpecialtyByClinicId',clinicId],
             exact: true,
         });
     };
