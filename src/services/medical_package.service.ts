@@ -1,12 +1,9 @@
 import apiClient from '../constants/api';
+import { MedicalPackageCreateDTO } from '../models';
 
 const medicalPackageService = {
-    async createService(data: any, config: any): Promise<any> {
-        const res = await apiClient.post(
-            '/medical-package/create',
-            data,
-            config
-        );
+    async createService(payload: MedicalPackageCreateDTO): Promise<any> {
+        const res = await apiClient.post('/medical-package/create', payload);
         return res;
     },
     async deleteService(id: number, config: any): Promise<any> {
@@ -24,7 +21,7 @@ const medicalPackageService = {
         );
         return res;
     },
-    async getMedicalPackageById(id: number): Promise<any> {
+    async getMedicalPackageById(id: number | null): Promise<any> {
         const res = await apiClient.get('/medical-package/get-by-id/' + id);
         return res?.data;
     },

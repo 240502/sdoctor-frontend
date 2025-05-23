@@ -17,7 +17,7 @@ export interface MedicalPackage {
 
 interface Pagination {
     pageIndex?: number;
-    pageSize?: number ;
+    pageSize?: number;
 }
 export interface MedicalPackageOptions extends Pagination {
     clinicId?: number | null;
@@ -25,4 +25,27 @@ export interface MedicalPackageOptions extends Pagination {
     startPrice?: number | null;
     endPrice?: number | null;
     location?: string | null;
+}
+
+export interface MedicalPackageCreateDTO {
+    name: string;
+    summary: string;
+    price: number;
+    clinicId: number;
+    categoryId: number;
+    image: string;
+    preparationProcess: string;
+    serviceDetail: string;
+}
+
+export interface MedicalPackageUpdateDTO {
+    id: number;
+    name: string;
+    summary: string;
+    price: number;
+    clinicId: number;
+    categoryId: number;
+    image: string;
+    preparationProcess: string;
+    serviceDetail: string;
 }
