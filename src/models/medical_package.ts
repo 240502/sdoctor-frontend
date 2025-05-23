@@ -17,7 +17,7 @@ export interface MedicalPackage {
 
 interface Pagination {
     pageIndex?: number;
-    pageSize?: number | null;
+    pageSize?: number ;
 }
 export interface MedicalPackageOptions extends Pagination {
     clinicId?: number | null;

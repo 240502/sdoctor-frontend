@@ -18,13 +18,13 @@ const ServiceCard = ({
         <Row gutter={[24, 24]} className="cards">
             {services?.map((service: MedicalPackage) => {
                 return (
-                    <Col span={6} className="card-item" key={service?.name}>
+                    <Col span={6} className="card-item " key={service?.name}>
                         <div className="card-container rounded border border-1 ">
-                            <div className="service-image">
+                            <div className="service-image text-center">
                                 <Image
+                                    
                                     preview={false}
                                     src={service.image}
-                                    className="rounded"
                                 ></Image>
                             </div>
                             <div className="card-body">
@@ -45,9 +45,9 @@ const ServiceCard = ({
                                 <p className="mb-0 opacity-75 text-center mb-3">
                                     {service.categoryName}
                                 </p>
-                                <div className="clinic-info">
+                                <div className="clinic-info p-3">
                                     <p className="mb-1">
-                                        <DollarOutlined className="me-1" /> Giá:{' '}
+                                        <DollarOutlined className="me-1"/> Giá:{' '}
                                         <span className="text-success fw-bold mb-1">
                                             {service.price.toLocaleString(
                                                 undefined

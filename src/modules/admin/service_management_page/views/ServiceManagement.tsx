@@ -2,11 +2,11 @@ import {
     Breadcrumb,
     notification,
     Divider,
-    Flex,
     Row,
     Col,
     Button,
     Pagination,
+    Skeleton,
 } from 'antd';
 import { HomeOutlined, PlusOutlined } from '@ant-design/icons';
 import {
@@ -17,7 +17,7 @@ import {
 import { useState, useEffect } from 'react';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { configValue } from '../../../../stores/userAtom';
-import { MedicalPackage } from '../../../../models/medical_package';
+import { MedicalPackage, MedicalPackageOptions } from '../../../../models/medical_package';
 import { InputServiceModal } from '../components/InputServiceModal';
 import { Clinic } from '../../../../models/clinic';
 import { ServiceCategory } from '../../../../models/category_services';
@@ -26,6 +26,7 @@ import { serviceListState } from '../../../../stores/medical_packageAtom';
 import ServiceCard from '../components/ServiceCard';
 import { ConfirmModal } from '../../../../components';
 import { openNotification } from '../../../../utils/notification';
+import { useFetchMedicalPackageForAdmin } from '../../../../hooks';
 
 const ServiceManagement = () => {
     const config = useRecoilValue(configValue);
@@ -134,16 +135,24 @@ const ServiceManagement = () => {
             console.log(err.message);
         }
     };
-    useEffect(() => {
-        getServices();
-    }, [pageIndex, pageSize, filterOptions]);
+
+    const [options, setOptions] = useState<MedicalPackageOptions>({
+        pageIndex: 1,
+        pageSize: 8,
+        clinicId:null,
+        categoryIds:null,
+        startPrice:null,
+        endPrice:null,
+        location:null,
+        
+    })
+    const { data, isError, isFetching, refetch, isRefetching } = useFetchMedicalPackageForAdmin(options);
+    
     useEffect(() => {
         getAllClinic();
         getAllServiceCategory();
     }, []);
-    useEffect(() => {
-        console.log('services', services);
-    }, [services]);
+  
     return (
         <>
             {contextHolder}
@@ -168,19 +177,22 @@ const ServiceManagement = () => {
                 </Col>
             </Row>
             <Divider></Divider>
-            <div className="block-services">
-                {services?.length > 0 ? (
+            <Skeleton active loading={isFetching || isRefetching}>
+                    <div className=' block-services'>
+                {!isError ? (
                     <>
                         <ServiceCard
-                            services={services}
+                            services={data?.medicalPackages}
                             onClickEditButton={onClickEditButton}
                             onClickDeleteButton={onClickDeleteButton}
                         />
-                        {pageCount > 1 && (
+                        {data?.pageCount && options?.pageSize && (
                             <Pagination
-                                current={pageIndex}
-                                pageSize={pageSize}
-                                total={pageCount * pageSize}
+                                className='mt-3'
+                                align='center'
+                                current={options.pageIndex}
+                                pageSize={options.pageSize}
+                                total={data?.pageCount * options?.pageSize}
                                 onChange={changePage}
                                 showSizeChanger
                                 pageSizeOptions={['4', '8', '12', '16', '20']}
@@ -189,8 +201,8 @@ const ServiceManagement = () => {
                     </>
                 ) : (
                     <p>Không có gói khám nào!</p>
-                )}
-            </div>
+                )}</div>  
+            </Skeleton>
             {openInputModal && (
                 <InputServiceModal
                     openInputModal={openInputModal}
