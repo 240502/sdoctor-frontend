@@ -1,43 +1,58 @@
-import { useEffect, useRef, useState } from 'react';
-
-import {
-    Table,
-    Button,
-    Pagination,
-    Image,
-    Flex,
-    Tooltip,
-    Switch,
-    Space,
-    Input,
-    InputRef,
-} from 'antd';
-import {
-    SearchOutlined,
-    UserAddOutlined,
-    UserSwitchOutlined,
-} from '@ant-design/icons';
-import { User } from '../../../../models/user';
 import { ColumnsType } from 'antd/es/table';
+import { SupportStaff } from '../../../../models/support_staff';
 import { FilterDropdownProps } from 'antd/es/table/interface';
-
+import { useRef, useState } from 'react';
+import { Button, Flex, Input, InputRef, Space } from 'antd';
+import {
+    DeleteOutlined,
+    EditOutlined,
+    SearchOutlined,
+} from '@ant-design/icons';
 import Highlighter from 'react-highlight-words';
+import { Table } from 'antd/lib';
 
-type DataIndex = keyof User;
-export const UserTable = ({
-    users,
-    pageIndex,
-    pageSize,
-    pageCount,
-    onPageChange,
-    handleOpenAccountModal,
-    onChangeSwitch,
-    handleOpenConfirmModal,
-}: any) => {
+import { useNavigate } from 'react-router-dom';
+import { NoticeType } from 'antd/es/message/interface';
+import { useDeleteSupportStaff } from '../../../../hooks/support_staff';
+import { ConfirmModal } from '../../../../components';
+
+type DataIndex = keyof SupportStaff;
+
+interface StaffTableProps {
+    supportStaffs: SupportStaff[];
+    handleClickEditButton: () => void;
+    openMessage: (type: NoticeType, content: string) => void;
+    refetch: () => void;
+}
+const StaffTable = ({
+    supportStaffs,
+    handleClickEditButton,
+    openMessage,
+    refetch,
+}: StaffTableProps) => {
+    const [deletedId, setDeletedId] = useState<number | null>(null);
+    const [openConfirmModal, setOpenConfirmModal] = useState<boolean>(false);
+
+    const cancelConfirmModal = () => {
+        setDeletedId(null);
+        setOpenConfirmModal(false);
+    };
+    const { mutate: deleteSupportStaff } = useDeleteSupportStaff();
+    const handleConfirm = () => {
+        deleteSupportStaff(deletedId, {
+            onSuccess() {
+                openMessage('success', 'Xóa thành công!');
+                refetch();
+            },
+            onError() {
+                openMessage('success', 'Xóa không thành công!');
+            },
+        });
+    };
+    const navigate = useNavigate();
+    const searchInput = useRef<InputRef>(null);
     const [searchText, setSearchText] = useState('');
     const [searchedColumn, setSearchedColumn] = useState('');
-    const searchInput = useRef<InputRef>(null);
-
     const handleSearch = (
         selectedKeys: string[],
         confirm: FilterDropdownProps['confirm'],
@@ -47,12 +62,10 @@ export const UserTable = ({
         setSearchText(selectedKeys[0]);
         setSearchedColumn(dataIndex);
     };
-
     const handleReset = (clearFilters: () => void) => {
         clearFilters();
         setSearchText('');
     };
-
     const getColumnSearchProps = (dataIndex: DataIndex) => ({
         filterDropdown: ({
             setSelectedKeys,
@@ -138,25 +151,12 @@ export const UserTable = ({
                 text
             ),
     });
-
-    const columns: ColumnsType<User> = [
+    const columns: ColumnsType<SupportStaff> = [
         {
             title: 'Họ và tên',
             ...getColumnSearchProps('fullName'),
             render: (_, record) => {
-                return (
-                    <Flex className="align-items-center">
-                        <div className="w-25">
-                            <Image
-                                src={record.image}
-                                className=" rounded-circle"
-                                preview={false}
-                            ></Image>
-                        </div>
-
-                        <p className="ms-2 mb-0">{record.fullName}</p>
-                    </Flex>
-                );
+                return <>{record.fullName}</>;
             },
         },
         {
@@ -181,90 +181,67 @@ export const UserTable = ({
             title: 'Số điện thoại',
             dataIndex: 'phone',
         },
-
         {
-            title: 'Trạng thái tài khoản',
-            key: 'account-status',
-            render: (_, record) => {
-                return (
-                    <Switch
-                        checked={record?.active === 1 ? true : false}
-                        onChange={(checked: boolean) => {
-                            handleOpenConfirmModal(
-                                record,
-                                'Bạn chắc chắn muốn khóa tài khoản này?',
-                                'update status'
-                            );
-                        }}
-                    />
-                );
+            title: 'Email',
+            dataIndex: 'email',
+            render: (text) => {
+                return text ?? '';
             },
         },
+
         {
             title: 'Chức năng',
             key: 'acton',
             render: (_, record) => {
-                console.log(record?.password === null);
                 return (
                     <>
-                        {record?.password === null && (
-                            <Tooltip placement="top" title="Tạo tài khoản">
-                                <Button
-                                    className="me-2 border-primary"
-                                    onClick={() =>
-                                        handleOpenAccountModal(record)
-                                    }
-                                >
-                                    <UserAddOutlined className="text-primary" />
-                                </Button>
-                            </Tooltip>
-                        )}
-                        {record?.password !== null && (
-                            <Tooltip placement="top" title="Reset mật khẩu">
-                                <Button
-                                    className="border-warning"
-                                    onClick={() => {
-                                        handleOpenConfirmModal(
-                                            record,
-                                            'Bạn chắc chắn muốn reset mật khẩu tài khoản này?',
-                                            'reset password'
-                                        );
-                                    }}
-                                >
-                                    <UserSwitchOutlined className="text-warning" />
-                                </Button>
-                            </Tooltip>
-                        )}
+                        <Button
+                            className="text-warning me-3 border-warning "
+                            onClick={() => {
+                                handleClickEditButton();
+                                const queryParams = new URLSearchParams();
+
+                                queryParams.append(
+                                    'employee',
+                                    record.employeeId.toString()
+                                );
+                                navigate(`/admin/support-staff?${queryParams}`);
+                            }}
+                        >
+                            <EditOutlined />
+                        </Button>
+                        <Button
+                            className="text-danger  border-danger"
+                            onClick={() => {
+                                setDeletedId(record.userId);
+                                setOpenConfirmModal(true);
+                            }}
+                        >
+                            <DeleteOutlined />
+                        </Button>
                     </>
                 );
             },
         },
     ];
-    useEffect(() => {}, [users]);
     return (
         <>
-            {users?.length > 0 ? (
-                <>
-                    <Table
-                        bordered
-                        columns={columns}
-                        dataSource={users}
-                        pagination={false}
-                    />
-                    <Pagination
-                        current={pageIndex}
-                        pageSize={pageSize}
-                        align="center"
-                        className="mt-3"
-                        onChange={onPageChange}
-                        showSizeChanger
-                        pageSizeOptions={['5', '10', '15', '20']}
-                        total={pageSize * pageCount}
-                    />
-                </>
-            ) : (
-                <p className="text-center"> Không có người dùng nào!</p>
+            <Table
+                bordered
+                columns={columns}
+                dataSource={supportStaffs}
+                pagination={false}
+            />
+            {openConfirmModal && (
+                <ConfirmModal
+                    message="Bạn chắc chắn muốn xóa gói khám này"
+                    isOpenModal={openConfirmModal}
+                    onCloseModal={cancelConfirmModal}
+                    handleOk={handleConfirm}
+                />
             )}
         </>
     );
 };
+
+export default StaffTable;

@@ -1,4 +1,7 @@
+import { DoctorExpertises } from './doctor_expertises';
+import { Education } from './education';
 import { Schedules } from './schedule';
+import { WorkExperience } from './work_experience';
 
 interface Pagination {
     pageIndex?: number;
@@ -13,7 +16,7 @@ export interface DoctorOptions extends Pagination {
     gender?: string | null;
     doctorTitles?: string[];
     departmentIds?: number[] | null;
-    searchContent: string | null;
+    searchContent?: string | null;
 }
 export interface CommonDoctorOptions extends Pagination {
     withoutId?: number | null;
@@ -46,6 +49,9 @@ export interface Doctor {
     averageStar: number;
     titleName: string;
     department: number;
+    doctorExpertises: DoctorExpertises[];
+    workExperiences: WorkExperience[];
+    eduction: Education[];
 }
 
 export interface DoctorCreateDto {

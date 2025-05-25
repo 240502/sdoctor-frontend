@@ -39,15 +39,11 @@ const userService = {
         return res;
     },
     async viewUser(data: any, config: any): Promise<any> {
-        const res = await apiClient.post('/api/user/view', data, config);
+        const res = await apiClient.post('/user/view', data, config);
         return res?.data;
     },
-    async createAccount(data: any, config: any): Promise<any> {
-        const res = await apiClient.post(
-            '/api/user/create-account',
-            data,
-            config
-        );
+    async createAccount(data: any): Promise<any> {
+        const res = await apiClient.post('/user/create-account', data);
         return res?.data;
     },
     async updateUserActiveStatus(data: any, config: any): Promise<any> {
@@ -58,12 +54,8 @@ const userService = {
         );
         return res?.data;
     },
-    async resetPassword(data: any, config: any): Promise<any> {
-        const res = await apiClient.put(
-            '/api/user/reset-password',
-            data,
-            config
-        );
+    async resetPassword(data: any): Promise<any> {
+        const res = await apiClient.put('/user/reset-password', data);
         return res?.data;
     },
     async getById(id: number): Promise<any> {

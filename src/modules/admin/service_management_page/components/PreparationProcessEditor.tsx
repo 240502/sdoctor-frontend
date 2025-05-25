@@ -3,14 +3,17 @@ import { CKEditor } from '@ckeditor/ckeditor5-react';
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 export const PreparationProcessEditor = ({
     handleChangeProcessEditor,
-    service,
+    medicalPackage,
 }: any) => {
     const editorRef = useRef<any>(null);
-
     return (
         <CKEditor
             editor={ClassicEditor}
-            data={service !== undefined ? service?.preparation_process : ''}
+            data={
+                medicalPackage !== undefined
+                    ? medicalPackage?.preparationProcess
+                    : ''
+            }
             config={{
                 // Các cấu hình khác nếu cần
                 toolbar: [
@@ -47,7 +50,6 @@ export const PreparationProcessEditor = ({
                 // showSuccess(labelContentRef.current);
             }}
             onChange={(event, editor) => {
-                console.log(editor.isReadOnly);
                 const data = editor.getData();
                 // if (isUpdate) {
                 //     setPost({ ...post, content: data });

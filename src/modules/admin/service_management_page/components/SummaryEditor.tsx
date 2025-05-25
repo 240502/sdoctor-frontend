@@ -1,13 +1,15 @@
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { CKEditor } from '@ckeditor/ckeditor5-react';
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
-export const SummaryEditor = ({ handleChangeSummaryEditor, service }: any) => {
+export const SummaryEditor = ({
+    handleChangeSummaryEditor,
+    medicalPackage,
+}: any) => {
     const editorRef = useRef<any>(null);
-
     return (
         <CKEditor
             editor={ClassicEditor}
-            data={service !== undefined ? service?.summary : ''}
+            data={medicalPackage !== undefined ? medicalPackage?.summary : ''}
             config={{
                 // Các cấu hình khác nếu cần
                 toolbar: [
@@ -44,13 +46,8 @@ export const SummaryEditor = ({ handleChangeSummaryEditor, service }: any) => {
                 // showSuccess(labelContentRef.current);
             }}
             onChange={(event, editor) => {
-                console.log(editor.isReadOnly);
                 const data = editor.getData();
-                // if (isUpdate) {
-                //     setPost({ ...post, content: data });
-                // } else {
                 handleChangeSummaryEditor(data);
-                // }
             }}
         />
     );

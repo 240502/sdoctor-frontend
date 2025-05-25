@@ -19,6 +19,7 @@ export interface User {
     functions: Functions[];
     doctorId: number;
     active: number;
+    roleName: string;
 }
 
 export interface LoginResponse {

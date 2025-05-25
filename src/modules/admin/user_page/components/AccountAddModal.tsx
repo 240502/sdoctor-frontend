@@ -1,12 +1,11 @@
 import { Form, Modal, Input, Button } from 'antd';
-import { UserService } from '../../../../services/user.service';
+import { userService } from '../../../../services';
 
 export const UserAddModal = ({
     openAccountModal,
     handleCloseModal,
     user,
     openNotification,
-    header,
     getUsers,
 }: any) => {
     const [form] = Form.useForm();
@@ -14,15 +13,14 @@ export const UserAddModal = ({
     const onFinish = (values: any) => {
         console.log('Form values:', values);
         const data = {
-            userId: user?.user_id,
+            userId: user?.userId,
             password: values?.password,
         };
         CreateAccount(data);
     };
     const CreateAccount = async (data: any) => {
         try {
-            const res = await UserService.createAccount(data, header);
-            console.log(res);
+            const res = await userService.createAccount(data);
             openNotification(
                 'success',
                 'Thông báo',
@@ -83,12 +81,6 @@ export const UserAddModal = ({
                     name="password"
                     rules={[
                         { required: true, message: 'Password is required!' },
-                        {
-                            pattern:
-                                /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
-                            message:
-                                'Mật khẩu phải có ít nhất 8 ký tự bao gồm chữ cái thường, hoa, ký tự đặc biệt và số!',
-                        },
                     ]}
                 >
                     <Input.Password

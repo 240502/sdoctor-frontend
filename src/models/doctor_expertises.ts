@@ -3,6 +3,7 @@ export interface DoctorExpertises {
     doctorId: number;
     specialtyId: number;
     expertieseId: number;
+    expertise: string;
 }
 
 export interface DoctorExpertisesCreateDto {

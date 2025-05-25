@@ -1,6 +1,10 @@
 import { useMutation, useQuery, UseQueryResult } from '@tanstack/react-query';
 import { medicalPackageService } from '../../services';
-import { MedicalPackage, MedicalPackageCreateDTO } from '../../models';
+import {
+    MedicalPackage,
+    MedicalPackageCreateDTO,
+    MedicalPackageUpdateDTO,
+} from '../../models';
 export const useFetchMedicalPackageById = (
     id: number | null
 ): UseQueryResult<MedicalPackage, Error> => {
@@ -21,5 +25,13 @@ export const useCreateMedicalPackage = () => {
         mutationKey: ['useCreateMedicalPackage'],
         mutationFn: (medicalPackage: MedicalPackageCreateDTO) =>
             medicalPackageService.createService(medicalPackage),
+    });
+};
+
+export const useUpdateMedicalPackage = () => {
+    return useMutation({
+        mutationKey: ['useUpdateMedicalPackage'],
+        mutationFn: (medicalPackage: MedicalPackageUpdateDTO) =>
+            medicalPackageService.updateService(medicalPackage),
     });
 };

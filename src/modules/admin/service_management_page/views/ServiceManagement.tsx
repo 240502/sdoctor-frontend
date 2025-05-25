@@ -21,14 +21,15 @@ import { ServiceCategory } from '../../../../models/category_services';
 import ServiceCard from '../components/ServiceCard';
 import { useFetchMedicalPackageForAdmin } from '../../../../hooks';
 import { NoticeType } from 'antd/es/message/interface';
+import { useQueryClient } from '@tanstack/react-query';
+import { useSearchParams } from 'react-router-dom';
 
 const ServiceManagement = () => {
+    const [searchParams] = useSearchParams();
     const [api, contextHolder] = message.useMessage();
     const [openInputModal, setOpenInputModal] = useState<boolean>(false);
     const [isUpdate, setIsUpdate] = useState<boolean>(false);
-    const [medicalPackage, setMedicalPackage] = useState<MedicalPackage>(
-        {} as MedicalPackage
-    );
+    const queryClient = useQueryClient();
     const [clinics, setClinics] = useState<Clinic[]>([]);
     const [categories, setCategories] = useState<ServiceCategory[]>([]);
     const [options, setOptions] = useState<MedicalPackageOptions>({
@@ -71,13 +72,17 @@ const ServiceManagement = () => {
         useFetchMedicalPackageForAdmin(options);
     const onClickEditButton = (medicalPackage: MedicalPackage) => {
         setIsUpdate(true);
-        setMedicalPackage(medicalPackage);
         setOpenInputModal(true);
     };
     const cancelModal = () => {
-        setMedicalPackage({} as MedicalPackage);
         setOpenInputModal(false);
         setIsUpdate(false);
+        queryClient.removeQueries({
+            queryKey: [
+                'useFetchMedicalPackageById',
+                JSON.stringify(Number(searchParams.get('package'))),
+            ],
+        });
     };
     useEffect(() => {
         getAllClinic();
@@ -116,8 +121,10 @@ const ServiceManagement = () => {
                     {!isError ? (
                         <>
                             <ServiceCard
-                                services={data?.medicalPackages}
+                                medicalPackages={data?.medicalPackages}
                                 onClickEditButton={onClickEditButton}
+                                openMessage={openMessage}
+                                refetch={refetch}
                             />
                             {data?.pageCount && options?.pageSize && (
                                 <Pagination

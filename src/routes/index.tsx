@@ -32,6 +32,7 @@ import { Profile } from '../modules/admin/profile_page';
 import { ScheduleManagement } from '../modules/admin/schedule_page';
 import { ServiceManagement } from '../modules/admin/service_management_page';
 import { UserManagement } from '../modules/admin/user_page';
+
 import {
     VIEW_POST_BY_CATEGORY_PATH,
     VIEW_MAJOR_PATH,
@@ -62,9 +63,10 @@ import {
     PROFILE_PATH,
     SERVICE_MANAGEMENT_PATH,
     APPOINTMENT_DETAIL_PATH,
-    ADD_DOCTOR_PATH,
+    SUPPORT_STAFF_PATH,
 } from './path';
 import AppointmentDetailPage from '../modules/admin/appointment_detail_page';
+import { StaffManagement } from '../modules/admin/staff_management_page';
 export const publicRoutes = [
     {
         path: BOOKING_SUCCESS_PATH,
@@ -212,6 +214,11 @@ export const privateRoutes = [
     {
         path: SERVICE_MANAGEMENT_PATH,
         component: ServiceManagement,
+        layout: AdminLayout,
+    },
+    {
+        path: SUPPORT_STAFF_PATH,
+        component: StaffManagement,
         layout: AdminLayout,
     },
 ];

@@ -1,24 +1,17 @@
 import apiClient from '../constants/api';
-import { MedicalPackageCreateDTO } from '../models';
+import { MedicalPackageUpdateDTO, MedicalPackageCreateDTO } from '../models';
 
 const medicalPackageService = {
     async createService(payload: MedicalPackageCreateDTO): Promise<any> {
         const res = await apiClient.post('/medical-package/create', payload);
         return res;
     },
-    async deleteService(id: number, config: any): Promise<any> {
-        const res = await apiClient.delete(
-            '/medical-package/delete/' + id,
-            config
-        );
+    async deleteService(id: number | null): Promise<any> {
+        const res = await apiClient.delete('/medical-package/delete/' + id);
         return res;
     },
-    async updateService(data: any, config: any): Promise<any> {
-        const res = await apiClient.put(
-            '/medical-package/update/',
-            data,
-            config
-        );
+    async updateService(data: MedicalPackageUpdateDTO): Promise<any> {
+        const res = await apiClient.put('/medical-package/update/', data);
         return res;
     },
     async getMedicalPackageById(id: number | null): Promise<any> {

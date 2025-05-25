@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { UserService } from '../../../../services/user.service';
 import { useRecoilValue } from 'recoil';
 import { configValue } from '../../../../stores/userAtom';
 import { notification, Breadcrumb, Divider, Flex, Button, Select } from 'antd';
@@ -8,6 +7,7 @@ import { UserTable } from '../components/UserTable';
 import { UserAddModal } from '../components/AccountAddModal';
 import { ConfirmModal } from '../../../../components';
 import { User } from '../../../../models/user';
+import { userService } from '../../../../services';
 
 type NotificationType = 'success' | 'error';
 const UserManagement = () => {
@@ -74,7 +74,7 @@ const UserManagement = () => {
                 pageSize: pageSize,
                 active: active,
             };
-            const res = await UserService.viewUser(data, header);
+            const res = await userService.viewUser(data, header);
             console.log(res);
             setUsers(res.data);
             setPageCount(res.pageCount);
@@ -90,7 +90,7 @@ const UserManagement = () => {
                 userId: user.userId,
                 active: active === 1 ? 0 : 1,
             };
-            const res = await UserService.updateUserActiveStatus(data, header);
+            const res = await userService.updateUserActiveStatus(data, header);
             console.log(res);
             openNotification(
                 'success',
@@ -114,7 +114,7 @@ const UserManagement = () => {
             const data = {
                 userId: user.userId,
             };
-            const res = await UserService.resetPassword(data, header);
+            const res = await userService.resetPassword(data);
             console.log(res);
             openNotification(
                 'success',
@@ -153,10 +153,7 @@ const UserManagement = () => {
                 ></Breadcrumb>
             </div>
             <Divider></Divider>
-            <Flex className="justify-content-between">
-                <h5>Danh sách người dùng</h5>
-            </Flex>
-            <Divider></Divider>
+
             <div className="filter-option mb-3">
                 <Select
                     className="col-2"
@@ -190,7 +187,7 @@ const UserManagement = () => {
                     getUsers={getUsers}
                 />
             )}
-            {openConfirmModal && (
+            {/* {openConfirmModal && (
                 <ConfirmModal
                     message={message}
                     openModal={openConfirmModal}
@@ -201,7 +198,7 @@ const UserManagement = () => {
                             : updateUserActiveStatus
                     }
                 />
-            )}
+            )} */}
         </div>
     );
 };

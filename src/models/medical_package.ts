@@ -39,7 +39,7 @@ export interface MedicalPackageCreateDTO {
 }
 
 export interface MedicalPackageUpdateDTO {
-    id: number;
+    id?: number;
     name: string;
     summary: string;
     price: number;

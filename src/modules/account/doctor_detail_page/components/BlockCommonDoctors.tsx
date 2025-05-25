@@ -55,7 +55,7 @@ const BlockCommonDoctors = ({ doctorId }: { doctorId: number }) => {
                                             {doctor.title} {doctor?.fullName}
                                         </p>
                                         <Tag color="blue" className="mb-2">
-                                            {doctor.majorName}
+                                            {doctor.departmentName}
                                         </Tag>
                                         <p>
                                             <EnvironmentOutlined />{' '}

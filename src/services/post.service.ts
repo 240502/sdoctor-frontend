@@ -17,7 +17,7 @@ const postService = {
 
     async viewPost(payload: FetchPostPayload): Promise<PostResponse> {
         const res: AxiosResponse<PostResponse> = await apiClient.get(
-            `/post/get-post-with-options?searchContent=${payload.searchContent}&categoryId=${payload.categoryId}&pageIndex=${payload.pageIndex}&pageSize=${payload.pageSize}&status=${payload.status}&authorId=${payload.authorId}`
+            `/post/get-post-with-options?position=${payload.position}&searchContent=${payload.searchContent}&categoryId=${payload.categoryId}&pageIndex=${payload.pageIndex}&pageSize=${payload.pageSize}&status=${payload.status}&authorId=${payload.authorId}`
         );
         return res.data;
     },

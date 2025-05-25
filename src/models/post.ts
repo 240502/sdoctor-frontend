@@ -39,6 +39,7 @@ export interface FetchPostPayload {
     pageSize: number;
     status: string | null;
     authorId: number | null;
+    position: string | null;
 }
 
 export interface PostResponse {

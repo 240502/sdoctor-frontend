@@ -36,6 +36,7 @@ const NewsManagement = () => {
         authorId: user.userId,
         pageIndex: 1,
         pageSize: 8,
+        position: user.roleName,
     });
     const openNotificationWithIcon = (
         type: NotificationType,

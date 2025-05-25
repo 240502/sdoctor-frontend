@@ -16,17 +16,16 @@ import {
     Flex,
     Skeleton,
 } from 'antd';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { baseURL } from '../../../../constants/api';
 import parse from 'html-react-parser';
-import { useSetRecoilState } from 'recoil';
-import { doctorState } from '../../../../stores/doctorAtom';
 import { useNavigate } from 'react-router-dom';
 import { useFetchDoctorDetail } from '../../../../hooks';
 import { BlockComment } from '../components/BlockComment';
 import BlockCommonDoctors from '../components/BlockCommonDoctors';
 import { joinRoom } from '../../../../socket';
+import DoctorInfoDetail from '../components/DoctorInfoDetail';
 type DataParams = {
     id: string;
 };
@@ -37,12 +36,12 @@ const ViewDetailDoctor = () => {
     const items: TabsProps['items'] = [
         {
             key: '1',
-            label: 'Thông tin chi tiết',
-            children: <>{parse(String(data?.introduction))}</>,
+            label: <h6>Thông tin chi tiết</h6>,
+            children: <DoctorInfoDetail doctor={data} />,
         },
         {
             key: '2',
-            label: 'Đánh giá',
+            label: <h6>Đánh giá</h6>,
             children: <BlockComment doctorId={Number(id)} />,
         },
     ];

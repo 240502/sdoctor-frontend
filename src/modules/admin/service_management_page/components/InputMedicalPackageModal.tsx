@@ -27,9 +27,11 @@ import { ServiceCategory } from '../../../../models';
 import {
     useFetchMedicalPackageById,
     useCreateMedicalPackage,
+    useUpdateMedicalPackage,
 } from '../../../../hooks';
 import { useSearchParams } from 'react-router-dom';
 import { NoticeType } from 'antd/es/message/interface';
+import { useQueryClient } from '@tanstack/react-query';
 
 interface InputMedicalPackageModalProps {
     openInputModal: boolean;
@@ -49,19 +51,26 @@ export const InputMedicalPackageModal = ({
     openMessage,
     refetch,
 }: InputMedicalPackageModalProps) => {
+    const queryClient = useQueryClient();
     const [searchParams] = useSearchParams();
     const { mutate: createMedicalPackage } = useCreateMedicalPackage();
+    const { mutate: updateMedicalPackage } = useUpdateMedicalPackage();
     const { data, isError, isFetching } = useFetchMedicalPackageById(
-        searchParams.get('medical') ? Number(searchParams.get('medical')) : null
+        searchParams.get('package') ? Number(searchParams.get('package')) : null
     );
-    const [medicalPackage, setMedicalPackage] = useState<MedicalPackage>(
-        {} as MedicalPackage
-    );
+
     const [previewOpen, setPreviewOpen] = useState(false);
     const [previewImage, setPreviewImage] = useState('');
     const [fileList, setFileList] = useState<UploadFile[]>([]);
     const [form] = Form.useForm();
+    const normFile = (e: any) => {
+        if (Array.isArray(e)) {
+            return e;
+        }
+        console.log(e);
 
+        return e?.fileList;
+    };
     const getBase64 = (file: FileType): Promise<string> =>
         new Promise((resolve, reject) => {
             const reader = new FileReader();
@@ -78,9 +87,12 @@ export const InputMedicalPackageModal = ({
         setPreviewOpen(true);
     };
 
-    const handleChange: UploadProps['onChange'] = ({ fileList: newFileList }) =>
+    const handleChange: UploadProps['onChange'] = ({
+        fileList: newFileList,
+    }) => {
         setFileList(newFileList);
-
+        form.setFieldsValue({ image: newFileList });
+    };
     const uploadButton = (
         <button style={{ border: 0, background: 'none' }} type="button">
             <PlusOutlined />
@@ -100,51 +112,59 @@ export const InputMedicalPackageModal = ({
         }
     };
     const handleChangeSummaryEditor = (data: any) => {
-        console.log('set data');
-        setMedicalPackage({ ...medicalPackage, summary: data });
+        form.setFieldsValue({ summary: data });
     };
     const handleChangeProcessEditor = (data: any) => {
-        setMedicalPackage({ ...medicalPackage, preparationProcess: data });
+        form.setFieldsValue({ preparationProcess: data });
     };
     const handleChangeDetailEditor = (data: any) => {
-        setMedicalPackage({ ...medicalPackage, serviceDetail: data });
+        form.setFieldsValue({ packageDetail: data });
     };
-    useEffect(() => {}, [data]);
     const onFinish = (values: {
         image: UploadFile[];
         name: string;
         price: number;
         clinicId: number;
         categoryId: number;
+        summary: string;
+        preparationProcess: string;
+        packageDetail: string;
     }) => {
-        console.log('values', values);
-        console.log(isUpdate);
-
         if (isUpdate) {
+            console.log('values');
+
             const newMedicalPackage: MedicalPackageUpdateDTO = {
-                id: medicalPackage.id,
+                id: data?.id,
                 name: values?.name,
-                summary: medicalPackage.summary,
+                summary: values.summary,
                 price: values?.price,
                 clinicId: values?.clinicId,
                 categoryId: values?.categoryId,
-                image: fileList[0].url ?? '',
-                preparationProcess: medicalPackage?.preparationProcess,
-                serviceDetail: medicalPackage?.serviceDetail,
+                image: values.image[0].url ?? '',
+                preparationProcess: values?.preparationProcess,
+                serviceDetail: values?.packageDetail,
             };
+            updateMedicalPackage(newMedicalPackage, {
+                onSuccess() {
+                    openMessage('success', 'Cập nhật thành công!');
+                    refetch();
+                    cancelModal();
+                },
+                onError() {
+                    openMessage('error', 'Cập nhật không thành công!');
+                },
+            });
         } else {
             const newMedicalPackage: MedicalPackageCreateDTO = {
                 name: values?.name,
-                summary: medicalPackage.summary,
+                summary: values.summary,
                 price: values?.price,
                 clinicId: values?.clinicId,
                 categoryId: values?.categoryId,
-                image: fileList[0].url ?? '',
-                preparationProcess: medicalPackage?.preparationProcess,
-                serviceDetail: medicalPackage?.serviceDetail,
+                image: values.image[0].url ?? '',
+                preparationProcess: values?.preparationProcess,
+                serviceDetail: values?.packageDetail,
             };
-            console.log('create', newMedicalPackage);
-
             createMedicalPackage(newMedicalPackage, {
                 onSuccess() {
                     openMessage('success', 'Thêm thành công!');
@@ -158,70 +178,6 @@ export const InputMedicalPackageModal = ({
         }
     };
 
-    const normFile = (e: any) => {
-        if (Array.isArray(e)) {
-            return e;
-        }
-        return e?.fileList;
-    };
-    // const CreateService = async (data: any) => {
-    //     try {
-    //         const res = await medicalPackageService.createService(data, config);
-    //         console.log(res.data.result[0]);
-    //         setServices((prvServices: MedicalPackage[]) => [
-    //             ...prvServices,
-    //             res.data.result[0],
-    //         ]);
-    //         openNotification(
-    //             notificationApi,
-    //             'success',
-    //             'Thông báo',
-    //             'Thêm thành công!'
-    //         );
-    //         cancelModal();
-    //     } catch (err: any) {
-    //         console.log(err.message);
-    //         openNotification(
-    //             notificationApi,
-    //             'error',
-    //             'Thông báo',
-    //             'Thêm không thành công!'
-    //         );
-    //     }
-    // };
-    // const UpdateService = async (data: any) => {
-    //     try {
-    //         const res = await medicalPackageService.updateService(data, config);
-    //         setServices((prvServices: MedicalPackage[]) => {
-    //             return prvServices.map((service: MedicalPackage) => {
-    //                 return service.id === data?.id
-    //                     ? {
-    //                           ...data,
-    //                           clinic_name: service.clinicName,
-    //                           category_name: service.categoryName,
-    //                           location: service.location,
-    //                       }
-    //                     : service;
-    //             });
-    //         });
-    //         openNotification(
-    //             notificationApi,
-    //             'success',
-    //             'Thông báo',
-    //             'Sửa thành công!'
-    //         );
-    //         cancelModal();
-    //     } catch (err: any) {
-    //         openNotification(
-    //             notificationApi,
-    //             'success',
-    //             'Thông báo',
-    //             'Sửa không thành công!'
-    //         );
-    //         console.log(err.message);
-    //     }
-    // };
-
     useEffect(() => {
         if (data) {
             form.setFieldsValue({
@@ -229,6 +185,9 @@ export const InputMedicalPackageModal = ({
                 categoryId: data.categoryId,
                 name: data.name,
                 price: data.price,
+                summary: data.summary,
+                preparationProcess: data.preparationProcess,
+                packageDetail: data.serviceDetail,
                 image: data.image
                     ? [
                           {
@@ -252,7 +211,6 @@ export const InputMedicalPackageModal = ({
                       ]
                     : []
             );
-            setMedicalPackage(data);
         }
     }, [data]);
     return (
@@ -360,32 +318,38 @@ export const InputMedicalPackageModal = ({
                         </Form.Item>
                     </Col>
                     <Col span={24}>
-                        <Form.Item label="Về gói khám">
+                        <Form.Item label="Về gói khám" name={'summary'}>
                             <SummaryEditor
                                 handleChangeSummaryEditor={
                                     handleChangeSummaryEditor
                                 }
-                                service={medicalPackage}
+                                medicalPackage={data}
                             ></SummaryEditor>
                         </Form.Item>
                     </Col>
                     <Col span={24}>
-                        <Form.Item label="Quá trình chuẩn bị">
+                        <Form.Item
+                            label="Quá trình chuẩn bị"
+                            name={'preparationProcess'}
+                        >
                             <PreparationProcessEditor
                                 handleChangeProcessEditor={
                                     handleChangeProcessEditor
                                 }
-                                service={medicalPackage}
+                                medicalPackage={data}
                             ></PreparationProcessEditor>
                         </Form.Item>
                     </Col>
                     <Col span={24}>
-                        <Form.Item label="Chi tiết gói khám">
+                        <Form.Item
+                            label="Chi tiết gói khám"
+                            name={'packageDetail'}
+                        >
                             <ServiceDetailEditor
                                 handleChangeDetailEditor={
                                     handleChangeDetailEditor
                                 }
-                                service={medicalPackage}
+                                medicalPackage={data}
                             />
                         </Form.Item>
                     </Col>

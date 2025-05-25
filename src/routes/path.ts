@@ -31,7 +31,9 @@ const PROFILE_PATH = '/admin/profile';
 const SERVICE_MANAGEMENT_PATH = '/admin/service';
 const APPOINTMENT_DETAIL_PATH = '/admin/appointment-detail';
 const ADD_DOCTOR_PATH = '/admin/add-doctor';
+const SUPPORT_STAFF_PATH = '/admin/support-staff';
 export {
+    SUPPORT_STAFF_PATH,
     SERVICE_MANAGEMENT_PATH,
     PROFILE_PATH,
     INVOICE_MANAGEMENT_PATH,

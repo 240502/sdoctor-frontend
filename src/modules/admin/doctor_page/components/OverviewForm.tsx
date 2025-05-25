@@ -554,7 +554,6 @@ export const OverviewForm = ({
                             </Form.Item>
                         </Col>
                         <Col span={12}>
-                            {/* Xã phường */}
                             <Form.Item
                                 label="Xã/Phường"
                                 name="commune"

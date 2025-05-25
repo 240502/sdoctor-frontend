@@ -9,52 +9,72 @@ import { MedicalPackage } from '../../../../models/medical_package';
 import { useState } from 'react';
 import { ConfirmModal } from '../../../../components';
 import { useNavigate } from 'react-router-dom';
+import { useDeleteMedicalPackage } from '../../../../hooks';
+import { NoticeType } from 'antd/es/message/interface';
 
+interface ServiceCardProps {
+    medicalPackages?: MedicalPackage[];
+    onClickEditButton: (medicalPackage: MedicalPackage) => void;
+    openMessage: (type: NoticeType, content: string) => void;
+    refetch: () => void;
+}
 const ServiceCard = ({
-    services,
+    medicalPackages,
     onClickEditButton,
-    onClickDeleteButton,
-}: any) => {
+    openMessage,
+    refetch,
+}: ServiceCardProps) => {
     const [openConfirmModal, setOpenConfirmModal] = useState<boolean>(false);
-    const [openInputModal, setOpenInputModal] = useState<boolean>(false);
-    const [deletedId, setDeletedId] = useState<number | null>();
+    const [deletedId, setDeletedId] = useState<number | null>(null);
 
     const cancelConfirmModal = () => {
         setDeletedId(null);
         setOpenConfirmModal(false);
     };
+    const { mutate: deleteMedicalPackage } = useDeleteMedicalPackage();
     const navigate = useNavigate();
+    const handleConfirm = () => {
+        deleteMedicalPackage(deletedId, {
+            onSuccess() {
+                openMessage('success', 'Xóa thành công!');
+                refetch();
+            },
+            onError() {
+                openMessage('success', 'Xóa không thành công!');
+            },
+        });
+    };
     return (
         <>
             <Row gutter={[24, 24]} className="cards">
-                {services?.map((service: MedicalPackage) => {
+                {medicalPackages?.map((medicalPackage: MedicalPackage) => {
                     return (
                         <Col
                             span={6}
                             className="card-item "
-                            key={service?.name}
+                            key={medicalPackage?.name}
                         >
                             <div className="card-container flex-grow-1 border border-1  p-3  rounded border border-1 h-100 d-flex flex-column ">
                                 <div className="service-image">
                                     <Image
                                         preview={false}
-                                        src={service.image}
+                                        src={medicalPackage.image}
                                         className="rounded"
                                     ></Image>
                                 </div>
                                 <div className="card-body">
                                     <h6 className="doctor-name text-center mt-1">
-                                        {service.name}
+                                        {medicalPackage.name}
                                     </h6>
                                     <p className="mb-0 opacity-75 text-center mb-3">
-                                        {service.categoryName}
+                                        {medicalPackage.categoryName}
                                     </p>
                                     <div className="clinic-info p-2 rounded mt-3">
                                         <p className="mb-1">
                                             <DollarOutlined className="me-1" />{' '}
                                             Giá:{' '}
                                             <span className="text-success fw-bold mb-1">
-                                                {service.price.toLocaleString(
+                                                {medicalPackage.price.toLocaleString(
                                                     undefined
                                                 )}{' '}
                                                 VNĐ
@@ -62,12 +82,12 @@ const ServiceCard = ({
                                         </p>
                                         <p className="mb-1">
                                             <i className="fa-regular fa-hospital me-1"></i>
-                                            {service.clinicName}
+                                            {medicalPackage.clinicName}
                                         </p>
 
                                         <p>
                                             <EnvironmentOutlined className="me-1" />{' '}
-                                            {service.location}
+                                            {medicalPackage.location}
                                         </p>
                                     </div>
                                 </div>
@@ -75,13 +95,13 @@ const ServiceCard = ({
                                     <Button
                                         className="border-0 text-success"
                                         onClick={() => {
-                                            onClickEditButton(service);
+                                            onClickEditButton(medicalPackage);
                                             const queryParams =
                                                 new URLSearchParams();
 
                                             queryParams.append(
                                                 'package',
-                                                service.id.toString()
+                                                medicalPackage.id.toString()
                                             );
                                             navigate(
                                                 `/admin/service?${queryParams}`
@@ -92,9 +112,10 @@ const ServiceCard = ({
                                     </Button>
                                     <Button
                                         className="border-0 text-danger"
-                                        onClick={() =>
-                                            onClickDeleteButton(service)
-                                        }
+                                        onClick={() => {
+                                            setDeletedId(medicalPackage.id);
+                                            setOpenConfirmModal(true);
+                                        }}
                                     >
                                         <DeleteOutlined /> Xóa
                                     </Button>
@@ -104,14 +125,14 @@ const ServiceCard = ({
                     );
                 })}
             </Row>
-            {/* {openConfirmModal && (
+            {openConfirmModal && (
                 <ConfirmModal
                     message="Bạn chắc chắn muốn xóa gói khám này"
-                    // openModal={openConfirmModal}
-                    handleCancelModal={cancelConfirmModal}
-                    handleOk={DeleteService}
+                    isOpenModal={openConfirmModal}
+                    onCloseModal={cancelConfirmModal}
+                    handleOk={handleConfirm}
                 />
-            )} */}
+            )}
         </>
     );
 };

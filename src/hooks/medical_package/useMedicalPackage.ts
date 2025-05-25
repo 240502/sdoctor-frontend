@@ -1,9 +1,6 @@
-
-
-import { useQuery, UseQueryResult } from "@tanstack/react-query";
-import { MedicalPackage, MedicalPackageOptions } from "../../models";
-import { medicalPackageService } from "../../services";
-
+import { useMutation, useQuery, UseQueryResult } from '@tanstack/react-query';
+import { MedicalPackage, MedicalPackageOptions } from '../../models';
+import { medicalPackageService } from '../../services';
 
 interface PaginatedMedicalPackage {
     medicalPackages: MedicalPackage[];
@@ -12,11 +9,19 @@ interface PaginatedMedicalPackage {
     totalItems: number;
 }
 
-export const useFetchMedicalPackageForAdmin = (payload: MedicalPackageOptions):UseQueryResult<PaginatedMedicalPackage,Error> => {
-    return useQuery<PaginatedMedicalPackage,Error>({
-        queryKey: ["useFetchMedicalPackageForAdmin", payload],
-        queryFn: () => medicalPackageService.viewService(payload)
-        
-    })
-    
-}
+export const useFetchMedicalPackageForAdmin = (
+    payload: MedicalPackageOptions
+): UseQueryResult<PaginatedMedicalPackage, Error> => {
+    return useQuery<PaginatedMedicalPackage, Error>({
+        queryKey: ['useFetchMedicalPackageForAdmin', payload],
+        queryFn: () => medicalPackageService.viewService(payload),
+    });
+};
+
+export const useDeleteMedicalPackage = () => {
+    return useMutation({
+        mutationKey: ['useDeleteMedicalPackage'],
+        mutationFn: (id: number | null) =>
+            medicalPackageService.deleteService(id),
+    });
+};

@@ -142,11 +142,11 @@ main {
         border-radius: 6px;
         padding: 16px;
     }
-    .summary h6 {
+    h6.title {
         gap: 8px;
         align-items: center;
     }
-    .summary h6::before {
+    h6.title::before {
         display: block;
         content: '';
         width: 2px;
