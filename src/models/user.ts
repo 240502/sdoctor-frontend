@@ -20,6 +20,7 @@ export interface User {
     doctorId: number;
     active: number;
     roleName: string;
+    supporterId: number;
 }
 
 export interface LoginResponse {

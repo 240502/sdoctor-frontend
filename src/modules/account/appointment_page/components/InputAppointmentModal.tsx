@@ -11,6 +11,7 @@ import {
     DatePicker,
     Select,
     Switch,
+    InputNumber,
 } from 'antd';
 import dayjs from 'dayjs';
 import TextArea from 'antd/es/input/TextArea';
@@ -35,6 +36,8 @@ import {
     PhoneOutlined,
     UserOutlined,
 } from '@ant-design/icons';
+import { useFetchDoctorServicesByDoctorId } from '../../../../hooks/doctor_service';
+import { DoctorService } from '../../../../models/doctor_service';
 
 const InputAppointmentModal = ({
     openModal,
@@ -47,15 +50,12 @@ const InputAppointmentModal = ({
     refetch,
 }: any) => {
     const [searchParams] = useSearchParams();
-
-    const [provinces, setProvinces] = useState<ProvinceType[]>([]);
-    const [districts, setDistricts] = useState<DistrictType[]>([]);
-    const [wards, setWards] = useState<WardType[]>([]);
-    const [district, setDistrict] = useState<DistrictType>({} as DistrictType);
-    const [province, setProvince] = useState<ProvinceType>({} as ProvinceType);
-    const [ward, setWard] = useState<WardType>({} as WardType);
+    const { data: doctorService } = useFetchDoctorServicesByDoctorId(
+        doctor?.doctorId
+    );
+    const [selectedService, setSelectedService] =
+        useState<DoctorService | null>(null);
     const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
-    const [saveProfile, setSaveProfile] = useState<boolean>(false);
     const [form] = Form.useForm();
     const navigate = useNavigate();
 
@@ -68,8 +68,6 @@ const InputAppointmentModal = ({
             console.log(err.message);
         }
     };
-    useEffect(() => console.log(paymentMethods), [paymentMethods]);
-
     const sendBookingSuccessMail = useSendBookingSuccessMail();
     const { mutate: createAppointment } = useCreateAppointment();
     const handleSendBookingSuccessMail = (payload: any) => {
@@ -120,8 +118,8 @@ const InputAppointmentModal = ({
                     date: date,
                     location: doctor.location,
                     status: 'Chờ xác nhận',
-                    fee: 10000,
-                    serviceName: doctor.serviceName,
+                    fee: values.servicePrice,
+                    serviceName: selectedService?.serviceName,
                 };
                 handleSendBookingSuccessMail(mailPayload);
                 openMessage('Success', 'Đặt lịch hẹn thành công !');
@@ -131,8 +129,8 @@ const InputAppointmentModal = ({
                 const newInvoice = {
                     appointmentId: appointment?.id,
                     doctorId: doctor.doctorId,
-                    serviceId: doctor.serviceId,
-                    amount: doctor.price,
+                    serviceId: values.serviceId,
+                    amount: values.servicePrice,
                     paymentMethod: values.payment_method,
                 };
                 console.log('new invoice', newInvoice);
@@ -148,6 +146,8 @@ const InputAppointmentModal = ({
                         if (values.payment_method === 1) {
                             navigate(`/booking-success?${queryParams}`);
                         } else {
+                            console.log(values.payment_method);
+
                             createPayment.mutate(appointment.id);
                         }
                     },
@@ -162,10 +162,16 @@ const InputAppointmentModal = ({
 
     useEffect(() => {
         getAllPaymentMethod();
-        if (doctor) {
-            const doctorId = searchParams.get('doctorId');
-        }
     }, []);
+    useEffect(() => {
+        if (doctorService && doctorService.length > 0) {
+            const firstService = doctorService[0];
+            form.setFieldsValue({
+                serviceId: firstService.id,
+                servicePrice: Number(firstService.customPrice),
+            });
+        }
+    }, [doctorService]);
     return (
         <Modal
             title={
@@ -185,7 +191,7 @@ const InputAppointmentModal = ({
                     span={8}
                     className="left appointment-info border border-start-0 border-top-0 border-bottom-0"
                 >
-                    <h6 className="title">Thông tin bác sĩ</h6>
+                    <h6 className="">Thông tin bác sĩ</h6>
                     <div className="doctor-info text-center">
                         <Image
                             src={doctor?.image}
@@ -211,18 +217,6 @@ const InputAppointmentModal = ({
                         <p>
                             {' '}
                             <strong>Địa điểm: </strong> {doctor.location}
-                        </p>
-                    </div>
-                    <div className="fee">
-                        <p>
-                            {' '}
-                            <strong>Phí khám: </strong>{' '}
-                            {doctor?.price?.toLocaleString(undefined)} đ
-                        </p>
-                    </div>
-                    <div className="service">
-                        <p>
-                            <strong>Dịch vụ khám:</strong> {doctor.serviceName}
                         </p>
                     </div>
                 </Col>
@@ -313,6 +307,7 @@ const InputAppointmentModal = ({
                             </Col>
                         </Col>
                     </Row>
+
                     <Form
                         form={form}
                         layout="vertical"
@@ -321,7 +316,46 @@ const InputAppointmentModal = ({
                             payment_method: 1,
                         }}
                     >
-                        {/* Reason */}
+                        <Form.Item
+                            label={<p className="fw-bold mb-2">Dịch vụ khám</p>}
+                            name="serviceId"
+                        >
+                            <Select
+                                placeholder="Chọn dịch vụ khám"
+                                className="w-100"
+                                onChange={(value: number) => {
+                                    const selectedService = doctorService?.find(
+                                        (service: DoctorService) =>
+                                            service.id === value
+                                    );
+                                    setSelectedService(selectedService);
+                                    form.setFieldsValue({
+                                        servicePrice: Number(
+                                            selectedService?.customPrice
+                                        ),
+                                    });
+                                }}
+                                options={doctorService?.map(
+                                    (service: DoctorService) => ({
+                                        label: service.serviceName,
+                                        value: service.id,
+                                    })
+                                )}
+                            ></Select>
+                        </Form.Item>
+                        <Form.Item
+                            label={<p className="fw-bold mb-2">Giá vụ khám</p>}
+                            name="servicePrice"
+                        >
+                            <InputNumber
+                                style={{ width: '100%' }}
+                                readOnly
+                                addonAfter="VND"
+                                formatter={(value) =>
+                                    `${Number(value).toLocaleString()}`
+                                }
+                            />
+                        </Form.Item>
                         <Form.Item
                             label={<p className="fw-bold mb-2">Lý do khám</p>}
                             name="reason"

@@ -1,1 +1,1 @@
-export * from './useFetchAllDoctorService';
+export * from './useDoctorService';

@@ -53,6 +53,7 @@ const BookingAppointment = () => {
     const doctorId = searchParams.get('doctorId');
 
     const { data: doctorResponse } = useFetchDoctorDetail(Number(doctorId));
+
     const {
         data: scheduleReponse,
         error: scheduleError,

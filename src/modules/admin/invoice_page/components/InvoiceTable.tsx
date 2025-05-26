@@ -11,7 +11,7 @@ import {
     InputRef,
 } from 'antd';
 import { ColumnsType } from 'antd/es/table';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Invoices } from '../../../../models/invoices';
 import { invoicesService } from '../../../../services';
 import {
@@ -23,11 +23,11 @@ import {
 import Highlighter from 'react-highlight-words';
 import { FilterDropdownProps } from 'antd/es/table/interface';
 import { ViewInvoiceModal } from '../../../../components';
+import { useNavigate } from 'react-router-dom';
 
 type DataIndex = keyof Invoices;
 
 export const InvoiceTable = ({
-    config,
     openNotification,
     onClickUpdateButton,
     pageIndex,
@@ -38,12 +38,15 @@ export const InvoiceTable = ({
     changePage,
     onClickDeleteButton,
 }: any) => {
+    const navigate = useNavigate();
+
     const [searchText, setSearchText] = useState('');
     const [searchedColumn, setSearchedColumn] = useState('');
     const searchInput = useRef<InputRef>(null);
     const [openViewInvoiceModal, setOpenViewInvoiceModal] =
         useState<boolean>(false);
-    const [invoice, setInvoice] = useState<Invoices>({} as Invoices);
+    const [deletedId, setDeletedId] = useState<number | null>(null);
+
     const handleSearch = (
         selectedKeys: string[],
         confirm: FilterDropdownProps['confirm'],
@@ -218,7 +221,16 @@ export const InvoiceTable = ({
                                 <Button
                                     className="border-info text-info"
                                     onClick={() => {
-                                        setInvoice(record);
+                                        const queryParams =
+                                            new URLSearchParams();
+
+                                        queryParams.append(
+                                            'invoice',
+                                            record.id.toString()
+                                        );
+                                        navigate(
+                                            `/admin/invoice?${queryParams}`
+                                        );
                                         setOpenViewInvoiceModal(true);
                                     }}
                                 >
@@ -261,7 +273,7 @@ export const InvoiceTable = ({
         },
     ];
     const cancelViewInvoiceModal = () => {
-        setInvoice({} as Invoices);
+        // setInvoice({} as Invoices);
         setOpenViewInvoiceModal(false);
     };
     const changeStatusInvoice = async (id: number, status: string) => {
@@ -311,7 +323,7 @@ export const InvoiceTable = ({
             {openViewInvoiceModal && (
                 <ViewInvoiceModal
                     openViewInvoiceModal={openViewInvoiceModal}
-                    invoice={invoice}
+                    // invoice={invoice}
                     cancelViewInvoiceModal={cancelViewInvoiceModal}
                 />
             )}

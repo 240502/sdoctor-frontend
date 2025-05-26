@@ -1,6 +1,10 @@
 import apiClient from '../constants/api';
 
 const invoicesService = {
+    async getInvoiceById(id: number | null): Promise<any> {
+        const res = await apiClient.get('/invoice/get-by-id/' + id);
+        return res?.data;
+    },
     async createInvoice(data: any): Promise<any> {
         const res = await apiClient.post('/invoice/create', data);
         return res;

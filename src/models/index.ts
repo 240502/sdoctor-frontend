@@ -6,7 +6,7 @@ export * from './comment';
 export * from './doctor';
 export * from './schedule';
 export * from './doctor_schedule_details';
-export * from './doctor_service';
+export * from './service';
 export * from './functions';
 export * from './home_directory';
 export * from './invoices';

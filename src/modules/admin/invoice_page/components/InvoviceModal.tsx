@@ -1,13 +1,13 @@
 import { Modal, Button, Row, Col, Form, Input, Select, DatePicker } from 'antd';
 import { useEffect, useState } from 'react';
-import { DoctorService } from '../../../../models/doctor_service';
 import dayjs from 'dayjs';
 import {
     invoicesService,
     appointmentService,
     doctorServiceService,
 } from '../../../../services';
-import { useFetchAppointmentAtInvoice } from '../../../../hooks';
+import { useFetchInvoiceById } from '../../../../hooks/invoice/useInvoice';
+import { useSearchParams } from 'react-router-dom';
 
 export const InvoiceModal = ({
     invoice,
@@ -21,6 +21,7 @@ export const InvoiceModal = ({
     const [form] = Form.useForm();
     const [doctorServices, setDoctorServices] = useState<DoctorService[]>([]);
     const [invoiceType, setInvoiceType] = useState<number>(1);
+
     const onFinish = (values: any) => {
         console.log(values);
         const dataUpdate = {
@@ -171,14 +172,16 @@ export const InvoiceModal = ({
                 initialValues={{
                     ...invoice,
                     created_at: invoice?.created_at
-                        ? dayjs(invoice?.created_at.toString().split('Z')[0])
+                        ? dayjs(invoice?.created_at?.toString().split('Z')[0])
                         : null,
                     payment_date: invoice?.payment_date
-                        ? dayjs(invoice?.payment_date.toString().split('Z')[0])
+                        ? dayjs(invoice?.payment_date?.toString().split('Z')[0])
                         : null,
                     appointment_date: invoice?.appointment_date
                         ? dayjs(
-                              invoice?.appointment_date.toString().split('Z')[0]
+                              invoice?.appointment_date
+                                  ?.toString()
+                                  .split('Z')[0]
                           )
                         : null,
                 }}

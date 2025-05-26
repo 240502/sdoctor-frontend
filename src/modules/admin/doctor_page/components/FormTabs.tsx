@@ -6,6 +6,7 @@ import DoctorExperienceTimeline from './DoctorExperienceTimeLine';
 import DoctorExpertiseForm from './DoctorExpertiseForm';
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import InputServiceTab from './InputServiceTab';
 
 const FormTabs = ({ openMessage, isUpdateDoctor, refetch }: any) => {
     const [searchParams] = useSearchParams();
@@ -60,6 +61,16 @@ const FormTabs = ({ openMessage, isUpdateDoctor, refetch }: any) => {
             label: <h6>Học vấn</h6>,
             children: (
                 <DoctorEducationTimeLine
+                    doctorId={doctorId}
+                    openMessage={openMessage}
+                />
+            ),
+        },
+        {
+            key: '5',
+            label: <h6>Dịch vụ</h6>,
+            children: (
+                <InputServiceTab
                     doctorId={doctorId}
                     openMessage={openMessage}
                 />

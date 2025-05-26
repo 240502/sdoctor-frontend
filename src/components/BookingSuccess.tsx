@@ -22,7 +22,6 @@ const BookingSuccess = ({ receiptData }: any) => {
     const { data, isError, error, isFetching } = useFetchAppointmentById(
         Number(searchParams.get('appointment'))
     );
-    console.log('data', data);
     const navigate = useNavigate();
     return (
         <div className="container my-4">
@@ -48,8 +47,6 @@ const BookingSuccess = ({ receiptData }: any) => {
                         >
                             {data?.location}
                         </Text>
-
-                        {/* Receipt ID and Barcode Placeholder */}
                         <div className="d-flex justify-content-between align-items-center mb-3">
                             <div>
                                 <p className="fw-bold text-center mb-2">

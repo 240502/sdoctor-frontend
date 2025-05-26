@@ -22,7 +22,7 @@ import { configValue, userValue } from '../../../../stores/userAtom';
 import { doctorService, otherService } from '../../../../services';
 import { Clinic } from '../../../../models/clinic';
 import { Major } from '../../../../models/major';
-import { DoctorService } from '../../../../models/doctor_service';
+import { DoctorService } from '../../../../models/service';
 type FileType = Parameters<GetProp<UploadProps, 'beforeUpload'>>[0];
 import viVN from 'antd/lib/locale/vi_VN';
 import 'dayjs/locale/vi';
@@ -38,6 +38,8 @@ import { openNotification } from '../../../../utils/notification';
 import { DistrictType, ProvinceType, WardType } from '../../../../models/other';
 import axios from 'axios';
 import { ChangePasswordModal } from '../components/ChangePassword';
+import { useFetchAllDepartments } from '../../../../hooks';
+import { Department } from '../../../../models';
 dayjs.locale('vi');
 dayjs.extend(customParseFormat);
 const Profile = () => {
@@ -61,6 +63,7 @@ const Profile = () => {
     const [province, setProvince] = useState<ProvinceType>({} as ProvinceType);
     const [ward, setWard] = useState<WardType>({} as WardType);
 
+    const { data } = useFetchAllDepartments();
     const [openChangePasswordModal, setOpenChangePasswordModal] =
         useState<boolean>(false);
 
@@ -184,7 +187,7 @@ const Profile = () => {
     };
     const UpdateDoctor = async (newDoctor: any) => {
         try {
-            const res = await doctorService.updateDoctor(newDoctor, config);
+            const res = await doctorService.updateDoctor(newDoctor);
             console.log(res);
             openNotification(
                 api,
@@ -297,14 +300,14 @@ const Profile = () => {
     }, [provinces.length]);
 
     useEffect(() => {
-        console.log(user);
-
         if (user?.roleId === 2) {
             getDoctorById(user.userId);
             getAllClinic();
             getAllMajor();
             getAllService();
         } else {
+            console.log('user', user);
+
             form.setFieldsValue({
                 ...user,
                 birthday: user?.birthday ? dayjs(user.birthday) : null,
@@ -435,14 +438,16 @@ const Profile = () => {
                                             showSearch
                                             optionFilterProp="children"
                                         >
-                                            {majors.map((major: Major) => (
-                                                <Select.Option
-                                                    key={major.id}
-                                                    value={major.id}
-                                                >
-                                                    {major.name}
-                                                </Select.Option>
-                                            ))}
+                                            {data?.departments?.map(
+                                                (department: Department) => (
+                                                    <Select.Option
+                                                        key={department.id}
+                                                        value={department.id}
+                                                    >
+                                                        {department.name}
+                                                    </Select.Option>
+                                                )
+                                            )}
                                         </Select>
                                     </Form.Item>
                                 </Col>

@@ -9,7 +9,7 @@ export const BlockDescription = ({ service, isFetching }: any) => {
                 <Col span={18} className="border-end">
                     <Skeleton active loading={isFetching}>
                         <div className="summary position-relative">
-                            <h6 className="title">Về dịch vụ</h6>
+                            <h6 className="title d-flex">Về dịch vụ</h6>
                             <div className="content fs-6">
                                 {parse(service?.summary)}
                             </div>
@@ -17,7 +17,7 @@ export const BlockDescription = ({ service, isFetching }: any) => {
                     </Skeleton>
                     <Skeleton active loading={isFetching}>
                         <div className="preparation-process position-relative">
-                            <h6 className="title">Quá trình chuẩn bị</h6>
+                            <h6 className="title d-flex">Quá trình chuẩn bị</h6>
                             <div className="content fs-6">
                                 {parse(service?.preparationProcess)}
                             </div>
@@ -25,7 +25,7 @@ export const BlockDescription = ({ service, isFetching }: any) => {
                     </Skeleton>
                     <Skeleton active loading={isFetching}>
                         <div className="service-detail position-relative">
-                            <h6 className="title">Chi tiết dịch vụ</h6>
+                            <h6 className="title d-flex">Chi tiết dịch vụ</h6>
                             <div className="content fs-6">
                                 {parse(service?.serviceDetail)}
                             </div>

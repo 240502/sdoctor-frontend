@@ -132,6 +132,17 @@ main {
     }
 }
 
+h6.title {
+    gap: 8px;
+    align-items: center;
+}
+h6.title::before {
+    display: block;
+    content: '';
+    width: 2px;
+    height: 15px;
+    background: #2d87f3;
+}
 //doctor detail
 .doctor-detail {
     .des p {
@@ -142,17 +153,7 @@ main {
         border-radius: 6px;
         padding: 16px;
     }
-    h6.title {
-        gap: 8px;
-        align-items: center;
-    }
-    h6.title::before {
-        display: block;
-        content: '';
-        width: 2px;
-        height: 15px;
-        background: #2d87f3;
-    }
+
     .summary p {
         margin-bottom: 5px;
         font-size: 16px;

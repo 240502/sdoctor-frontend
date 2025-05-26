@@ -48,13 +48,13 @@ const ViewDetailService = () => {
                     <Skeleton active loading={isFetching}>
                         <Col
                             span={4}
-                            className="rounded-circle clinic-image text-center"
+                            className="rounded-5 clinic-image text-center"
                         >
                             <Image
                                 src={data?.image}
                                 preview={false}
                                 width={128}
-                                className="rounded-circle shadow"
+                                className="rounded-5 shadow"
                             ></Image>
                         </Col>
                         <Col span={20} className="pt-3">

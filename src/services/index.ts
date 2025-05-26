@@ -6,7 +6,7 @@ export { default as appointmentStatusService } from './appointment_status.servic
 export { default as clinicService } from './clinic.service';
 export { default as commentService } from './comment.service';
 export { default as scheduleService } from './schedules.service';
-export { default as doctorServiceService } from './doctor_service.service';
+export { default as serviceService } from './services.service';
 export { default as doctorService } from './doctor.service';
 // export  { default as homeDirectoryService } from './home_directory.service';
 export { default as homeMenuService } from './home_menu.service';
@@ -26,3 +26,4 @@ export { default as departmentSerivce } from './department.service';
 export { default as degreesService } from './degrees.service';
 export { default as doctorExpertisesService } from './doctor_expertises.service';
 export { default as workExperienceService } from './work_experience.service';
+export { default as doctorServiceService } from './doctor_service.service';
