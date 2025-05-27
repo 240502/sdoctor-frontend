@@ -65,7 +65,7 @@ const appointmentService = {
         return res.data;
     },
 
-    async getAppointmentById(id: number): Promise<any> {
+    async getAppointmentById(id: number | null): Promise<any> {
         const res = await apiClient.get('/appointment/get-by-id/' + id);
         return res.data;
     },

@@ -1,259 +1,270 @@
-import { Button, DatePicker, Form, Input, Modal, Radio } from 'antd';
-import { useEffect, useState } from 'react';
-import { doctorService } from '../services';
-import { Doctor } from '../models/doctor';
-import { Image } from 'antd';
-import TextArea from 'antd/es/input/TextArea';
-import dayjs from 'dayjs';
-import { paymentMethodService } from '../services';
-import { PaymentMethod } from '../models/payment_method';
+import { useSearchParams } from 'react-router-dom';
+import { useEffect } from 'react';
+import { PaymentMethod } from '../models';
+import {
+    Button,
+    Col,
+    Divider,
+    Form,
+    Image,
+    InputNumber,
+    Modal,
+    Radio,
+    Row,
+    Select,
+    Skeleton,
+} from 'antd';
 
-const ViewAppointmentModal = ({
-    handleCancelModal,
-    isModalOpen,
-    appointment,
-}: any) => {
-    const dateFormat = 'DD-MM-YYYY';
-    const [doctor, setDoctor] = useState<Doctor>({} as Doctor);
-    const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
-    const getDoctorById = async (id: number) => {
-        try {
-            const res = await doctorService.getDoctorById(id);
-            console.log(res);
-            setDoctor(res);
-        } catch (err: any) {
-            console.log(err.message);
-        }
-    };
-    const getAllPaymentMethod = async () => {
-        try {
-            const res = await paymentMethodService.getAllPaymentMethod();
-            console.log(res?.data);
-            setPaymentMethods(res.data);
-        } catch (err: any) {
-            console.log('err', err.message);
-            setPaymentMethods([]);
-        }
-    };
+import dayjs from 'dayjs';
+import {
+    EnvironmentOutlined,
+    PhoneOutlined,
+    UserOutlined,
+} from '@ant-design/icons';
+import { DoctorService } from '../models/doctor_service';
+import TextArea from 'antd/es/input/TextArea';
+import { useFetchAppointmentById } from '../hooks';
+const InputAppointmentModal = ({ openModal, cancelModal }: any) => {
+    const [searchParams] = useSearchParams();
+
+    const { data, isFetching } = useFetchAppointmentById(
+        searchParams.get('appointment')
+            ? Number(searchParams.get('appointment'))
+            : null
+    );
     useEffect(() => {
-        getDoctorById(appointment.doctorId);
-        getAllPaymentMethod();
-        console.log('appointment', appointment);
-    }, [appointment]);
+        console.log(data);
+    }, [data]);
+    const [form] = Form.useForm();
 
     return (
         <Modal
             title={
-                <h3 className="fs-5 text-capitalize border border-top-0 border-start-0 border-end-0 pb-2">
-                    Phiếu đặt lịch khám
-                </h3>
+                <>
+                    <h6>Phiếu đặt lịch khám</h6>
+                    <Divider />
+                </>
             }
-            onCancel={handleCancelModal}
-            open={isModalOpen}
-            className="w-50"
+            open={openModal}
+            onCancel={cancelModal}
             maskClosable={false}
-            footer={[
-                <Button
-                    key="back"
-                    onClick={() => {
-                        handleCancelModal();
-                    }}
-                >
-                    Đóng
-                </Button>,
-            ]}
+            footer={[]}
+            className="w-50"
         >
-            <div className="row">
-                <div className="col-3 modal__left border border-top-0 border-start-0 border-bottom-0 ">
-                    <h6 className="heading mb-4">Thông tin bác sĩ</h6>
-                    <div className="doctor__info text-center">
-                        <Image
-                            preview={false}
-                            src={doctor.image}
-                            className="rounded-circle"
-                            width={115}
-                        ></Image>
-                        <h6 className="doctor__name mt-3">
-                            {doctor?.fullName}
-                        </h6>
-                    </div>
-                    <div className="appointment__time mt-3">
-                        <p className="time">
-                            <strong>Thời gian:</strong>{' '}
-                            {appointment?.startTime +
-                                '-' +
-                                appointment?.endTime}
-                        </p>
-                        <p className="date">
-                            <strong>Ngày khám:</strong>{' '}
-                            {appointment?.appointmentDate
-                                ?.toString()
-                                .slice(0, 10)}
-                        </p>
-                    </div>
-                    <div className="location mt-3">
-                        <span>
-                            {' '}
-                            <strong>Địa điểm:</strong> {doctor.location}
-                        </span>
-                    </div>
-                    <div className="fee mt-3">
-                        <span>
-                            <strong>Phí khám:</strong>{' '}
-                            {appointment.amount.toLocaleString(undefined)} đ
-                        </span>
-                    </div>
-                </div>
-                <div className="col-9">
-                    <Form>
-                        <div className="mb-3">
-                            <label
-                                htmlFor="patient_name"
-                                className="form-label fw-bold fw-bold"
-                            >
-                                Tên bệnh nhân
-                            </label>
-                            <Input
-                                className="form-control patient_name "
-                                id="patient_name"
-                                value={appointment.patientName}
-                            ></Input>
-
-                            <div
-                                className="error_message mt-3"
-                                style={{ color: 'red' }}
-                            ></div>
-                        </div>
-                        <div className="mb-3">
-                            <label htmlFor="" className="form-label fw-bold">
-                                Giới tính
-                            </label>
-                            <Radio.Group
-                                value={Number(appointment?.gender)}
-                                className="d-block"
-                            >
-                                <Radio value={1}>Nam</Radio>
-                                <Radio value={2}>Nữ</Radio>
-                                <Radio value={3}>Khác</Radio>
-                            </Radio.Group>
-                            <div
-                                className="error_message mt-3"
-                                style={{ color: 'red' }}
-                            ></div>
-                        </div>
-                        <div className="mb-3">
-                            <label
-                                htmlFor="patient_phone"
-                                className="form-label fw-bold"
-                            >
-                                Số điện thoại
-                            </label>
-                            <Input
-                                value={appointment.patientPhone}
-                                className=" form-control patient_phone"
-                                id="patient_phone"
-                            ></Input>
-                            <div
-                                className="error_message mt-3"
-                                style={{ color: 'red' }}
-                            ></div>
-                        </div>
-                        <div className="mb-3">
-                            <label
-                                htmlFor="patient_email"
-                                className="form-label fw-bold"
-                            >
-                                Email
-                            </label>
-                            <Input
-                                value={appointment.patientEmail}
-                                className="form-control patient_email"
-                                id="patient_email"
-                            ></Input>
-                            <div
-                                className="error_message mt-3"
-                                style={{ color: 'red' }}
-                            ></div>
-                        </div>
-                        <div className="mb-3">
-                            <label htmlFor="" className="form-label fw-bold">
-                                Ngày/ Tháng/ Năm Sinh
-                            </label>
-                            <DatePicker
-                                defaultValue={dayjs(
-                                    appointment.birthday,
-                                    dateFormat
-                                )}
-                                format={dateFormat}
-                                className="d-block"
+            <Skeleton active loading={isFetching}>
+                <Row gutter={24}>
+                    <Col
+                        span={8}
+                        className="left appointment-info border border-start-0 border-top-0 border-bottom-0"
+                    >
+                        <h6 className="">Thông tin bác sĩ</h6>
+                        <div className="doctor-info text-center">
+                            <Image
+                                src={''}
+                                preview={false}
+                                className="w-25 rounded-circle"
                             />
+                            <h6 className="doctor-name w-full mt-3">
+                                {data?.doctorName}
+                            </h6>
                         </div>
-                        <div className="mb-3">
-                            <label htmlFor="" className="form-label fw-bold">
-                                Tỉnh/ Thành phố
-                            </label>
-
-                            <Input value={appointment.province}></Input>
-                        </div>
-                        <div className="mb-3">
-                            <label htmlFor="" className="form-label fw-bold">
-                                Quận/ Huyện
-                            </label>
-                            <Input value={appointment.district}></Input>
-                        </div>
-                        <div className="mb-3">
-                            <label htmlFor="" className="form-label fw-bold">
-                                Xã/ Phường
-                            </label>
-
-                            <Input value={appointment.commune}></Input>
-                        </div>
-
-                        <div className="mb-3">
-                            <label htmlFor="" className="form-label fw-bold">
-                                Lý do khám
-                            </label>
-                            <TextArea
-                                value={appointment?.examinationReason}
-                                className="form-control"
-                            ></TextArea>
-                            <div
-                                className="error_message mt-3"
-                                style={{ color: 'red' }}
-                            ></div>
-                        </div>
-
-                        <div className="mb-3">
-                            <label htmlFor="" className="form-label fw-bold">
-                                Hình thức thanh toán
-                            </label>
-                            <Radio.Group
-                                className="d-block"
-                                value={appointment?.paymentMethod}
-                            >
-                                {paymentMethods.map(
-                                    (paymentMethod: PaymentMethod) => {
-                                        return (
-                                            <Radio
-                                                value={paymentMethod.id}
-                                                className="d-block"
-                                            >
-                                                {paymentMethod.name}
-                                            </Radio>
-                                        );
-                                    }
+                        <div className="time">
+                            <p className="">
+                                <strong>Thời gian: </strong> {data?.startTime} -{' '}
+                                {data?.endTime}
+                            </p>
+                            <p>
+                                <strong>Ngày khám: </strong>
+                                {dayjs(data?.appointmentDate).format(
+                                    'DD-MM-YYYY'
                                 )}
-                            </Radio.Group>
-                            <div
-                                className="error_message mt-3"
-                                style={{ color: 'red' }}
-                            ></div>
+                            </p>
                         </div>
-                    </Form>
-                </div>
-            </div>
+                        <div className="location ">
+                            <p>
+                                {' '}
+                                <strong>Địa điểm: </strong> {data?.location}
+                            </p>
+                        </div>
+                    </Col>
+                    <Col span={16}>
+                        <h6>Thông tin bệnh nhân</h6>
+                        <Row gutter={24} className="mb-3">
+                            <Col span={24}>
+                                <Col span={24} className="d-flex mb-2">
+                                    <div className="col-5">
+                                        <label htmlFor="">
+                                            <UserOutlined className="fs-6 text-body-tertiary" />
+                                            <span className="ms-2 fs-6 ">
+                                                Họ và tên :
+                                            </span>
+                                        </label>
+                                    </div>
+                                    <div className="col-7">
+                                        <span className="col-6 fs-6 fw-medium">
+                                            {data?.patientName.toUpperCase()}
+                                        </span>
+                                    </div>
+                                </Col>
+                                <Col span={24} className="d-flex mb-2">
+                                    <div className="col-5">
+                                        <label className="fs-6">
+                                            <i className="fs-6  fa-solid fa-cake-candles d-inline-block  text-body-tertiary"></i>
+                                            <span className="ms-2 fs-6 ">
+                                                Ngày sinh :
+                                            </span>
+                                        </label>
+                                    </div>
+                                    <div className="col-7">
+                                        <span className="col-6 fs-6 fw-medium">
+                                            {dayjs(data?.birthday).format(
+                                                'DD/MM/YYYY'
+                                            )}
+                                        </span>
+                                    </div>
+                                </Col>
+                                <Col span={24} className="d-flex mb-2">
+                                    <div className="col-5">
+                                        <label className="fs-6">
+                                            <PhoneOutlined className="text-body-tertiary" />
+                                            <span className="ms-2 fs-6 ">
+                                                Số điện thoại :
+                                            </span>
+                                        </label>
+                                    </div>
+                                    <div className="col-7">
+                                        <span className="col-6 fs-6 fw-medium">
+                                            {data?.patientPhone}
+                                        </span>
+                                    </div>
+                                </Col>
+                                <Col span={24} className="d-flex mb-2">
+                                    <div className="col-5">
+                                        <label className="fs-6">
+                                            <EnvironmentOutlined className="text-body-tertiary" />
+                                            <span className="ms-2 fs-6 ">
+                                                Địa chỉ :
+                                            </span>
+                                        </label>
+                                    </div>
+                                    <div className="col-7">
+                                        <span className="col-6 fs-6  fw-medium">
+                                            {data?.commune +
+                                                ',' +
+                                                data?.district +
+                                                ',' +
+                                                data?.province}
+                                        </span>
+                                    </div>
+                                </Col>
+                                <Col span={24} className="d-flex mb-2">
+                                    <div className="col-5">
+                                        <label className="fs-6">
+                                            <i className="fa-regular fa-envelope  text-body-tertiary"></i>
+                                            <span className="ms-2 fs-6 ">
+                                                Địa chỉ email :
+                                            </span>
+                                        </label>
+                                    </div>
+                                    <div className="col-7">
+                                        <span className="col-6 fs-6 fw-medium">
+                                            {data?.patientEmail}
+                                        </span>
+                                    </div>
+                                </Col>
+                            </Col>
+                        </Row>
+                        <h6>Dịch vụ</h6>
+                        <Row gutter={24} className="mb-3">
+                            <Col span={24}>
+                                <Col span={24} className="d-flex mb-2">
+                                    <div className="col-5">
+                                        <label htmlFor="">
+                                            <UserOutlined className="fs-6 text-body-tertiary" />
+                                            <span className="ms-2 fs-6 ">
+                                                Họ và tên :
+                                            </span>
+                                        </label>
+                                    </div>
+                                    <div className="col-7">
+                                        <span className="col-6 fs-6 fw-medium">
+                                            {data?.patientName.toUpperCase()}
+                                        </span>
+                                    </div>
+                                </Col>
+                                <Col span={24} className="d-flex mb-2">
+                                    <div className="col-5">
+                                        <label className="fs-6">
+                                            <i className="fs-6  fa-solid fa-cake-candles d-inline-block  text-body-tertiary"></i>
+                                            <span className="ms-2 fs-6 ">
+                                                Ngày sinh :
+                                            </span>
+                                        </label>
+                                    </div>
+                                    <div className="col-7">
+                                        <span className="col-6 fs-6 fw-medium">
+                                            {dayjs(data?.birthday).format(
+                                                'DD/MM/YYYY'
+                                            )}
+                                        </span>
+                                    </div>
+                                </Col>
+                                <Col span={24} className="d-flex mb-2">
+                                    <div className="col-5">
+                                        <label className="fs-6">
+                                            <PhoneOutlined className="text-body-tertiary" />
+                                            <span className="ms-2 fs-6 ">
+                                                Số điện thoại :
+                                            </span>
+                                        </label>
+                                    </div>
+                                    <div className="col-7">
+                                        <span className="col-6 fs-6 fw-medium">
+                                            {data?.patientPhone}
+                                        </span>
+                                    </div>
+                                </Col>
+                                <Col span={24} className="d-flex mb-2">
+                                    <div className="col-5">
+                                        <label className="fs-6">
+                                            <EnvironmentOutlined className="text-body-tertiary" />
+                                            <span className="ms-2 fs-6 ">
+                                                Địa chỉ :
+                                            </span>
+                                        </label>
+                                    </div>
+                                    <div className="col-7">
+                                        <span className="col-6 fs-6  fw-medium">
+                                            {data?.commune +
+                                                ',' +
+                                                data?.district +
+                                                ',' +
+                                                data?.province}
+                                        </span>
+                                    </div>
+                                </Col>
+                                <Col span={24} className="d-flex mb-2">
+                                    <div className="col-5">
+                                        <label className="fs-6">
+                                            <i className="fa-regular fa-envelope  text-body-tertiary"></i>
+                                            <span className="ms-2 fs-6 ">
+                                                Địa chỉ email :
+                                            </span>
+                                        </label>
+                                    </div>
+                                    <div className="col-7">
+                                        <span className="col-6 fs-6 fw-medium">
+                                            {data?.patientEmail}
+                                        </span>
+                                    </div>
+                                </Col>
+                            </Col>
+                        </Row>
+                    </Col>
+                </Row>
+            </Skeleton>
         </Modal>
     );
 };
 
-export default ViewAppointmentModal;
+export default InputAppointmentModal;

@@ -32,8 +32,12 @@ const useDeleteDoctorService = () => {
 const useFetchDoctorServicesByDoctorId = (doctorId: number | null) => {
     return useQuery({
         queryKey: ['useFetchDoctorServicesByDoctorId', doctorId],
-        queryFn: () =>
-            doctorServiceService.getDoctorServiceByDoctorId(doctorId),
+        queryFn: () => {
+            if (doctorId === null) {
+                throw new Error('Doctor ID cannot be null');
+            }
+            return doctorServiceService.getDoctorServiceByDoctorId(doctorId);
+        },
         retry: false,
     });
 };

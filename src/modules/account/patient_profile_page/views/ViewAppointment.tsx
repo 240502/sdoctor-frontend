@@ -47,8 +47,8 @@ const { Option } = Select;
 const { RangePicker } = DatePicker;
 import 'dayjs/locale/vi';
 import isoWeek from 'dayjs/plugin/isoWeek';
-import { InputCommentModal } from '../components/InputCommentModal';
 import { NoticeType } from 'antd/es/message/interface';
+import { InputCommentModal } from '../components/InputCommentModal';
 dayjs.extend(isoWeek);
 dayjs.locale('vi');
 const ViewAppointment = () => {
@@ -315,7 +315,15 @@ const ViewAppointment = () => {
                                 onClick={() => {
                                     setIsModalOpen(true);
                                     setAppointment(record);
-                                    setIsView(true);
+                                    const queryParams = new URLSearchParams();
+
+                                    queryParams.append(
+                                        'appointment',
+                                        record.id.toString()
+                                    );
+                                    navigate(
+                                        `/patient/appointment?${queryParams}`
+                                    );
                                 }}
                             >
                                 <EyeOutlined className="text-info" />
@@ -377,6 +385,7 @@ const ViewAppointment = () => {
 
     const handleCancelModal = () => {
         setIsModalOpen(false);
+        navigate(`/patient/appointment`);
     };
     const handleCancelModalConfirm = () => {
         setIsOpenModalConfirm(false);
@@ -473,9 +482,8 @@ const ViewAppointment = () => {
                         />
                         {isModalOpen && (
                             <ViewAppointmentModal
-                                handleCancelModal={handleCancelModal}
-                                isModalOpen
-                                appointment={appointment}
+                                openModal={isModalOpen}
+                                cancelModal={handleCancelModal}
                             />
                         )}
                         {isOpenModalConfirm && (

@@ -38,6 +38,7 @@ import {
 } from '@ant-design/icons';
 import { useFetchDoctorServicesByDoctorId } from '../../../../hooks/doctor_service';
 import { DoctorService } from '../../../../models/doctor_service';
+import { Doctor, InvoicesCreateDto } from '../../../../models';
 
 const InputAppointmentModal = ({
     openModal,
@@ -53,8 +54,9 @@ const InputAppointmentModal = ({
     const { data: doctorService } = useFetchDoctorServicesByDoctorId(
         doctor?.doctorId
     );
-    const [selectedService, setSelectedService] =
-        useState<DoctorService | null>(null);
+    const [selectedServices, setSelectedServices] = useState<
+        DoctorService[] | null
+    >(null);
     const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
     const [form] = Form.useForm();
     const navigate = useNavigate();
@@ -119,22 +121,29 @@ const InputAppointmentModal = ({
                     location: doctor.location,
                     status: 'Chờ xác nhận',
                     fee: values.servicePrice,
-                    serviceName: selectedService?.serviceName,
+                    serviceName: selectedServices
+                        ?.map((service: DoctorService) => service.serviceName)
+                        .join(', '),
                 };
                 handleSendBookingSuccessMail(mailPayload);
                 openMessage('Success', 'Đặt lịch hẹn thành công !');
                 const queryParams = new URLSearchParams();
                 queryParams.append('appointment', appointment.id.toString());
                 queryParams.append('payment', values.payment_method.toString());
-                const newInvoice = {
+                const newInvoice: InvoicesCreateDto = {
                     appointmentId: appointment?.id,
                     doctorId: doctor.doctorId,
-                    serviceId: values.serviceId,
                     amount: values.servicePrice,
+                    services: selectedServices?.map(
+                        (service: DoctorService) => {
+                            return {
+                                serviceId: service.id,
+                                price: service.customPrice,
+                            };
+                        }
+                    ),
                     paymentMethod: values.payment_method,
                 };
-                console.log('new invoice', newInvoice);
-
                 CreateInvoice(newInvoice);
                 const newNotification = {
                     userId: doctor.doctorId,
@@ -323,16 +332,38 @@ const InputAppointmentModal = ({
                             <Select
                                 placeholder="Chọn dịch vụ khám"
                                 className="w-100"
-                                onChange={(value: number) => {
-                                    const selectedService = doctorService?.find(
-                                        (service: DoctorService) =>
-                                            service.id === value
+                                mode="multiple"
+                                onChange={(values: number[]) => {
+                                    console.log('value', values);
+                                    let totalPrice: number =
+                                        form.getFieldValue('servicePrice');
+                                    const selectedServices = values.map(
+                                        (value: number, index: number) => {
+                                            const selectedService =
+                                                doctorService?.find(
+                                                    (service: DoctorService) =>
+                                                        service.id === value
+                                                );
+
+                                            if (index === 0) {
+                                                totalPrice += 0;
+                                            } else {
+                                                totalPrice += Number(
+                                                    selectedService.customPrice
+                                                );
+                                            }
+
+                                            return selectedService;
+                                        }
                                     );
-                                    setSelectedService(selectedService);
+                                    console.log(
+                                        'selectedServices',
+                                        selectedServices
+                                    );
+
+                                    setSelectedServices(selectedServices);
                                     form.setFieldsValue({
-                                        servicePrice: Number(
-                                            selectedService?.customPrice
-                                        ),
+                                        servicePrice: totalPrice,
                                     });
                                 }}
                                 options={doctorService?.map(

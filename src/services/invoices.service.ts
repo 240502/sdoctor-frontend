@@ -1,6 +1,10 @@
 import apiClient from '../constants/api';
 
 const invoicesService = {
+    async createInvoiceDetail(data: any): Promise<any> {
+        const res = await apiClient.post('/invoice/create-detail', data);
+        return res;
+    },
     async getInvoiceById(id: number | null): Promise<any> {
         const res = await apiClient.get('/invoice/get-by-id/' + id);
         return res?.data;
@@ -10,11 +14,11 @@ const invoicesService = {
         return res;
     },
     async updateInvoice(data: any): Promise<any> {
-        const res = await apiClient.put('/api/invoice/update', data);
+        const res = await apiClient.put('/invoice/update', data);
         return res;
     },
-    async deleteInvoice(id: number): Promise<any> {
-        const res = await apiClient.delete('/api/invoice/delete/' + id);
+    async deleteInvoice(id: number | null): Promise<any> {
+        const res = await apiClient.delete('/invoice/delete/' + id);
         return res;
     },
     async getRecentInvoice(doctorId: number | null): Promise<any> {
@@ -41,6 +45,10 @@ const invoicesService = {
             '/invoice/get-by-appointment-id/' + appointmentId
         );
         return res?.data;
+    },
+    async deleteInvoiceDetail(id: number): Promise<any> {
+        const res = await apiClient.delete('/invoice/delete-detail/' + id);
+        return res;
     },
 };
 export default invoicesService;

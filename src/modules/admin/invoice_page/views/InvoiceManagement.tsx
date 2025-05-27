@@ -1,73 +1,61 @@
 import {
     Breadcrumb,
-    Button,
     Divider,
     Flex,
-    notification,
     Select,
     DatePicker,
     Row,
     Col,
+    message,
+    Pagination,
+    Skeleton,
 } from 'antd';
 import { useRecoilValue } from 'recoil';
 import { userState } from '../../../../stores/userAtom';
-import { HomeOutlined, PlusOutlined } from '@ant-design/icons';
+import { HomeOutlined } from '@ant-design/icons';
 import { InvoiceTable } from '../components/InvoiceTable';
 import { useEffect, useState } from 'react';
-import { Invoices } from '../../../../models/invoices';
 import { InvoiceModal } from '../components/InvoviceModal';
-import { ConfirmModal } from '../../../../components';
 import { useFetchInvoices } from '../../../../hooks/invoice/useInvoice';
-const { RangePicker } = DatePicker;
 import dayjs, { Dayjs } from 'dayjs';
 import 'dayjs/locale/vi';
 import isoWeek from 'dayjs/plugin/isoWeek';
+import { NoticeType } from 'antd/es/message/interface';
+import { useNavigate } from 'react-router-dom';
 dayjs.extend(isoWeek);
 dayjs.locale('vi');
-type NotificationType = 'success' | 'error';
 const InvoiceManagement = () => {
-    const [api, contextHolder] = notification.useNotification();
+    const navigate = useNavigate();
+    const [api, contextHolder] = message.useMessage();
     const [openInvoiceModal, setOpenInvoiceModal] = useState<boolean>(false);
-    const [invoice, setInvoice] = useState<Invoices>({} as Invoices);
-    const [openConfirmModal, setOpenConfirmModal] = useState<boolean>(false);
     const [update, setUpdate] = useState<boolean>(false);
     const user = useRecoilValue(userState);
-
     const [options, setOptions] = useState<{
         pageIndex: number;
         pageSize: number;
         status: string;
         doctorId: number;
-        fromDate: Dayjs;
-        toDate: Dayjs;
+        createdAt: Dayjs;
     }>({
         pageIndex: 1,
         pageSize: 10,
         status: 'Chưa thanh toán',
         doctorId: user.supporterId || 0,
-        fromDate: dayjs().startOf('isoWeek'),
-        toDate: dayjs().endOf('isoWeek'),
+        createdAt: dayjs(),
     });
 
     const { data, isError, error, isFetching, refetch, isRefetching } =
         useFetchInvoices(options);
-
-    useEffect(() => {
-        console.log(data);
-    }, [data]);
     const cancelInvoiceModal = () => {
         setOpenInvoiceModal(false);
-        setInvoice({} as Invoices);
+        setUpdate(false);
+        navigate('/admin/invoice');
     };
-    const onClickUpdateButton = (invoice: Invoices) => {
-        setInvoice(invoice);
+    const handleClickUpdateButton = () => {
         setOpenInvoiceModal(true);
         setUpdate(true);
     };
-    const onClickDeleteButton = (invoice: Invoices) => {
-        setInvoice(invoice);
-        setOpenConfirmModal(true);
-    };
+
     const changePage = (current: number, size: number) => {
         if (options.pageSize !== size) {
             setOptions({ ...options, pageSize: size, pageIndex: 1 });
@@ -75,18 +63,12 @@ const InvoiceManagement = () => {
             setOptions({ ...options, pageIndex: current });
         }
     };
-    const openNotification = (
-        type: NotificationType,
-        title: string,
-        message: string
-    ) => {
-        api[type]({
-            message: title,
-            description: message,
+    const openNotification = (type: NoticeType, message: string) => {
+        api.open({
+            type,
+            content: message,
+            duration: 2,
         });
-    };
-    const cancelConfirmModal = () => {
-        setOpenConfirmModal(false);
     };
 
     return (
@@ -101,12 +83,6 @@ const InvoiceManagement = () => {
             <Divider />
             <Flex className="justify-content-between ps-2 pe-2 mb-3">
                 <h5>Danh sách hóa đơn</h5>
-                <Button
-                    className="border-0 text-white bg-primary"
-                    onClick={() => setOpenInvoiceModal(true)}
-                >
-                    <PlusOutlined /> Thêm mới
-                </Button>
             </Flex>
             <Row className="mt-3 mb-3" gutter={24}>
                 <Col span={12}>
@@ -125,27 +101,49 @@ const InvoiceManagement = () => {
                     </Select>
                 </Col>
                 <Col span={12} className="text-end">
-                    <RangePicker
-                        placeholder={['Từ ngày', 'Đến ngày']}
-                        value={[options.fromDate, options.toDate]}
-                        format={'DD-MM-YYYY'}
-                    ></RangePicker>
+                    <DatePicker
+                        format="DD-MM-YYYY"
+                        value={options.createdAt}
+                        onChange={(date: Dayjs) =>
+                            setOptions({ ...options, createdAt: date })
+                        }
+                    />
                 </Col>
             </Row>
-            <InvoiceTable
-                openNotification={openNotification}
-                onClickUpdateButton={onClickUpdateButton}
-                pageCount={data?.pageCount}
-                invoices={data?.invoices}
-                changePage={changePage}
-                onClickDeleteButton={onClickDeleteButton}
-            />
+            <Skeleton active loading={isFetching || isRefetching}>
+                {isError ? (
+                    <p className="fw-bold text-center">
+                        {error.message.includes('404')
+                            ? 'Không có hóa đơn nào !'
+                            : 'Không thể tải hóa đơn, vui lòng thử lại sau.'}
+                    </p>
+                ) : (
+                    <>
+                        <InvoiceTable
+                            openNotification={openNotification}
+                            handleClickUpdateButton={handleClickUpdateButton}
+                            invoices={data?.invoices}
+                            refetch={refetch}
+                        />
+                        {
+                            <Pagination
+                                className="mt-3"
+                                align="center"
+                                showSizeChanger
+                                pageSizeOptions={['5', '10', '15']}
+                                current={options.pageIndex}
+                                pageSize={options.pageSize}
+                                total={data?.pageCount * options.pageSize}
+                                onChange={changePage}
+                            />
+                        }
+                    </>
+                )}
+            </Skeleton>
             {openInvoiceModal && (
                 <InvoiceModal
-                    invoice={data?.invoices}
                     openInvoiceModal={openInvoiceModal}
                     cancelInvoiceModal={cancelInvoiceModal}
-                    setInvoice={setInvoice}
                     openNotification={openNotification}
                     update={update}
                 />

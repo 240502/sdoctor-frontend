@@ -22,22 +22,26 @@ import {
 } from '@ant-design/icons';
 import Highlighter from 'react-highlight-words';
 import { FilterDropdownProps } from 'antd/es/table/interface';
-import { ViewInvoiceModal } from '../../../../components';
+import { ConfirmModal, ViewInvoiceModal } from '../../../../components';
 import { useNavigate } from 'react-router-dom';
+import { NoticeType } from 'antd/es/message/interface';
+import { useUpdateInvoiceStatus } from '../../../../hooks';
+import { useDeleteInvoice } from '../../../../hooks/invoice/useInvoice';
 
 type DataIndex = keyof Invoices;
+interface InvoiceTableProps {
+    openNotification: (type: NoticeType, content: string) => void;
+    handleClickUpdateButton: () => void;
+    invoices: Invoices[];
+    refetch: () => void;
+}
 
 export const InvoiceTable = ({
     openNotification,
-    onClickUpdateButton,
-    pageIndex,
-    pageSize,
-    pageCount,
+    handleClickUpdateButton,
     invoices,
-    getInvoices,
-    changePage,
-    onClickDeleteButton,
-}: any) => {
+    refetch,
+}: InvoiceTableProps) => {
     const navigate = useNavigate();
 
     const [searchText, setSearchText] = useState('');
@@ -45,8 +49,10 @@ export const InvoiceTable = ({
     const searchInput = useRef<InputRef>(null);
     const [openViewInvoiceModal, setOpenViewInvoiceModal] =
         useState<boolean>(false);
+    const [openConfirmModal, setOpenConfirmModal] = useState<boolean>(false);
     const [deletedId, setDeletedId] = useState<number | null>(null);
-
+    const { mutate: deleteInvoice } = useDeleteInvoice();
+    const { mutate: updateInvoiceStatus } = useUpdateInvoiceStatus();
     const handleSearch = (
         selectedKeys: string[],
         confirm: FilterDropdownProps['confirm'],
@@ -147,6 +153,21 @@ export const InvoiceTable = ({
                 text
             ),
     });
+    const closeModalConfirm = () => {
+        setOpenConfirmModal(false);
+        setDeletedId(null);
+    };
+    const handleConfirm = () => {
+        deleteInvoice(deletedId, {
+            onSuccess() {
+                openNotification('success', 'Xóa thành công!');
+                refetch();
+            },
+            onError() {
+                openNotification('error', 'Xóa không thành công!');
+            },
+        });
+    };
 
     const columns: ColumnsType<Invoices> = [
         {
@@ -197,7 +218,25 @@ export const InvoiceTable = ({
                         value={record.status}
                         className="w-100"
                         onChange={(value: string) => {
-                            changeStatusInvoice(record.id, value);
+                            updateInvoiceStatus(
+                                { id: record.id, status: value },
+                                {
+                                    onSuccess: () => {
+                                        openNotification(
+                                            'success',
+                                            'Cập nhật trạng thái thành công'
+                                        );
+                                        refetch();
+                                    },
+                                    onError: (error: any) => {
+                                        openNotification(
+                                            'error',
+                                            error.message ||
+                                                'Cập nhật trạng thái không thành công'
+                                        );
+                                    },
+                                }
+                            );
                         }}
                     >
                         <Select.Option value="Đã thanh toán">
@@ -245,7 +284,17 @@ export const InvoiceTable = ({
                                     <Tooltip placement="top" title="Sửa">
                                         <Button
                                             onClick={() => {
-                                                onClickUpdateButton(record);
+                                                const queryParams =
+                                                    new URLSearchParams();
+
+                                                queryParams.append(
+                                                    'invoice',
+                                                    record.id.toString()
+                                                );
+                                                navigate(
+                                                    `/admin/invoice?${queryParams}`
+                                                );
+                                                handleClickUpdateButton();
                                             }}
                                             className="text-success border-success"
                                         >
@@ -258,7 +307,8 @@ export const InvoiceTable = ({
                                         <Button
                                             className="text-danger border-danger"
                                             onClick={() => {
-                                                onClickDeleteButton(record);
+                                                setDeletedId(record.id);
+                                                setOpenConfirmModal(true);
                                             }}
                                         >
                                             <DeleteOutlined />
@@ -273,31 +323,7 @@ export const InvoiceTable = ({
         },
     ];
     const cancelViewInvoiceModal = () => {
-        // setInvoice({} as Invoices);
         setOpenViewInvoiceModal(false);
-    };
-    const changeStatusInvoice = async (id: number, status: string) => {
-        try {
-            const data = {
-                id: id,
-                status: status,
-            };
-            const res = await invoicesService.updateInvoiceStatus(data);
-
-            getInvoices();
-            openNotification(
-                'success',
-                'Thông báo',
-                'Cập nhập trạng thái thành công'
-            );
-        } catch (err: any) {
-            console.log(err.message);
-            openNotification(
-                'error',
-                'Thông báo',
-                'Cập nhập trạng thái không thành công'
-            );
-        }
     };
 
     return (
@@ -308,18 +334,7 @@ export const InvoiceTable = ({
                 columns={columns}
                 dataSource={invoices}
             ></Table>
-            {pageCount > 1 && (
-                <Pagination
-                    className="mt-3"
-                    align="center"
-                    showSizeChanger
-                    pageSizeOptions={['5', '10', '15']}
-                    current={pageIndex}
-                    pageSize={pageSize}
-                    total={pageCount * pageSize}
-                    onChange={changePage}
-                />
-            )}
+
             {openViewInvoiceModal && (
                 <ViewInvoiceModal
                     openViewInvoiceModal={openViewInvoiceModal}
@@ -327,6 +342,14 @@ export const InvoiceTable = ({
                     cancelViewInvoiceModal={cancelViewInvoiceModal}
                 />
             )}
+            {
+                <ConfirmModal
+                    message="Bạn chắc chắn muốn xóa hóa đơn này?"
+                    isOpenModal={openConfirmModal}
+                    onCloseModal={closeModalConfirm}
+                    handleOk={handleConfirm}
+                />
+            }
         </>
     );
 };

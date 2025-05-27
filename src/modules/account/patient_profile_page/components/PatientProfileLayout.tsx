@@ -15,20 +15,6 @@ export const PatientProfileLayout = ({ children, breadcrumb }: any) => {
         },
 
         {
-            key: '2',
-            label: 'Bác sĩ đã xem',
-            icon: <i className="fa-solid fa-user-doctor"></i>,
-            link: '/patient/watched-doctor',
-        },
-
-        {
-            key: '3',
-            label: 'Cơ sở y tế đã xem',
-            icon: <i className="fa-regular fa-hospital"></i>,
-            link: '/patient/watched-clinic',
-        },
-
-        {
             key: '4',
             label: 'Lịch hẹn',
             icon: <i className="fa-regular fa-calendar-check"></i>,

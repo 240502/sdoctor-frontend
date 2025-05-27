@@ -1,9 +1,6 @@
 import { Modal, Col, Row, Divider, Button, Skeleton } from 'antd';
 import { useEffect, useState } from 'react';
-import { Appointment } from '../models/appointment';
-import { appointmentService } from '../services';
 import dayjs from 'dayjs';
-// import downloadInvoicePdf from '../../../../utils/dowloadPDF';
 import { useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useFetchInvoiceById } from '../hooks/invoice/useInvoice';
@@ -12,59 +9,29 @@ const ViewInvoiceModal = ({
     openViewInvoiceModal,
     cancelViewInvoiceModal,
 }: any) => {
-    const [appointment, setAppointment] = useState<Appointment>(
-        {} as Appointment
-    );
     const [searchParams] = useSearchParams();
 
-    const [appointmentDate, setAppointmentDate] = useState<string>('');
-    const [createdInvoiceDate, setCreatedInvoiceDate] = useState<string>('');
     const {
         data: invoice,
         isError,
-        error,
         isFetching,
     } = useFetchInvoiceById(
         searchParams.get('invoice') ? Number(searchParams.get('invoice')) : null
     );
-    useEffect(() => {
-        console.log('data', invoice);
-    }, [invoice]);
-    // const getAppointmentById = async () => {
-    //     try {
-    //         const res = await AppointmentService.getAppointmentById(
-    //             invoice?.appointment_id
-    //         );
+    const [services, setServices] = useState<string[]>([]);
+    const [prices, setPrices] = useState<number[]>([]);
 
-    //         console.log('invoice', invoice);
-    //         console.log(res);
-    //         setAppointment(res);
-    //         const convertedAppointmentDate = new Date(
-    //             res?.appointment_date.split('Z')[0]
-    //         );
-    //         const formattedAppointmentDate = `${convertedAppointmentDate.getDate()}-${
-    //             convertedAppointmentDate.getMonth() + 1
-    //         }-${convertedAppointmentDate.getFullYear()}`;
-    //         const convertedCreatedDate = new Date(
-    //             res?.created_at.split('Z')[0]
-    //         );
-    //         const formattedCreatedDate = `${convertedCreatedDate.getDate()}-${
-    //             convertedCreatedDate.getMonth() + 1
-    //         }-${convertedCreatedDate.getFullYear()} ${convertedCreatedDate.getHours()}:${convertedCreatedDate.getMinutes()}:${convertedCreatedDate.getSeconds()}`;
-    //         setAppointmentDate(formattedAppointmentDate);
-    //         setCreatedInvoiceDate(formattedCreatedDate);
-    //     } catch (err: any) {
-    //         console.log(err.message);
-    //     }
-    // };
     useEffect(() => {
-        // getAppointmentById();
-    }, []);
-    const ref = useRef<HTMLDivElement>(null);
-    const generatePdf = () => {
-        if (ref.current) {
+        if (invoice) {
+            const serviceNames = invoice?.serviceNames.split(',');
+            setServices(serviceNames);
+            const prices = invoice?.prices
+                .split(',')
+                .map((price: string) => Number(price));
+            setPrices(prices);
         }
-    };
+    }, [invoice]);
+
     return (
         <Modal
             open={openViewInvoiceModal}
@@ -72,7 +39,7 @@ const ViewInvoiceModal = ({
             title="Chi tiết hóa đơn"
             className="w-50"
             footer={[
-                <Button onClick={generatePdf}>Download PDF</Button>,
+                <Button>Download PDF</Button>,
                 <Button onClick={cancelViewInvoiceModal}>Đóng</Button>,
             ]}
         >
@@ -80,7 +47,7 @@ const ViewInvoiceModal = ({
                 {isError ? (
                     <p>{'Có lỗi khi lấy dữ liệu. Vui lòng thử lại sau!'}</p>
                 ) : (
-                    <div id="invoice-content" ref={ref}>
+                    <div id="invoice-content">
                         <Row gutter={24}>
                             <Col span={12}>
                                 <h1 className="fw-bold text-primary">
@@ -161,16 +128,40 @@ const ViewInvoiceModal = ({
                                     </Row>
                                     <Divider className="mt-2 mb-2" />
                                     <Row gutter={24} className="">
-                                        <Col span={8} className=" text-center">
-                                            {invoice?.serviceName}
-                                        </Col>
-                                        <Col span={8} className=" text-center">
-                                            1
-                                        </Col>
-                                        <Col span={8} className=" text-center">
-                                            {invoice?.amount?.toLocaleString()}{' '}
-                                            VNĐ
-                                        </Col>
+                                        {services.map((service, index) => (
+                                            <Col
+                                                span={24}
+                                                key={index}
+                                                className="mb-2"
+                                            >
+                                                <Row
+                                                    gutter={24}
+                                                    className="bg-light pt-2 pb-2"
+                                                >
+                                                    <Col
+                                                        span={8}
+                                                        className=" text-center"
+                                                    >
+                                                        {service}
+                                                    </Col>
+                                                    <Col
+                                                        span={8}
+                                                        className=" text-center"
+                                                    >
+                                                        1
+                                                    </Col>
+                                                    <Col
+                                                        span={8}
+                                                        className=" text-center"
+                                                    >
+                                                        {prices[
+                                                            index
+                                                        ].toLocaleString()}
+                                                        VNĐ
+                                                    </Col>
+                                                </Row>
+                                            </Col>
+                                        ))}
                                     </Row>
                                 </Col>
                             </Row>
