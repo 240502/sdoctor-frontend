@@ -1,13 +1,6 @@
 import { useSearchParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import {
-    Col,
-    Divider,
-    Image,
-    Modal,
-    Row,
-    Skeleton,
-} from 'antd';
+import { Col, Divider, Image, Modal, Row, Skeleton } from 'antd';
 
 import dayjs from 'dayjs';
 import {
@@ -22,8 +15,10 @@ interface InputAppointmentModalProps {
     cancelModal: () => void;
 }
 
-
-const InputAppointmentModal = ({ openModal, cancelModal }: InputAppointmentModalProps) => {
+const InputAppointmentModal = ({
+    openModal,
+    cancelModal,
+}: InputAppointmentModalProps) => {
     const [searchParams] = useSearchParams();
     const [services, setServices] = useState<[]>([]);
     const { data, isFetching } = useFetchAppointmentById(
@@ -34,18 +29,24 @@ const InputAppointmentModal = ({ openModal, cancelModal }: InputAppointmentModal
     useEffect(() => {
         if (data) {
             console.log(data);
-            
-            const services = data?.serviceName?.split(",").map((item: string) => item.trim());
-            const prices = data?.prices?.split(",").map((price: string) => Number(price.trim())) ?? [];
-            const newServices:any = services?.map((service: string,index:number) => {
-                return {
-                    price: prices[index],
-                    name:service
+
+            const services = data?.serviceName
+                ?.split(',')
+                .map((item: string) => item.trim());
+            const prices =
+                data?.prices
+                    ?.split(',')
+                    .map((price: string) => Number(price.trim())) ?? [];
+            const newServices: any = services?.map(
+                (service: string, index: number) => {
+                    return {
+                        price: prices[index],
+                        name: service,
+                    };
                 }
-            })
+            );
             setServices(newServices);
         }
-       
     }, [data]);
     return (
         <Modal
@@ -182,33 +183,31 @@ const InputAppointmentModal = ({ openModal, cancelModal }: InputAppointmentModal
                         </Row>
                         <h6>Danh sách dịch vụ</h6>
                         <Row gutter={24}>
-                                <Col span={24} className="header">
-                                    <Row
-                                        gutter={24}
-                                        className="bg-light pt-2 pb-2"
+                            <Col span={24} className="header">
+                                <Row gutter={24} className="bg-light pt-2 pb-2">
+                                    <Col
+                                        span={8}
+                                        className="fw-bold fs-6 text-center"
                                     >
-                                        <Col
-                                            span={8}
-                                            className="fw-bold fs-6 text-center"
-                                        >
-                                            Dịch vụ
-                                        </Col>
-                                        <Col
-                                            span={8}
-                                            className="fw-bold fs-6 text-center"
-                                        >
-                                            Số lượng
-                                        </Col>
-                                        <Col
-                                            span={8}
-                                            className="fw-bold fs-6 text-center"
-                                        >
-                                            Giá
-                                        </Col>
-                                    </Row>
-                                    <Divider className="mt-2 mb-2" />
-                                    <Row gutter={24} className="">
-                                        {services.map((service:any, index:number) => (
+                                        Dịch vụ
+                                    </Col>
+                                    <Col
+                                        span={8}
+                                        className="fw-bold fs-6 text-center"
+                                    >
+                                        Số lượng
+                                    </Col>
+                                    <Col
+                                        span={8}
+                                        className="fw-bold fs-6 text-center"
+                                    >
+                                        Giá
+                                    </Col>
+                                </Row>
+                                <Divider className="mt-2 mb-2" />
+                                <Row gutter={24} className="">
+                                    {services?.map(
+                                        (service: any, index: number) => (
                                             <Col
                                                 span={24}
                                                 key={index}
@@ -234,14 +233,16 @@ const InputAppointmentModal = ({ openModal, cancelModal }: InputAppointmentModal
                                                         span={8}
                                                         className=" text-center"
                                                     >
-                                                        {service?.price?.toLocaleString()} VNĐ
+                                                        {service?.price?.toLocaleString()}{' '}
+                                                        VNĐ
                                                     </Col>
                                                 </Row>
                                             </Col>
-                                        ))}
-                                    </Row>
-                                </Col>
-                            </Row>
+                                        )
+                                    )}
+                                </Row>
+                            </Col>
+                        </Row>
                     </Col>
                 </Row>
             </Skeleton>

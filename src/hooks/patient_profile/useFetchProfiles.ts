@@ -5,5 +5,6 @@ export const useFetchProfiles = (uuids: string[]) => {
     return useQuery({
         queryKey: ['useFetchProfiles', uuids],
         queryFn: () => patientProfileService.getPatientProfiles(uuids),
+        retry: false,
     });
 };

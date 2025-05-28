@@ -43,23 +43,23 @@ import { TabsProps } from 'antd/lib';
 import { useFetchTotalAppointmentByStatus } from '../../../../hooks/appointments/useAppointment';
 interface AppointmentTable {
     openMessage: (type: NoticeType, content: string) => void;
-    userId:number
+    userId: number;
 }
 const AppointmentTable = ({ openMessage, userId }: AppointmentTable) => {
     const tabs: TabsProps['items'] = [
-            {
-                key: '1',
-                label: <h6 className="m-0">Chờ xác nhận</h6>,
-            },
-            {
-                key: '2',
-                label: <h6 className="m-0">Đã xác nhận</h6>,
-            },
-            {
-                key: '3',
-                label: <h6 className="m-0">Đã hủy</h6>,
-            }
-        ];
+        {
+            key: '1',
+            label: <h6 className="m-0">Chờ xác nhận</h6>,
+        },
+        {
+            key: '2',
+            label: <h6 className="m-0">Đã xác nhận</h6>,
+        },
+        {
+            key: '3',
+            label: <h6 className="m-0">Đã hủy</h6>,
+        },
+    ];
     const [searchText, setSearchText] = useState('');
     const [searchedColumn, setSearchedColumn] = useState('');
     const searchInput = useRef<InputRef>(null);
@@ -91,7 +91,10 @@ const AppointmentTable = ({ openMessage, userId }: AppointmentTable) => {
     const rejectionReasonInputRef = useRef<any>(null);
     const { data, error, isError, isFetching, refetch, isRefetching } =
         useFetchAppointmentWithOptions(options);
-    const { data: totalAppointment } = useFetchTotalAppointmentByStatus(options.userId);
+    const {
+        data: totalAppointment,
+        refetch: refetchingTotalAppointmentByStatus,
+    } = useFetchTotalAppointmentByStatus(options.userId);
     const updateAppointmentStatus = useUpdateAppointmentStatus();
     const sendRejectionMail = useSendRejectionSuccessMail();
     const sendConfirmSuccessMail = useSendConfirmSuccessMail();
@@ -118,10 +121,7 @@ const AppointmentTable = ({ openMessage, userId }: AppointmentTable) => {
         }
         updateAppointmentStatus.mutate(payload, {
             onSuccess() {
-                openMessage(
-                    'success',
-                    'Cập nhập trạng thái thành công!'
-                );
+                openMessage('success', 'Cập nhập trạng thái thành công!');
                 handleCancelModalConfirm();
                 if (type === 'delete') {
                     const payload = {
@@ -151,12 +151,10 @@ const AppointmentTable = ({ openMessage, userId }: AppointmentTable) => {
                     sendConfirmSuccessMail.mutate(payload);
                 }
                 refetch();
+                refetchingTotalAppointmentByStatus();
             },
             onError() {
-                openMessage(
-                    'error',
-                    'Cập nhập trạng thái không thành công!'
-                );
+                openMessage('error', 'Cập nhập trạng thái không thành công!');
                 handleCancelModalConfirm();
             },
         });
@@ -351,56 +349,52 @@ const AppointmentTable = ({ openMessage, userId }: AppointmentTable) => {
             key: 'action',
             render: (_, record) => (
                 <>
-                        
                     <Button
-                            className="me-2 text-success border-0"
-                            onClick={() => {
-                                setOpenModalConfirm(true);
-                                setType('confirm');
-                                if (record.statusId === 2)
-                                {
-                                    setAppointment({
-                                        ...record,
-                                        statusId: 4,
-                                    });
-                                    setMessage(
-                                        'Bạn chắc chắn xác nhận lịch hẹn này đã hoàn thành!'
-                                    );
-                                }
-                                else {
-                                    setAppointment({
-                                        ...record,
-                                        statusId: 2,
-                                    });
-                                    setMessage(
-                                        'Bạn chắc chắn xác nhận lịch hẹn này!'
-                                    );
-                               }
-                            }}
-                        >
-                        <CheckOutlined /> {
-                            record.statusId === 2 ? "Hoàn thành" : "Xác nhấn"
-                        }
+                        className="me-2 text-success border-0"
+                        onClick={() => {
+                            setOpenModalConfirm(true);
+                            setType('confirm');
+                            if (record.statusId === 2) {
+                                setAppointment({
+                                    ...record,
+                                    statusId: 4,
+                                });
+                                setMessage(
+                                    'Bạn chắc chắn xác nhận lịch hẹn này đã hoàn thành!'
+                                );
+                            } else {
+                                setAppointment({
+                                    ...record,
+                                    statusId: 2,
+                                });
+                                setMessage(
+                                    'Bạn chắc chắn xác nhận lịch hẹn này!'
+                                );
+                            }
+                        }}
+                    >
+                        <CheckOutlined />{' '}
+                        {record.statusId === 2 ? 'Hoàn thành' : 'Xác nhấn'}
                     </Button>
-                    {
-                        record.statusId === 1 && <>
-                            <Divider type="vertical" className='pt-3 pb-3'/>
+                    {record.statusId === 1 && (
+                        <>
+                            <Divider type="vertical" className="pt-3 pb-3" />
                             <Button
-                                className='text-danger border-0  '
-                                    onClick={() => {
-                                        setOpenModalConfirm(true);
-                                        setAppointment({ ...record, statusId: 3 });
-                                        setMessage(
-                                            'Bạn chắc chắn hủy lịch hẹn này!'
-                                        );
-                                        setType('delete');
-                                    }}
-                                >
-                                    <CloseOutlined className="text-danger" /> Từ chối
+                                className="text-danger border-0  "
+                                onClick={() => {
+                                    setOpenModalConfirm(true);
+                                    setAppointment({ ...record, statusId: 3 });
+                                    setMessage(
+                                        'Bạn chắc chắn hủy lịch hẹn này!'
+                                    );
+                                    setType('delete');
+                                }}
+                            >
+                                <CloseOutlined className="text-danger" /> Từ
+                                chối
                             </Button>
                         </>
-                    }
-                  
+                    )}
                 </>
             ),
         },
@@ -412,9 +406,7 @@ const AppointmentTable = ({ openMessage, userId }: AppointmentTable) => {
             setOptions({ ...options, pageIndex: current });
         }
     };
-    const onDateRangeChange = (
-        dates: [Dayjs | null, Dayjs | null] | null,
-    ) => {
+    const onDateRangeChange = (dates: [Dayjs | null, Dayjs | null] | null) => {
         if (dates && dates[0] && dates[1]) {
             setOptions({ ...options, fromDate: dates[0], toDate: dates[1] });
         } else {
@@ -429,7 +421,7 @@ const AppointmentTable = ({ openMessage, userId }: AppointmentTable) => {
 
     return (
         <>
-             <Row gutter={24} className='mb-3'>
+            <Row gutter={24} className="mb-3">
                 <Col span={12}>
                     {tabs.map((tab) => {
                         return (
@@ -440,25 +432,40 @@ const AppointmentTable = ({ openMessage, userId }: AppointmentTable) => {
                                         : 'default'
                                 }
                                 className="me-2 col-3"
-                               
                                 onClick={() => {
-                                    if (Number(options.status) !== Number(tab.key)) {
-                                        setOptions({...options,status:Number(tab.key)})
+                                    if (
+                                        Number(options.status) !==
+                                        Number(tab.key)
+                                    ) {
+                                        setOptions({
+                                            ...options,
+                                            status: Number(tab.key),
+                                        });
                                     }
                                 }}
                                 key={tab.key}
                             >
-                                {tab.label} <Tag className='rounded-5'> { tab.key === '1' ? totalAppointment?.pendingCount : tab.key === '2' ? totalAppointment?.confirmedCount: tab.key === '3' ? totalAppointment?.cancelledCount: totalAppointment?.completedCount  }</Tag>
+                                {tab.label}{' '}
+                                <Tag className="rounded-5 fw-medium">
+                                    {' '}
+                                    {tab.key === '1'
+                                        ? totalAppointment?.pendingCount
+                                        : tab.key === '2'
+                                        ? totalAppointment?.confirmedCount
+                                        : tab.key === '3'
+                                        ? totalAppointment?.cancelledCount
+                                        : totalAppointment?.completedCount}
+                                </Tag>
                             </Button>
                         );
                     })}
                 </Col>
-                <Col span={12} className='text-end'>
+                <Col span={12} className="text-end">
                     <RangePicker
-                            placeholder={['Từ ngày', 'Đến ngày']}
-                            value={[options.fromDate, options.toDate]}
-                            format={'DD-MM-YYYY'}
-                            onChange={onDateRangeChange}
+                        placeholder={['Từ ngày', 'Đến ngày']}
+                        value={[options.fromDate, options.toDate]}
+                        format={'DD-MM-YYYY'}
+                        onChange={onDateRangeChange}
                     />
                 </Col>
             </Row>

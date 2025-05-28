@@ -3,7 +3,7 @@ import { appointmentService } from '../../services';
 import { AppointmentResponseDto } from '../../models';
 import { Dayjs } from 'dayjs';
 interface PayloadType {
-    uuid: string;
+    uuid: [];
     pageIndex?: number;
     pageSize?: number;
     status?: number;

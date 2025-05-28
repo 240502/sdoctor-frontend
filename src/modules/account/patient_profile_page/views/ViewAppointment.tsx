@@ -75,14 +75,14 @@ const ViewAppointment = () => {
         statusId: number;
         pageIndex: number;
         pageSize: number;
-        uuid: string;
+        uuid: [];
         fromDate: Dayjs;
         toDate: Dayjs;
     }>({
         statusId: 1,
         pageIndex: 1,
         pageSize: 8,
-        uuid: patientProfile.uuid,
+        uuid: JSON.parse(localStorage.getItem('uuids') || '[]'),
         fromDate: dayjs().startOf('isoWeek'),
         toDate: dayjs().endOf('isoWeek'),
     });

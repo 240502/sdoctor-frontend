@@ -11,13 +11,13 @@ export interface DoctorServiceUpdateDTO {
 }
 
 export interface DoctorService {
-    id: number;
-    doctorId: number;
-    serviceId: number;
-    customPrice: number;
-    basePrice: number;
-    serviceName: string;
-    createdAt: Date;
-    updatedAt: Date;
-    departmentId: number;
+    id: number | null;
+    doctorId: number | null;
+    serviceId: number | null;
+    customPrice: number | null;
+    basePrice: number | null;
+    serviceName: string | null;
+    createdAt: Date | null;
+    updatedAt: Date | null;
+    departmentId: number | null;
 }

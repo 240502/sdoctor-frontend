@@ -175,6 +175,19 @@ const InputAppointmentModal = ({
     useEffect(() => {
         if (doctorService && doctorService.length > 0) {
             const firstService = doctorService[0];
+            setSelectedServices([
+                {
+                    id: firstService.id,
+                    doctorId: 0,
+                    serviceId: null,
+                    customPrice: firstService.customPrice,
+                    basePrice: 0,
+                    serviceName: '',
+                    createdAt: null,
+                    updatedAt: null,
+                    departmentId: null,
+                },
+            ]);
             form.setFieldsValue({
                 serviceId: firstService.id,
                 servicePrice: Number(firstService.customPrice),
@@ -355,10 +368,6 @@ const InputAppointmentModal = ({
 
                                             return selectedService;
                                         }
-                                    );
-                                    console.log(
-                                        'selectedServices',
-                                        selectedServices
                                     );
 
                                     setSelectedServices(selectedServices);

@@ -21,5 +21,6 @@ export const useFetchAppointmentWithOptions = (payload: {
         queryKey: ['useFetchAppointmentWithOptions', payload],
         queryFn: async () =>
             appointmentService.getAppointmentWithOptions(payload),
+        retry: false,
     });
 };

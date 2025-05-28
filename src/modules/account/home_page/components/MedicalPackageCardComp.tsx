@@ -35,7 +35,9 @@ const MedicalPackageCardComp = ({ medicalPackages }: any) => {
                                         navigate(
                                             '/service/detail/' + service?.id
                                         );
-                                        // updateViewService(Number(service?.id));
+                                        updateMedicalPackageViews.mutate(
+                                            Number(service?.id)
+                                        );
                                     }}
                                 >
                                     {service.name}
@@ -76,7 +78,7 @@ const MedicalPackageCardComp = ({ medicalPackages }: any) => {
                                         );
                                     }}
                                 >
-                                    Đặt lịch hẹn
+                                    Xem chi tiết
                                 </Button>
                             </Flex>
                         </div>

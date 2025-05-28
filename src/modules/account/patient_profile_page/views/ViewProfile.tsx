@@ -2,74 +2,88 @@ import {
     Button,
     Card,
     DatePicker,
-    DatePickerProps,
     Input,
     Radio,
     Select,
-    notification,
     Form,
     Row,
     Col,
     message,
+    List,
+    Skeleton,
 } from 'antd';
 import { useEffect, useState } from 'react';
 import dayjs from 'dayjs';
-import axios from 'axios';
 import { useRecoilState } from 'recoil';
 import { patientProfileState } from '../../../../stores/patientAtom';
-import { patientProfileService } from '../../../../services';
 import { PatientProfileLayout } from '../components/PatientProfileLayout';
-import { PatientProfile } from '../../../../models/patient_profile';
-import { ProvinceType, DistrictType, WardType } from '../../../../models/other';
+import { ProvinceType, DistrictType } from '../../../../models/other';
+import { v4 as uuidv4 } from 'uuid';
 import { ConfirmModal } from '../../../../components';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
-type NotificationType = 'success' | 'error';
+import {
+    useFetchDistrictsByProvince,
+    useFetchProfiles,
+    useFetchProvinces,
+    useFetchWardsByDistrict,
+} from '../../../../hooks';
+import { NoticeType } from 'antd/es/message/interface';
+import {
+    useCreatePatientProfile,
+    useFetchProfileByUuid,
+    useUpdatePatientProfile,
+} from '../../../../hooks/patient_profile/usePatientProfile';
+import { PatientProfile } from '../../../../models';
+import {
+    EditOutlined,
+    EnvironmentOutlined,
+    PhoneOutlined,
+    UserOutlined,
+} from '@ant-design/icons';
 const ViewProfile = () => {
+    const [searchParams] = useSearchParams();
+    const queryClient = useQueryClient();
+    const navigate = useNavigate();
     const [messageApi, messageContextHolder] = message.useMessage();
+    const [updatedUuid, setUpdatedUuid] = useState<string>(
+        searchParams.get('profile') ?? ''
+    );
     const [patientProfile, setPatientProfile] =
         useRecoilState(patientProfileState);
-    const [profileCopy, setProfileCopy] = useState<PatientProfile>(
-        {} as PatientProfile
+    const {
+        data: profiles,
+        isError,
+        error,
+        isFetching,
+        refetch,
+    } = useFetchProfiles(JSON.parse(localStorage.getItem('uuids') || `[]`));
+    const { data: profile, isFetching: isFetchingProfile } =
+        useFetchProfileByUuid(updatedUuid);
+    const [selectedProvinceId, setSelectedProvinceId] = useState<number | null>(
+        null
     );
+    const [selectedDistrictId, setSelectedDistrictId] = useState<number | null>(
+        null
+    );
+    const { data: provinces } = useFetchProvinces();
+    const { data: districts } = useFetchDistrictsByProvince(selectedProvinceId);
+    const { data: wards } = useFetchWardsByDistrict(selectedDistrictId);
     const [form] = Form.useForm();
     const dateFormat = 'DD-MM-YYYY';
-    const [isCreate, setIsCreate] = useState<boolean>(true);
+    const [isCreate, setIsCreate] = useState<boolean>(false);
+    const [showForm, setShowForm] = useState<boolean>(false);
     const [isOpenModalConfirm, setIsOpenModalConfirm] =
         useState<boolean>(false);
-
-    const [provinces, setProvinces] = useState<ProvinceType[]>([]);
-    const [districts, setDistricts] = useState<DistrictType[]>([]);
-    const [wards, setWards] = useState<WardType[]>([]);
-    const [province, setProvince] = useState<ProvinceType>({} as ProvinceType);
-    const [district, setDistrict] = useState<DistrictType>({} as DistrictType);
-    const [ward, setWard] = useState<WardType>({} as WardType);
-
-    const [api, contextHolder] = notification.useNotification();
-    const [error, setError] = useState<any>();
-    const [searchValue, setSearchValue] = useState<string>('');
-    const openNotificationWithIcon = (
-        type: NotificationType,
-        title: string,
-        des: string
-    ) => {
-        api[type]({
-            message: title,
-            description: des,
-        });
+    const openMessage = (type: NoticeType, content: string) => {
+        messageApi.open({ type, content });
     };
-    const onBirthDayChange: DatePickerProps['onChange'] = (
-        date,
-        dateString
-    ) => {
-        setProfileCopy({
-            ...patientProfile,
-            birthday: dayjs(date).format('YYYY-MM-DD'),
-        });
-    };
+    const { mutate: createPatientProfile } = useCreatePatientProfile();
+    const { mutate: updatePatientProfile } = useUpdatePatientProfile();
     const handleUpdate = (values: any) => {
         if (isCreate) {
             const newProfile = {
+                uuid: uuidv4(),
                 patientName: values.patientName,
                 patientPhone: values.patientPhone,
                 patientEmail: values.patientEmail,
@@ -79,273 +93,304 @@ const ViewProfile = () => {
                 commune: values.commune,
                 gender: values.gender,
             };
-            CreatePatientProfile(newProfile);
-        } else {
-            if (
-                JSON.stringify({
-                    ...profileCopy,
-                    birthday: dayjs(profileCopy.birthday).format('YYYY-MM-DD'),
-                }) !==
-                JSON.stringify({
-                    ...patientProfile,
-                    birthday: dayjs(patientProfile.birthday).format(
-                        'YYYY-MM-DD'
-                    ),
-                })
-            ) {
-                const newProfile = {
-                    patientName: values.patientName,
-                    patientPhone: values.patientPhone,
-                    patientEmail: values.patientEmail,
-                    birthday: dayjs(values.birthday).format('YYYY-MM-DD'),
-                    province: values.province,
-                    district: values.district,
-                    commune: values.commune,
-                    gender: values.gender,
-                    uuid: patientProfile.uuid,
-                    id: patientProfile.id,
-                };
-                UpdateProfile(newProfile);
-            } else {
-                messageApi.open({
-                    type: 'warning',
-                    content: 'Không có gì thay đổi!',
-                    duration: 3000,
-                });
-            }
-        }
-    };
-    const CreatePatientProfile = async (data: any) => {
-        try {
-            const res = await patientProfileService.createPatientProfile(data);
-            console.log(res.data.result);
-            localStorage.setItem('uuid', JSON.stringify(res.data.result.uuid));
-            openNotificationWithIcon(
-                'success',
-                'Thông báo',
-                'Thêm hồ sơ thành công'
-            );
-            setIsCreate(false);
-            setPatientProfile(res.data.result);
-        } catch (err: any) {
-            console.log(err.message);
-            openNotificationWithIcon(
-                'error',
-                'Thông báo',
-                'Thêm hồ sơ không thành công'
-            );
-        }
-    };
-    const [searchParams] = useSearchParams();
-    const queryClient = useQueryClient();
-
-    const navigate = useNavigate();
-    const UpdateProfile = async (newProfile: any) => {
-        try {
-            const res = await patientProfileService.updatePatientProfile(
-                newProfile
-            );
-            console.log(res);
-            openNotificationWithIcon(
-                'success',
-                'Thông báo!',
-                'Cập nhật thông tin thành công!'
-            );
-            setPatientProfile(newProfile);
-            const queryParams = new URLSearchParams();
-            queryParams.append('doctorId', searchParams.get('index') ?? '');
-            queryClient.invalidateQueries({
-                queryKey: ['useFetchProfiles', [newProfile.uuid]],
-            });
-            navigate(`/booking-appointment?${queryParams}`);
-        } catch (err: any) {
-            console.log(err.message);
-            openNotificationWithIcon(
-                'error',
-                'Thông báo!',
-                'Cập nhật thông tin không thành công!'
-            );
-        }
-    };
-    const getWards = async (districtId: any) => {
-        try {
-            const res = await axios.get(
-                `https://vapi.vnappmob.com//api/v2/province/ward/${districtId}`
-            );
-            setWards(res.data.results);
-        } catch (err) {
-            console.log(err);
-        }
-    };
-    const getListDistrict = async (provinceId: any) => {
-        try {
-            const res = await axios.get(
-                `https://vapi.vnappmob.com//api/v2/province/district/${provinceId}`
-            );
-
-            setDistricts(res.data.results);
-        } catch (err) {
-            console.log(err);
-        }
-    };
-
-    const handleCancelModalConfirm = () => {
-        setIsOpenModalConfirm(false);
-    };
-    const handleDeleteProfile = async (uuid: string) => {
-        try {
-            const res = await patientProfileService.deletePatientProfile(uuid);
-            console.log(res);
-            openNotificationWithIcon(
-                'success',
-                'Thông báo!',
-                'Xóa thành công!'
-            );
-            localStorage.removeItem('uuid');
-            setPatientProfile({} as PatientProfile);
-            handleCancelModalConfirm();
-            setProvinces([]);
-            setDistricts([]);
-            setWards([]);
-            setProvince({} as ProvinceType);
-            setDistrict({} as DistrictType);
-            setWard({} as WardType);
-            setPatientProfile({} as PatientProfile);
-            form.setFieldValue('patientName', '');
-            form.setFieldValue('patientPhone', '');
-            form.setFieldValue('patientEmail', '');
-            form.setFieldValue('gender', null);
-            form.setFieldValue('province', null);
-            form.setFieldValue('district', null);
-            form.setFieldValue('commune', null);
-            form.setFieldValue('birthday', null);
-
-            window.scrollTo(0, 0);
-        } catch (err: any) {
-            console.log(err.message);
-            openNotificationWithIcon(
-                'error',
-                'Thông báo!',
-                'Xóa không thành công!'
-            );
-        }
-    };
-    const handleGetProfileByPhoneOrEmail = () => {
-        if (searchValue === '') {
-            setError({
-                ...error,
-                searchContentError: 'Vui lòng nhập thông tin tìm kiếm',
+            createPatientProfile(newProfile, {
+                onSuccess() {
+                    openMessage('success', 'Thêm hồ sơ thành công!');
+                    const uuids = JSON.parse(
+                        localStorage.getItem('uuids') || '[]'
+                    );
+                    if (uuids.length > 0) {
+                        uuids.push(newProfile.uuid);
+                        console.log(uuids);
+                        localStorage.setItem('uuids', JSON.stringify(uuids));
+                    } else {
+                        localStorage.setItem(
+                            'uuids',
+                            JSON.stringify([newProfile.uuid])
+                        );
+                    }
+                    refetch();
+                    setIsCreate(false);
+                    setShowForm(false);
+                    form.resetFields();
+                },
+                onError() {
+                    openMessage('error', 'Thêm hồ sơ không thành công!');
+                },
             });
         } else {
-            const data = { searchContent: searchValue };
-            getProfileByPhoneOrEmail(data);
+            const newProfile: any = {
+                patientName: values.patientName,
+                patientPhone: values.patientPhone,
+                patientEmail: values.patientEmail,
+                birthday: dayjs(values.birthday).format('YYYY-MM-DD'),
+                province: values.province,
+                district: values.district,
+                commune: values.commune,
+                gender: values.gender,
+                uuid: profile.uuid,
+                id: profile.id,
+            };
+            updatePatientProfile(newProfile, {
+                onSuccess() {
+                    openMessage('success', 'Cập nhật hồ sơ thành công!');
+                    refetch();
+                    setShowForm(false);
+                    form.resetFields();
+                    queryClient.removeQueries({
+                        queryKey: ['useFetchProfileByUuid', updatedUuid],
+                        exact: true,
+                    });
+                    if (searchParams.get('index')) {
+                        setPatientProfile(newProfile);
+                        queryClient.invalidateQueries({
+                            queryKey: ['useFetchProfileByUuid', updatedUuid],
+                        });
+                        const queryParams = new URLSearchParams();
+                        queryParams.append(
+                            'doctorId',
+                            searchParams.get('index') ?? ''
+                        );
+                        navigate(`/booking-appointment?${queryParams}`);
+                    }
+                },
+                onError() {
+                    openMessage('success', 'Cập nhật hồ sơ không thành công!');
+                },
+            });
         }
     };
-    const getProfileByPhoneOrEmail = async (data: any) => {
-        try {
-            const res = await patientProfileService.getProfileByPhoneOrEmail(
-                data
-            );
-            localStorage.setItem('uuid', res.uuid);
-            setIsCreate(false);
-            setPatientProfile(res);
-            setSearchValue('');
-        } catch (err: any) {
-            console.log(err.message);
-            openNotificationWithIcon(
-                'error',
-                'Thông báo!',
-                'Không tìm thấy hồ sơ nào!'
-            );
-        }
-    };
-    const getProvinces = async () => {
-        console.log('getProvinces');
-        try {
-            const res = await axios.get(
-                'https://vapi.vnappmob.com/api/v2/province'
-            );
-            setProvinces(res.data.results);
-        } catch (err) {
-            console.log(err);
-        }
-    };
+
     useEffect(() => {
-        getProvinces();
         window.scrollTo(0, 0);
-        if (patientProfile.uuid) {
-            setProfileCopy(patientProfile);
-            setIsCreate(false);
+        if (searchParams.get('profile')) {
+            setShowForm(true);
         }
     }, []);
 
     useEffect(() => {
-        if (province.province_id !== 0) {
-            getListDistrict(province.province_id);
-        }
-    }, [province.province_id]);
-    useEffect(() => {
-        if (districts.length > 0) {
-            if (district !== undefined) {
-                getWards(district.district_id);
+        if (profile?.uuid) {
+            if (provinces) {
+                const province = provinces.find(
+                    (pro: any) => pro.province_name === profile.province
+                );
+                if (province) {
+                    setSelectedProvinceId(province.province_id);
+                }
             }
         }
-    }, [district.district_id]);
+    }, [provinces]);
+
     useEffect(() => {
-        const getProvince = () => {
-            const province: any = provinces.find(
-                (item) => item?.province_name === patientProfile.province
-            );
-            if (province) {
-                setProvince(province);
+        if (profile?.uuid) {
+            if (districts) {
+                const district = districts.find(
+                    (dis: DistrictType) =>
+                        dis.district_name === profile.district
+                );
+                if (district) {
+                    setSelectedDistrictId(district?.district_id);
+                }
             }
-        };
-        if (provinces.length > 1) {
-            getProvince();
         }
-    }, [provinces.length, patientProfile.uuid]);
+    }, [districts]);
+
     useEffect(() => {
-        const getDistrict = () => {
-            const district: any = districts.find(
-                (item) => item.district_name === patientProfile.district
-            );
-            if (district) {
-                setDistrict(district);
-            }
-        };
-        if (districts.length > 1) {
-            getDistrict();
+        if (profile) {
+            form.setFieldsValue({
+                patientName: profile.patientName,
+                patientPhone: profile.patientPhone,
+                patientEmail: profile.patientEmail,
+                gender: profile.gender,
+                birthday: dayjs(profile.birthday),
+                province: profile.province,
+                district: profile.district,
+                commune: profile.commune,
+            });
         }
-    }, [districts.length]);
-    useEffect(() => {
-        const getWards = () => {
-            const ward = wards.find(
-                (item) => item.ward_name === patientProfile.commune
-            );
-            if (ward) {
-                setWard(ward);
-            }
-        };
-        if (wards.length > 1) {
-            getWards();
-        }
-    }, [wards.length]);
+    }, [profile]);
+    const handleDelete = (uuid: string) => {};
     return (
         <>
-            {contextHolder}
             {messageContextHolder}
             <PatientProfileLayout breadcrumb="Hồ sơ">
-                <Card title="Hồ sơ bệnh nhân" bordered={false}>
-                    {patientProfile?.uuid !== undefined || isCreate ? (
-                        <Form
-                            form={form}
-                            layout="vertical"
-                            onFinish={handleUpdate}
-                            initialValues={{
-                                ...patientProfile,
-                                birthday: dayjs(patientProfile.birthday),
-                            }}
-                        >
+                <Skeleton active loading={isFetching}>
+                    <List
+                        itemLayout="vertical"
+                        grid={
+                            profiles?.length === 1
+                                ? { gutter: 24, column: 1 } // 1 cột khi chỉ có 1 profile
+                                : { gutter: 24, column: 2 } // 2 cột khi có 2+ profiles}
+                        }
+                        dataSource={profiles}
+                        renderItem={(profile: PatientProfile) => {
+                            return (
+                                <List.Item actions={[]}>
+                                    <Card
+                                        className={
+                                            profiles?.length === 1
+                                                ? 'shadow w-50 m-auto '
+                                                : 'shadow '
+                                        }
+                                    >
+                                        <Row gutter={24} className="">
+                                            <Col span={24}>
+                                                <Col span={24}>
+                                                    <UserOutlined className="fs-6 text-body-tertiary" />
+                                                    <span
+                                                        className="ms-2 fs-6 fw-medium"
+                                                        style={{
+                                                            color: '#0378db',
+                                                        }}
+                                                    >
+                                                        {profile.patientName}
+                                                    </span>
+                                                </Col>
+                                                <Col
+                                                    span={24}
+                                                    className="d-flex"
+                                                >
+                                                    <div className="col-5">
+                                                        <label className="fs-6">
+                                                            <i className="fs-6  fa-solid fa-cake-candles d-inline-block  text-body-tertiary"></i>
+                                                            <span className="ms-2 fs-6 fw-medium">
+                                                                Ngày sinh :
+                                                            </span>
+                                                        </label>
+                                                    </div>
+                                                    <div className="col-7">
+                                                        <span className="col-6 fs-6 fw-medium">
+                                                            {dayjs(
+                                                                profile.birthday
+                                                            ).format(
+                                                                'DD/MM/YYYY'
+                                                            )}
+                                                        </span>
+                                                    </div>
+                                                </Col>
+                                                <Col
+                                                    span={24}
+                                                    className="d-flex"
+                                                >
+                                                    <div className="col-5">
+                                                        <label className="fs-6">
+                                                            <PhoneOutlined className="text-body-tertiary" />
+                                                            <span className="ms-2 fs-6 fw-medium">
+                                                                Số điện thoại :
+                                                            </span>
+                                                        </label>
+                                                    </div>
+                                                    <div className="col-7">
+                                                        <span className="col-6 fs-6 fw-medium">
+                                                            {
+                                                                profile.patientPhone
+                                                            }
+                                                        </span>
+                                                    </div>
+                                                </Col>
+                                                <Col
+                                                    span={24}
+                                                    className="d-flex"
+                                                >
+                                                    <div className="col-5">
+                                                        <label className="fs-6">
+                                                            <EnvironmentOutlined className="text-body-tertiary" />
+                                                            <span className="ms-2 fs-6 fw-medium">
+                                                                Địa chỉ :
+                                                            </span>
+                                                        </label>
+                                                    </div>
+                                                    <div className="col-7">
+                                                        <span className="col-6 fs-6 fw-medium">
+                                                            {profile.commune +
+                                                                ',' +
+                                                                profile.district +
+                                                                ',' +
+                                                                profile.province}
+                                                        </span>
+                                                    </div>
+                                                </Col>
+                                                <Col
+                                                    span={24}
+                                                    className="d-flex"
+                                                >
+                                                    <div className="col-5">
+                                                        <label className="fs-6">
+                                                            <i className="fa-regular fa-envelope  text-body-tertiary"></i>
+                                                            <span className="ms-2 fs-6 fw-medium">
+                                                                Địa chỉ email :
+                                                            </span>
+                                                        </label>
+                                                    </div>
+                                                    <div className="col-7">
+                                                        <span className="col-6 fs-6 fw-medium">
+                                                            {
+                                                                profile.patientEmail
+                                                            }
+                                                        </span>
+                                                    </div>
+                                                </Col>
+                                            </Col>
+                                            <Col span={24} className="mt-3">
+                                                <Row
+                                                    gutter={24}
+                                                    justify={'space-between'}
+                                                >
+                                                    <Col
+                                                        span={12}
+                                                        className="d-flex"
+                                                    >
+                                                        <Button
+                                                            className="bg-danger text-white border-0"
+                                                            onClick={() => {
+                                                                handleDelete(
+                                                                    profile.uuid
+                                                                );
+                                                            }}
+                                                        >
+                                                            <i className="fa-solid fa-trash"></i>
+                                                            Xóa
+                                                        </Button>
+                                                        <Button
+                                                            style={{
+                                                                backgroundColor:
+                                                                    'rgba(54,153,255,.1)',
+                                                            }}
+                                                            className="ms-3 border-0"
+                                                            onClick={() => {
+                                                                const queryParams =
+                                                                    new URLSearchParams();
+                                                                queryParams.append(
+                                                                    'profile',
+                                                                    profile.uuid.toString()
+                                                                );
+                                                                navigate(
+                                                                    `/patient/profile?${queryParams.toString()}`
+                                                                );
+                                                                setShowForm(
+                                                                    true
+                                                                );
+                                                                setUpdatedUuid(
+                                                                    profile.uuid
+                                                                );
+                                                            }}
+                                                        >
+                                                            <EditOutlined />
+                                                            Chỉnh sửa
+                                                        </Button>
+                                                    </Col>
+                                                </Row>
+                                            </Col>
+                                        </Row>
+                                    </Card>
+                                </List.Item>
+                            );
+                        }}
+                    ></List>
+                </Skeleton>
+                {showForm ? (
+                    <Form form={form} layout="vertical" onFinish={handleUpdate}>
+                        <Skeleton active loading={isFetchingProfile}>
                             <Row gutter={24}>
                                 <Col span={12}>
                                     <Form.Item
@@ -374,14 +419,7 @@ const ViewProfile = () => {
                                             },
                                         ]}
                                     >
-                                        <Input
-                                            onChange={(e: any) =>
-                                                setProfileCopy({
-                                                    ...patientProfile,
-                                                    patientName: e.target.value,
-                                                })
-                                            }
-                                        />
+                                        <Input />
                                     </Form.Item>
                                 </Col>
                                 <Col span={12}>
@@ -402,15 +440,7 @@ const ViewProfile = () => {
                                             },
                                         ]}
                                     >
-                                        <Input
-                                            onChange={(e) =>
-                                                setProfileCopy({
-                                                    ...patientProfile,
-                                                    patientPhone:
-                                                        e.target.value,
-                                                })
-                                            }
-                                        />
+                                        <Input />
                                     </Form.Item>
                                 </Col>
                                 <Col span={12}>
@@ -428,15 +458,7 @@ const ViewProfile = () => {
                                             },
                                         ]}
                                     >
-                                        <Input
-                                            onChange={(e) =>
-                                                setProfileCopy({
-                                                    ...patientProfile,
-                                                    patientEmail:
-                                                        e.target.value,
-                                                })
-                                            }
-                                        />
+                                        <Input />
                                     </Form.Item>
                                 </Col>
                                 <Col span={12}>
@@ -455,12 +477,6 @@ const ViewProfile = () => {
                                             value={Number(
                                                 patientProfile.gender
                                             )}
-                                            onChange={(e) =>
-                                                setProfileCopy({
-                                                    ...patientProfile,
-                                                    gender: e.target.value,
-                                                })
-                                            }
                                         >
                                             <Radio value={1}>Nam</Radio>
                                             <Radio value={2}>Nữ</Radio>
@@ -481,7 +497,6 @@ const ViewProfile = () => {
                                     >
                                         <DatePicker
                                             placeholder="Chọn ngày"
-                                            onChange={onBirthDayChange}
                                             className="d-block"
                                             type="date"
                                             format={dateFormat}
@@ -506,20 +521,19 @@ const ViewProfile = () => {
                                             onChange={(
                                                 province_name: string
                                             ) => {
-                                                const pro: any = provinces.find(
-                                                    (province: any) => {
-                                                        return (
-                                                            province.province_name ===
-                                                            province_name
-                                                        );
-                                                    }
+                                                const pro: any =
+                                                    provinces?.find(
+                                                        (province: any) => {
+                                                            return (
+                                                                province.province_name ===
+                                                                province_name
+                                                            );
+                                                        }
+                                                    );
+                                                setSelectedProvinceId(
+                                                    pro.province_id
                                                 );
-                                                setProvince(pro);
 
-                                                setProfileCopy({
-                                                    ...patientProfile,
-                                                    province: province_name,
-                                                });
                                                 form.setFieldValue(
                                                     'district',
                                                     null
@@ -532,7 +546,7 @@ const ViewProfile = () => {
                                             placeholder="Chọn tỉnh/ thành phố"
                                             optionFilterProp="children"
                                         >
-                                            {provinces.map(
+                                            {provinces?.map(
                                                 (province: ProvinceType) => {
                                                     return (
                                                         <Select.Option
@@ -569,20 +583,19 @@ const ViewProfile = () => {
                                             className="d-block"
                                             showSearch
                                             onChange={(value: string) => {
-                                                const dis: any = districts.find(
-                                                    (item: any) => {
-                                                        return (
-                                                            item.district_name ===
-                                                            value
-                                                        );
-                                                    }
+                                                const dis: any =
+                                                    districts?.find(
+                                                        (item: any) => {
+                                                            return (
+                                                                item.district_name ===
+                                                                value
+                                                            );
+                                                        }
+                                                    );
+                                                setSelectedDistrictId(
+                                                    dis.district_id
                                                 );
-                                                setDistrict(dis);
 
-                                                setProfileCopy({
-                                                    ...patientProfile,
-                                                    district: value,
-                                                });
                                                 form.setFieldValue(
                                                     'commune',
                                                     null
@@ -591,7 +604,7 @@ const ViewProfile = () => {
                                             placeholder="Chọn quận/ huyện/ thị xã"
                                             optionFilterProp="children"
                                         >
-                                            {districts.map((item) => {
+                                            {districts?.map((item) => {
                                                 return (
                                                     <Select.Option
                                                         key={item.district_name}
@@ -621,17 +634,10 @@ const ViewProfile = () => {
                                         <Select
                                             className="d-block"
                                             showSearch
-                                            onChange={(value: string) => {
-                                                setProfileCopy({
-                                                    ...patientProfile,
-                                                    commune: value,
-                                                });
-                                                setWard(ward);
-                                            }}
                                             placeholder="Chọn xã/ phường"
                                             optionFilterProp="children"
                                         >
-                                            {wards.map((item) => {
+                                            {wards?.map((item) => {
                                                 return (
                                                     <Select.Option
                                                         key={item.ward_name}
@@ -644,16 +650,18 @@ const ViewProfile = () => {
                                         </Select>
                                     </Form.Item>
                                 </Col>
-                            </Row>
-                            <div className="group__button d-flex justify-content-between">
-                                <Button
-                                    className="bg-primary text-white "
-                                    onClick={() => {
-                                        form.submit();
-                                    }}
-                                >
-                                    Lưu thông tin
-                                </Button>
+                            </Row>{' '}
+                        </Skeleton>
+                        <div className="group__button d-flex justify-content-between">
+                            <Button
+                                className="bg-primary text-white "
+                                onClick={() => {
+                                    form.submit();
+                                }}
+                            >
+                                Lưu thông tin
+                            </Button>
+                            {patientProfile?.uuid && (
                                 <Button
                                     className=" bg-danger text-white"
                                     onClick={() => {
@@ -662,69 +670,31 @@ const ViewProfile = () => {
                                 >
                                     Xóa hồ sơ
                                 </Button>
-                            </div>
-                        </Form>
-                    ) : (
-                        <div className="container mt-5">
-                            <Card
-                                className="mx-auto shadow-lg"
-                                style={{ maxWidth: '500px' }}
-                            >
-                                <div className="mb-4">
-                                    <label className="form-label">
-                                        Nhập số điện thoại hoặc email
-                                    </label>
-                                    <Input
-                                        onFocus={() => {
-                                            setError({});
-                                        }}
-                                        placeholder="Số điện thoại hoặc email"
-                                        value={searchValue}
-                                        onChange={(e) => {
-                                            setSearchValue(
-                                                String(e.target.value)
-                                            );
-                                        }}
-                                    />
-                                    {error?.searchContentError && (
-                                        <div
-                                            className="error_message mt-3"
-                                            style={{ color: 'red' }}
-                                        >
-                                            {error?.searchContentError}
-                                        </div>
-                                    )}
-                                    <Button
-                                        type="primary"
-                                        block
-                                        className="mt-3"
-                                        onClick={handleGetProfileByPhoneOrEmail}
-                                    >
-                                        Tìm kiếm
-                                    </Button>
-                                </div>
-
-                                <Button
-                                    type="default"
-                                    block
-                                    className="mt-4"
-                                    onClick={() => {
-                                        setIsCreate(true);
-                                        getProvinces();
-                                    }}
-                                >
-                                    Thêm mới hồ sơ
-                                </Button>
-                            </Card>
+                            )}
                         </div>
-                    )}
-                </Card>
+                    </Form>
+                ) : (
+                    <div className="text-center">
+                        <Button
+                            type="default"
+                            className="mt-4"
+                            onClick={() => {
+                                setIsCreate(true);
+                                setShowForm(true);
+                            }}
+                        >
+                            Thêm mới hồ sơ
+                        </Button>
+                    </div>
+                )}
                 {isOpenModalConfirm && (
                     <ConfirmModal
                         message="Bạn chắc chắc muốn xóa hồ sơ này!"
-                        openModal={isOpenModalConfirm}
-                        handleCancelModal={() => setIsOpenModalConfirm(false)}
-                        handleOk={handleDeleteProfile}
+                        isOpenModal={isOpenModalConfirm}
+                        onCloseModal={() => setIsOpenModalConfirm(false)}
+                        handleOk={() => {
+                            console.log('delete');
+                        }}
                     />
                 )}
             </PatientProfileLayout>

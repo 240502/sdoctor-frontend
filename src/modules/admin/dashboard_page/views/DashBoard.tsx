@@ -117,7 +117,6 @@ const DashBoard = () => {
                 yAxisIndex: 1,
             });
         } else {
-            // Xử lý dữ liệu lịch hẹn
             appointmentRecords.forEach((record: any) => {
                 if (
                     !record?.appointmentDate ||

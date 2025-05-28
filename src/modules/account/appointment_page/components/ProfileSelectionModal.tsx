@@ -37,63 +37,9 @@ const ProfileSelectionModal = ({
     useEffect(() => {
         console.log('profiles', profiles);
     }, [profiles]);
-    // // Lấy danh sách hồ sơ
-    // const { data: profiles, refetch } = useQuery({
-    //     queryKey: ['profiles'],
-    //     queryFn: profileService.getProfiles,
-    // });
 
-    // // Mutation để thêm hồ sơ mới
-    // const createMutation = useMutation({
-    //     mutationFn: profileService.createProfile,
-    //     onSuccess: (newProfile) => {
-    //         saveProfile(newProfile); // Lưu vào localStorage
-    //         refetch(); // Làm mới danh sách
-    //         form.resetFields();
-    //         setIsEditing(false);
-    //     },
-    // });
-
-    // // Mutation để chỉnh sửa hồ sơ
-    // const updateMutation = useMutation({
-    //     mutationFn: ({
-    //         uuid,
-    //         data,
-    //     }: {
-    //         uuid: string;
-    //         data: Partial<Profile>;
-    //     }) => profileService.updateProfile(uuid, data),
-    //     onSuccess: (updatedProfile) => {
-    //         saveProfile(updatedProfile); // Cập nhật localStorage
-    //         refetch();
-    //         form.resetFields();
-    //         setIsEditing(false);
-    //         setEditingProfile(null);
-    //     },
-    // });
-
-    // Xử lý chọn hồ sơ
-    // const handleSelectProfile = (profile: PatientProfile) => {
-    //     onSelectProfile(profile.uuid);
-    //     onClose();
-    // };
-
-    // Xử lý mở form chỉnh sửa
-    const handleEditProfile = (profile: PatientProfile) => {
-        setIsEditing(true);
-        setEditingProfile(profile);
-        form.setFieldsValue(profile);
-    };
     const navigate = useNavigate();
 
-    // // Xử lý gửi form (thêm hoặc chỉnh sửa)
-    // const handleSubmit = (values: Profile) => {
-    //     if (editingProfile) {
-    //         updateMutation.mutate({ uuid: editingProfile.uuid, data: values });
-    //     } else {
-    //         createMutation.mutate(values);
-    //     }
-    // };
     const [searchParams] = useSearchParams();
 
     return (
@@ -221,10 +167,6 @@ const ProfileSelectionModal = ({
                                                     span={12}
                                                     className="d-flex"
                                                 >
-                                                    <Button className="bg-danger text-white border-0">
-                                                        <i className="fa-solid fa-trash"></i>
-                                                        Xóa
-                                                    </Button>
                                                     <Button
                                                         style={{
                                                             backgroundColor:
