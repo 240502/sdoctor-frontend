@@ -2,6 +2,10 @@ import apiClient from '../constants/api';
 import { Appointment } from '../models';
 import { Dayjs } from 'dayjs';
 const appointmentService = {
+    async getTotalAppointmentByStatus(doctorId: number): Promise<any>{
+        const res = await apiClient.get(`/appointment/get-total-by-status/${doctorId}`);
+        return res?.data;
+    },
     async getRecentAppointments(payload: {
         entityId: number;
         limit: number;

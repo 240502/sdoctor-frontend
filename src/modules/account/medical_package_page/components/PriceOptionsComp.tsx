@@ -39,7 +39,7 @@ export const PriceOptionsComp = () => {
                     medicalPackageOptions?.endPrice ?? 20000000,
                 ]}
                 min={50000}
-                max={20000000}
+                max={100000000}
                 tooltip={{ formatter: formatCurrency }}
             />
         </div>

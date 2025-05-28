@@ -14,5 +14,13 @@ const departmentSerivce = {
         );
         return res.data;
     },
+    async getDepartmentsWithPagination(payload: {
+        pageIndex: number;
+        pageSize: number;
+        name: string
+    }): Promise<Department[] | any>{
+        const res = await apiClient.get(`/department/get-departments-with-pagination?pageIndex=${payload.pageIndex}&pageSize=${payload.pageSize}&name=${payload.name}`);
+        return res?.data;
+    }
 };
 export default departmentSerivce;

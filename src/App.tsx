@@ -1,7 +1,7 @@
 import { privateRoutes, publicRoutes } from './routes';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import PrivateRoutes from './routes/private_router';
-import { Fragment, Suspense, useEffect } from 'react';
+import { Fragment, Suspense } from 'react';
 import './assets/fontawesome/css/all.min.css';
 import AuthInitializer from './components/AuthInitializer';
 

@@ -62,6 +62,10 @@ const ViewService = () => {
                                 )
                             )}
                         </Skeleton>
+                        <Skeleton active loading={isFetching}></Skeleton>
+                        <Skeleton active loading={isFetching}></Skeleton>
+                        <Skeleton active loading={isFetching}></Skeleton>
+
                     </Col>
                 </Row>
             </div>

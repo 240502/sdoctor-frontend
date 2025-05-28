@@ -64,9 +64,11 @@ import {
     SERVICE_MANAGEMENT_PATH,
     APPOINTMENT_DETAIL_PATH,
     SUPPORT_STAFF_PATH,
+    REQUEST_MANAGEMENT_PATH,
 } from './path';
 import AppointmentDetailPage from '../modules/admin/appointment_detail_page';
 import { StaffManagement } from '../modules/admin/staff_management_page';
+import { RequestsManagement } from '../modules/admin/requests_management_page';
 export const publicRoutes = [
     {
         path: BOOKING_SUCCESS_PATH,
@@ -161,6 +163,11 @@ export const publicRoutes = [
 ];
 
 export const privateRoutes = [
+    {
+        path: REQUEST_MANAGEMENT_PATH,
+        component: RequestsManagement,
+        layout: AdminLayout,
+    },
     {
         path: APPOINTMENT_DETAIL_PATH,
         component: AppointmentDetailPage,

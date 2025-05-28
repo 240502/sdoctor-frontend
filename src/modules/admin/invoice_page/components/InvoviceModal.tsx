@@ -10,16 +10,11 @@ import {
     Card,
     List,
     Popconfirm,
-    Divider,
     Skeleton,
 } from 'antd';
 import { useEffect, useState } from 'react';
 import dayjs from 'dayjs';
-import {
-    invoicesService,
-    appointmentService,
-    doctorServiceService,
-} from '../../../../services';
+
 import {
     useCreateInvoiceDetail,
     useDeleteInvoiceDetail,

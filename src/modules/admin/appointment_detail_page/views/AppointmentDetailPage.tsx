@@ -1,12 +1,10 @@
 import { EyeOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import {
-    Badge,
     Button,
     Card,
     Col,
     Divider,
-    Flex,
     Row,
     Skeleton,
     Tag,
@@ -236,7 +234,7 @@ const AppointmentDetailPage = () => {
                                                 {appointment.patientName}
                                             </h6>
                                         </Col>
-                                        <Col span={4}>
+                                        <Col span={8}>
                                             <p
                                                 style={{ color: '#012047' }}
                                                 className="mb-2"

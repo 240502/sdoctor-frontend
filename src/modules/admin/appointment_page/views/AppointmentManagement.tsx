@@ -1,11 +1,11 @@
 import { HomeOutlined } from '@ant-design/icons';
 import { Breadcrumb, Divider, notification } from 'antd';
 import { useState } from 'react';
-import AppointmentTable from '../components/AppointmentTable';
 import { AppointmentResponseDto } from '../../../../models/appointment';
 import { useRecoilValue } from 'recoil';
 import { userValue } from '../../../../stores/userAtom';
 import AppointmentDetailModal from '../components/AppointmentDetailModal';
+import AppointmentsTable from '../components/AppointmetsTable';
 type NotificationType = 'success' | 'warning' | 'error';
 const AppointmentManagement = () => {
     const user = useRecoilValue(userValue);
@@ -56,7 +56,7 @@ const AppointmentManagement = () => {
             </div>
             <div className="block__list__appointment">
                 <h5 className="mb-3">Danh sách lịch hẹn</h5>
-                <AppointmentTable
+                <AppointmentsTable
                     openNotificationWithIcon={openNotificationWithIcon}
                     handleClickViewDetail={onClickViewButton}
                     userId={user.userId}

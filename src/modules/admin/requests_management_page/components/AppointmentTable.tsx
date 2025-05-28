@@ -3,17 +3,15 @@ import { AppointmentResponseDto } from '../../../../models/appointment';
 import {
     Button,
     Col,
-    Flex,
     Input,
     InputRef,
     Pagination,
     Row,
-    Select,
     Skeleton,
     Space,
     Tag,
     DatePicker,
-    Tooltip,
+    Divider,
 } from 'antd';
 import Highlighter from 'react-highlight-words';
 import { useRef, useState } from 'react';
@@ -21,12 +19,10 @@ import { FilterDropdownProps } from 'antd/es/table/interface';
 import {
     CheckOutlined,
     CloseOutlined,
-    EyeOutlined,
     SearchOutlined,
 } from '@ant-design/icons';
 
 import { ConfirmAppointmentModal } from '../../../../components';
-const { Option } = Select;
 import { useFetchAppointmentWithOptions } from '../../../../hooks/appointments/useFetchAppointmentWithOptions';
 type DataIndex = keyof AppointmentResponseDto;
 const { RangePicker } = DatePicker;
@@ -38,15 +34,32 @@ dayjs.extend(isoWeek);
 // Thiết lập locale tiếng Việt
 dayjs.locale('vi');
 import {
-    useFetchAllAppointmentStatus,
     useSendConfirmSuccessMail,
     useSendRejectionSuccessMail,
     useUpdateAppointmentStatus,
 } from '../../../../hooks';
-import { useNavigate } from 'react-router-dom';
-const AppointmentTable = ({ openNotificationWithIcon, userId }: any) => {
-    const navigate = useNavigate();
-
+import { NoticeType } from 'antd/es/message/interface';
+import { TabsProps } from 'antd/lib';
+import { useFetchTotalAppointmentByStatus } from '../../../../hooks/appointments/useAppointment';
+interface AppointmentTable {
+    openMessage: (type: NoticeType, content: string) => void;
+    userId:number
+}
+const AppointmentTable = ({ openMessage, userId }: AppointmentTable) => {
+    const tabs: TabsProps['items'] = [
+            {
+                key: '1',
+                label: <h6 className="m-0">Chờ xác nhận</h6>,
+            },
+            {
+                key: '2',
+                label: <h6 className="m-0">Đã xác nhận</h6>,
+            },
+            {
+                key: '3',
+                label: <h6 className="m-0">Đã hủy</h6>,
+            }
+        ];
     const [searchText, setSearchText] = useState('');
     const [searchedColumn, setSearchedColumn] = useState('');
     const searchInput = useRef<InputRef>(null);
@@ -78,7 +91,7 @@ const AppointmentTable = ({ openNotificationWithIcon, userId }: any) => {
     const rejectionReasonInputRef = useRef<any>(null);
     const { data, error, isError, isFetching, refetch, isRefetching } =
         useFetchAppointmentWithOptions(options);
-    const { data: appointmentStatusRes } = useFetchAllAppointmentStatus();
+    const { data: totalAppointment } = useFetchTotalAppointmentByStatus(options.userId);
     const updateAppointmentStatus = useUpdateAppointmentStatus();
     const sendRejectionMail = useSendRejectionSuccessMail();
     const sendConfirmSuccessMail = useSendConfirmSuccessMail();
@@ -105,9 +118,8 @@ const AppointmentTable = ({ openNotificationWithIcon, userId }: any) => {
         }
         updateAppointmentStatus.mutate(payload, {
             onSuccess() {
-                openNotificationWithIcon(
+                openMessage(
                     'success',
-                    'Thông báo!',
                     'Cập nhập trạng thái thành công!'
                 );
                 handleCancelModalConfirm();
@@ -141,9 +153,8 @@ const AppointmentTable = ({ openNotificationWithIcon, userId }: any) => {
                 refetch();
             },
             onError() {
-                openNotificationWithIcon(
+                openMessage(
                     'error',
-                    'Thông báo!',
                     'Cập nhập trạng thái không thành công!'
                 );
                 handleCancelModalConfirm();
@@ -340,78 +351,56 @@ const AppointmentTable = ({ openNotificationWithIcon, userId }: any) => {
             key: 'action',
             render: (_, record) => (
                 <>
-                    <Tooltip placement="top" title="Xem chi tiết">
-                        <Button
-                            className="border-info me-2"
+                        
+                    <Button
+                            className="me-2 text-success border-0"
                             onClick={() => {
-                                const queryParams = new URLSearchParams();
-                                queryParams.append(
-                                    'appointment',
-                                    record.id.toString()
-                                );
-                                navigate(
-                                    `/admin/appointment-detail?${queryParams}`
-                                );
+                                setOpenModalConfirm(true);
+                                setType('confirm');
+                                if (record.statusId === 2)
+                                {
+                                    setAppointment({
+                                        ...record,
+                                        statusId: 4,
+                                    });
+                                    setMessage(
+                                        'Bạn chắc chắn xác nhận lịch hẹn này đã hoàn thành!'
+                                    );
+                                }
+                                else {
+                                    setAppointment({
+                                        ...record,
+                                        statusId: 2,
+                                    });
+                                    setMessage(
+                                        'Bạn chắc chắn xác nhận lịch hẹn này!'
+                                    );
+                               }
                             }}
                         >
-                            <EyeOutlined className="text-info" />
-                        </Button>
-                    </Tooltip>
-                    {(record.statusId === 2 || record.statusId === 1) && (
-                        <Tooltip
-                            placement="top"
-                            title={
-                                record.statusId === 1
-                                    ? 'Xác nhận'
-                                    : 'Hoàn thành'
-                            }
-                        >
+                        <CheckOutlined /> {
+                            record.statusId === 2 ? "Hoàn thành" : "Xác nhấn"
+                        }
+                    </Button>
+                    {
+                        record.statusId === 1 && <>
+                            <Divider type="vertical" className='pt-3 pb-3'/>
                             <Button
-                                className="border-success me-2"
-                                onClick={() => {
-                                    setOpenModalConfirm(true);
-                                    setType('confirm');
-
-                                    if (record.statusId === 2) {
-                                        setAppointment({
-                                            ...record,
-                                            statusId: 4,
-                                        });
+                                className='text-danger border-0  '
+                                    onClick={() => {
+                                        setOpenModalConfirm(true);
+                                        setAppointment({ ...record, statusId: 3 });
                                         setMessage(
-                                            'Bạn chắc chắn muốn đánh dấu lịch hẹn đã hoàn thành này!'
+                                            'Bạn chắc chắn hủy lịch hẹn này!'
                                         );
-                                    } else {
-                                        setAppointment({
-                                            ...record,
-                                            statusId: 2,
-                                        });
-                                        setMessage(
-                                            'Bạn chắc chắn xác nhận lịch hẹn này!'
-                                        );
-                                    }
-                                }}
-                            >
-                                <CheckOutlined className="text-success" />
+                                        setType('delete');
+                                    }}
+                                >
+                                    <CloseOutlined className="text-danger" /> Từ chối
                             </Button>
-                        </Tooltip>
-                    )}
-                    {(record.statusId === 2 || record.statusId === 1) && (
-                        <Tooltip placement="top" title="Từ chối">
-                            <Button
-                                danger
-                                onClick={() => {
-                                    setOpenModalConfirm(true);
-                                    setAppointment({ ...record, statusId: 3 });
-                                    setMessage(
-                                        'Bạn chắc chắn hủy lịch hẹn này!'
-                                    );
-                                    setType('delete');
-                                }}
-                            >
-                                <CloseOutlined className="text-danger" />
-                            </Button>{' '}
-                        </Tooltip>
-                    )}
+                        </>
+                    }
+                  
                 </>
             ),
         },
@@ -425,7 +414,6 @@ const AppointmentTable = ({ openNotificationWithIcon, userId }: any) => {
     };
     const onDateRangeChange = (
         dates: [Dayjs | null, Dayjs | null] | null,
-        dateStrings: [string, string]
     ) => {
         if (dates && dates[0] && dates[1]) {
             setOptions({ ...options, fromDate: dates[0], toDate: dates[1] });
@@ -441,35 +429,36 @@ const AppointmentTable = ({ openNotificationWithIcon, userId }: any) => {
 
     return (
         <>
-            <Row gutter={24} className="mb-3 ">
+             <Row gutter={24} className='mb-3'>
                 <Col span={12}>
-                    <Select
-                        className="w-25"
-                        value={options.status}
-                        onChange={(value) => {
-                            setOptions({ ...options, status: value });
-                        }}
-                    >
-                        {appointmentStatusRes &&
-                            appointmentStatusRes.map((status) => {
-                                return (
-                                    <Option
-                                        key={status.id}
-                                        value={status.id}
-                                        label={status.name}
-                                    >
-                                        {status.name}
-                                    </Option>
-                                );
-                            })}
-                    </Select>
+                    {tabs.map((tab) => {
+                        return (
+                            <Button
+                                type={
+                                    options.status === Number(tab.key)
+                                        ? 'primary'
+                                        : 'default'
+                                }
+                                className="me-2 col-3"
+                               
+                                onClick={() => {
+                                    if (Number(options.status) !== Number(tab.key)) {
+                                        setOptions({...options,status:Number(tab.key)})
+                                    }
+                                }}
+                                key={tab.key}
+                            >
+                                {tab.label} <Tag className='rounded-5'> { tab.key === '1' ? totalAppointment?.pendingCount : tab.key === '2' ? totalAppointment?.confirmedCount: tab.key === '3' ? totalAppointment?.cancelledCount: totalAppointment?.completedCount  }</Tag>
+                            </Button>
+                        );
+                    })}
                 </Col>
-                <Col span={12} className="text-end">
+                <Col span={12} className='text-end'>
                     <RangePicker
-                        placeholder={['Từ ngày', 'Đến ngày']}
-                        value={[options.fromDate, options.toDate]}
-                        format={'DD-MM-YYYY'}
-                        onChange={onDateRangeChange}
+                            placeholder={['Từ ngày', 'Đến ngày']}
+                            value={[options.fromDate, options.toDate]}
+                            format={'DD-MM-YYYY'}
+                            onChange={onDateRangeChange}
                     />
                 </Col>
             </Row>

@@ -72,4 +72,7 @@ export interface AppointmentResponseDto {
     rejectionReason: string;
     serviceName: string;
     clinicName: string;
+    prices?: string;
+    doctorImage: string;
+    patientAddress: string;
 }

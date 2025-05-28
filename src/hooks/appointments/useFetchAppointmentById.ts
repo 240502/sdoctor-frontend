@@ -1,5 +1,5 @@
 import { useQuery, UseQueryResult } from '@tanstack/react-query';
-import { Appointment, AppointmentResponseDto } from '../../models';
+import {  AppointmentResponseDto } from '../../models';
 import { appointmentService } from '../../services';
 
 export const useFetchAppointmentById = (
