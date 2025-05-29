@@ -54,9 +54,7 @@ export const AppLayout = ({ children }: any) => {
                 </div>
             </Header>
             <Content className="bg-body">{children}</Content>
-            <Footer>
-                <HomeFooter />
-            </Footer>
+            <HomeFooter />
         </Layout>
     );
 };

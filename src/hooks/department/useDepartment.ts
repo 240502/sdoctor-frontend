@@ -5,7 +5,11 @@ const useFetchDepartmentByPagination = (payload: { pageIndex: number; pageSize: 
     return useQuery({
         queryKey: ["useFetchDepartmentByPagination", payload],
         queryFn: () => departmentSerivce.getDepartmentsWithPagination(payload),
-        retry:false
+        retry: false,
+        select:(data) => ({
+            departments: data?.data,
+            pageCount:data?.pageCount  
+        }),
     })
 }
 

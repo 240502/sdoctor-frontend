@@ -3,157 +3,43 @@ import {
     Col,
     Divider,
     Image,
-    Input,
-    Pagination,
     Row,
-    Select,
     Skeleton,
     Tabs,
 } from 'antd';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { baseURL } from '../../../../constants/api';
-// import { ClinicService } from '../../../../services/clinic.service';
-import parse from 'html-react-parser';
 import '@/assets/scss/clinic.scss';
 // import { doctorService } from '../../../../services/doctor.service';
 import { EnvironmentOutlined, HomeOutlined } from '@ant-design/icons';
-// import { BlockDescription } from '../components/BlockDescription';
-// import { MajorService } from '../../../../services/major.service';
-// import { ServiceService } from '../../../../services/medical_package.service';
-// import { ServiceCategoryService } from '../../../../services/service_category.service';
-import { useFetchClinicById } from '../../../../hooks';
+import { useFetchClinicById, } from '../../../../hooks';
 import DoctorsTab from '../components/DoctorsTab';
 import MedicalPackage from '../components/MedicalPackage';
+import ClinicDetail from '../components/ClinicDetail';
 
 const ViewClinicDetail = () => {
     const { id } = useParams<any>();
+    const { data, error, isFetching } = useFetchClinicById(Number(id));
     const [current, setCurrent] = useState<string>('0');
 
     const [selectedKey, setSelectedKey] = useState<string>('1');
-    const { data, error, isFetching } = useFetchClinicById(Number(id));
-    // const handleGetClinicById = async (id: number) => {
-    //     try {
-    //         const clinic = clinics.find((item: Clinic) => item.id === id);
-    //         if (clinic) {
-    //             setClinic(clinic);
-    //         } else {
-    //             const res = await ClinicService.getClinicById(id);
-    //             setClinic(res);
-    //         }
-    //     } catch (err: any) {
-    //         throw new Error(err.message);
-    //     }
-    // };
-
-    const handleFilterDoctor = () => {
-        // if (searchContent === '') {
-        //     setFilteredDoctors(doctors);
-        // } else {
-        //     const filteredDoctors = doctors.filter((doc: Doctor) =>
-        //         doc.fullName.includes(searchContent)
-        //     );
-        //     setFilteredDoctors(filteredDoctors);
-        // }
-    };
-    // const getAllMajor = async () => {
-    //     try {
-    //         const majorList = await MajorService.getAllMajor();
-    //         setMajors(majorList);
-    //     } catch (err: any) {
-    //         console.log(err.message);
-    //     }
-    // };
-    // const getDoctors = async () => {
-    //     try {
-    //         const data = {
-    //             pageIndex: pageIndex,
-    //             pageSize: pageSize,
-    //             clinicId: Number(id),
-    //             majorId: majorId === 0 ? null : Number(majorId),
-    //         };
-    //         const res = await doctorService.viewDoctorForClient(data);
-    //         setDoctors(res.data);
-    //     } catch (err: any) {
-    //         setDoctors([]);
-    //         console.log(err.message);
-    //     }
-    // };
-    // const getService = async () => {
-    //     try {
-    //         const data = {
-    //             pageIndex: pageIndex,
-    //             pageSize: pageSize,
-    //             categoryId: categoryId,
-    //             clinicId: Number(id),
-    //         };
-    //         const result = await ServiceService.viewService(data);
-    //         setServices(result?.data);
-    //         setPageCount(result?.pageCount);
-    //     } catch (err: any) {
-    //         setServices([]);
-    //         setPageCount(0);
-    //         console.log(err.message);
-    //     }
-    // };
-    const handleFilterService = () => {
-        // if (searchContent === '') {
-        //     setFilteredServices(services);
-        // } else {
-        //     const filteredServices = services.filter((service: Service) =>
-        //         service.name.includes(searchContent)
-        //     );
-        //     setFilteredServices(filteredServices);
-        // }
-    };
-    // const handleUpdateViewsDoctor = async (id: number) => {
-    //     try {
-    //         const res = await doctorService.updateViewsDoctor(id);
-    //     } catch (err: any) {
-    //         console.log(err.message);
-    //     }
-    // };
+   
+    
+   
+    
+    
+    
 
     const handleChangeMenu = (e: any) => {
         setCurrent(e.key);
     };
-    // const getAllServiceCategory = async () => {
-    //     try {
-    //         const res = await ServiceCategoryService.getAll();
-    //         setServiceCategories(res);
-    //     } catch (err: any) {
-    //         setServiceCategories([]);
-
-    //         console.log(err.message);
-    //     }
-    // };
+    
 
     useEffect(() => {
-        // handleGetClinicById(Number(id));
         window.scrollTo(0, 0);
     }, [id]);
-    // useEffect(() => {
-    //     handleFilterDoctor();
-    // }, [searchContent, doctors]);
-    // useEffect(() => {
-    //     handleFilterService();
-    // }, [searchContent, services]);
-    // useEffect(() => {
-    //     // if (Number(selectedKey) === 2) {
-    //     //     getDoctors();
-    //     //     getAllMajor();
-    //     // }
-    //     // if (Number(selectedKey) === 3) {
-    //     //     getAllServiceCategory();
-    //     //     getService();
-    //     // }
-    // }, [majorId, selectedKey]);
-    // useEffect(() => {
-    //     // getService();
-    // }, [categoryId]);
-    // useEffect(() => {
-    //     // getDoctors();
-    // }, [majorId]);
+   
     return (
         <Skeleton active loading={isFetching}>
             <div className=" clinic-detail ">
@@ -215,7 +101,7 @@ const ViewClinicDetail = () => {
                                     key: '1',
                                     label: 'Giới thiệu chung',
                                     children: (
-                                        <>{parse(String(data?.description))}</>
+                                        <ClinicDetail clinicId={Number(id)}/>
                                     ),
                                 },
                                 {

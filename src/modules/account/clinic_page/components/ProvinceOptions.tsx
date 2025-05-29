@@ -1,27 +1,14 @@
-import { useState, useEffect } from 'react';
-import { ProvinceType } from '../../../../models';
-import axios from 'axios';
 import { Select } from 'antd';
 import { useRecoilState } from 'recoil';
 import { clinicFilterOptions } from '../../../../stores/clinicAtom';
+import { useFetchProvinces } from '../../../../hooks';
+import { ProvinceType } from '../../../../models';
 
 const ProvinceOptions = () => {
     const [clinicOptions, setClinicOptions] =
         useRecoilState(clinicFilterOptions);
-    const [provinces, setProvinces] = useState<ProvinceType[]>([]);
-    const getProvinces = async () => {
-        try {
-            const res = await axios.get(
-                'https://vapi.vnappmob.com/api/v2/province'
-            );
-            setProvinces(res.data.results);
-        } catch (err) {
-            console.log(err);
-        }
-    };
-    useEffect(() => {
-        getProvinces();
-    }, []);
+    const { data: provinces } = useFetchProvinces();
+ 
     const handleChangeLocation = (value: string) => {
         let province: string = '';
         const cityStr = 'thành phố';
@@ -48,7 +35,7 @@ const ProvinceOptions = () => {
                 optionFilterProp="children"
                 allowClear
             >
-                {provinces?.map((province: any) => {
+                {provinces?.map((province: ProvinceType) => {
                     return (
                         <Select.Option
                             key={Number(province.province_id)}

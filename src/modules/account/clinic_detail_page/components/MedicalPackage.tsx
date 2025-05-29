@@ -1,6 +1,8 @@
 import {
     useFetchAllMedicalPackageCategory,
     useFetchMedicalPackageWithPaginationAndOptions,
+    useGetMedicalEquipmentByClinicId,
+    useGetWorkingHoursByClinicId,
 } from '../../../../hooks';
 import { Row, Col, Select, Input, Skeleton } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
@@ -8,8 +10,9 @@ import { MedicalPackageCard } from '../../../../components';
 import { ServiceCategory } from '../../../../models';
 import { useRecoilState } from 'recoil';
 import { medicalPackageOptionsState } from '../../../../stores/medical_packageAtom';
-import { useMemo } from 'react';
-const MedicalPackage = ({ clinicId }: any) => {
+import { useEffect, useMemo } from 'react';
+
+const MedicalPackage = ({ clinicId }: {clinicId:number | null}) => {
     const [medicaPackageOptions, setMedicalPackageOptions] = useRecoilState(
         medicalPackageOptionsState
     );

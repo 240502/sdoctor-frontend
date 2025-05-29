@@ -1,4 +1,6 @@
 export interface Department {
     id:number;
-    name:string;
+    name: string;
+    imageUrl: string;
+    totalDoctor: number;
 }

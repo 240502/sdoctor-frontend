@@ -1,3 +1,3 @@
 export const HomeFooter = () => {
-    return <div className="container mx-5"></div>;
+    return <div className="container " style={{position:"absolute", bottom:0}}></div>;
 };

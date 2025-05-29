@@ -9,7 +9,6 @@ interface Pagination {
 }
 export interface DoctorOptions extends Pagination {
     clinicId: number | null;
-    majorIds?: number[] | null;
     doctorServiceIds?: number[];
     startPrice?: number | null;
     endPrice?: number | null;

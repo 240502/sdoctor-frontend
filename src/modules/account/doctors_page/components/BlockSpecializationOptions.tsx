@@ -1,10 +1,10 @@
-import { useFetchSpecializationsWithPagination } from '../../../../hooks';
+import { useFetchAllDepartments } from '../../../../hooks';
 import { Select } from 'antd';
 import { Major } from '../../../../models/major';
 import { useRecoilState } from 'recoil';
 import { doctorFilterOptions } from '../../../../stores';
 export const BlockSpecializationOptions = () => {
-    const { data, isFetching } = useFetchSpecializationsWithPagination({});
+    const { data, isFetching } = useFetchAllDepartments();
     const [doctocOptions, setDoctorOptions] =
         useRecoilState(doctorFilterOptions);
     return (
@@ -18,26 +18,26 @@ export const BlockSpecializationOptions = () => {
                 mode="multiple"
                 showSearch
                 value={
-                    doctocOptions?.majorIds?.length === 0
+                    doctocOptions?.departmentIds?.length === 0
                         ? null
-                        : doctocOptions.majorIds
+                        : doctocOptions.departmentIds
                 }
                 onChange={(value: number[]) => {
-                    console.log(doctocOptions.majorIds);
-                    if (doctocOptions.majorIds) {
+                    console.log(doctocOptions.departmentIds);
+                    if (doctocOptions.departmentIds) {
                         setDoctorOptions({
                             ...doctocOptions,
-                            majorIds: [...doctocOptions.majorIds, ...value],
+                            departmentIds: [...doctocOptions.departmentIds, ...value],
                         });
                     }
                     setDoctorOptions({
                         ...doctocOptions,
-                        majorIds: [...value],
+                        departmentIds: [...value],
                     });
                 }}
             >
                 {!isFetching &&
-                    data?.majors?.map((major: Major) => {
+                    data?.departments?.map((major: Major) => {
                         return (
                             <Select.Option value={major.id}>
                                 {major.name}

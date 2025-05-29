@@ -8,7 +8,7 @@ import ViewDetailDoctor from '../modules/account/doctor_detail_page';
 import ViewDoctor from '../modules/account/doctors_page';
 import { Home } from '../modules/account/home_page';
 import { LoginLayout } from '../modules/account/login_page';
-import { ViewMajor } from '../modules/account/major_page';
+import { ViewDepartment } from '../modules/account/department_page';
 import ViewMedicalPackageDetail from '../modules/account/medical_package_detail_page';
 import {
     PostDetail,
@@ -77,7 +77,7 @@ export const publicRoutes = [
     },
     {
         path: VIEW_MAJOR_PATH,
-        component: ViewMajor,
+        component: ViewDepartment,
         layout: AppLayout,
     },
     {
