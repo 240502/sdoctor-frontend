@@ -35,6 +35,7 @@ import { UserManagement } from '../modules/admin/user_page';
 
 import {
     VIEW_POST_BY_CATEGORY_PATH,
+    DOCTOR_PROFILE_PATH,
     VIEW_MAJOR_PATH,
     CLINIC_MANAGEMENT_PATH,
     HOME_PATH,
@@ -69,6 +70,7 @@ import {
 import AppointmentDetailPage from '../modules/admin/appointment_detail_page';
 import { StaffManagement } from '../modules/admin/staff_management_page';
 import { RequestsManagement } from '../modules/admin/requests_management_page';
+import { ProfileDoctorPage } from '../modules/admin/profile_doctor_page';
 export const publicRoutes = [
     {
         path: BOOKING_SUCCESS_PATH,
@@ -163,6 +165,11 @@ export const publicRoutes = [
 ];
 
 export const privateRoutes = [
+    {
+        path: DOCTOR_PROFILE_PATH,
+        component: ProfileDoctorPage,
+        layout: AdminLayout,
+    },
     {
         path: REQUEST_MANAGEMENT_PATH,
         component: RequestsManagement,

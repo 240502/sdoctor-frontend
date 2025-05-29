@@ -24,7 +24,7 @@ const useUpdateDoctorService = () => {
 const useDeleteDoctorService = () => {
     return useMutation({
         mutationKey: ['useDeleteDoctorService'],
-        mutationFn: async (id: number) =>
+        mutationFn: async (id: number | null) =>
             doctorServiceService.deleteDoctorService(id),
     });
 };

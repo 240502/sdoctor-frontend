@@ -10,11 +10,11 @@ const LoginLayout = () => {
             label: 'Login',
             children: <FormLogin />,
         },
-        {
-            key: '2',
-            label: 'Register',
-            children: <FormRegister />,
-        },
+        // {
+        //     key: '2',
+        //     label: 'Register',
+        //     children: <FormRegister />,
+        // },
     ];
 
     return (

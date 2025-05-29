@@ -1,14 +1,6 @@
 import { EyeOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
-import {
-    Button,
-    Card,
-    Col,
-    Divider,
-    Row,
-    Skeleton,
-    Tag,
-} from 'antd';
+import { Button, Card, Col, Divider, Row, Skeleton, Tag } from 'antd';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useFetchAppointmentById } from '../../../../hooks';
 import { useEffect } from 'react';
@@ -107,18 +99,6 @@ const AppointmentDetailPage = () => {
                                 </span>
                             </Col>
                             <Col span={8} className="text-end">
-                                <Tag
-                                    color="#6B7280"
-                                    className="p-2 rounded-5 fw-medium"
-                                >
-                                    Bệnh nhân mới
-                                </Tag>
-                                <Tag
-                                    color="#FFCA18"
-                                    className="p-2 rounded-5 fw-medium"
-                                >
-                                    Sắp tới
-                                </Tag>
                                 <p className="fw-medium mt-2">
                                     Chi phí tư vấn :{' '}
                                     {appointment?.amount.toLocaleString(

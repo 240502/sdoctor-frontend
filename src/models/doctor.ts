@@ -85,7 +85,6 @@ export interface DoctorUpdateDto {
     commune: string;
     title: number;
     birthday: string;
-    servicePrice: number;
     summary: string;
     introduction: string;
 }

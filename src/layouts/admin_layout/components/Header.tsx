@@ -26,7 +26,11 @@ const Header = ({ collapsed, setCollapsed }: any) => {
         <Menu className="">
             <Menu.Item key="1">
                 <Link
-                    to="/admin/profile"
+                    to={
+                        user?.roleId === 2
+                            ? `/admin/doctor-profile/${user.userId}`
+                            : `/admin/profile?user=${user.userId}}`
+                    }
                     className="text-decoration-none text-dark"
                 >
                     Hồ sơ

@@ -31,19 +31,17 @@ export const FormLogin = () => {
             {
                 onSuccess: (data) => {
                     setIsAuthenticated(true);
-                    // Giả sử API trả về user info trong response
                     const user = {
                         userId: data?.user.userId,
                         roleId: data?.user.roleId,
-                    }; // Điều chỉnh theo response thực tế
-                    console.log('gọi join room');
+                    };
 
                     joinRoom(data?.user.userId, `doctor_${data?.user.userId}`);
 
                     if (user.roleId === 2) {
                         navigate('/admin/dashboard');
                     } else {
-                        navigate('/admin/profile');
+                        navigate(`/admin/profile?user=${user.userId}}`);
                     }
                     openNotification(
                         'success',

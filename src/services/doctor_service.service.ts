@@ -25,7 +25,7 @@ const doctorServiceService = {
         return res;
     },
 
-    async deleteDoctorService(id: number): Promise<any> {
+    async deleteDoctorService(id: number | null): Promise<any> {
         const res = await apiClient.delete(`/doctor-service/delete/${id}`);
         return res;
     },

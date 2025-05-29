@@ -30,8 +30,8 @@ const userService = {
         const res = await apiClient.post('/api/user/create', data, config);
         return res;
     },
-    async updateUser(data: any, config: any): Promise<any> {
-        const res = await apiClient.put('/api/user/update', data, config);
+    async updateUser(data: any): Promise<any> {
+        const res = await apiClient.put('/user/update', data);
         return res;
     },
     async deleteUser(id: number, config: any): Promise<any> {
@@ -58,8 +58,8 @@ const userService = {
         const res = await apiClient.put('/user/reset-password', data);
         return res?.data;
     },
-    async getById(id: number): Promise<any> {
-        const res = await apiClient.get('/api/user/getById/' + id);
+    async getById(id: number | null): Promise<any> {
+        const res = await apiClient.get('/user/getById/' + id);
         return res?.data;
     },
     async changePassword(data: any, config: any): Promise<any> {

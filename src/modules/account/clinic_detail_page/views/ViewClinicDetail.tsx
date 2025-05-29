@@ -1,19 +1,11 @@
-import {
-    Breadcrumb,
-    Col,
-    Divider,
-    Image,
-    Row,
-    Skeleton,
-    Tabs,
-} from 'antd';
+import { Breadcrumb, Col, Divider, Image, Row, Skeleton, Tabs } from 'antd';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { baseURL } from '../../../../constants/api';
 import '@/assets/scss/clinic.scss';
 // import { doctorService } from '../../../../services/doctor.service';
 import { EnvironmentOutlined, HomeOutlined } from '@ant-design/icons';
-import { useFetchClinicById, } from '../../../../hooks';
+import { useFetchClinicById } from '../../../../hooks';
 import DoctorsTab from '../components/DoctorsTab';
 import MedicalPackage from '../components/MedicalPackage';
 import ClinicDetail from '../components/ClinicDetail';
@@ -22,24 +14,13 @@ const ViewClinicDetail = () => {
     const { id } = useParams<any>();
     const { data, error, isFetching } = useFetchClinicById(Number(id));
     const [current, setCurrent] = useState<string>('0');
-
     const [selectedKey, setSelectedKey] = useState<string>('1');
-   
-    
-   
-    
-    
-    
-
     const handleChangeMenu = (e: any) => {
         setCurrent(e.key);
     };
-    
-
     useEffect(() => {
         window.scrollTo(0, 0);
     }, [id]);
-   
     return (
         <Skeleton active loading={isFetching}>
             <div className=" clinic-detail ">
@@ -101,7 +82,7 @@ const ViewClinicDetail = () => {
                                     key: '1',
                                     label: 'Giới thiệu chung',
                                     children: (
-                                        <ClinicDetail clinicId={Number(id)}/>
+                                        <ClinicDetail clinicId={Number(id)} />
                                     ),
                                 },
                                 {

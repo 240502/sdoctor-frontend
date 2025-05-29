@@ -17,5 +17,6 @@ export const useFetchRecentAppointments = (payload: {
     return useQuery<FetchRecentAppointmentsResponse, Error>({
         queryKey: ['useFetchRecentAppointments', payload],
         queryFn: async () => appointmentService.getRecentAppointments(payload),
+        retry: false,
     });
 };

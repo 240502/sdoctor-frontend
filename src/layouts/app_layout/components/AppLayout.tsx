@@ -44,7 +44,13 @@ export const AppLayout = ({ children }: any) => {
                             className="border-0"
                             onClick={() => {
                                 user?.userId
-                                    ? navigate('/admin/profile')
+                                    ? user?.roleId === 2
+                                        ? navigate(
+                                              `/admin/doctor-profile/${user.userId}`
+                                          )
+                                        : navigate(
+                                              `/admin/profile?user=${user.userId}}`
+                                          )
                                     : navigate('/login');
                             }}
                         >

@@ -104,9 +104,6 @@ const ScheduleManagement = () => {
             setTimes(times);
         }
     };
-    useEffect(() => {
-        console.log('times', times);
-    }, [times]);
 
     return (
         <div className="schedule-management">

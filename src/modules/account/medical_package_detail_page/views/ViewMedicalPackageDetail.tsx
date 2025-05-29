@@ -72,44 +72,42 @@ const ViewDetailService = () => {
             </div>
             <Divider className="divider" />
             <div className="container">
-                <div className="tabs">
-                    <Tabs
-                        // onChange={(key: string) => {
-                        //     setSelectedKey(key);
-                        // }}
-                        className=""
-                        // onClick={handleChangeMenu}
-                        items={[
-                            {
-                                key: '1',
-                                label: 'Thông tin cơ bản',
-                                children: (
-                                    <>
-                                        {data?.id && (
-                                            <BlockDescription
-                                                service={data}
-                                                isFetching={isFetching}
-                                            />
-                                        )}
-                                    </>
-                                ),
-                            },
-                            {
-                                key: '2',
-                                label: 'Đánh giá',
-                                children: (
-                                    <>
-                                        {data?.id && (
-                                            <BlockComment
-                                                commentableId={Number(data?.id)}
-                                            />
-                                        )}
-                                    </>
-                                ),
-                            },
-                        ]}
-                    ></Tabs>
-                </div>
+                <Tabs
+                    // onChange={(key: string) => {
+                    //     setSelectedKey(key);
+                    // }}
+                    className="text-start"
+                    // onClick={handleChangeMenu}
+                    items={[
+                        {
+                            key: '1',
+                            label: 'Thông tin cơ bản',
+                            children: (
+                                <>
+                                    {data?.id && (
+                                        <BlockDescription
+                                            service={data}
+                                            isFetching={isFetching}
+                                        />
+                                    )}
+                                </>
+                            ),
+                        },
+                        {
+                            key: '2',
+                            label: 'Đánh giá',
+                            children: (
+                                <>
+                                    {data?.id && (
+                                        <BlockComment
+                                            commentableId={Number(data?.id)}
+                                        />
+                                    )}
+                                </>
+                            ),
+                        },
+                    ]}
+                ></Tabs>
             </div>
         </div>
     );

@@ -8,6 +8,8 @@ import { userValue } from '../../../stores/userAtom';
 
 export const Sidenav = () => {
     const user = useRecoilValue(userValue);
+    console.log('user', user.functions);
+
     return (
         <Menu theme="dark" mode="inline">
             {user?.functions?.map((item: Functions, index: number) => {
