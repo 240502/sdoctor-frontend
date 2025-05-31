@@ -6,6 +6,7 @@ import { useRecoilValue } from 'recoil';
 import { userValue } from '../../../../stores/userAtom';
 import AppointmentDetailModal from '../components/AppointmentDetailModal';
 import AppointmentsTable from '../components/AppointmetsTable';
+import DoctorAppointmentCalendar from '../components/Test';
 type NotificationType = 'success' | 'warning' | 'error';
 const AppointmentManagement = () => {
     const user = useRecoilValue(userValue);
@@ -39,6 +40,7 @@ const AppointmentManagement = () => {
 
     return (
         <div className="container">
+            <DoctorAppointmentCalendar />
             {contextHoler}
             <div className="block__filter">
                 <Breadcrumb

@@ -23,6 +23,7 @@ import { ConfirmModal } from '../../../../components';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import {
+    useDeletePatientProfile,
     useFetchDistrictsByProvince,
     useFetchProfiles,
     useFetchProvinces,
@@ -58,6 +59,7 @@ const ViewProfile = () => {
         isFetching,
         refetch,
     } = useFetchProfiles(JSON.parse(localStorage.getItem('uuids') || `[]`));
+    const [deletedId, setDeletedId] = useState<string>('');
     const { data: profile, isFetching: isFetchingProfile } =
         useFetchProfileByUuid(updatedUuid);
     const [selectedProvinceId, setSelectedProvinceId] = useState<number | null>(
@@ -80,6 +82,7 @@ const ViewProfile = () => {
     };
     const { mutate: createPatientProfile } = useCreatePatientProfile();
     const { mutate: updatePatientProfile } = useUpdatePatientProfile();
+    const { mutate: deletePatientProfile } = useDeletePatientProfile();
     const handleUpdate = (values: any) => {
         if (isCreate) {
             const newProfile = {
@@ -209,7 +212,19 @@ const ViewProfile = () => {
             });
         }
     }, [profile]);
-    const handleDelete = (uuid: string) => {};
+    const handleDelete = () => {
+        deletePatientProfile(deletedId, {
+            onSuccess() {
+                openMessage('success', 'Xóa thành công!');
+                refetch();
+                setIsOpenModalConfirm(false);
+            },
+            onError() {
+                openMessage('error', 'Xóa không thành công!');
+                setIsOpenModalConfirm(false);
+            },
+        });
+    };
     return (
         <>
             {messageContextHolder}
@@ -343,7 +358,10 @@ const ViewProfile = () => {
                                                         <Button
                                                             className="bg-danger text-white border-0"
                                                             onClick={() => {
-                                                                handleDelete(
+                                                                setIsOpenModalConfirm(
+                                                                    true
+                                                                );
+                                                                setDeletedId(
                                                                     profile.uuid
                                                                 );
                                                             }}
@@ -692,9 +710,7 @@ const ViewProfile = () => {
                         message="Bạn chắc chắc muốn xóa hồ sơ này!"
                         isOpenModal={isOpenModalConfirm}
                         onCloseModal={() => setIsOpenModalConfirm(false)}
-                        handleOk={() => {
-                            console.log('delete');
-                        }}
+                        handleOk={handleDelete}
                     />
                 )}
             </PatientProfileLayout>

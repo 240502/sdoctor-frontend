@@ -1,6 +1,5 @@
 import { Menu } from 'antd';
 import parse from 'html-react-parser';
-
 import { Functions } from '../../../models/functions';
 import { Link } from 'react-router-dom';
 import { useRecoilValue } from 'recoil';
@@ -8,10 +7,8 @@ import { userValue } from '../../../stores/userAtom';
 
 export const Sidenav = () => {
     const user = useRecoilValue(userValue);
-    console.log('user', user.functions);
-
     return (
-        <Menu theme="dark" mode="inline">
+        <Menu theme="dark" mode="inline" selectedKeys={[]}>
             {user?.functions?.map((item: Functions, index: number) => {
                 return (
                     <Menu.Item key={index}>

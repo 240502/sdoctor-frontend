@@ -3,13 +3,12 @@ import { Menu } from 'antd';
 import { Link } from 'react-router-dom';
 import { homeMenuService } from '../../../../services';
 import { HomeMenuModel } from '../../../../models/home_menu';
-import { useRecoilState, useSetRecoilState } from 'recoil';
+import { useSetRecoilState } from 'recoil';
 import { majorIdState } from '../../../../stores/majorAtom';
 import type { MenuProps } from 'antd';
 export const HomeMenu = () => {
     const setMajorId = useSetRecoilState(majorIdState);
     const [homeMenus, setHomeMenus] = useState<HomeMenuModel[]>([]);
-    const [selectedKeys, setSelectedKeys] = useState<string[]>([]);
     const loadData = async () => {
         try {
             const data = await homeMenuService.getHomeMenu();
@@ -40,7 +39,7 @@ export const HomeMenu = () => {
         <Menu
             className="home__menu border-0 col-8  justify-content-center"
             mode="horizontal"
-            selectedKeys={selectedKeys}
+            selectedKeys={[]}
             style={{ maxHeight: '700px', zIndex: '99' }}
             items={menuItems}
         />
