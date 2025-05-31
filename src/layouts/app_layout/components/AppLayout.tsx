@@ -49,7 +49,7 @@ export const AppLayout = ({ children }: any) => {
                                               `/admin/doctor-profile/${user.userId}`
                                           )
                                         : navigate(
-                                              `/admin/profile?user=${user.userId}}`
+                                              `/admin/profile?user=${user.userId}`
                                           )
                                     : navigate('/login');
                             }}

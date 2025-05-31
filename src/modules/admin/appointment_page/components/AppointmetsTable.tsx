@@ -12,24 +12,16 @@ import {
     Space,
     Tag,
     DatePicker,
-    Tooltip,
-    Divider,
-    Card,
-    Tabs,
     TabsProps,
 } from 'antd';
 import Highlighter from 'react-highlight-words';
 import { useRef, useState } from 'react';
 import { FilterDropdownProps } from 'antd/es/table/interface';
 import {
-    ClockCircleOutlined,
     EyeOutlined,
-    MailOutlined,
-    PhoneOutlined,
     SearchOutlined,
 } from '@ant-design/icons';
 
-const { Option } = Select;
 import { useFetchAppointmentWithOptions } from '../../../../hooks/appointments/useFetchAppointmentWithOptions';
 type DataIndex = keyof AppointmentResponseDto;
 const { RangePicker } = DatePicker;
@@ -39,7 +31,6 @@ import isoWeek from 'dayjs/plugin/isoWeek';
 dayjs.extend(isoWeek);
 dayjs.locale('vi');
 import {
-    useFetchAllAppointmentStatus,
     useSendConfirmSuccessMail,
     useSendRejectionSuccessMail,
     useUpdateAppointmentStatus,
@@ -91,7 +82,6 @@ const AppointmentsTable = ({ openNotificationWithIcon, userId }: any) => {
     const rejectionReasonInputRef = useRef<any>(null);
     const { data, error, isError, isFetching, refetch, isRefetching } =
         useFetchAppointmentWithOptions(options);
-    const { data: appointmentStatusRes } = useFetchAllAppointmentStatus();
     const updateAppointmentStatus = useUpdateAppointmentStatus();
     const sendRejectionMail = useSendRejectionSuccessMail();
     const sendConfirmSuccessMail = useSendConfirmSuccessMail();
