@@ -49,6 +49,7 @@ import 'dayjs/locale/vi';
 import isoWeek from 'dayjs/plugin/isoWeek';
 import { NoticeType } from 'antd/es/message/interface';
 import { InputCommentModal } from '../components/InputCommentModal';
+import { useCreateVnpay } from '../../../../hooks/payment/useCreateVnpay';
 dayjs.extend(isoWeek);
 dayjs.locale('vi');
 const ViewAppointment = () => {
@@ -90,7 +91,8 @@ const ViewAppointment = () => {
     const { data, error, isFetching, refetch, isRefetching } =
         useFetchAppointmentByUuid(options);
 
-    const createPayment = useCreatePayment();
+    // const createPayment = useCreatePayment();
+    const { mutate: createPayment } = useCreateVnpay();
     const getAllAppointmentStatus = async () => {
         try {
             const res = await appointmentStatusService.getAll();
@@ -290,96 +292,125 @@ const ViewAppointment = () => {
         {
             title: 'Action',
             key: 'action',
-            render: (text: string, record: AppointmentResponseDto) => (
-                <Row gutter={24} className="">
-                    {record.statusId === 4 && (
-                        <Col span={6} className="text-center">
-                            <Tooltip placement="topLeft" title={'Đặt lại'}>
+            render: (text: string, record: AppointmentResponseDto) => {
+                const appointmentTime = dayjs(
+                    `${record.appointmentDate} ${record.startTime}`,
+                    'YYYY-MM-DD HH:mm'
+                );
+                const now = dayjs();
+                const isPastOrCurrent =
+                    now.isSame(appointmentTime) || now.isAfter(appointmentTime);
+
+                return (
+                    <Row gutter={24} className="">
+                        <Col span={6}>
+                            <Tooltip placement="topLeft" title={'Xem chi tiết'}>
                                 <Button
-                                    className="mb-2"
+                                    className="mb-2 border border-info"
                                     onClick={() => {
+                                        setIsModalOpen(true);
+                                        setAppointment(record);
+                                        const queryParams =
+                                            new URLSearchParams();
+                                        queryParams.append(
+                                            'appointment',
+                                            record.id.toString()
+                                        );
                                         navigate(
-                                            '/doctor/detail/' + record.doctorId
+                                            `/patient/appointment?${queryParams}`
                                         );
                                     }}
                                 >
-                                    <RedoOutlined />
+                                    <EyeOutlined className="text-info" />
                                 </Button>
                             </Tooltip>
                         </Col>
-                    )}
-                    <Col span={6}>
-                        <Tooltip placement="topLeft" title={'Xem chi tiết'}>
-                            <Button
-                                className="mb-2 border border-info"
-                                onClick={() => {
-                                    setIsModalOpen(true);
-                                    setAppointment(record);
-                                    const queryParams = new URLSearchParams();
-
-                                    queryParams.append(
-                                        'appointment',
-                                        record.id.toString()
-                                    );
-                                    navigate(
-                                        `/patient/appointment?${queryParams}`
-                                    );
-                                }}
-                            >
-                                <EyeOutlined className="text-info" />
-                            </Button>
-                        </Tooltip>
-                    </Col>
-                    {record.statusId === 1 && (
-                        <Col span={6}>
-                            <Tooltip placement="topLeft" title={'Hủy lịch hẹn'}>
-                                <Button
-                                    className=""
-                                    danger
-                                    onClick={() => {
-                                        setIsOpenModalConfirm(true);
-                                        setAppointment(record);
-                                    }}
-                                >
-                                    <CloseOutlined className="text-danger" />
-                                </Button>
-                            </Tooltip>
-                        </Col>
-                    )}
-                    {record.statusId === 4 && record.isEvaluate === 0 && (
-                        <Tooltip title="Đánh giá" placement="top">
-                            <Button
-                                onClick={() => {
-                                    setOpenInputCommentModal(true);
-                                    setAppointment(record);
-                                }}
-                            >
-                                <EditOutlined />
-                            </Button>
-                        </Tooltip>
-                    )}
-                    {record.invoiceStatus === 'Chưa thanh toán' &&
-                        record.paymentMethod === 2 && (
-                            <Col span={6}>
-                                <Tooltip
-                                    placement="topLeft"
-                                    title={'Thanh toán'}
-                                >
-                                    <Button
-                                        className=""
-                                        onClick={() => {
-                                            console.log(record);
-                                            // getInvoiceByAppointment(record.id);
-                                            createPayment.mutate(record.id);
-                                        }}
-                                    >
-                                        <DollarOutlined className="" />
-                                    </Button>
-                                </Tooltip>
-                            </Col>
+                        {!isPastOrCurrent && (
+                            <>
+                                {record.statusId === 4 && (
+                                    <Col span={6} className="text-center">
+                                        <Tooltip
+                                            placement="topLeft"
+                                            title={'Đặt lại'}
+                                        >
+                                            <Button
+                                                className="mb-2"
+                                                onClick={() => {
+                                                    navigate(
+                                                        '/doctor/detail/' +
+                                                            record.doctorId
+                                                    );
+                                                }}
+                                            >
+                                                <RedoOutlined />
+                                            </Button>
+                                        </Tooltip>
+                                    </Col>
+                                )}
+                                {record.statusId === 1 && (
+                                    <Col span={6}>
+                                        <Tooltip
+                                            placement="topLeft"
+                                            title={'Hủy lịch hẹn'}
+                                        >
+                                            <Button
+                                                className=""
+                                                danger
+                                                onClick={() => {
+                                                    setIsOpenModalConfirm(true);
+                                                    setAppointment(record);
+                                                }}
+                                            >
+                                                <CloseOutlined className="text-danger" />
+                                            </Button>
+                                        </Tooltip>
+                                    </Col>
+                                )}
+                                {record.statusId === 4 &&
+                                    record.isEvaluate === 0 && (
+                                        <Col span={6}>
+                                            <Tooltip
+                                                title="Đánh giá"
+                                                placement="top"
+                                            >
+                                                <Button
+                                                    onClick={() => {
+                                                        setOpenInputCommentModal(
+                                                            true
+                                                        );
+                                                        setAppointment(record);
+                                                    }}
+                                                >
+                                                    <EditOutlined />
+                                                </Button>
+                                            </Tooltip>
+                                        </Col>
+                                    )}
+                                {record.invoiceStatus === 'Chưa thanh toán' &&
+                                    record.paymentMethod === 2 && (
+                                        <Col span={6}>
+                                            <Tooltip
+                                                placement="topLeft"
+                                                title={'Thanh toán'}
+                                            >
+                                                <Button
+                                                    className=""
+                                                    onClick={() => {
+                                                        createPayment(
+                                                            record.id
+                                                        );
+                                                    }}
+                                                >
+                                                    <DollarOutlined className="" />
+                                                </Button>
+                                            </Tooltip>
+                                        </Col>
+                                    )}
+                            </>
                         )}
-                </Row>
-            ),
+                    </Row>
+                );
+            },
         },
     ];
 

@@ -9,5 +9,11 @@ const paymentService = {
         const res = await apiClient.post('/payment/callback');
         return res;
     },
+    async createVnpay(appointmentId: number): Promise<any> {
+        const res = await apiClient.post(
+            '/payment/vnpay/create/' + appointmentId
+        );
+        return res;
+    },
 };
 export default paymentService;

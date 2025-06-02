@@ -39,7 +39,6 @@ const DoctorManagement = () => {
         pageIndex: 1,
         pageSize: 8,
         clinicId: null,
-        majorIds: [],
         doctorServiceIds: [],
         endPrice: null,
         gender: null,

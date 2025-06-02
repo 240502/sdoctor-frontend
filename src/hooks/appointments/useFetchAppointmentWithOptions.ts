@@ -12,7 +12,7 @@ interface AppointmentResponse {
 export const useFetchAppointmentWithOptions = (payload: {
     pageIndex: number;
     pageSize: number;
-    status: number;
+    status: number | null;
     userId: number;
     fromDate: Dayjs;
     toDate: Dayjs;

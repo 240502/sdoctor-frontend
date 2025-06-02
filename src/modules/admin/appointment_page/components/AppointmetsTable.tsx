@@ -17,24 +17,17 @@ import {
 import Highlighter from 'react-highlight-words';
 import { useRef, useState } from 'react';
 import { FilterDropdownProps } from 'antd/es/table/interface';
-import {
-    EyeOutlined,
-    SearchOutlined,
-} from '@ant-design/icons';
+import { EyeOutlined, SearchOutlined } from '@ant-design/icons';
 
 import { useFetchAppointmentWithOptions } from '../../../../hooks/appointments/useFetchAppointmentWithOptions';
 type DataIndex = keyof AppointmentResponseDto;
 const { RangePicker } = DatePicker;
 import dayjs, { Dayjs } from 'dayjs';
-import 'dayjs/locale/vi'; 
-import isoWeek from 'dayjs/plugin/isoWeek'; 
+import 'dayjs/locale/vi';
+import isoWeek from 'dayjs/plugin/isoWeek';
 dayjs.extend(isoWeek);
 dayjs.locale('vi');
-import {
-    useSendConfirmSuccessMail,
-    useSendRejectionSuccessMail,
-    useUpdateAppointmentStatus,
-} from '../../../../hooks';
+
 import { useNavigate } from 'react-router-dom';
 import { useFetchTotalAppointmentByStatus } from '../../../../hooks/appointments/useAppointment';
 const AppointmentsTable = ({ openNotificationWithIcon, userId }: any) => {
@@ -50,16 +43,12 @@ const AppointmentsTable = ({ openNotificationWithIcon, userId }: any) => {
         {
             key: '3',
             label: <h6 className="m-0">Đã hủy</h6>,
-        }
+        },
     ];
     const navigate = useNavigate();
     const [searchText, setSearchText] = useState('');
     const [searchedColumn, setSearchedColumn] = useState('');
     const searchInput = useRef<InputRef>(null);
-    const [openModalConfirm, setOpenModalConfirm] = useState<boolean>(false);
-    const [appointment, setAppointment] = useState<AppointmentResponseDto>(
-        {} as AppointmentResponseDto
-    );
     const [options, setOptions] = useState<{
         pageIndex: number;
         pageSize: number;
@@ -75,84 +64,13 @@ const AppointmentsTable = ({ openNotificationWithIcon, userId }: any) => {
         fromDate: dayjs().startOf('isoWeek'),
         toDate: dayjs().endOf('isoWeek'),
     });
-    const handleCancelModalConfirm = () => {
-        setAppointment({} as AppointmentResponseDto);
-        setOpenModalConfirm(false);
-    };
-    const rejectionReasonInputRef = useRef<any>(null);
+
     const { data, error, isError, isFetching, refetch, isRefetching } =
         useFetchAppointmentWithOptions(options);
-    const updateAppointmentStatus = useUpdateAppointmentStatus();
-    const sendRejectionMail = useSendRejectionSuccessMail();
-    const sendConfirmSuccessMail = useSendConfirmSuccessMail();
-    const { data: totalAppointment } = useFetchTotalAppointmentByStatus(options.userId);
-    const handleOk = () => {
-        let payload: any = {};
-        if (type === 'delete') {
-            payload = {
-                appointment: {
-                    ...appointment,
-                    rejectionReason:
-                        rejectionReasonInputRef.current?.resizableTextArea
-                            ?.textArea.value,
-                },
-                requirementObject: 'doctor',
-            };
-        } else {
-            payload = {
-                appointment: {
-                    ...appointment,
-                },
-                requirementObject: 'doctor',
-            };
-        }
-        updateAppointmentStatus.mutate(payload, {
-            onSuccess() {
-                openNotificationWithIcon(
-                    'success',
-                    'Thông báo!',
-                    'Cập nhập trạng thái thành công!'
-                );
-                handleCancelModalConfirm();
-                if (type === 'delete') {
-                    const payload = {
-                        email: appointment.patientEmail,
-                        doctorName: appointment.doctorName,
-                        patientName: appointment.patientName,
-                        date: dayjs(
-                            appointment.appointmentDate.toString().split('T')[0]
-                        ).format('DD-MM-YYYY'),
-                        rejectionReason:
-                            rejectionReasonInputRef.current?.resizableTextArea
-                                ?.textArea.value,
-                        requirementObject: 'doctor',
-                    };
-                    sendRejectionMail.mutate(payload);
-                } else {
-                    const payload = {
-                        patientName: appointment.patientName,
-                        email: appointment.patientEmail,
-                        doctorName: appointment.doctorName,
-                        date: dayjs(
-                            appointment.appointmentDate.toString().split('T')[0]
-                        ).format('DD-MM-YYYY'),
-                        time: `${appointment.startTime} - ${appointment.endTime}`,
-                        location: appointment.location,
-                    };
-                    sendConfirmSuccessMail.mutate(payload);
-                }
-                refetch();
-            },
-            onError() {
-                openNotificationWithIcon(
-                    'error',
-                    'Thông báo!',
-                    'Cập nhập trạng thái không thành công!'
-                );
-                handleCancelModalConfirm();
-            },
-        });
-    };
+
+    const { data: totalAppointment } = useFetchTotalAppointmentByStatus(
+        options.userId
+    );
     const handleSearch = (
         selectedKeys: string[],
         confirm: FilterDropdownProps['confirm'],
@@ -253,7 +171,7 @@ const AppointmentsTable = ({ openNotificationWithIcon, userId }: any) => {
                 text
             ),
     });
-  
+
     const onChangePage = (current: number, size: number) => {
         if (Number(size) !== options.pageSize) {
             setOptions({ ...options, pageIndex: 1, pageSize: size });
@@ -261,9 +179,7 @@ const AppointmentsTable = ({ openNotificationWithIcon, userId }: any) => {
             setOptions({ ...options, pageIndex: current });
         }
     };
-    const onDateRangeChange = (
-        dates: [Dayjs | null, Dayjs | null] | null,
-    ) => {
+    const onDateRangeChange = (dates: [Dayjs | null, Dayjs | null] | null) => {
         if (dates && dates[0] && dates[1]) {
             setOptions({ ...options, fromDate: dates[0], toDate: dates[1] });
         } else {
@@ -365,31 +281,29 @@ const AppointmentsTable = ({ openNotificationWithIcon, userId }: any) => {
             key: 'action',
             render: (_, record) => (
                 <>
-                        
                     <Button
-                            className="me-2 text-success border-0"
-                            onClick={() => {
+                        className="me-2 text-success border-0"
+                        onClick={() => {
                             const queryParams = new URLSearchParams();
-                                queryParams.append(
-                                    'appointment',
-                                    record.id.toString()
-                                );
-                                navigate(
-                                    `/admin/appointment-detail?${queryParams}`
-                                );
-                            }}
-                        >
-                            <EyeOutlined  /> Chi tiết
+                            queryParams.append(
+                                'appointment',
+                                record.id.toString()
+                            );
+                            navigate(
+                                `/admin/appointment-detail?${queryParams}`
+                            );
+                        }}
+                    >
+                        <EyeOutlined /> Chi tiết
                     </Button>
-                   
                 </>
             ),
         },
     ];
-  
+
     return (
         <>
-            <Row gutter={24} className='mb-3'>
+            <Row gutter={24} className="mb-3">
                 <Col span={12}>
                     {tabs.map((tab) => {
                         return (
@@ -400,26 +314,40 @@ const AppointmentsTable = ({ openNotificationWithIcon, userId }: any) => {
                                         : 'default'
                                 }
                                 className="me-2 col-3"
-                               
                                 onClick={() => {
-                                    if (Number(options.status) !== Number(tab.key)) {
-                                        setOptions({...options,status:Number(tab.key)})
+                                    if (
+                                        Number(options.status) !==
+                                        Number(tab.key)
+                                    ) {
+                                        setOptions({
+                                            ...options,
+                                            status: Number(tab.key),
+                                        });
                                     }
                                 }}
                                 key={tab.key}
                             >
-                                {tab.label} <Tag className='rounded-5'> { tab.key === '1' ? totalAppointment?.pendingCount : tab.key === '2' ? totalAppointment?.confirmedCount: tab.key === '3' ? totalAppointment?.cancelledCount: totalAppointment?.completedCount  }</Tag>
-
+                                {tab.label}{' '}
+                                <Tag className="rounded-5">
+                                    {' '}
+                                    {tab.key === '1'
+                                        ? totalAppointment?.pendingCount
+                                        : tab.key === '2'
+                                        ? totalAppointment?.confirmedCount
+                                        : tab.key === '3'
+                                        ? totalAppointment?.cancelledCount
+                                        : totalAppointment?.completedCount}
+                                </Tag>
                             </Button>
                         );
                     })}
                 </Col>
-                <Col span={12} className='text-end'>
+                <Col span={12} className="text-end">
                     <RangePicker
-                            placeholder={['Từ ngày', 'Đến ngày']}
-                            value={[options.fromDate, options.toDate]}
-                            format={'DD-MM-YYYY'}
-                            onChange={onDateRangeChange}
+                        placeholder={['Từ ngày', 'Đến ngày']}
+                        value={[options.fromDate, options.toDate]}
+                        format={'DD-MM-YYYY'}
+                        onChange={onDateRangeChange}
                     />
                 </Col>
             </Row>

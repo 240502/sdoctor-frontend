@@ -64,9 +64,7 @@ export const OverviewForm = ({
             ? Number(searchParams.get('doctorId'))
             : null
     );
-    useEffect(() => {
-        console.log('doctorDetail', doctorDetail);
-    }, [doctorDetail]);
+
     const [form] = Form.useForm();
     const createDoctor = useCreateDoctor();
     const { mutate: updateDoctor } = useUpdateDoctor();
@@ -169,7 +167,6 @@ export const OverviewForm = ({
                 commune: doctor.commune,
                 birthday: doctor.birthday.split('T')[0],
                 department: doctor.department,
-                servicePrice: doctor.servicePrice,
             };
 
             updateDoctor(newDoctor, {
@@ -222,9 +219,7 @@ export const OverviewForm = ({
     const clinics = useMemo(() => {
         return clinicsResponse?.pages.flatMap((page) => page.data) ?? [];
     }, [clinicsResponse]);
-    useEffect(() => {
-        console.log('doctor', doctor);
-    }, [doctor]);
+
     return (
         <Skeleton active loading={isFetching}>
             {!isFetching && (
@@ -655,29 +650,6 @@ export const OverviewForm = ({
                                     )}
                                 </Form.Item>
                             </ConfigProvider>
-                        </Col>
-                        <Col span={12}>
-                            <Form.Item
-                                label="Giá dịch vụ"
-                                name="servicePrice"
-                                rules={[
-                                    {
-                                        required: true,
-                                        message: 'Vui lòng nhập giá dịch vụ!',
-                                    },
-                                ]}
-                            >
-                                <Input
-                                    placeholder="Nhập giá dịch vụ ..."
-                                    type="number"
-                                    onChange={(e: any) =>
-                                        setDoctor({
-                                            ...doctor,
-                                            servicePrice: e.target.value,
-                                        })
-                                    }
-                                ></Input>
-                            </Form.Item>
                         </Col>
                     </Row>
 

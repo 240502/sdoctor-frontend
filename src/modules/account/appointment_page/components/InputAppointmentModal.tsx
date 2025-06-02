@@ -39,6 +39,7 @@ import {
 import { useFetchDoctorServicesByDoctorId } from '../../../../hooks/doctor_service';
 import { DoctorService } from '../../../../models/doctor_service';
 import { Doctor, InvoicesCreateDto } from '../../../../models';
+import { useCreateVnpay } from '../../../../hooks/payment/useCreateVnpay';
 
 const InputAppointmentModal = ({
     openModal,
@@ -94,7 +95,7 @@ const InputAppointmentModal = ({
         }
     };
     const createPayment = useCreatePayment();
-
+    const { mutate: createVnpay } = useCreateVnpay();
     const [paymentMethod, setPaymentMethod] = useState<number>(1);
     const { mutate: createNotification } = useCreateNotification();
 
@@ -156,8 +157,8 @@ const InputAppointmentModal = ({
                             navigate(`/booking-success?${queryParams}`);
                         } else {
                             console.log(values.payment_method);
-
-                            createPayment.mutate(appointment.id);
+                            createVnpay(appointment.id);
+                            // createPayment.mutate(appointment.id);
                         }
                     },
                 });
@@ -226,8 +227,8 @@ const InputAppointmentModal = ({
                     </div>
                     <div className="time">
                         <p className="">
-                            <strong>Thời gian: </strong> {schedule.startTime} -{' '}
-                            {schedule.endTime}
+                            <strong>Thời gian: </strong> {schedule?.startTime} -{' '}
+                            {schedule?.endTime}
                         </p>
                         <p>
                             {' '}
@@ -238,7 +239,7 @@ const InputAppointmentModal = ({
                     <div className="location ">
                         <p>
                             {' '}
-                            <strong>Địa điểm: </strong> {doctor.location}
+                            <strong>Địa điểm: </strong> {doctor?.location}
                         </p>
                     </div>
                 </Col>

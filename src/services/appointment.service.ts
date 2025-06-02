@@ -2,8 +2,20 @@ import apiClient from '../constants/api';
 import { Appointment } from '../models';
 import { Dayjs } from 'dayjs';
 const appointmentService = {
-    async getTotalAppointmentByStatus(doctorId: number): Promise<any>{
-        const res = await apiClient.get(`/appointment/get-total-by-status/${doctorId}`);
+    async getAppointmentsByYearAndMonth(
+        fromDate: string,
+        toDate: string,
+        doctorId: number
+    ): Promise<any> {
+        const res = await apiClient.get(
+            `/appointment/get-appointments-by-month-year?fromDate=${fromDate}&toDate=${toDate}&doctorId=${doctorId}`
+        );
+        return res?.data;
+    },
+    async getTotalAppointmentByStatus(doctorId: number): Promise<any> {
+        const res = await apiClient.get(
+            `/appointment/get-total-by-status/${doctorId}`
+        );
         return res?.data;
     },
     async getRecentAppointments(payload: {
@@ -39,7 +51,7 @@ const appointmentService = {
     async getAppointmentWithOptions(payload: {
         pageIndex: number;
         pageSize: number;
-        status: number;
+        status: number | null;
         userId: number;
         fromDate: Dayjs;
         toDate: Dayjs;

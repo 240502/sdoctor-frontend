@@ -76,7 +76,7 @@ const MedicalPackageCard = ({ medicalPackages }: any) => {
                                         );
                                     }}
                                 >
-                                    Đặt lịch hẹn
+                                    Xem chi tiết
                                 </Button>
                             </Flex>
                         </div>

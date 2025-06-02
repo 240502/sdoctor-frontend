@@ -1,5 +1,9 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { MedicalEquipment, MedicalEquipmentCreateDto, MedicalEquipmentUpdateDto } from '../../models';
+import {
+    MedicalEquipment,
+    MedicalEquipmentCreateDto,
+    MedicalEquipmentUpdateDto,
+} from '../../models';
 import medicalEquipmentService from '../../services/medical_equipment.service';
 
 export const useCreateMedicalEquipment = () => {
@@ -28,5 +32,6 @@ export const useGetMedicalEquipmentByClinicId = (clinicId: number | null) => {
         queryKey: ['useGetMedicalEquipmentByClinicId', clinicId],
         queryFn: () =>
             medicalEquipmentService.getMedicalEquipmentByClinicId(clinicId),
+        retry: false,
     });
 };

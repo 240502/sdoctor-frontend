@@ -1,27 +1,52 @@
-import { Button, Typography, Space, Card, Skeleton } from 'antd';
+import { Button, Typography, Space, Card, Skeleton, Modal } from 'antd';
 import { useFetchAppointmentById } from '../hooks';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import dayjs from 'dayjs';
 const { Title, Text } = Typography;
 import Barcode from 'react-barcode';
-const BookingSuccess = ({ receiptData }: any) => {
+import { useEffect } from 'react';
+import { useCreateVnpay } from '../hooks/payment/useCreateVnpay';
+const BookingSuccess = () => {
     const [searchParams] = useSearchParams();
-
-    // const {
-    //     receiptId,
-    //     hospital,
-    //     address,
-    //     examinationTime,
-    //     doctor,
-    //     service,
-    //     cost,
-    //     patient,
-    //     dob,
-    //     patientReceiptId,
-    // } = receiptData;
     const { data, isError, error, isFetching } = useFetchAppointmentById(
         Number(searchParams.get('appointment'))
     );
+    const { mutate: createPayment } = useCreateVnpay();
+    useEffect(() => {
+        if (
+            data?.paymentMethod === 2 &&
+            data?.invoiceStatus === 'Chưa thanh toán'
+        ) {
+            Modal.warning({
+                closable: true,
+                title: 'Vui lòng thanh toán trước thời gian hẹn 1 tiếng!',
+                content: (
+                    <>
+                        <p className="mt-2">
+                            Lịch hẹn của bạn với bác sĩ{' '}
+                            {data.doctorName || 'N/A'} vào {data.startTime} -{' '}
+                            {dayjs(data.appointmentDate).format('DD-MM-YYYY')}{' '}
+                            chưa được thanh toán. Vui lòng hoàn tất thanh toán
+                            để xác nhận lịch hẹn.
+                        </p>
+                        <p className="mt-2">
+                            Số tiền cần thanh toán:{' '}
+                            <strong>
+                                {data.amount.toLocaleString('vi-VN')} VNĐ
+                            </strong>
+                        </p>
+                    </>
+                ),
+                okText: 'Thanh toán ngay',
+                cancelText: 'Đóng',
+                onOk: () => {
+                    if (data?.id) {
+                        createPayment(data.id);
+                    }
+                },
+            });
+        }
+    }, [data]);
     const navigate = useNavigate();
     return (
         <div className="container my-4">

@@ -82,7 +82,10 @@ const ViewClinicDetail = () => {
                                     key: '1',
                                     label: 'Giới thiệu chung',
                                     children: (
-                                        <ClinicDetail clinicId={Number(id)} />
+                                        <ClinicDetail
+                                            clinicId={Number(id)}
+                                            description={data?.description}
+                                        />
                                     ),
                                 },
                                 {
