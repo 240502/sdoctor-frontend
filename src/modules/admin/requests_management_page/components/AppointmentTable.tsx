@@ -53,7 +53,7 @@ const AppointmentTable = ({ openMessage, userId }: AppointmentTable) => {
         },
         {
             key: '2',
-            label: <h6 className="m-0">Đã xác nhận</h6>,
+            label: <h6 className="m-0">Chờ khám</h6>,
         },
         {
             key: '3',

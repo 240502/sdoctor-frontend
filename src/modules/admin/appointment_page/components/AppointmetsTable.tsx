@@ -7,17 +7,17 @@ import {
     InputRef,
     Pagination,
     Row,
-    Select,
     Skeleton,
     Space,
     Tag,
     DatePicker,
     TabsProps,
+    message,
 } from 'antd';
 import Highlighter from 'react-highlight-words';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { FilterDropdownProps } from 'antd/es/table/interface';
-import { EyeOutlined, SearchOutlined } from '@ant-design/icons';
+import { EyeOutlined, PlusOutlined, SearchOutlined } from '@ant-design/icons';
 
 import { useFetchAppointmentWithOptions } from '../../../../hooks/appointments/useFetchAppointmentWithOptions';
 type DataIndex = keyof AppointmentResponseDto;
@@ -30,21 +30,32 @@ dayjs.locale('vi');
 
 import { useNavigate } from 'react-router-dom';
 import { useFetchTotalAppointmentByStatus } from '../../../../hooks/appointments/useAppointment';
+import { useUpdateAppointmentStatus } from '../../../../hooks';
+import { InvoiceModal } from './InvoiceModal';
+import { NoticeType } from 'antd/es/message/interface';
+const tabs: TabsProps['items'] = [
+    {
+        key: '2',
+        label: <h6 className="m-0">Chờ khám</h6>,
+    },
+    {
+        key: '5',
+        label: <h6 className="m-0">Đang khám</h6>,
+    },
+    {
+        key: '4',
+        label: <h6 className="m-0">Hoàn thành</h6>,
+    },
+    {
+        key: '3',
+        label: <h6 className="m-0">Đã hủy</h6>,
+    },
+];
 const AppointmentsTable = ({ openNotificationWithIcon, userId }: any) => {
-    const tabs: TabsProps['items'] = [
-        {
-            key: '2',
-            label: <h6 className="m-0">Chờ khám</h6>,
-        },
-        {
-            key: '4',
-            label: <h6 className="m-0">Hoàn thành</h6>,
-        },
-        {
-            key: '3',
-            label: <h6 className="m-0">Đã hủy</h6>,
-        },
-    ];
+    const [api, contextHolder] = message.useMessage();
+    const [isUpdateInvoice, setIsUpdateInvoice] = useState<boolean>(false);
+    const [openInvoiceModal, setOpenInvoiceModal] = useState<boolean>(false);
+    const [appointmentId, setAppointmentId] = useState<number | null>(null);
     const navigate = useNavigate();
     const [searchText, setSearchText] = useState('');
     const [searchedColumn, setSearchedColumn] = useState('');
@@ -71,6 +82,7 @@ const AppointmentsTable = ({ openNotificationWithIcon, userId }: any) => {
     const { data: totalAppointment } = useFetchTotalAppointmentByStatus(
         options.userId
     );
+    const { mutate: updateAppointmentStatus } = useUpdateAppointmentStatus();
     const handleSearch = (
         selectedKeys: string[],
         confirm: FilterDropdownProps['confirm'],
@@ -84,6 +96,17 @@ const AppointmentsTable = ({ openNotificationWithIcon, userId }: any) => {
     const handleReset = (clearFilters: () => void) => {
         clearFilters();
         setSearchText('');
+    };
+    const openMessage = (type: NoticeType, content: string) => {
+        api.open({ type, content });
+    };
+
+    const cancelInvoiceModal = () => {
+        setOpenInvoiceModal(false);
+        if (isUpdateInvoice) {
+            setIsUpdateInvoice(true);
+        }
+        navigate('/admin/appointment');
     };
 
     const getColumnSearchProps = (dataIndex: DataIndex) => ({
@@ -245,8 +268,8 @@ const AppointmentsTable = ({ openNotificationWithIcon, userId }: any) => {
             },
         },
         {
-            title: 'Trạng thái',
-            dataIndex: 'statusName',
+            title: 'Trạng thái hóa đơn',
+            dataIndex: 'invoiceStatus',
             render: (_, record) => (
                 <Tag
                     color={
@@ -259,18 +282,18 @@ const AppointmentsTable = ({ openNotificationWithIcon, userId }: any) => {
                             : 'cyan'
                     }
                 >
-                    {record.statusName.toUpperCase()}
+                    {record.invoiceStatus.toUpperCase()}
                 </Tag>
             ),
 
             filters: [
                 {
-                    text: 'Chờ xác nhận',
-                    value: 'Chờ xác nhận',
+                    text: 'Chưa thanh toán',
+                    value: 'Chưa thanh toán',
                 },
                 {
-                    text: 'Đã xác nhận',
-                    value: 'Đã xác nhận',
+                    text: 'Đã thanh toán',
+                    value: 'Đã thanh toán',
                 },
             ],
             onFilter: (value, record) =>
@@ -282,7 +305,7 @@ const AppointmentsTable = ({ openNotificationWithIcon, userId }: any) => {
             render: (_, record) => (
                 <>
                     <Button
-                        className="me-2 text-success border-0"
+                        className="me-2 text-white border-0 bg-info"
                         onClick={() => {
                             const queryParams = new URLSearchParams();
                             queryParams.append(
@@ -296,15 +319,114 @@ const AppointmentsTable = ({ openNotificationWithIcon, userId }: any) => {
                     >
                         <EyeOutlined /> Chi tiết
                     </Button>
+                    {record.statusId === 5 && (
+                        <Button
+                            className=" border-0 bg-primary text-white"
+                            onClick={() => {
+                                if (
+                                    record.invoiceStatus === 'Chưa thanh toán'
+                                ) {
+                                    setIsUpdateInvoice(true);
+                                }
+                                setOpenInvoiceModal(true);
+                                const params = new URLSearchParams();
+                                params.append(
+                                    'appointment',
+                                    record.id.toString()
+                                );
+                                navigate(`/admin/appointment?${params}`);
+                            }}
+                        >
+                            <PlusOutlined />
+                            Chỉ định khám
+                        </Button>
+                    )}
                 </>
             ),
         },
     ];
 
+    useEffect(() => {
+        const checkAppointments = async () => {
+            console.log('chạy');
+
+            if (!data?.appointments || ![2, 5].includes(options.status)) return;
+            const now = dayjs();
+
+            for (const appointment of data?.appointments) {
+                const appointmentStartTime = dayjs(
+                    `${appointment.appointmentDate.toString().split('T')[0]} ${
+                        appointment.startTime
+                    }`
+                );
+                const appointmentEndTime = dayjs(
+                    `${appointment.appointmentDate.toString().split('T')[0]} ${
+                        appointment.endTime
+                    }`
+                );
+
+                if (
+                    appointment.statusId === 2 &&
+                    (now.isAfter(appointmentStartTime) ||
+                        now.isSame(appointmentStartTime))
+                ) {
+                    updateAppointmentStatus(
+                        {
+                            appointment: { ...appointment, statusId: 5 },
+                            requirementObject: 'doctor',
+                        },
+                        {
+                            onSuccess() {
+                                refetch();
+                            },
+                            onError(err: any) {
+                                console.log(
+                                    'Có lỗi khi cập nhật trạng thái lịch hẹn',
+                                    err
+                                );
+                            },
+                        }
+                    );
+                }
+
+                if (
+                    appointment.statusId === 5 &&
+                    (now.isAfter(appointmentEndTime) ||
+                        now.isSame(appointmentEndTime))
+                ) {
+                    updateAppointmentStatus(
+                        {
+                            appointment: { ...appointment, statusId: 4 },
+                            requirementObject: 'doctor',
+                        },
+                        {
+                            onSuccess() {
+                                refetch();
+                            },
+                            onError(err: any) {
+                                console.log(
+                                    'Có lỗi khi cập nhật trạng thái lịch hẹn',
+                                    err
+                                );
+                            },
+                        }
+                    );
+                }
+            }
+        };
+
+        checkAppointments();
+        const interval = setInterval(checkAppointments, 60000);
+        return () => {
+            console.log('clear interval', interval);
+            clearInterval(interval);
+        };
+    }, [data, options.status, refetch]);
     return (
         <>
+            {contextHolder}
             <Row gutter={24} className="mb-3">
-                <Col span={12}>
+                <Col span={12} className="d-flex">
                     {tabs.map((tab) => {
                         return (
                             <Button
@@ -336,7 +458,9 @@ const AppointmentsTable = ({ openNotificationWithIcon, userId }: any) => {
                                         ? totalAppointment?.confirmedCount
                                         : tab.key === '3'
                                         ? totalAppointment?.cancelledCount
-                                        : totalAppointment?.completedCount}
+                                        : tab.key === '4'
+                                        ? totalAppointment?.completedCount
+                                        : totalAppointment?.inProgress}
                                 </Tag>
                             </Button>
                         );
@@ -384,6 +508,14 @@ const AppointmentsTable = ({ openNotificationWithIcon, userId }: any) => {
                     </>
                 )}
             </Skeleton>
+            {openInvoiceModal && (
+                <InvoiceModal
+                    openInvoiceModal={openInvoiceModal}
+                    openMessage={openMessage}
+                    cancelInvoiceModal={cancelInvoiceModal}
+                    isUpdate={true}
+                />
+            )}
         </>
     );
 };

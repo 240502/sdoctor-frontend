@@ -1,5 +1,4 @@
 import { showError } from './global';
-
 export const validatePatientBirthDay = (element: any): boolean => {
     let isError = false;
     const now = new Date();

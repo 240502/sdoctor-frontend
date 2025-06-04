@@ -103,17 +103,13 @@ const BookingAppointment = () => {
         if (date === dayjs().format('YYYY-MM-DD')) {
             if (scheduleReponse?.data && scheduleReponse.data?.length > 0) {
                 intervalId = setInterval(() => {
-                    console.log('chạy');
-                    let payload: any = [];
                     const { schedules, updatedScheduleIds } =
                         markScheduleIfExpired(scheduleReponse?.data);
                     if (updatedScheduleIds.length > 0) {
-                        console.log('update scheudle', payload);
                         refetch();
                     }
                 }, 60000);
 
-                // gọi 1 lần ngay từ đầu (không cần đợi 1 phút)
                 const { schedules, updatedScheduleIds } = markScheduleIfExpired(
                     scheduleReponse.data
                 );

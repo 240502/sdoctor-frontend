@@ -294,9 +294,12 @@ const ViewAppointment = () => {
             key: 'action',
             render: (text: string, record: AppointmentResponseDto) => {
                 const appointmentTime = dayjs(
-                    `${record.appointmentDate} ${record.startTime}`,
+                    `${record.appointmentDate.toString().split('T')[0]} ${
+                        record.startTime
+                    }`,
                     'YYYY-MM-DD HH:mm'
                 );
+
                 const now = dayjs();
                 const isPastOrCurrent =
                     now.isSame(appointmentTime) || now.isAfter(appointmentTime);

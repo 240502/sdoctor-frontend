@@ -56,6 +56,21 @@ const useFetchInvoiceById = (id: number | null) => {
     });
 };
 
+const useFetchInvoiceByAppointment = (appointmentId: number | null) => {
+    return useQuery({
+        queryKey: ['useFetchInvoiceByAppointment', appointmentId],
+        queryFn: async () => {
+            if (appointmentId === null) {
+                throw new Error('Invoice ID cannot be null');
+            }
+            return await invoicesService.getInvoiceByAppointmentId(
+                appointmentId
+            );
+        },
+        retry: false,
+    });
+};
+
 const useUpdateInvoiceStatus = () => {
     return useMutation({
         mutationKey: ['useUpdateInvoiceStatus'],
@@ -87,7 +102,9 @@ const useDeleteInvoice = () => {
             invoicesService.deleteInvoice(deleteId),
     });
 };
+
 export {
+    useFetchInvoiceByAppointment,
     useDeleteInvoice,
     useCreateInvoice,
     useFetchInvoices,
