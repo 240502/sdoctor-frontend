@@ -2,6 +2,18 @@ import apiClient from '../constants/api';
 import { Appointment } from '../models';
 import { Dayjs } from 'dayjs';
 const appointmentService = {
+    async getAppointmentForDoctor(payload: {
+        doctorId: number;
+        status: number;
+        appointmentDate: string;
+        pageIndex: number;
+        pageSize: number;
+    }): Promise<any> {
+        const res = await apiClient.get(
+            `/appointment/get-appointments-for-doctor?doctorId=${payload.doctorId}&status=${payload.status}&appointmentDate=${payload.appointmentDate}&pageSize=${payload.pageSize}&pageIndex=${payload.pageIndex}`
+        );
+        return res?.data;
+    },
     async getAppointmentsByYearAndMonth(
         fromDate: string,
         toDate: string,
@@ -12,9 +24,12 @@ const appointmentService = {
         );
         return res?.data;
     },
-    async getTotalAppointmentByStatus(doctorId: number): Promise<any> {
+    async getTotalAppointmentByStatus(
+        doctorId: number,
+        appointmentDate: string
+    ): Promise<any> {
         const res = await apiClient.get(
-            `/appointment/get-total-by-status/${doctorId}`
+            `/appointment/get-total-by-status?doctorId=${doctorId}&appointmentDate=${appointmentDate}`
         );
         return res?.data;
     },
@@ -53,17 +68,14 @@ const appointmentService = {
         pageSize: number;
         status: number | null;
         userId: number;
-        fromDate: Dayjs;
-        toDate: Dayjs;
+        appointmentDate: Dayjs;
     }): Promise<any> {
         const res = await apiClient.get(
-            `/appointment/get-appointment-with-options?fromDate=${payload.fromDate.format(
+            `/appointment/get-appointment-with-options?appointmentDate=${payload.appointmentDate.format(
                 'YYYY-MM-DD'
-            )}&toDate=${payload.toDate.format('YYYY-MM-DD')}&userId=${
-                payload.userId
-            }&pageIndex=${payload.pageIndex}&pageSize=${
-                payload.pageSize
-            }&status=${payload.status}`
+            )}&userId=${payload.userId}&pageIndex=${
+                payload.pageIndex
+            }&pageSize=${payload.pageSize}&status=${payload.status}`
         );
         return res?.data;
     },

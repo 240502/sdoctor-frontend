@@ -110,6 +110,7 @@ const InputAppointmentModal = ({
             scheduleId: schedule.id,
             type: 'doctor',
         };
+
         createAppointment(newAppointment, {
             onSuccess: (data) => {
                 const appointment = data.data.result;
@@ -138,7 +139,7 @@ const InputAppointmentModal = ({
                     services: selectedServices?.map(
                         (service: DoctorService) => {
                             return {
-                                serviceId: service.id,
+                                serviceId: service.serviceId,
                                 price: service.customPrice,
                             };
                         }
@@ -176,21 +177,24 @@ const InputAppointmentModal = ({
     useEffect(() => {
         if (doctorService && doctorService.length > 0) {
             const firstService = doctorService[0];
+            console.log('first', firstService);
+
             setSelectedServices([
                 {
                     id: firstService.id,
                     doctorId: 0,
-                    serviceId: null,
+                    serviceId: firstService.serviceId,
                     customPrice: firstService.customPrice,
                     basePrice: 0,
                     serviceName: '',
                     createdAt: null,
                     updatedAt: null,
                     departmentId: null,
+                    doctorServiceId: null,
                 },
             ]);
             form.setFieldsValue({
-                serviceId: firstService.id,
+                serviceId: firstService.serviceId,
                 servicePrice: Number(firstService.customPrice),
             });
         }
@@ -348,7 +352,6 @@ const InputAppointmentModal = ({
                                 className="w-100"
                                 mode="multiple"
                                 onChange={(values: number[]) => {
-                                    console.log('value', values);
                                     let totalPrice: number =
                                         form.getFieldValue('servicePrice');
                                     const selectedServices = values.map(
@@ -356,7 +359,8 @@ const InputAppointmentModal = ({
                                             const selectedService =
                                                 doctorService?.find(
                                                     (service: DoctorService) =>
-                                                        service.id === value
+                                                        service.serviceId ===
+                                                        value
                                                 );
 
                                             if (index === 0) {
@@ -379,7 +383,7 @@ const InputAppointmentModal = ({
                                 options={doctorService?.map(
                                     (service: DoctorService) => ({
                                         label: service.serviceName,
-                                        value: service.id,
+                                        value: service.serviceId,
                                     })
                                 )}
                             ></Select>

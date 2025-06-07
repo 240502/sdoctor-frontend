@@ -14,8 +14,7 @@ export const useFetchAppointmentWithOptions = (payload: {
     pageSize: number;
     status: number | null;
     userId: number;
-    fromDate: Dayjs;
-    toDate: Dayjs;
+    appointmentDate: Dayjs;
 }): UseQueryResult<AppointmentResponse, Error> => {
     return useQuery<AppointmentResponse, Error>({
         queryKey: ['useFetchAppointmentWithOptions', payload],

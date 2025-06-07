@@ -20,4 +20,5 @@ export interface DoctorService {
     createdAt: Date | null;
     updatedAt: Date | null;
     departmentId: number | null;
+    doctorServiceId: number | null;
 }

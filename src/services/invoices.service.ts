@@ -50,5 +50,11 @@ const invoicesService = {
         const res = await apiClient.delete('/invoice/delete-detail/' + id);
         return res;
     },
+    async getInvoiceDetailByAppointment(appointmentId: number): Promise<any> {
+        const res = await apiClient.get(
+            '/invoice/get-invoice-detail-by-appointment/' + appointmentId
+        );
+        return res?.data;
+    },
 };
 export default invoicesService;

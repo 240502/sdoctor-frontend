@@ -26,3 +26,4 @@ export * from './education';
 export * from './clinic_specialty';
 export * from './medical_equipment';
 export * from './working_hours';
+export * from './examination_result';

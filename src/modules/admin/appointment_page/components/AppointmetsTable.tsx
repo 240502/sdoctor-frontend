@@ -29,10 +29,14 @@ dayjs.extend(isoWeek);
 dayjs.locale('vi');
 
 import { useNavigate } from 'react-router-dom';
-import { useFetchTotalAppointmentByStatus } from '../../../../hooks/appointments/useAppointment';
+import {
+    useFetchAppointmentsForDoctor,
+    useFetchTotalAppointmentByStatus,
+} from '../../../../hooks/appointments/useAppointment';
 import { useUpdateAppointmentStatus } from '../../../../hooks';
 import { InvoiceModal } from './InvoiceModal';
 import { NoticeType } from 'antd/es/message/interface';
+import InputResultModal from './InputResultModal';
 const tabs: TabsProps['items'] = [
     {
         key: '2',
@@ -53,6 +57,7 @@ const tabs: TabsProps['items'] = [
 ];
 const AppointmentsTable = ({ openNotificationWithIcon, userId }: any) => {
     const [api, contextHolder] = message.useMessage();
+    const [isOpenResultModal, setIsOpenResultModal] = useState<boolean>(false);
     const [isUpdateInvoice, setIsUpdateInvoice] = useState<boolean>(false);
     const [openInvoiceModal, setOpenInvoiceModal] = useState<boolean>(false);
     const [appointmentId, setAppointmentId] = useState<number | null>(null);
@@ -64,24 +69,27 @@ const AppointmentsTable = ({ openNotificationWithIcon, userId }: any) => {
         pageIndex: number;
         pageSize: number;
         status: number;
-        userId: number;
-        fromDate: Dayjs;
-        toDate: Dayjs;
+        doctorId: number;
+        appointmentDate: Dayjs;
     }>({
-        userId: userId,
+        doctorId: userId,
         pageIndex: 1,
         pageSize: 8,
         status: 2,
-        fromDate: dayjs().startOf('isoWeek'),
-        toDate: dayjs().endOf('isoWeek'),
+        appointmentDate: dayjs(),
     });
 
     const { data, error, isError, isFetching, refetch, isRefetching } =
-        useFetchAppointmentWithOptions(options);
+        useFetchAppointmentsForDoctor({
+            ...options,
+            appointmentDate: options.appointmentDate.format('YYYY-MM-DD'),
+        });
 
-    const { data: totalAppointment } = useFetchTotalAppointmentByStatus(
-        options.userId
-    );
+    const { data: totalAppointment, refetch: refetchTotalAppointment } =
+        useFetchTotalAppointmentByStatus({
+            doctorId: options.doctorId,
+            appointmentDate: options.appointmentDate.format('YYYY-MM-DD'),
+        });
     const { mutate: updateAppointmentStatus } = useUpdateAppointmentStatus();
     const handleSearch = (
         selectedKeys: string[],
@@ -108,7 +116,10 @@ const AppointmentsTable = ({ openNotificationWithIcon, userId }: any) => {
         }
         navigate('/admin/appointment');
     };
-
+    const cancelResultModal = () => {
+        setIsOpenResultModal(false);
+        navigate('/admin/appointment');
+    };
     const getColumnSearchProps = (dataIndex: DataIndex) => ({
         filterDropdown: ({
             setSelectedKeys,
@@ -202,15 +213,16 @@ const AppointmentsTable = ({ openNotificationWithIcon, userId }: any) => {
             setOptions({ ...options, pageIndex: current });
         }
     };
-    const onDateRangeChange = (dates: [Dayjs | null, Dayjs | null] | null) => {
-        if (dates && dates[0] && dates[1]) {
-            setOptions({ ...options, fromDate: dates[0], toDate: dates[1] });
-        } else {
-            // Nếu dates là null hoặc có giá trị null, đặt lại về tuần hiện tại
+    const onDateRangeChange = (date: Dayjs) => {
+        if (date) {
             setOptions({
                 ...options,
-                fromDate: dayjs().startOf('isoWeek'),
-                toDate: dayjs().endOf('isoWeek'),
+                appointmentDate: date,
+            });
+        } else {
+            setOptions({
+                ...options,
+                appointmentDate: dayjs(),
             });
         }
     };
@@ -319,6 +331,23 @@ const AppointmentsTable = ({ openNotificationWithIcon, userId }: any) => {
                     >
                         <EyeOutlined /> Chi tiết
                     </Button>
+                    {record.statusId === 4 && (
+                        <Button
+                            className=" border-0 bg-primary text-white"
+                            onClick={() => {
+                                setIsOpenResultModal(true);
+                                const params = new URLSearchParams();
+                                params.append(
+                                    'appointment',
+                                    record.id.toString()
+                                );
+                                navigate(`/admin/appointment?${params}`);
+                            }}
+                        >
+                            <PlusOutlined />
+                            Kết luận
+                        </Button>
+                    )}
                     {record.statusId === 5 && (
                         <Button
                             className=" border-0 bg-primary text-white"
@@ -348,8 +377,6 @@ const AppointmentsTable = ({ openNotificationWithIcon, userId }: any) => {
 
     useEffect(() => {
         const checkAppointments = async () => {
-            console.log('chạy');
-
             if (!data?.appointments || ![2, 5].includes(options.status)) return;
             const now = dayjs();
 
@@ -378,6 +405,7 @@ const AppointmentsTable = ({ openNotificationWithIcon, userId }: any) => {
                         {
                             onSuccess() {
                                 refetch();
+                                refetchTotalAppointment();
                             },
                             onError(err: any) {
                                 console.log(
@@ -402,6 +430,7 @@ const AppointmentsTable = ({ openNotificationWithIcon, userId }: any) => {
                         {
                             onSuccess() {
                                 refetch();
+                                refetchTotalAppointment();
                             },
                             onError(err: any) {
                                 console.log(
@@ -453,23 +482,23 @@ const AppointmentsTable = ({ openNotificationWithIcon, userId }: any) => {
                                 <Tag className="rounded-5">
                                     {' '}
                                     {tab.key === '1'
-                                        ? totalAppointment?.pendingCount
+                                        ? totalAppointment?.pendingCount ?? 0
                                         : tab.key === '2'
-                                        ? totalAppointment?.confirmedCount
+                                        ? totalAppointment?.confirmedCount ?? 0
                                         : tab.key === '3'
-                                        ? totalAppointment?.cancelledCount
+                                        ? totalAppointment?.cancelledCount ?? 0
                                         : tab.key === '4'
-                                        ? totalAppointment?.completedCount
-                                        : totalAppointment?.inProgress}
+                                        ? totalAppointment?.completedCount ?? 0
+                                        : totalAppointment?.inProgress ?? 0}
                                 </Tag>
                             </Button>
                         );
                     })}
                 </Col>
                 <Col span={12} className="text-end">
-                    <RangePicker
-                        placeholder={['Từ ngày', 'Đến ngày']}
-                        value={[options.fromDate, options.toDate]}
+                    <DatePicker
+                        placeholder={'Chọn ngày'}
+                        value={options.appointmentDate}
                         format={'DD-MM-YYYY'}
                         onChange={onDateRangeChange}
                     />
@@ -514,6 +543,13 @@ const AppointmentsTable = ({ openNotificationWithIcon, userId }: any) => {
                     openMessage={openMessage}
                     cancelInvoiceModal={cancelInvoiceModal}
                     isUpdate={true}
+                />
+            )}
+            {isOpenResultModal && (
+                <InputResultModal
+                    openModal={isOpenResultModal}
+                    openMessage={openMessage}
+                    cancelResultModal={cancelResultModal}
                 />
             )}
         </>

@@ -103,7 +103,16 @@ const useDeleteInvoice = () => {
     });
 };
 
+const useFetchInvoiceDetailByAppointment = (appointmentId: number) => {
+    return useQuery({
+        queryKey: ['useFetchInvoiceDetailByAppointment', appointmentId],
+        queryFn: () =>
+            invoicesService.getInvoiceDetailByAppointment(appointmentId),
+        retry: false,
+    });
+};
 export {
+    useFetchInvoiceDetailByAppointment,
     useFetchInvoiceByAppointment,
     useDeleteInvoice,
     useCreateInvoice,

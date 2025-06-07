@@ -11,6 +11,9 @@ const BookingSuccess = () => {
     const { data, isError, error, isFetching } = useFetchAppointmentById(
         Number(searchParams.get('appointment'))
     );
+    useEffect(() => {
+        console.log('data', data);
+    }, [data]);
     const { mutate: createPayment } = useCreateVnpay();
     useEffect(() => {
         if (
@@ -120,7 +123,7 @@ const BookingSuccess = () => {
                                 ? ' Chi phí:'
                                 : 'Chi phí: '}{' '}
                             <Text strong>
-                                {data?.amount.toLocaleString(undefined)} VNĐ
+                                {data?.amount?.toLocaleString(undefined)} VNĐ
                             </Text>
                         </Text>
                         <Text

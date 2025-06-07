@@ -11,5 +11,14 @@ const serviceService = {
         );
         return res?.data;
     },
+    async getServiceByDepartmentAndDoctor(
+        department: number,
+        doctorId: number
+    ): Promise<any> {
+        const res = await apiClient.get(
+            `/service/get-by-department-doctor?department=${department}&doctorId=${doctorId}`
+        );
+        return res?.data;
+    },
 };
 export default serviceService;

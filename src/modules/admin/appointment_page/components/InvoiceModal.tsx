@@ -28,6 +28,10 @@ import { DoctorService } from '../../../../models/doctor_service';
 import { useFetchDoctorServicesByDoctorId } from '../../../../hooks/doctor_service';
 import { DeleteOutlined } from '@ant-design/icons';
 import { NoticeType } from 'antd/es/message/interface';
+import {
+    useFetchServiceByDepartment,
+    useFetchServiceByDepartmentAndDoctor,
+} from '../../../../hooks/service/useService';
 
 interface InvoiceModalProps {
     openInvoiceModal: boolean;
@@ -56,9 +60,17 @@ export const InvoiceModal = ({
                 ? Number(searchParams.get('appointment'))
                 : null
         );
+
     const { data: doctorServiceResponse } = useFetchDoctorServicesByDoctorId(
         data?.doctorId || null
     );
+    const { data: services } = useFetchServiceByDepartmentAndDoctor({
+        department: data?.department,
+        doctorId: data?.doctorId,
+    });
+    useEffect(() => {
+        console.log('services', services);
+    }, [services]);
     const handleChangeService = (values: number[]) => {
         setSelectedServiceIds(values);
     };
@@ -369,12 +381,14 @@ export const InvoiceModal = ({
 
                                 handleChangeService(values);
                             }}
-                            options={doctorServiceResponse?.map(
+                            options={services?.map(
                                 (service: DoctorService) => ({
                                     value: service.id,
-                                    label: `${
-                                        service.serviceName
-                                    } - ${service.customPrice?.toLocaleString()} VNĐ`,
+                                    label: `${service.serviceName} - ${
+                                        service?.customPrice
+                                            ? service?.customPrice?.toLocaleString()
+                                            : service?.basePrice?.toLocaleString()
+                                    } VNĐ`,
                                 })
                             )}
                         />

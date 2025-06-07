@@ -72,15 +72,13 @@ const AppointmentTable = ({ openMessage, userId }: AppointmentTable) => {
         pageSize: number;
         status: number;
         userId: number;
-        fromDate: Dayjs;
-        toDate: Dayjs;
+        appointmentDate: Dayjs;
     }>({
         userId: userId,
         pageIndex: 1,
         pageSize: 8,
         status: 1,
-        fromDate: dayjs().startOf('isoWeek'),
-        toDate: dayjs().endOf('isoWeek'),
+        appointmentDate: dayjs(),
     });
     const [type, setType] = useState<string>('');
     const [message, setMessage] = useState<string>('');
@@ -94,7 +92,10 @@ const AppointmentTable = ({ openMessage, userId }: AppointmentTable) => {
     const {
         data: totalAppointment,
         refetch: refetchingTotalAppointmentByStatus,
-    } = useFetchTotalAppointmentByStatus(options.userId);
+    } = useFetchTotalAppointmentByStatus({
+        doctorId: options.userId,
+        appointmentDate: options.appointmentDate.format('YYYY-MM-DD'),
+    });
     const updateAppointmentStatus = useUpdateAppointmentStatus();
     const sendRejectionMail = useSendRejectionSuccessMail();
     const sendConfirmSuccessMail = useSendConfirmSuccessMail();
@@ -406,15 +407,13 @@ const AppointmentTable = ({ openMessage, userId }: AppointmentTable) => {
             setOptions({ ...options, pageIndex: current });
         }
     };
-    const onDateRangeChange = (dates: [Dayjs | null, Dayjs | null] | null) => {
-        if (dates && dates[0] && dates[1]) {
-            setOptions({ ...options, fromDate: dates[0], toDate: dates[1] });
+    const onDateRangeChange = (date: Dayjs) => {
+        if (date) {
+            setOptions({ ...options, appointmentDate: date });
         } else {
-            // Nếu dates là null hoặc có giá trị null, đặt lại về tuần hiện tại
             setOptions({
                 ...options,
-                fromDate: dayjs().startOf('isoWeek'),
-                toDate: dayjs().endOf('isoWeek'),
+                appointmentDate: dayjs(),
             });
         }
     };
@@ -461,9 +460,9 @@ const AppointmentTable = ({ openMessage, userId }: AppointmentTable) => {
                     })}
                 </Col>
                 <Col span={12} className="text-end">
-                    <RangePicker
-                        placeholder={['Từ ngày', 'Đến ngày']}
-                        value={[options.fromDate, options.toDate]}
+                    <DatePicker
+                        placeholder={'Chọn ngày'}
+                        value={options.appointmentDate}
                         format={'DD-MM-YYYY'}
                         onChange={onDateRangeChange}
                     />

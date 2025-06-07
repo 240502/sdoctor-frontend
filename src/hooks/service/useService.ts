@@ -9,4 +9,17 @@ const useFetchServiceByDepartment = (departmentId: number | null) => {
     });
 };
 
-export { useFetchServiceByDepartment };
+const useFetchServiceByDepartmentAndDoctor = (payload: {
+    department: number;
+    doctorId: number;
+}) => {
+    return useQuery({
+        queryKey: ['useFetchServiceByDepartmentAndDoctor', payload],
+        queryFn: () =>
+            serviceService.getServiceByDepartmentAndDoctor(
+                payload.department,
+                payload.doctorId
+            ),
+    });
+};
+export { useFetchServiceByDepartment, useFetchServiceByDepartmentAndDoctor };

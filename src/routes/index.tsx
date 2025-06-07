@@ -66,11 +66,13 @@ import {
     APPOINTMENT_DETAIL_PATH,
     SUPPORT_STAFF_PATH,
     REQUEST_MANAGEMENT_PATH,
+    PATIENT_MANAGEMENT,
 } from './path';
 import AppointmentDetailPage from '../modules/admin/appointment_detail_page';
 import { StaffManagement } from '../modules/admin/staff_management_page';
 import { RequestsManagement } from '../modules/admin/requests_management_page';
 import { ProfileDoctorPage } from '../modules/admin/profile_doctor_page';
+import { PatientPage } from '../modules/admin/patient_page';
 export const publicRoutes = [
     {
         path: BOOKING_SUCCESS_PATH,
@@ -165,6 +167,11 @@ export const publicRoutes = [
 ];
 
 export const privateRoutes = [
+    {
+        path: PATIENT_MANAGEMENT,
+        component: PatientPage,
+        layout: AdminLayout,
+    },
     {
         path: DOCTOR_PROFILE_PATH,
         component: ProfileDoctorPage,

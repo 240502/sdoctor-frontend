@@ -34,8 +34,9 @@ const ADD_DOCTOR_PATH = '/admin/add-doctor';
 const SUPPORT_STAFF_PATH = '/admin/support-staff';
 const REQUEST_MANAGEMENT_PATH = '/admin/requests';
 const DOCTOR_PROFILE_PATH = '/admin/doctor-profile/:id';
-
+const PATIENT_MANAGEMENT = `/admin/patients`;
 export {
+    PATIENT_MANAGEMENT,
     DOCTOR_PROFILE_PATH,
     REQUEST_MANAGEMENT_PATH,
     SUPPORT_STAFF_PATH,

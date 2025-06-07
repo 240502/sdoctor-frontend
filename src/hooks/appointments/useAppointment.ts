@@ -1,10 +1,17 @@
 import { useQuery } from '@tanstack/react-query';
 import { appointmentService } from '../../services';
 
-const useFetchTotalAppointmentByStatus = (doctorId: number) => {
+const useFetchTotalAppointmentByStatus = (payload: {
+    doctorId: number;
+    appointmentDate: string;
+}) => {
     return useQuery({
-        queryKey: ['useFetchTotalAppointmentByStatus', doctorId],
-        queryFn: () => appointmentService.getTotalAppointmentByStatus(doctorId),
+        queryKey: ['useFetchTotalAppointmentByStatus', payload],
+        queryFn: () =>
+            appointmentService.getTotalAppointmentByStatus(
+                payload.doctorId,
+                payload.appointmentDate
+            ),
         retry: false,
     });
 };
@@ -25,4 +32,27 @@ const useFetchAppointmentsByMonthAndYear = (payload: {
         retry: false,
     });
 };
-export { useFetchTotalAppointmentByStatus, useFetchAppointmentsByMonthAndYear };
+
+const useFetchAppointmentsForDoctor = (payload: {
+    doctorId: number;
+    status: number;
+    appointmentDate: string;
+    pageIndex: number;
+    pageSize: number;
+}) => {
+    return useQuery({
+        queryKey: ['useFetchAppointmentsForDoctor', payload],
+        queryFn: () => appointmentService.getAppointmentForDoctor(payload),
+        select: (data) => ({
+            appointments: data?.data,
+            pageCount: data?.pageCount,
+            pageSize: data?.pageSize,
+            pageIndex: data?.pageIndex,
+        }),
+    });
+};
+export {
+    useFetchTotalAppointmentByStatus,
+    useFetchAppointmentsByMonthAndYear,
+    useFetchAppointmentsForDoctor,
+};
