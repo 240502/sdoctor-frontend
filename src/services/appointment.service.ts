@@ -2,6 +2,13 @@ import apiClient from '../constants/api';
 import { Appointment } from '../models';
 import { Dayjs } from 'dayjs';
 const appointmentService = {
+    async updateIsConclusion(appointmentId: number): Promise<any> {
+        const res = await apiClient.put(
+            '/appointment/update-is-conclusion/' + appointmentId
+        );
+        return res;
+    },
+
     async getAppointmentForDoctor(payload: {
         doctorId: number;
         status: number;

@@ -90,7 +90,7 @@ export const RecentInvoicesTable = ({ user }: { user: User }) => {
             className="shadow"
             title={
                 <Flex className="justify-content-between align-items-center">
-                    <h6>Hóa đơn gần đây</h6>{' '}
+                    <h6>Hóa đơn hôm nay</h6>{' '}
                     <Button
                         className="border-top-0 border-start-0 border-end-0 text-primary fw-bold"
                         onClick={() => {

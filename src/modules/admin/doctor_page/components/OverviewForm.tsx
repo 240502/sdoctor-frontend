@@ -41,6 +41,7 @@ import {
     useFetchProvinces,
     useFetchWardsByDistrict,
     useFetchDoctorDetail,
+    useFetchRoomsByClinicIdAndDepartmentId,
 } from '../../../../hooks';
 import { Degrees } from '../../../../models/degrees';
 import { useSearchParams } from 'react-router-dom';
@@ -64,7 +65,6 @@ export const OverviewForm = ({
             ? Number(searchParams.get('doctorId'))
             : null
     );
-
     const [form] = Form.useForm();
     const createDoctor = useCreateDoctor();
     const { mutate: updateDoctor } = useUpdateDoctor();
@@ -72,6 +72,10 @@ export const OverviewForm = ({
     const { data: clinicsResponse } = useFetchClinicsWithPagination({});
     const { data: departments } = useFetchAllDepartments();
     const { data: titles } = useFetchAllDegrees();
+    const { data: rooms } = useFetchRoomsByClinicIdAndDepartmentId({
+        clinicId: doctor?.clinicId,
+        departmentId: doctor?.department,
+    });
 
     const handleChangeDoctorEditor = (data: any) => {
         setDoctor({ ...doctor, introduction: data });
@@ -167,6 +171,7 @@ export const OverviewForm = ({
                 commune: doctor.commune,
                 birthday: doctor.birthday.split('T')[0],
                 department: doctor.department,
+                roomId: doctor.roomId,
             };
 
             updateDoctor(newDoctor, {
@@ -202,6 +207,7 @@ export const OverviewForm = ({
                 birthday: doctor.birthday,
                 department: doctor.department,
                 servicePrice: doctor.servicePrice,
+                roomId: doctor.roomId,
             };
             createDoctor.mutate(newDoctor, {
                 onSuccess(data) {
@@ -313,12 +319,12 @@ export const OverviewForm = ({
                                     allowClear
                                     showSearch
                                     optionFilterProp="children"
-                                    onChange={(value: number) =>
+                                    onChange={(value: number) => {
                                         setDoctor({
                                             ...doctor,
                                             department: value,
-                                        })
-                                    }
+                                        });
+                                    }}
                                 >
                                     {departments?.departments?.map(
                                         (department: Department) => (
@@ -650,6 +656,32 @@ export const OverviewForm = ({
                                     )}
                                 </Form.Item>
                             </ConfigProvider>
+                        </Col>
+                        <Col span={12}>
+                            <Form.Item label="Phòng khám" name="roomId">
+                                <Select
+                                    placeholder=""
+                                    onChange={(e: any) =>
+                                        setDoctor({
+                                            ...doctor,
+                                            roomId: e,
+                                        })
+                                    }
+                                >
+                                    {rooms &&
+                                        rooms.map((room: any) => {
+                                            return (
+                                                <Select.Option
+                                                    key={room.id}
+                                                    value={room.id}
+                                                    label={room.name}
+                                                >
+                                                    {room.name}
+                                                </Select.Option>
+                                            );
+                                        })}
+                                </Select>
+                            </Form.Item>
                         </Col>
                     </Row>
 

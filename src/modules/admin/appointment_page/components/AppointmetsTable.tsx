@@ -331,7 +331,7 @@ const AppointmentsTable = ({ openNotificationWithIcon, userId }: any) => {
                     >
                         <EyeOutlined /> Chi tiết
                     </Button>
-                    {record.statusId === 4 && (
+                    {record.statusId === 4 && record.isConclusion === 0 && (
                         <Button
                             className=" border-0 bg-primary text-white"
                             onClick={() => {

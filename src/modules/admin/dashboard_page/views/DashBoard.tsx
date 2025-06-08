@@ -50,7 +50,6 @@ const DashBoard = () => {
         endOfWeek.setDate(endOfWeek.getDate() + diff);
         return endOfWeek;
     };
-    // Lấy dữ liệu từ hooks
     const { data: revenueRecords } = useFetchRevenueByWeek({
         startWeek: getStartOfWeek(new Date()).toISOString().slice(0, 10),
         endWeek: getEndOfWeek(new Date()).toISOString().slice(0, 10),
@@ -62,13 +61,9 @@ const DashBoard = () => {
         endWeek: getEndOfWeek(new Date()).toISOString().slice(0, 10),
         doctorId: user.userId,
     });
+
     useEffect(() => {
-        console.log('chart', chartSeries);
-    }, [chartSeries]);
-    useEffect(() => {
-        // Kiểm tra dữ liệu đầu vào
         const series = [];
-        // Khởi tạo Map để lưu trữ dữ liệu theo ngày
         const revenueByDay = new Map<string, number>();
         let isEmpty = false;
         if (!Array.isArray(revenueRecords)) {
@@ -81,21 +76,18 @@ const DashBoard = () => {
             });
             isEmpty = true;
         } else {
-            // Xử lý dữ liệu doanh thu
             revenueRecords.forEach((record: any) => {
                 if (!record?.appointmentDate || record.totalPrice == null)
                     return;
                 const appointmentDate = new Date(record.appointmentDate);
-                if (isNaN(appointmentDate.getTime())) return; // Bỏ qua ngày không hợp lệ
+                if (isNaN(appointmentDate.getTime())) return;
                 const dayIndex = appointmentDate.getDay();
-                // Ánh xạ: T2 (1) -> T2, T3 (2) -> T3, ..., CN (0) -> CN
                 const dayLabel =
                     weekdayLabels[dayIndex === 0 ? 6 : dayIndex - 1];
                 if (dayLabel) {
                     revenueByDay.set(dayLabel, Number(record.totalPrice));
                 }
             });
-            // Tạo dữ liệu cho series
             const revenueSeriesData = weekdayLabels.map(
                 (label) => revenueByDay.get(label) || 0
             );

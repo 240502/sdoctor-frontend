@@ -240,6 +240,15 @@ const InputAppointmentModal = ({
                             {dayjs(date).format('DD-MM-YYYY')}
                         </p>
                     </div>
+                    {doctor?.roomName && (
+                        <div className="location ">
+                            <p>
+                                {' '}
+                                <strong>Phòng khám: </strong> {doctor?.roomName}
+                            </p>
+                        </div>
+                    )}
+
                     <div className="location ">
                         <p>
                             {' '}

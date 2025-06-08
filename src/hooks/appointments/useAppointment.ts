@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { appointmentService } from '../../services';
 
 const useFetchTotalAppointmentByStatus = (payload: {
@@ -51,8 +51,17 @@ const useFetchAppointmentsForDoctor = (payload: {
         }),
     });
 };
+
+const useUpdateIsConclusion = () => {
+    return useMutation({
+        mutationKey: ['useUpdateIsConclusion'],
+        mutationFn: (appointmentId: number) =>
+            appointmentService.updateIsConclusion(appointmentId),
+    });
+};
 export {
     useFetchTotalAppointmentByStatus,
     useFetchAppointmentsByMonthAndYear,
     useFetchAppointmentsForDoctor,
+    useUpdateIsConclusion,
 };

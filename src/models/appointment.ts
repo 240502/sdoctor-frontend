@@ -75,4 +75,6 @@ export interface AppointmentResponseDto {
     prices?: string;
     doctorImage: string;
     patientAddress: string;
+    isConclusion: number;
+    roomName: string;
 }

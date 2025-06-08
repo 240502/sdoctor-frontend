@@ -14,11 +14,7 @@ import {
 } from 'antd';
 import { SaveOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
-import {
-    useFetchInvoiceById,
-    useFetchInvoiceDetailByAppointment,
-} from '../../../../hooks/invoice/useInvoice';
-import { useFetchRecentAppointments } from '../../../../hooks/appointments/useFetchRecentAppointment';
+import { useFetchInvoiceDetailByAppointment } from '../../../../hooks/invoice/useInvoice';
 import {
     useCreateExaminationResult,
     useFetchAppointmentById,
@@ -26,16 +22,10 @@ import {
 import { useSearchParams } from 'react-router-dom';
 import { NoticeType } from 'antd/es/message/interface';
 import { ExaminationResulsCreateDTO } from '../../../../models/examination_results';
+import { useUpdateIsConclusion } from '../../../../hooks/appointments/useAppointment';
 
 const { Title, Text } = Typography;
 const { TextArea } = Input;
-const { Option } = Select;
-
-interface Service {
-    invoice_detail_id: number;
-    service_id: number;
-    service_name: string;
-}
 
 interface ExaminationResultFormValues {
     results: {
@@ -72,7 +62,7 @@ const ExaminationResultForm = ({
         );
     const { data: appointmentData, isLoading: loadingAppointment } =
         useFetchAppointmentById(Number(searchParams.get('appointment')));
-
+    const { mutate: updateIsConclusion } = useUpdateIsConclusion();
     useEffect(() => {
         if (invoiceDetails && invoiceDetails.length > 0) {
             form.setFieldsValue({
@@ -120,13 +110,13 @@ const ExaminationResultForm = ({
                     isGeneralConclusion: 1,
                 },
             ];
-            console.log('payload', payload);
 
             createResult(payload, {
                 onSuccess() {
                     openMessage('success', 'Thêm thành công!');
                     cancelResultModal();
                     form.resetFields();
+                    updateIsConclusion(Number(searchParams.get('appointment')));
                 },
                 onError() {
                     openMessage('success', 'Thêm không thành công!');

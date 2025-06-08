@@ -51,6 +51,8 @@ export interface Doctor {
     doctorExpertises: DoctorExpertises[];
     workExperiences: WorkExperience[];
     eduction: Education[];
+    roomId: number;
+    roomName: string;
 }
 
 export interface DoctorCreateDto {
@@ -69,6 +71,7 @@ export interface DoctorCreateDto {
     introduction: string;
     department: number;
     servicePrice: number;
+    roomId: number;
 }
 
 export interface DoctorUpdateDto {
@@ -87,4 +90,5 @@ export interface DoctorUpdateDto {
     birthday: string;
     summary: string;
     introduction: string;
+    roomId: number;
 }

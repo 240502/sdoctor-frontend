@@ -11,9 +11,7 @@ const BookingSuccess = () => {
     const { data, isError, error, isFetching } = useFetchAppointmentById(
         Number(searchParams.get('appointment'))
     );
-    useEffect(() => {
-        console.log('data', data);
-    }, [data]);
+    useEffect(() => {}, [data]);
     const { mutate: createPayment } = useCreateVnpay();
     useEffect(() => {
         if (
@@ -155,8 +153,16 @@ const BookingSuccess = () => {
                                 <Text strong>Thời gian khám: </Text>
                                 <Text>
                                     {data?.startTime + '-' + data?.endTime} -
-                                    8/5/2025
+                                    {dayjs(
+                                        data?.appointmentDate
+                                            .toString()
+                                            .split('T')[0]
+                                    ).format('DD/MM/YYYY')}
                                 </Text>
+                            </div>
+                            <div>
+                                <Text strong>Phòng khám: </Text>
+                                <Text>{data?.roomName}</Text>
                             </div>
                             <div>
                                 <Text strong>Phí khám: </Text>
